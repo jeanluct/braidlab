@@ -6,7 +6,7 @@
 
 #define STARTTOL 0.000000001
 #define SQRT sqrt
-#define ABS fabs
+#define FABS fabs
 typedef long double decimal;
 extern decimal TOL; //Tolerance
 

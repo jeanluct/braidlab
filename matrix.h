@@ -108,7 +108,7 @@ void matrix::GrowthCalc()
 		for (i=0; i<n; i++)
 		{
 		  decimal Test = Evec[i]/Eval;
-		  if (ABS(Test-Temp[i])>TOL/10.0) Finished = false;
+		  if (FABS(Test-Temp[i])>TOL/10.0) Finished = false;
 		  Temp[i] = Test;
 		}
 	}
