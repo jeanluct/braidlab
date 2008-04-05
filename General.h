@@ -52,7 +52,7 @@ class Error {
 public:
 	char Message[100];
 	int Type; //0 = IO error, 1 = Algorithm error, 2 = Special error(decrease tol), 3 = other 4 = terminal
-	Error(char* Erm, int T);
+	Error(const char* Erm, int T);
 	void Report();
 	int GetType() {return Type;}
 };

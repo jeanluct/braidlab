@@ -33,10 +33,10 @@ OBJS = $(OBJSOURCES:.cpp=.o)
 lib libtrains: libtrains.a
 
 libtrains.a: $(OBJS)
-	ar -r libtrains.a $(OBJS)
+	ar cr libtrains.a $(OBJS)
 	ranlib libtrains.a
 
-frontend: libtrains.a frontend.o
+frontend: libtrains.a frontend.cpp
 
 # Clean up directory.  Remove object files and dependencies file.
 clean:

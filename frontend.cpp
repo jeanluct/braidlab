@@ -19,10 +19,10 @@ namespace trains {
 
 using namespace std;
 
-static char* ThurstonType[] = {"Pseudo-Anosov", "Finite Order", "Reducible", "Reducible",
+static const char* ThurstonType[] = {"Pseudo-Anosov", "Finite Order", "Reducible", "Reducible",
   "Pseudo-Anosov or Reducible", "Unknown"};
 
-static char* Commands[] = {"load", "save", "print", "train", "exit", "relabel", "input",
+static const char* Commands[] = {"load", "save", "print", "train", "exit", "relabel", "input",
 	"braid", "quit", "q", "dir", "ls", "step", "growth", "printto", "horseshoe", "hs",
 	"tol", "precision", "reduction", "check", "help", "tolerance", "prec", "gates", "run", 
     "charpoly", "cp", "loops", "trains", "loop", "addloop", "add", "factor", "shortprint", 

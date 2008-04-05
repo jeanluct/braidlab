@@ -401,7 +401,7 @@ void vertexiterator::Reset()
 
 //Edge Class
 
-static char* EdgeType[] = {"Main", "Peripheral", "Pre-peripheral"};
+static const char* EdgeType[] = {"Main", "Peripheral", "Pre-peripheral"};
 
 void edge::Set(long label, edgetype type, uint start, uint end, intarray& image, uint puncture)
 {

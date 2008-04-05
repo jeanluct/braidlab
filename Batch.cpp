@@ -19,7 +19,7 @@ namespace trains {
 
 using namespace std;
 
-static char* TType[] = {"Pseudo-Anosov", "Finite Order", "Reducible", "Reducible",
+static const char* TType[] = {"Pseudo-Anosov", "Finite Order", "Reducible", "Reducible",
 "Pseudo-Anosov or Reducible", "Unknown"};
 
 static string Comms[] = {"to", "str", "out", "br", "save", "hs", "print", "ifpa", "ifred", "iffo", "ifreset", "shortsing", "longsing", "randomhs", "randombr", "prec", "factor", "nofactor", "boundaryperipheral", "boundarynonperipheral","bp", "bnp", "ss", "ls", "beep", "raw", "latex", "maple"};

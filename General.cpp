@@ -22,7 +22,7 @@ extern bool GrowthCheck = true;
 
 
 
-Error::Error(char* Erm, int T)
+Error::Error(const char* Erm, int T)
 {
 	Type = T;
 	strcpy(Message, Erm);

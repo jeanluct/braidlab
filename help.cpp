@@ -11,7 +11,7 @@ namespace trains {
 
 using namespace std;
 
-static char* Topics[] = {"overview", "implementation", "load", "save", "print",
+static const char* Topics[] = {"overview", "implementation", "load", "save", "print",
 	"train", "quit", "relabel", "input",
 	"braid", "ls", "step", "growth", "printto", "horseshoe",
 	"tolerance", "precision", "reduction", "check", "help",
