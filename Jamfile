@@ -1,0 +1,3 @@
+# frontend.cpp is part of the library.
+lib trains : [ glob *.cpp ] : <link>static ;
+exe frontend : trains : <optimization>speed ;
