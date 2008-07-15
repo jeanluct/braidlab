@@ -10,8 +10,8 @@ namespace trains {
 
 enum edgetype {Main, Peripheral, Preperipheral};
 
-
-
+class matrix;
+class graph;
 
 
 class edge {
