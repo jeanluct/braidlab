@@ -38,6 +38,8 @@ libtrains.a: $(OBJS)
 
 frontend: libtrains.a frontend.cpp
 
+train: libtrains.a train.cpp
+
 # Clean up directory.  Remove object files and dependencies file.
 clean:
 	rm -f $(OBJS) $(DEPFILE)
