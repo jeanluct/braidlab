@@ -17,7 +17,7 @@ using namespace std;
 
 namespace trains {
 
-decimal TOL = STARTTOL;
+decimal TOL = 0.0000000001;//STARTTOL;
 bool GrowthCheck = true;
 
 static const char* ThurstonType[] = {"Pseudo-Anosov",
