@@ -1,64 +1,68 @@
-#   Copyright (C) 2000-2001 Jae Choon Cha.
-#
-#   This file is part of CBraid.
-#
-#   CBraid is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   any later version.
-#
-#   CBraid is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with CBraid; if not, write to the Free Software
-#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# File names and directories
+SOURCES       = test.cpp speedtest.cpp braiding_main.cpp
+PROGRAMS      = $(SOURCES:.cpp=)
+OBJS	      = $(SOURCES:.cpp=.o)
+CBRAID_LIBDIR = ../lib
+CBRAID_INCDIR = ../include
+CBRAID_LIB    = $(CBRAID_LIBDIR)/libcbraid.a
+DEPFILE       = .depends
 
-#   JLT: Folded Juan Gonzalez-Meneses' "braiding" program (which
-#   depends on CBraid) into this Makefile.
-
-# File names
-LIBCBRAID=../lib/libcbraid.a
+# Commands
+CPP          = g++
+MAKEDEPCMD   = $(CPP)
 
 # Compile options.
-#CPPFLAGS_CLN=-DUSE_CLN
-#LIBFLAGS_CLN=-lcln
-
-CPPFLAGS=-Wall -O -I../include -L../lib $(CPPFLAGS_CLN)
-LIBFLAGS=-lcbraid $(LIBFLAGS_CLN)
+#CPPFLAGS_CLN = -DUSE_CLN
+ifeq ($(CPPFLAGS_CLN),-DUSE_CLN)
+	LIBFLAGS_CLN = -lcln
+endif
+CPPFLAGS = -Wall -O -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
+LIBFLAGS = -lcbraid $(LIBFLAGS_CLN)
+MAKEDEPFLAGS = -M
 
 # Default arguments for test programs.
-TEST_ARG=
+TEST_ARG =
 
 # Default compile rules
-.cpp.o:
-	$(CXX) $(CPPFLAGS) -c $<
+# Rule to make an object file from a source file.
+%.o: %.cpp
+	$(CPP) -c $(CPPFLAGS) -I$(CBRAID_INCDIR) $<
+
+# Rule to make an executable from an object file.
+.o:
+	$(CPP) $(CPPFLAGS) $(OBJ) $@.o -o $(subst _main,,$@) $(LIBFLAGS)
 
 # Default target.
-all: test speedtest braiding
+all: $(PROGRAMS)
+
+braiding: braiding_main
+
+$(PROGRAMS): $(DEPFILE) $(CBRAID_LIB)
 
 # Build library
-$(LIBCBRAID):
-	cd ../lib; make libcbraid.a
+$(CBRAID_LIB):
+	cd $(CBRAID_LIBDIR); make libcbraid.a
 
 # Sample programs.
 do-test: test
 	./test $(TEST_ARG)
 
-test: test.cpp optarg.h $(LIBCBRAID)
-	$(CXX) $(CPPFLAGS) -o test test.cpp $(LIBFLAGS)
-
 do-speedtest: speedtest
 	./speedtest $(SPEEDTEST_ARG)
 
-speedtest: speedtest.cpp optarg.h timecounter.h $(LIBCBRAID)
-	$(CXX) $(CPPFLAGS) -o speedtest speedtest.cpp $(LIBFLAGS)
-
-braiding: braiding_main.cpp $(LIBCBRAID)
-	$(CXX) $(CPPFLAGS) -o braiding braiding_main.cpp $(LIBFLAGS)
-
 # Cleanup.
 clean:
-	rm -rf $(LIBCBRAID_CLEAN) test speedtest braiding *.o
+	rm -rf $(subst _main,,$(PROGRAMS)) $(OBJS) $(DEPFILE)
+
+# Make dependencies.
+depend:
+	rm -f $(DEPFILE)
+	make $(DEPFILE)
+
+# Make dependencies file.
+$(DEPFILE):
+	$(MAKEDEPCMD) $(MAKEDEPFLAGS) $(SOURCES) \
+		-I$(CBRAID_INCDIR) > $(DEPFILE)
+
+# Read in dependencies file created by 'make depend'.
+sinclude $(DEPFILE)

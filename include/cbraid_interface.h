@@ -257,7 +257,7 @@ public:
     // Inversion operators.  We also have variants:
 
     // a.Inverse()        return the inverse of a.
-    // a.AssignInverse()  invert a. 
+    // a.AssignInverse()  invert a.
     // !a                 the operator form of a.Inverse().
     Factor Inverse() const;
     Factor& AssignInverse();
@@ -322,7 +322,7 @@ std::ostream& operator<<(std::ostream& os, const Braid<P>& b);
 
 // Real declaration.
 template<class P> class Braid {
-        
+
 public:
     // Type for canonical factors.
     /* JLT: the old code was typedef Factor<P> Factor, which is no
@@ -469,4 +469,3 @@ void BallotSequence(CBraid::sint16 n, const cln::cl_I k,
                     CBraid::sint8* s);
 
 #endif // USE_CLN
-

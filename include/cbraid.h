@@ -56,5 +56,3 @@ namespace CBraid {
 }
 
 #endif // _cbraid_h_
-
-

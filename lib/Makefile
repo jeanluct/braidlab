@@ -32,7 +32,9 @@ LIBCBRAID_CLEAN = $(LIBCBRAID_OBJ) $(LIBCBRAID_A)
 
 # Compile options.
 #CPPFLAGS_CLN = -DUSE_CLN
-#LIBFLAGS_CLN = -lcln
+ifeq ($(CPPFLAGS_CLN),-DUSE_CLN)
+	LIBFLAGS_CLN = -lcln
+endif
 # The -fPIC option is for Matlab MEX-files.  Doesn't hurt for other uses.
 CPPFLAGS = -Wall -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)

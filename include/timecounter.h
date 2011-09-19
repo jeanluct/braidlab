@@ -51,6 +51,3 @@ public:
 
 
 #endif // _TIMECOUNTER_H_
-
-
-

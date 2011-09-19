@@ -304,5 +304,3 @@ InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
 
 
 #endif // _OPTARG_H
-
-
