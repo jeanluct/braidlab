@@ -1,0 +1,82 @@
+Changelog for CBraid and Braiding (lightly edited svn log):
+
+------------------------------------------------------------------------
+r432 | jeanluc | 2011-09-17 15:54:24 -0500 (Sat, 17 Sep 2011) | 4 lines
+
+ * Move all executables (including braiding_main.cpp) to programs folder.
+ * Removed sample and braiding folders.
+ * Makefile also builds braiding program.
+
+------------------------------------------------------------------------
+r431 | jeanluc | 2011-09-17 13:44:30 -0500 (Sat, 17 Sep 2011) | 1 line
+
+Removed unused vars and trailing spaces from braiding.
+
+------------------------------------------------------------------------
+r428 | jeanluc | 2011-09-16 09:36:19 -0500 (Fri, 16 Sep 2011) | 4 lines
+
+ * Merged braiding into libcbraid.  Updated Makefile.
+ * The cbraid and braiding .h files are now in an include folder.
+ * Moved braidlcf to the braidlcs Multi_Use_Code, added Makefile that
+   should be able to build MEX files on different systems.
+
+------------------------------------------------------------------------
+r424 | jeanluc | 2011-09-14 17:46:01 -0500 (Wed, 14 Sep 2011) | 1 line
+
+Better comment for update; use flags needed for Matlab MEX-file compilation.
+
+------------------------------------------------------------------------
+r421 | jeanluc | 2011-09-14 09:53:49 -0500 (Wed, 14 Sep 2011) | 3 lines
+
+ * convert is a test program to convert a JLT braid to CBraid.
+
+------------------------------------------------------------------------
+r418 | jeanluc | 2011-09-13 20:48:00 -0500 (Tue, 13 Sep 2011) | 3 lines
+
+ * Braiding: Wrap in Braiding namespace.
+ * Braiding: Reformat.
+
+------------------------------------------------------------------------
+r417 | jeanluc | 2011-09-13 18:40:52 -0500 (Tue, 13 Sep 2011) | 6 lines
+
+ * Include std global namespaces in braiding, since I don't include
+   them in CBraid anymore.
+ * For CBraid, do not include the namespace CBraid in cbraid.cpp, but
+   rather include it in the namespace itself.
+
+------------------------------------------------------------------------
+r416 | jeanluc | 2011-09-13 18:36:00 -0500 (Tue, 13 Sep 2011) | 2 lines
+
+Added program "braiding" by Juan Gonzalez-Meneses.
+
+------------------------------------------------------------------------
+r415 | jeanluc | 2011-09-13 18:17:47 -0500 (Tue, 13 Sep 2011) | 7 lines
+
+Updated for GCC 4.4.5:
+ * No longer allowed to use typedef A<T> A.  So instead typedef
+   Factor<P> Factor now use typedef Factor<P> CanonicalFactor.
+ * Various other places where the stricter template parsing made the
+   compiler unhappy.
+ * Changed time.h to ctime.
+
+------------------------------------------------------------------------
+r414 | jeanluc | 2011-09-13 17:53:32 -0500 (Tue, 13 Sep 2011) | 14 lines
+
+Changes to CBraid to go to gcc-3.4:
+
+ * Redefined sint16 and uint16 to be int and unsigned int, rather than
+   short and unsigned short.  shorts are just too short.  Redo this
+   with explicit types.
+ * Added typename after typedef and in external class definition.
+ * Added std:: in many places.
+ * Changed optarg to OptArg to avoid name clash.
+ * Bugfix in cbraid_interface: the function Complement was using ~a
+   (which doesn't even compile) rather than the inverse of *this.
+
+Note that these changes are no longer sufficient for the code to
+compile with GCC 4.4.5, but I wanted a separate commit for the old changes.
+
+------------------------------------------------------------------------
+r413 | jeanluc | 2011-09-13 17:05:20 -0500 (Tue, 13 Sep 2011) | 2 lines
+
+Added source code CBraid version 2001/12/07 by Jae Choon Cha.
