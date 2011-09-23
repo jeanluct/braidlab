@@ -196,6 +196,6 @@ for i = 1:size(crossdat,1)
   end
 end
 
-varargout{1} = gen;
+varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
 if nargout > 2, varargout{3} = cross_cell; end

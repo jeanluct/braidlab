@@ -30,6 +30,10 @@ classdef braid
 	  error
 	end
       else
+	% Store word as row vector.
+	if size(b,1) > size(b,2)
+	  b = b.';
+	end
 	br.word = b;
 	br.repr = 'word';
 	br.delta = 0;
@@ -104,38 +108,6 @@ classdef braid
 
     function l = length(b)
       l = length(b.word);
-    end
-
-    function [varargout] = compact(b,t)
-      w = b.word;
-      cancel = true;
-      while cancel
-	cancel = false;
-        i = find(w(1:end-1) == -w(2:end));
-	if ~isempty(i)
-	  w([i i+1]) = [];
-	  if nargin > 1, t([i i+1]) = []; end
-	  cancel = true;
-	end
-        i = find(w(1:end-2) == -w(3:end) & ...
-		 abs(abs(w(2:end-1))-abs(w(1:end-2))) > 1);
-	if ~isempty(i)
-	  w([i i+2]) = [];
-	  if nargin > 1, t([i i+2]) = []; end
-	  cancel = true;
-	end
-        i = find(w(1:end-3) == -w(4:end) & ...
-		 abs(abs(w(2:end-2))-abs(w(1:end-3))) > 1 & ...
-		 abs(abs(w(3:end-1))-abs(w(1:end-3))) > 1);
-	if ~isempty(i)
-	  w([i i+3]) = [];
-	  if nargin > 1, t([i i+3]) = []; end
-	  cancel = true;
-	end
-      end
-      b.word = w;
-      varargout{1} = b;
-      if nargout > 1, varargout{2} = t; end
     end
 
   end

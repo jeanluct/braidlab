@@ -18,20 +18,36 @@ for k =1:4
 end
 hold off
 
-[gen1,tcr1,cross_cell] = color_braiding(XY(ii,:,:),ti(ii));
+[gen1,tcr1] = color_braiding(XY(ii,:,:),ti(ii));
 
-fprintf('Number of crossings in raw form: %d\n',length(gen1))
-lcf1 = canform(gen1);
-fprintf('       Length of canonical form: %d\n',cflength(lcf1))
+fprintf('      Number of crossings in raw form: %d\n',length(gen1))
+gen1c = compact(gen1);
+fprintf('Number of crossings in compacted form: %d\n',length(gen1c))
+
+if ~cfequal(canform(gen1.word),canform(gen1c.word))
+  error('Something went wrong when compacting...')
+end
+
+lcf1 = canform(gen1c.word);
+fprintf('             Length of canonical form: %d\n',cflength(lcf1))
 
 % ROTATE
+disp('Now rotate...')
+
 XYr = [XY(:,2,:) -XY(:,1,:)];
 
-[gen2,tcr2,cross_cell] = color_braiding(XYr(ii,:,:),ti(ii));
+[gen2,tcr2] = color_braiding(XYr(ii,:,:),ti(ii));
 
-fprintf('Number of crossings in raw form: %d\n',length(gen2))
-lcf2 = canform(gen2);
-fprintf('       Length of canonical form: %d\n',cflength(lcf2))
+fprintf('      Number of crossings in raw form: %d\n',length(gen2))
+gen2c = compact(gen2);
+fprintf('Number of crossings in compacted form: %d\n',length(gen2c))
+
+if ~cfequal(canform(gen2.word),canform(gen2c.word))
+  error('Something went wrong when compacting...')
+end
+
+lcf2 = canform(gen2c.word);
+fprintf('             Length of canonical form: %d\n',cflength(lcf2))
 
 [conj,C] = conjtest(lcf1,lcf2);
 
