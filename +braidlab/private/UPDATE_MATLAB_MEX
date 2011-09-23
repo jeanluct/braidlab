@@ -1,0 +1,104 @@
+Tutorial: how to get MEX files to run on Ubuntu 11.04.
+
+The problem is that Ubuntu 11.04 uses GCC-4.5, and Matlab MEX files
+require GCC-4.3 or earlier (for Matlab R2011a and R2011b).  The second
+problem is that in Ubuntu 10.10 one could install GCC-4.3 alongside
+the newer compiler, but this is no longer supported in 11.04.
+
+Hence, we have to download, compile, and install GCC-4.3 from sources!
+Bummer.
+
+(*** But first a small fix which prevent Matlab from complaining on startup:
+see http://morganbye.net/blog/2011/05/matlab-ubuntu-1104
+
+For 64 bit:
+
+    sudo ln -s /lib64/x86_64-linux-gnu/libc-2.13.so /lib64/libc.so.6
+
+For 32 bit:
+
+    sudo ln -s /lib/i386-linux-gnu/libc-2.13.so /lib/libc.so.6
+***)
+
+Check that the commands 'matlab' and 'mex' are on your path.
+Typically, 'which mex' and 'which matlab' should tell you they're in
+/usr/local/bin.
+
+We'll need a couple of header file libraries:
+
+    sudo apt-get install libmpfr-dev libgmp3-dev
+
+For 64-bit Ubuntu, also install to cross-compiling libraries:
+
+    sudo apt-get install libc6-dev-i386
+
+    # Needed?
+    #sudo ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/asm
+    #sudo ln -s /usr/include/i386-linux-gnu/asm /usr/include/asm
+
+Let's download the sources. cd to some work directory with lots of
+space.  For instance,
+
+    cd /tmp; mkdir gcc-tmp; cd gcc-tmp
+
+Type (all on one line):
+
+    wget http://gcc.petsads.us/releases/gcc-4.3.6/gcc-core-4.3.6.tar.bz2 \
+       http://gcc.petsads.us/releases/gcc-4.3.6/gcc-fortran-4.3.6.tar.bz2 \
+       http://gcc.petsads.us/releases/gcc-4.3.6/gcc-g++-4.3.6.tar.bz2
+
+This will take a little while (about 30MB is downloaded).  Next, untar
+the files:
+
+    tar xvjf gcc-core-4.3.6.tar.bz2
+    tar xvjf gcc-g++-4.3.6.tar.bz2
+    tar xvjf gcc-fortran-4.3.6.tar.bz2
+
+Now type
+
+    mkdir gcc-build; cd gcc-build
+    ../gcc-4.3.6/configure --prefix=/usr/local/gcc-4.3.6
+
+Make sure there are no errors.  And finally, compile away!
+
+    make
+
+This should take a while.  After it's done, type
+
+    sudo make install
+
+to install all the files to /usr/local/gcc-4.3.6.
+
+Now that this is done, let's configure MEX/Matlab.  Type
+
+    mex -setup
+
+(*** If you get an error "mex: unrecognized option '-setup'", your mex
+command in /usr/local/bin is being shadowed by the Polish latex
+packages in /usr/bin.  If you don't need those, run
+
+    sudo apt-get remove texlive-lang-polish
+
+This removes the package.  Then log out and into a new terminal window
+to update the path variable. ***)
+
+Choose option 1, configure for gcc.  Then tell it to save to to
+the home folder by answering 'y'.  Now the mexopts.sh file is
+read-only, so type
+
+    chmod u+w ~/.matlab/<Matlab version>/mexopts.sh
+
+<Matlab version> is probably R2011a or R2011b.  Next edit the file.
+Search and replace the *first two* instances of each of these:
+
+ * 'gcc'      and replace with '/usr/local/gcc-4.3.6/bin/gcc'
+ * 'g++'      and replace with '/usr/local/gcc-4.3.6/bin/g++'
+ * 'gfortran' and replace with '/usr/local/gcc-4.3.6/bin/gfotran'
+
+So you should be replacing a total of 6 items.  (Well, it doesn't hurt
+to replace the other instances, but it's not necessary.)
+
+And we're done!  MEX files should compile correctly now.  It's now
+safe to delete the /tmp/gcc-tmp folder and its contents:
+
+    rm -rf /tmp/gcc-tmp

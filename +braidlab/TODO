@@ -1,0 +1,56 @@
+ * General, consistent renaming of functions.
+    * For instance: no function name should begin with braid, since
+      that's part of the namespace now.
+    * Remove "color" from names.  Have only one function for crossing,
+      possibly combining the code for color_braiding and gencross
+      depending on the number of crossings and punctures.
+    * crossings instead of gencross?  loopsigma is also a bad name.
+
+ * Make a +loop subfolder.  Should go in there:
+    * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
+      a private foldef.
+
+ * Makefile:
+    * Once +loop folder is added, make another Makefile in there.
+    * Master Makefile.
+    * Avoid rebuilding libcbraid every time a CPP file is compiled:
+      can we run a command once at the start of a Makefile?
+
+ * Add an entropy method, and try to speed it up.
+
+ * braid class? http://www.mathworks.com/help/techdoc/matlab_oop/brh2rgw.html
+    * I've done a basic implementation (see @braid subfolder).  It
+      works pretty well!  Now I should try to see if it's slower.
+
+ * color_braiding:
+    * Robustness test: gencross vs color_braiding. [update 2011-09-20:
+      it seems that color_braidig is more robust, and now that it's
+      sped up there's very little reason to stick with gencross.]
+    * Have a driver function that splits up the data into chunks, and
+      refines as needed?  Should throw exception when bad things happen.
+      http://www.mathworks.com/help/techdoc/matlab_prog/f3-38012.html
+    * Another option is to rewrite Michael's code in C++.  [update 2011-09-20:
+      sped up by a factor of ~ 30 by vectorizing.]
+    * Adapt Matt & JLT's C++ crossing code?  The code uses refinement by
+      interpolation.  Is this tricky?  I don't think we wrote an
+      interpolator.  Could we use Matlab's with acceptable speed?
+    * Projection line angle.
+
+ * Move interpcross to private.
+
+
+Classify functions [private]:
+
+general:	conjtest [conjtest_helper]
+
+canonical form:	canform, cfequal, cflength, cfword, halftwist [canform_helper]
+
+crossings:	gencross, color_braiding, color_braiding_sub [interpcross]
+
+loops: 		loopinter, loopsigma, loopplot [loopsigma_helper]
+
+
+Which of these could benefit from MEXing?
+
+Maybe avoid using "cross" and "crossings", since this can be confused
+with crossing numbers.
