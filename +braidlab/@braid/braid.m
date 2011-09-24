@@ -1,7 +1,7 @@
 %BRAID   Class for representing braids.
 
 % set/get methods
-% lexequal
+% lexeq
 % eq
 % makelcf
 % better naming convention for vars
@@ -12,20 +12,16 @@
 
 classdef braid
   properties
-    repr
     n
     word
-    delta
   end
 
   methods
 
     function br = braid(b,nn)
       if isa(b,'braidlab.braid')
-	br.repr  = b.repr;
 	br.n     = b.n;
 	br.word  = b.word;
-	br.delta = b.delta;
 	if nargin > 1
 	  error
 	end
@@ -35,23 +31,21 @@ classdef braid
 	  b = b.';
 	end
 	br.word = b;
-	br.repr = 'word';
-	br.delta = 0;
 	if nargin < 2
 	  br.n = max(abs(b))+1;
 	else
-	  n = nn;
+	  br.n = nn;
 	end
       end
     end
 
    % rename this to lexeq once true equality is implemented.
    function ee = eq(b1,b2)
-   %EQ   Test braids for equality.
+   %EQ   Test braids for lexicographical equality.
       import braidlab.braid
       b1 = braid(b1);
       b2 = braid(b2);
-      ee = b1.n == b2.n & b1.delta == b2.delta & ~any(b1.word ~= b2.word);
+      ee = b1.n == b2.n & ~any(b1.word ~= b2.word);
     end
 
     function ee = ne(b1,b2)
@@ -94,7 +88,7 @@ classdef braid
       else
 	str = num2str(b.word);
       end
-      str = ['<' str '>'];
+      str = ['< ' str ' >'];
     end
 
     function disp(b)

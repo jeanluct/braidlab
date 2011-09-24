@@ -20,13 +20,6 @@ CBRAID_LIBDIR     = ../../../cbraid/lib
 CBRAID_INCLUDEDIR = ../../../cbraid/include
 CBRAID_LD         = -lcbraid
 
-showvars:
-	@echo "$(MEXSUFFIX)"
-	@echo "$(MEXOPTSFILE)"
-	@echo "$(CC)"
-	@echo "$(CXX)"
-	@echo "$(MATLABHOME)"
-
 %.$(MEXSUFFIX): %.c
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
@@ -37,6 +30,13 @@ showvars:
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
 all: compact_helper.$(MEXSUFFIX)
+
+showvars:
+	@echo "$(MEXSUFFIX)"
+	@echo "$(MEXOPTSFILE)"
+	@echo "$(CC)"
+	@echo "$(CXX)"
+	@echo "$(MATLABHOME)"
 
 clean:
 	rm -f *.$(MEXSUFFIX) *.o
