@@ -1,7 +1,7 @@
 //
 // Matlab MEX file
 //
-// CANFORM   Left or right canonical form of a braid word.
+// CFBRAID_HELPER   Left or right canonical form of a braid word.
 //
 
 #include <iostream>
@@ -19,7 +19,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   using std::cout;
   using std::endl;
 
-  // Arguments checked and formatted in canform.m.
+  // Arguments checked and formatted in cfbraid.m.
 
   const mxArray *wA = prhs[0];
   const double *w = mxGetPr(wA);

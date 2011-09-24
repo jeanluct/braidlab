@@ -24,12 +24,13 @@ fprintf('      Number of crossings in raw form: %d\n',length(gen1))
 gen1c = compact(gen1);
 fprintf('Number of crossings in compacted form: %d\n',length(gen1c))
 
-if ~cfequal(canform(gen1.word),canform(gen1c.word))
+cf1 = cfbraid(gen1c);
+
+if cfbraid(gen1) ~= cf1
   error('Something went wrong when compacting...')
 end
 
-lcf1 = canform(gen1c.word);
-fprintf('             Length of canonical form: %d\n',cflength(lcf1))
+fprintf('             Length of canonical form: %d\n',length(cf1))
 
 % ROTATE
 disp('Now rotate...')
@@ -42,18 +43,19 @@ fprintf('      Number of crossings in raw form: %d\n',length(gen2))
 gen2c = compact(gen2);
 fprintf('Number of crossings in compacted form: %d\n',length(gen2c))
 
-if ~cfequal(canform(gen2.word),canform(gen2c.word))
+cf2 = cfbraid(gen2c);
+
+if cfbraid(gen2) ~= cf2
   error('Something went wrong when compacting...')
 end
 
-lcf2 = canform(gen2c.word);
-fprintf('             Length of canonical form: %d\n',cflength(lcf2))
+fprintf('             Length of canonical form: %d\n',length(cf2))
 
-[conj,C] = conjtest(lcf1,lcf2);
+[conj,C] = conjtest(cf1,cf2);
 
 if conj
   disp('Braids are conjugate!')
-  cfword(C)
+  C
 else
   warning('Braids are not conjugate...')
 end

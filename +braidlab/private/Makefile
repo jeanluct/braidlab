@@ -31,7 +31,7 @@ CBRAID_LD         = -lcbraid
 
 #loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.c
 
-all: loopsigma_helper.$(MEXSUFFIX) canform_helper.$(MEXSUFFIX) conjtest_helper.$(MEXSUFFIX)
+all: loopsigma_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
