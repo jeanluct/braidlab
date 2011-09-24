@@ -7,13 +7,11 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-// The algorithm was ripped from the braid::braidword class.
+// The sort-and-cancel algorithm was ripped from the braid::braidword class.
 
 #include <iostream>
 #include <list>
 #include "mex.h"
-
-using namespace std;
 
 extern void _main();
 
@@ -21,6 +19,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   using std::cout;
   using std::endl;
+  using std::max;
 
   // Arguments checked and formatted in compact.m.
 

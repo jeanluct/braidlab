@@ -16,8 +16,8 @@ CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 #INCLUDE   = -I$(MATLABHOME)/extern/include
 #MEXFLAGS  = 
 
-CBRAID_LIBDIR     = ../../cbraid/lib
-CBRAID_INCLUDEDIR = ../../cbraid/include
+CBRAID_LIBDIR     = ../../../cbraid/lib
+CBRAID_INCLUDEDIR = ../../../cbraid/include
 CBRAID_LD         = -lcbraid
 
 %.$(MEXSUFFIX): %.c
@@ -31,7 +31,7 @@ CBRAID_LD         = -lcbraid
 
 #loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.c
 
-all: loopsigma_helper.$(MEXSUFFIX) canform_helper.$(MEXSUFFIX) conjtest_helper.$(MEXSUFFIX)
+all: cfbraid_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
