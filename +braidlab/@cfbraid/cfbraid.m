@@ -1,20 +1,45 @@
 %CFBRAID   Class for representing braids in left canonical form.
+%   The object CFBRAID holds the left canonical form (LCF) W = D^M F of a
+%   braid word W.  Here D is the positive half-twist, M is a signed integer,
+%   and F is a sequence of positive factors written in Artin generators.
+%
+%   The class CFBRAID has the data members
+%
+%    'delta'    the power M of Delta;
+%    'factors'  cell array of positive factors F;
+%    'n'        order of braid group.
+%
+%   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
+%   Handbook of Knot Theory, pp. 78-82.
+%
+%   See also BRAID.
 
 classdef cfbraid
   properties
-    repr
-    n
-    factors
     delta
+    factors
+    n
   end
 
   methods
 
     function br = cfbraid(b,nn)
+    %CFBRAID   Construct the left canonical form of a braid word.
+    %   B = CFBRAID(W) constructs the left canonical form of a braid word W
+    %   expressed as a list of Artin generators.  W can also be a BRAID or
+    %   CFBRAID object.  If W is a list, CFBRAID(W,N) can be used to specify
+    %   the order N of the braid group, which is otherwise guessed from W.
+    %
+    %   See also BRAID.
+      if nargin == 0
+	br.delta = 0;
+	br.factors = cell(0);
+	br.n = 0;
+	return
+      end
       if isa(b,'braidlab.cfbraid')
-	br.repr = b.repr;
 	br.n = b.n;
-	br.factors  = b.factors;
+	br.factors = b.factors;
 	br.delta = b.delta;
 	if nargin > 1
 	  error('BRAIDLAB:cfbraid:cfbraid:badarg', ...
@@ -32,11 +57,14 @@ classdef cfbraid
 	if nargin < 2
 	  br.n = max(abs(b))+1;
 	else
-	  vr.nn = nn;
+	  br.n = nn;
+	  if br.n < max(abs(b))+1
+	    error('BRAIDLAB:cfbraid:cfbraid:badgen', ...
+		  'A generator is out of range.');
+	  end
 	end
 	w = b;
       end
-      br.repr = 'lcf';
       cf = cfbraid_helper(w,br.n,0);
       br.delta = cf.delta;
       br.factors = cf.factors;
@@ -53,6 +81,10 @@ classdef cfbraid
       ee = ~(b1 == b2);
     end
 
+    function ee = isempty(b)
+      ee = isempty(b.factors) & b.delta == 0;
+    end
+
     function str = char(b)
       if b.delta == 0 & isempty(b.factors)
 	str = '< e >';
@@ -64,7 +96,11 @@ classdef cfbraid
       end
       if ~isempty(b.factors)
 	for i = 1:length(b.factors)
-	  str = [str ' . ' num2str(b.factors{i})];
+	  if i == 1 & b.delta == 0
+	    str = [str num2str(b.factors{i})];
+	  else
+	    str = [str ' . ' num2str(b.factors{i})];
+	  end
 	end
       end
       str = ['< ' str ' >'];
@@ -85,6 +121,7 @@ classdef cfbraid
     %   Artin generators, where B is in left canonical form.
     %
     %   See also CFBRAID.
+      if b.delta == 0 & isempty(b.factors), l = 0; return; end
       Dl = b.n*(b.n-1)/2;  % The lengh of the half-twist Delta.
       l = abs(b.delta)*Dl + length(cell2mat(b.factors));
     end
@@ -104,8 +141,9 @@ classdef cfbraid
       else
 	k = b.delta;
       end
-      w = [repmat(D,[1 k]) w];
+      w = braidlab.braid([repmat(D,[1 k]) w],b.n);
     end
 
   end
+
 end

@@ -28,11 +28,11 @@ if length(gen1) ~= length(gen2)
 end
 
 fprintf('Number of crossings in raw form: %d\n',length(gen1))
-lcf1 = canform(gen1);
-lcf2 = canform(gen2.word);
-fprintf('       Length of canonical form: %d\n',cflength(lcf1))
+cf1 = cfbraid(gen1);
+cf2 = cfbraid(gen2);
+fprintf('       Length of canonical form: %d\n',length(cf1))
 
-if ~cfequal(lcf1,lcf2)
+if cf1 ~= cf2
   error('Braids do not match.')
 else
   disp('Braids match!')
