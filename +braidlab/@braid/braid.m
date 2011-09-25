@@ -42,10 +42,8 @@ classdef braid
    % rename this to lexeq once true equality is implemented.
    function ee = eq(b1,b2)
    %EQ   Test braids for lexicographical equality.
-      import braidlab.braid
-      b1 = braid(b1);
-      b2 = braid(b2);
-      ee = b1.n == b2.n & ~any(b1.word ~= b2.word);
+      ee = b1.n == b2.n & length(b1) == length(b2);
+      if ee, ee = ~any(b1.word ~= b2.word); end
     end
 
     function ee = ne(b1,b2)
