@@ -55,7 +55,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   } while (sw);
 
   // Then eventually try to apply the other rules.
-  //  ...
+  //
+  // Suggestion: look for i -(i+1) -i and replace with
+  //
+  // i -(i+1) -i  =  i -(i+1)   -i   -(i+1) (i+1)
+  //              =  i   -i   -(i+1)   -i   (i+1)
+  //              =           -(i+1)   -i   (i+1)
+  //
+  // It doesn't change the length, but maybe then could lead to more
+  // cancellations, once we've done everything we can with the
+  // commutativity rule.
+  //
+  // Another option is to systematically list all shortening rules.
 
   // Now copy list bw to an mxArray.
   plhs[0] = mxCreateDoubleMatrix(1,bw.size(),mxREAL);

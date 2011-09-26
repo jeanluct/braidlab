@@ -142,19 +142,41 @@ debugmsg('Part 3: Sorting the pair crossings into the generator sequence')
 % crossdat will be a matrix with crossing information:
 % Column 1: time. Column 2: direction. Column 3: lower strand. Column 4:
 % higher strand.
-crossdat = [];
 
 % JLT->MRA: renamed t_cross to crossdat.
 
 % JLT->MRA: lower/higher same as to the left/to the right?
 
 % Cycle through all cells.
-for I = 1:n
-  for J = 1:n
-    if ~isempty(cross_cell{I,J})
-      crossdat = [crossdat; cross_cell{I,J} ...
-		  ones(size(cross_cell{I,J},1),1)*I ...
-		  ones(size(cross_cell{I,J},1),1)*J];
+if true
+  % Precompute the total size of crossdat.  For large number of particles
+  % (>60), the recurring memory allocation needed to 'grow' crossdat becomes
+  % prohibitive.  For instance, for 100 particles I get a speedup of
+  % almost four for the function as a whole.
+  cellsize = cellfun('size',cross_cell,1);  % size of each cell element
+  totalsize = sum(sum(cellsize));           % total size of crossdat
+  crossdat = zeros(totalsize,4);            % allocate crossdat
+  k = 1;
+  for I = 1:n
+    for J = 1:n
+      if cellsize(I,J) > 0
+	k1 = k + cellsize(I,J) - 1;
+	crossdat(k:k1,1:2) = cross_cell{I,J};
+	crossdat(k:k1,3) = ones(cellsize(I,J),1)*I;
+	crossdat(k:k1,4) = ones(cellsize(I,J),1)*J;
+	k = k1 + 1;
+      end
+    end
+  end
+else % This is the old method.
+  crossdat = [];
+  for I = 1:n
+    for J = 1:n
+      if ~isempty(cross_cell{I,J})
+	crossdat = [crossdat; cross_cell{I,J} ...
+		    ones(size(cross_cell{I,J},1),1)*I ...
+		    ones(size(cross_cell{I,J},1),1)*J];
+      end
     end
   end
 end
