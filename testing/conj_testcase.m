@@ -9,16 +9,17 @@ import braidlab.*
 cl = {'r' 'g' 'b' 'm'};
 
 ii = 1:length(ti);
+XY = XY(ii,:,:); ti = ti(ii);
 
 % Close the braid.
-XY(ii(end),:,:) = XY(ii(1),:,:);
+[XY,ti] = closure(XY,ti);
 
 for k =1:4
-  plot(XY(ii,1,k),ti(ii),cl{k}), hold on
+  plot(XY(:,1,k),ti,cl{k}), hold on
 end
 hold off
 
-[gen1,tcr1] = color_braiding(XY(ii,:,:),ti(ii));
+[gen1,tcr1] = color_braiding(XY,ti);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen1))
 gen1c = compact(gen1);
@@ -37,7 +38,7 @@ disp('Now rotate...')
 
 XYr = [XY(:,2,:) -XY(:,1,:)];
 
-[gen2,tcr2] = color_braiding(XYr(ii,:,:),ti(ii));
+[gen2,tcr2] = color_braiding(XYr,ti);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen2))
 gen2c = compact(gen2);

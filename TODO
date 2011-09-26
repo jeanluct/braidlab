@@ -38,9 +38,7 @@
 
  * Move interpcross to private.
 
- * New function or method: close, which forces a data braid to close
-   by adding an extra final point, and looking for the nearest
-   connection.
+ * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.
 
 
 Classify functions [private]:
