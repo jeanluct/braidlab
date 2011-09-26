@@ -35,6 +35,10 @@
       interpolation.  Is this tricky?  I don't think we wrote an
       interpolator.  Could we use Matlab's with acceptable speed?
     * Projection line angle.
+    * Why does it ever fail?  Come up with testcase.  [I have this
+      ugly case where three particles occupy the same point at the
+      same time, but do not cross each other's path.  Since their Y
+      coords are different, there is actually no crossing.]
 
  * Move interpcross to private.
 

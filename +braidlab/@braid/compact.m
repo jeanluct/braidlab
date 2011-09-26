@@ -20,4 +20,12 @@ if nargin > 1
   error('BRAIDLAB:compact:nargin','t arg not yet implemented.')
 end
 
+if isempty(b)
+  varargout{1} = b;
+  if nargout > 1
+    varargout{2} = t;
+  end
+  return
+end
+
 varargout{1} = braidlab.braid(compact_helper(b.word,b.n),b.n);

@@ -50,6 +50,10 @@ classdef braid
       ee = ~(b1 == b2);
     end
 
+    function ee = isempty(b)
+      ee = isempty(b.word);
+    end
+
     % Conversion to a vector.
     function c = double(obj)
       c = obj.word;
