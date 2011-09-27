@@ -19,7 +19,7 @@ for k =1:4
 end
 hold off
 
-[gen1,tcr1] = color_braiding(XY,ti);
+gen1 = braid(XY,ti);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen1))
 gen1c = compact(gen1);
@@ -38,7 +38,7 @@ disp('Now rotate...')
 
 XYr = [XY(:,2,:) -XY(:,1,:)];
 
-[gen2,tcr2] = color_braiding(XYr,ti);
+gen2 = braid(XYr,ti);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen2))
 gen2c = compact(gen2);

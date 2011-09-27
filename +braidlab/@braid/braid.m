@@ -1,4 +1,18 @@
 %BRAID   Class for representing braids.
+%   B = BRAID(W) creates a braid object B from a vector of generators W.
+%   B = BRAID(W,N) specifies the order of the braid group N, which is
+%   otherwise guessed from the maximal elements of W.
+%
+%   B = BRAID(XY) construst a braid from a trajectory dataset XY.
+%   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
+%   of time steps and N is the number of particles.
+%
+%   BNEW = BRAID(B) constructs a new braid from the braid B.
+%
+%   For all these constructors a list of crossing times T may also be
+%   appended as a final argument.
+%
+%   See also CFBRAID.
 
 % set/get methods
 % better naming convention for vars
@@ -7,23 +21,33 @@ classdef braid
   properties
     n
     word
+    t
   end
 
   methods
 
-    function br = braid(b,nn)
+    function br = braid(b,nn,t)
       if nargin ==0
-	% Allow empty braid: return identity with order 1.
+	% Allow empty braid: return identity with one strand.
 	br.n = 1;
 	br.word = [];
+	br.t = [];
 	return
       end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
 	br.word  = b.word;
 	if nargin > 1
-	  error
+	  br.t = nn;
+	else
+	  br.t = [];
 	end
+      elseif max(size(size(b))) == 3
+	% The input is an array of data.
+	if nargin < 2
+	  nn = 1:size(b,1);
+	end
+	br = color_braiding(b,nn);
       else
 	% Store word as row vector.
 	if size(b,1) > size(b,2)
@@ -32,9 +56,29 @@ classdef braid
 	br.word = b;
 	if nargin < 2
 	  br.n = max(abs(b))+1;
+	  br.t = [];
 	else
-	  br.n = nn;
+	  if isscalar(nn)
+	    if length(b) == 1
+	      % Ambiguous.
+	      error('BRAIDLAB:braid:braid',...
+		    ['Ambiguous scalar as second argument for braid of' ...
+		     ' length 1.'])
+	    end
+	    br.n = nn;
+	  else
+	    br.n = max(abs(b))+1;
+	  end
+	  if nargin > 2
+	    br.t = t;
+	  else
+	    br.t = [];
+	  end
 	end
+      end
+      % Store time as row vector.
+      if size(br.t,1) > size(br.t,2)
+	br.t = br.t.';
       end
     end
 
@@ -56,6 +100,10 @@ classdef braid
     end
 
     function ee = isempty(b)
+      ee = isempty(b.word);
+    end
+
+    function ee = isidentity(b)
       ee = isempty(b.word);
     end
 

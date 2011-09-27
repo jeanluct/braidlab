@@ -30,7 +30,11 @@ if nargin > 1
     % Rigmarole to make sure t remains a row or column vector.
     ts = size(t); ts = ts + (ts ~= 1);
     t = reshape(t,[length(t) 1]);
-    varargout{2} = reshape([t ; t(end)+(t(end)-t(end-1))],ts);
+    % Append an extra t(end), so now t(end) is repeated twice.
+    varargout{2} = reshape([t ; t(end)],ts);
+    % Modify the second-to last time, to avoid changing the total time
+    % interval.
+    varargout{2}(end-1) = t(end) - (t(end)-t(end-1))/2;
   else
     error('BRAIDLAB:closure','Not enough output arguments.')
   end
