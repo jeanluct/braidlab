@@ -1,14 +1,7 @@
 %BRAID   Class for representing braids.
 
 % set/get methods
-% lexeq
-% eq
-% makelcf
 % better naming convention for vars
-% How to handle canonical form?  Separate class?
-% Suggestion: always use LCF, make == check also delta.
-% The problem with storing the LCF "internally" is that any
-% multiplication, etc, will screw it up.  Unless I always re-LCF.
 
 classdef braid
   properties
@@ -19,6 +12,12 @@ classdef braid
   methods
 
     function br = braid(b,nn)
+      if nargin ==0
+	% Allow empty braid: return identity with order 1.
+	br.n = 1;
+	br.word = [];
+	return
+      end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
 	br.word  = b.word;
@@ -39,9 +38,15 @@ classdef braid
       end
     end
 
-   % rename this to lexeq once true equality is implemented.
-   function ee = eq(b1,b2)
-   %EQ   Test braids for lexicographical equality.
+    function ee = eq(b1,b2)
+    %EQ   Test braids for equality.
+      ee = b1.n == b2.n;
+      % Check if the loop coordinates are the same.
+      if ee, ee = ~any(loopcoords(b1) ~= loopcoords(b2)); end
+    end
+
+    function ee = lexeq(b1,b2)
+    %LEXEQ   Test braids for lexicographical equality.
       ee = b1.n == b2.n & length(b1) == length(b2);
       if ee, ee = ~any(b1.word ~= b2.word); end
     end

@@ -5,6 +5,8 @@
       possibly combining the code for color_braiding and gencross
       depending on the number of crossings and punctures.
     * crossings instead of gencross?  loopsigma is also a bad name.
+      [crossings is bad: I want to reserve cross for crossing of
+      loops.  How about braidify?]
 
  * Make a +loop subfolder.  Should go in there:
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
@@ -12,15 +14,22 @@
 
  * Makefile:
     * Once +loop folder is added, make another Makefile in there.
-    * Master Makefile.
     * Avoid rebuilding libcbraid every time a CPP file is compiled:
       can we run a command once at the start of a Makefile?
 
  * Add an entropy method, and try to speed it up.
 
- * braid class? http://www.mathworks.com/help/techdoc/matlab_oop/brh2rgw.html
-    * I've done a basic implementation (see @braid subfolder).  It
-      works pretty well!  Now I should try to see if it's slower.
+ * braid class:
+    * The braid class works great!
+    * Make EQ do true equality by implementing the action on a basis
+      of loops.  See Dehornoy.
+    * entropy method.  Use the [010101...01] of Dehornoy?
+    * Add optional crossing times?  Then could just have a constructor
+      from trajectories.  No need for a separate color_braiding
+      function: just move it to private.
+
+ * cfbraid class: for braid in canonical form.
+    * Works great as well.
 
  * color_braiding:
     * Robustness test: gencross vs color_braiding. [update 2011-09-20:
@@ -29,8 +38,10 @@
     * Have a driver function that splits up the data into chunks, and
       refines as needed?  Should throw exception when bad things happen.
       http://www.mathworks.com/help/techdoc/matlab_prog/f3-38012.html
-    * Another option is to rewrite Michael's code in C++.  [update 2011-09-20:
-      sped up by a factor of ~ 30 by vectorizing.]
+    * Another option is to rewrite Michael's code in C++.  [update
+      2011-09-20: sped up by a factor of ~ 30 by vectorizing.  update
+      2011-09-25: another bg speedup for large number of particles by
+      preallocating vector.]
     * Adapt Matt & JLT's C++ crossing code?  The code uses refinement by
       interpolation.  Is this tricky?  I don't think we wrote an
       interpolator.  Could we use Matlab's with acceptable speed?
