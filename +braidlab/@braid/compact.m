@@ -1,4 +1,4 @@
-function [varargout] = compact(b,t)
+function c = compact(b)
 %COMPACT   Shorten a braid as much as possible.
 %   C = COMPACT(B) attempts to shorten a braid B by using group properties,
 %   and returns the shortened braid C.  The group relations are
@@ -9,23 +9,12 @@ function [varargout] = compact(b,t)
 %
 %   where S_i, i = 1,..n-1 are the Artin generators.
 %
-%   [C,TC] = COMPACT(B,T) simultaneously updates the list of crossing times
-%   T, and returns it as TC.
-%
 %   Note that COMPACT doesn't guarantee the shortest length.
 %
 %   See also BRAID.
 
-if nargin > 1
-  error('BRAIDLAB:compact:nargin','t arg not yet implemented.')
-end
+if isempty(b), c = b; return; end
 
-if isempty(b)
-  varargout{1} = b;
-  if nargout > 1
-    varargout{2} = t;
-  end
-  return
-end
+[bc,tc] = compact_helper(b.word,b.t);
 
-varargout{1} = braidlab.braid(compact_helper(b.word,b.n),b.n);
+c = braidlab.braid(bc,b.n,tc);
