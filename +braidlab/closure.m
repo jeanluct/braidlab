@@ -16,9 +16,9 @@ function [varargout] = closure(XY,t)
 % distances between the final points and the starting points.
 
 % Find the initial order of the particles.
-[X,I0] = sort(squeeze(XY(1,1,:)));
+[~,I0] = sort(squeeze(XY(1,1,:)));
 % Find the final order of the particles.
-[X,I1] = sort(squeeze(XY(end,1,:)));
+[~,I1] = sort(squeeze(XY(end,1,:)));
 
 XYnew = zeros(size(XY(1,:,:)));
 XYnew(1,:,I1) = XY(1,:,I0);
