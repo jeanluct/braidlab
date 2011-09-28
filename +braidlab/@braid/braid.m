@@ -86,6 +86,8 @@ classdef braid
     %EQ   Test braids for equality.
       ee = b1.n == b2.n;
       % Check if the loop coordinates are the same.
+      % This can fail if the braids are too long, since the coordinates
+      % overflow.  Check for that.
       if ee, ee = ~any(loopcoords(b1) ~= loopcoords(b2)); end
     end
 

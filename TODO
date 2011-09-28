@@ -1,73 +1,35 @@
  * General, consistent renaming of functions.
     * For instance: no function name should begin with braid, since
       that's part of the namespace now.
-    * Remove "color" from names.  Have only one function for crossing,
-      possibly combining the code for color_braiding and gencross
-      depending on the number of crossings and punctures.
-    * crossings instead of gencross?  loopsigma is also a bad name.
+    * loopsigma is also a bad name.
       [crossings is bad: I want to reserve cross for crossing of
-      loops.  How about braidify?]
+      loops.]
 
- * Make a +loop subfolder.  Should go in there:
+ * Make a @loop subfolder.  Should go in there:
+    * Instead of loopsigma, create a loop object, and have a method to
+      compute the product of a braid and a loop?  Only enfore that the
+      number of punctures be at least n when acting with a braid,
+      since we may want more punctures (as for normal form).
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.
+
+ * braid class:
+    * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
+
+ * cfbraid class: (for braid in canonical form)
+
+ * creating braids from data:
+    * Projection line angle.
+    * Do we need color_braiding_sub?  Maybe write something that works
+      from the brais.
+
+ * Move interpcross to private.
 
  * Makefile:
     * Once +loop folder is added, make another Makefile in there.
     * Avoid rebuilding libcbraid every time a CPP file is compiled:
       can we run a command once at the start of a Makefile?
-
- * Add an entropy method, and try to speed it up.
-
- * braid class:
-    * The braid class works great!
-    * Make EQ do true equality by implementing the action on a basis
-      of loops.  See Dehornoy.
-    * entropy method.  Use the [010101...01] of Dehornoy?
-    * Add optional crossing times?  Then could just have a constructor
-      from trajectories.  No need for a separate color_braiding
-      function: just move it to private.
-
- * cfbraid class: for braid in canonical form.
-    * Works great as well.
-
- * color_braiding:
-    * Robustness test: gencross vs color_braiding. [update 2011-09-20:
-      it seems that color_braidig is more robust, and now that it's
-      sped up there's very little reason to stick with gencross.]
-    * Have a driver function that splits up the data into chunks, and
-      refines as needed?  Should throw exception when bad things happen.
-      http://www.mathworks.com/help/techdoc/matlab_prog/f3-38012.html
-    * Another option is to rewrite Michael's code in C++.  [update
-      2011-09-20: sped up by a factor of ~ 30 by vectorizing.  update
-      2011-09-25: another bg speedup for large number of particles by
-      preallocating vector.]
-    * Adapt Matt & JLT's C++ crossing code?  The code uses refinement by
-      interpolation.  Is this tricky?  I don't think we wrote an
-      interpolator.  Could we use Matlab's with acceptable speed?
-    * Projection line angle.
-    * Why does it ever fail?  Come up with testcase.  [I have this
-      ugly case where three particles occupy the same point at the
-      same time, but do not cross each other's path.  Since their Y
-      coords are different, there is actually no crossing.]
-
- * Move interpcross to private.
-
- * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.
+    * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.
 
 
-Classify functions [private]:
-
-general:	conjtest [conjtest_helper]
-
-canonical form:	canform, cfequal, cflength, cfword, halftwist [canform_helper]
-
-crossings:	gencross, color_braiding, color_braiding_sub [interpcross]
-
-loops: 		loopinter, loopsigma, loopplot [loopsigma_helper]
-
-
-Which of these could benefit from MEXing?
-
-Maybe avoid using "cross" and "crossings", since this can be confused
-with crossing numbers.
+Which functions could benefit from MEXing?
