@@ -26,27 +26,30 @@ if nargin < 2
   conv = 'right';
 end
 
-n1 = b.n-1; % Add an extra puncture to the Dynnikov coordinates,
-	    % corresponding to the boundary.
+% Add an extra puncture to the Dynnikov coordinates, corresponding to the
+% boundary.
+n1 = b.n-1; u = zeros(1,2*n1);
 
 switch lower(conv)
  case {'left','dehornoy'}
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the left.
-  u = zeros(1,2*n1); u(1:n1) = 0; u(n1+1:2*n1) = 1;
+  u(n1+1:2*n1) = 1;
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
-  l = braidlab.loopsigma(-w,u);
  case 'right'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the right.
-  u = zeros(1,2*n1); u(1:n1) = 0; u(n1+1:2*n1) = -1;
-  if exist('vpi') == 2
-    % Use variable precision integers if available.
-    % Improve by checking for overflow first to see if needed, since vpi is
-    % slooooow.  Maybe even print warning.
-    l = braidlab.loopsigma(-b.word,vpi(u));
-  else
-    l = braidlab.loopsigma(-b.word,u);
-  end
+  u(n1+1:2*n1) = -1;
+  % No need to convert sigmas.
+  w = b.word;
+end
+
+if exist('vpi') == 2
+  % Use variable precision integers if available.
+  % Improve by checking for overflow first to see if needed, since vpi is
+  % slooooow.  Maybe even print warning.
+  l = braidlab.loopsigma(-w,vpi(u));
+else
+  l = braidlab.loopsigma(-w,u);
 end
