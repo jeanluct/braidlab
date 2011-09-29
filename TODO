@@ -10,11 +10,15 @@
       compute the product of a braid and a loop?  Only enfore that the
       number of punctures be at least n when acting with a braid,
       since we may want more punctures (as for normal form).
+    * What type for the loop entries?
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.
 
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
+    * ensure int32 for elements.
+    * crossing times are a real pain, since they don't make sense for
+      most operations.  Get rid of them?
 
  * cfbraid class: (for braid in canonical form)
 
