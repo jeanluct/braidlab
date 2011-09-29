@@ -77,7 +77,24 @@ classdef braid
       if size(br.t,1) > size(br.t,2)
 	br.t = br.t.';
       end
-      br.word = int32(br.word);  % Make sure it's an int32, internally.
+    end
+
+    function obj = set.n(obj,value)
+      if value < 1
+	error('BRAIDLAB:braid:setn','Need at least one strand.')
+      end
+      if ~isempty(obj.word)
+        if value < max(abs(obj.word))+1
+	  error('BRAIDLAB:braid:setn',...
+		'Too few strands for generators.')
+	end
+      end
+      obj.n = value;
+    end
+
+    % Make sure it's an int32, internally.
+    function obj = set.word(obj,value)
+      obj.word = int32(value);
     end
 
     function ee = eq(b1,b2)

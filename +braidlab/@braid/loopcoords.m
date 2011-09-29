@@ -2,7 +2,8 @@ function l = loopcoords(b,conv)
 %LOOPCOORDS   Loop coordinates of a braid.
 %   L = LOOPCOORDS(B) returns the Dynnikov loop coordinates of a braid, as
 %   defined by Dehornoy.  The are defined by the action of a braid on a
-%   generating set for the fundamental group of the disk with n punctures.
+%   nested generating set for the fundamental group of the disk with n
+%   punctures.
 %
 %   L = LOOPCOORDS(B,CONV) controls the convetion whether the boundary is
 %   added to the left (CONV='left') or right (CONV='right').  The default
@@ -18,6 +19,9 @@ function l = loopcoords(b,conv)
 %
 %   See also BRAID.
 
+% Note that we use -b.word to compute the loop coordinates, which converts
+% our generators to counterclockwise, to agree with Dehornoy's coordinates.
+
 if nargin < 2
   conv = 'right';
 end
@@ -27,15 +31,22 @@ n1 = b.n-1; % Add an extra puncture to the Dynnikov coordinates,
 
 switch lower(conv)
  case {'left','dehornoy'}
-  % Generators of the fundamental group, anchored to an extra puncture on
-  % the left.
+  % Nested generators of the fundamental group, anchored to an extra
+  % puncture on the left.
   u = zeros(1,2*n1); u(1:n1) = 0; u(n1+1:2*n1) = 1;
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
   l = braidlab.loopsigma(-w,u);
  case 'right'
-  % Generators of the fundamental group, anchored to an extra puncture on
-  % the right.
+  % Nested generators of the fundamental group, anchored to an extra
+  % puncture on the right.
   u = zeros(1,2*n1); u(1:n1) = 0; u(n1+1:2*n1) = -1;
-  l = braidlab.loopsigma(-b.word,u);
+  if exist('vpi') == 2
+    % Use variable precision integers if available.
+    % Improve by checking for overflow first to see if needed, since vpi is
+    % slooooow.  Maybe even print warning.
+    l = braidlab.loopsigma(-b.word,vpi(u));
+  else
+    l = braidlab.loopsigma(-b.word,u);
+  end
 end
