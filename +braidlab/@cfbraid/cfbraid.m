@@ -16,9 +16,9 @@
 
 classdef cfbraid
   properties
-    delta
-    factors
-    n
+    delta = 0
+    factors = cell(0)
+    n = 1
   end
 
   methods
@@ -31,12 +31,7 @@ classdef cfbraid
     %   the order N of the braid group, which is otherwise guessed from W.
     %
     %   See also BRAID.
-      if nargin == 0
-	br.delta = 0;
-	br.factors = cell(0);
-	br.n = 0;
-	return
-      end
+      if nargin == 0, return; end
       if isa(b,'braidlab.cfbraid')
 	br.n = b.n;
 	br.factors = b.factors;
@@ -65,7 +60,7 @@ classdef cfbraid
 	end
 	w = b;
       end
-      cf = cfbraid_helper(w,br.n,0);
+      cf = cfbraid_helper(int32(w),br.n,0);
       br.delta = cf.delta;
       br.factors = cf.factors;
     end

@@ -19,9 +19,9 @@
 
 classdef braid
   properties
-    n = 1        % number of strands
-    word = []    % braid word in Artin generators
-    t = []       % crossing times
+    n = 1            % number of strands
+    word = int32([]) % braid word in Artin generators
+    t = []           % crossing times
   end
 
   methods
@@ -113,12 +113,7 @@ classdef braid
     end
  
     function b12 = mtimes(b1,b2)
-      if b1.n ~= b2.n
-	error('BRAIDLAB:braid:mtimes',...
-	      'Braids must have same number of strands.')
-      end
-      b12 = braidlab.braid([b1.word b2.word],b1.n);
-      % Not sure what to do with crossing times.
+      b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
     end
 
     function bm = mpower(b,m)
