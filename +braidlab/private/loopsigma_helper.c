@@ -12,7 +12,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   int i, j, k, l, n, N, Nr, Ngen;
   const mxArray *iiA, *uA;
-  const double *ii, *u;
+  const int *ii;
+  const double *u;
   double *a, *b, *ap, *bp, *uo, c, d;
 
   if (nrhs < 2)
@@ -22,7 +23,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   iiA = prhs[0];
-  ii = mxGetPr(iiA);
+  ii = (int *)mxGetData(iiA);
   uA = prhs[1];
   u = mxGetPr(uA);
 
@@ -60,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       for (j = 0; j < Ngen; ++j) /* Loop over generators */
 	{
-	  i = fabs(ii[j]);
+	  i = abs(ii[j]);
 	  if (ii[j] > 0)
 	    {
 	      if (i == 1)

@@ -22,17 +22,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Arguments checked and formatted in cfbraid.m.
 
   const mxArray *wA = prhs[0];
-  const double *w = mxGetPr(wA);
+  const int *w = (int *)mxGetData(wA);
   const int N = max(mxGetM(wA),mxGetN(wA));
   int n = (int)mxGetScalar(prhs[1]);
   int ityp = (int)mxGetScalar(prhs[2]);
 
   // Convert braid word to list.
   std::list<int> bw;
-  for (int i = 0; i < N; ++i)
-    {
-      bw.push_back((int)w[i]);
-    }
+  for (int i = 0; i < N; ++i) bw.push_back(w[i]);
 
   CBraid::ArtinBraid B(Braiding::WordToBraid(bw,n));
 
@@ -95,8 +92,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    }
 	}
       // Now copy list wn to an mxArray.
-      mxArray *wnA = mxCreateDoubleMatrix(1,wn.size(),mxREAL);
-      double *wnp = mxGetPr(wnA);
+      mxArray *wnA = mxCreateNumericMatrix(1,wn.size(),mxINT32_CLASS,mxREAL);
+      int *wnp = (int *)mxGetPr(wnA);
       int k = 0;
       for (std::list<int>::const_iterator it2 = wn.begin();
 	   it2 != wn.end(); ++it2, ++k)
