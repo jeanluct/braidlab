@@ -19,21 +19,16 @@
 
 classdef braid
   properties
-    n
-    word
-    t
+    n = 1        % number of strands
+    word = []    % braid word in Artin generators
+    t = []       % crossing times
   end
 
   methods
 
     function br = braid(b,nn,t)
-      if nargin ==0
-	% Allow empty braid: return identity with one strand.
-	br.n = 1;
-	br.word = [];
-	br.t = [];
-	return
-      end
+      % Allow default empty braid: return identity with one strand.
+      if nargin ==0, return; end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
 	br.word  = b.word;
@@ -66,13 +61,15 @@ classdef braid
 		     ' length 1.'])
 	    end
 	    br.n = nn;
+	    if nargin > 2
+	      br.t = t;
+	    end
 	  else
 	    br.n = max(abs(b))+1;
-	  end
-	  if nargin > 2
-	    br.t = t;
-	  else
-	    br.t = [];
+	    br.t = nn;
+	    if nargin > 2
+	      error
+	    end
 	  end
 	end
       end
@@ -80,6 +77,7 @@ classdef braid
       if size(br.t,1) > size(br.t,2)
 	br.t = br.t.';
       end
+      br.word = int32(br.word);  % Make sure it's an int32, internally.
     end
 
     function ee = eq(b1,b2)
@@ -114,29 +112,26 @@ classdef braid
       c = obj.word;
     end
  
-   function b12 = mtimes(b1,b2)
-      import braidlab.braid
-      b1 = braid(b1);
-      b2 = braid(b2);
-      b12 = braid([b1.word b2.word]);
+    function b12 = mtimes(b1,b2)
+      if b1.n ~= b2.n
+	error('BRAIDLAB:braid:mtimes',...
+	      'Braids must have same number of strands.')
+      end
+      b12 = braidlab.braid([b1.word b2.word],b1.n);
+      % Not sure what to do with crossing times.
     end
 
-    function bb = mpower(b,m)
-      b = braidlab.braid(b);
-      if m == 0
-	bb = braidlab.braid([]);
-      elseif m > 0
-	bb = b;
-	bb.word = repmat(bb.word,[1 m]);
+    function bm = mpower(b,m)
+      bm = braidlab.braid([],b.n);
+      if m > 0
+	bm.word = repmat(b.word,[1 m]);
       else
-	bb = b.inv;
-	bb.word = repmat(bb.word,[1 -m]);
+	bm.word = repmat(b.inv.word,[1 -m]);
       end
     end
 
     function bi = inv(b)
-      b = braidlab.braid(b);
-      bi = braidlab.braid(-b.word(end:-1:1));
+      bi = braidlab.braid(-b.word(end:-1:1),b.n);
     end
 
     function str = char(b)

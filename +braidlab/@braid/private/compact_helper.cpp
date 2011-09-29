@@ -16,6 +16,19 @@
 
 extern void _main();
 
+
+// Delete two adjacent list entries specified by iterators.
+// it1 and it2 still adjacent after deletion, and point to the next
+// entries after the deleted ones.
+template<class T>
+inline
+void delete_two(T& b, typename T::iterator& it1, typename T::iterator& it2)
+{
+  it1 = b.erase(it1,++it2);
+  it2++ = it1;
+}
+
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   using std::cout;
@@ -25,7 +38,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Arguments checked and formatted in compact.m.
 
   const mxArray *wA = prhs[0];
-  const double *w = mxGetPr(wA);
+  const int *w = (int *)mxGetData(wA);
   const int N = max(mxGetM(wA),mxGetN(wA));
 
   const mxArray *tA = prhs[1];
@@ -55,16 +68,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (*it1 == -(*it2))
 	  {
 	    // Two adjacent generators cancel: eliminate them.
-	    it1 = bw.erase(it1,++it2);
-	    it2++ = it1;
+	    delete_two(bw,it1,it2);
 	    sw = true;
 
-	    if (dotimes)
-	      {
-		// Also erase the times.
-		itt1 = t.erase(itt1,++itt2);
-		itt2++ = itt1;
-	      }
+	    // Also erase the times.
+	    if (dotimes) delete_two(t,itt1,itt2);
 
 	    if (it2 == bw.end()) break;
 	  }
@@ -95,9 +103,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   //
   // Another option is to systematically list all shortening rules.
 
-  // Now copy list bw to an mxArray.
-  plhs[0] = mxCreateDoubleMatrix(1,bw.size(),mxREAL);
-  double *bwp = mxGetPr(plhs[0]);
+  // Now copy list bw to an mxArray of int32's.
+  plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);
+  int *bwp = (int *)mxGetData(plhs[0]);
   int k = 0;
   for (std::list<int>::const_iterator it = bw.begin();
        it != bw.end(); ++it, ++k)
