@@ -7,7 +7,7 @@
 %
 %    'delta'    the power M of Delta;
 %    'factors'  cell array of positive factors F;
-%    'n'        order of braid group.
+%    'n'        order of braid group (number of strands).
 %
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
 %   Handbook of Knot Theory, pp. 78-82.
