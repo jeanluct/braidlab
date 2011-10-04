@@ -2,8 +2,7 @@
     * For instance: no function name should begin with braid, since
       that's part of the namespace now.
     * loopsigma is also a bad name.
-      [crossings is bad: I want to reserve cross for crossing of
-      loops.]
+      [crossings is for generators; intersections is for loops.]
 
  * Make a @loop subfolder.  Should go in there:
     * Instead of loopsigma, create a loop object, and have a method to
