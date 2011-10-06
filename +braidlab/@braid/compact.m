@@ -15,6 +15,6 @@ function c = compact(b)
 
 if isempty(b), c = b; return; end
 
-[bc,tc] = compact_helper(b.word,b.t);
+bc = compact_helper(b.word);
 
-c = braidlab.braid(bc,b.n,tc);
+c = braidlab.braid(bc,b.n);

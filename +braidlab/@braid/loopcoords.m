@@ -65,7 +65,7 @@ if exist('vpi') == 2
 %  % specified large number of digits.
 %  l = braidlab.loopsigma(w,sfi(u,120,0));
 else
-  warning('BRAIDLAB:braid:loopcoords', ...
+  warning('BRAIDLAB:braid:loopcoords:overflow', ...
 	  'Integer overflow... switching to double-precision.')
   l = braidlab.loopsigma(w,u);
 end

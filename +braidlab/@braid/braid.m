@@ -9,9 +9,6 @@
 %
 %   BNEW = BRAID(B) constructs a new braid from the braid B.
 %
-%   For all these constructors a list of crossing times T may also be
-%   appended as a final argument.
-%
 %   See also CFBRAID.
 
 % set/get methods
@@ -21,28 +18,22 @@ classdef braid
   properties
     n = 1            % number of strands
     word = int32([]) % braid word in Artin generators
-    t = []           % crossing times
   end
 
   methods
 
-    function br = braid(b,nn,t)
+    function br = braid(b,nn)
       % Allow default empty braid: return identity with one strand.
-      if nargin ==0, return; end
+      if nargin == 0, return; end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
 	br.word  = b.word;
-	if nargin > 1
-	  br.t = nn;
-	else
-	  br.t = [];
-	end
       elseif max(size(size(b))) == 3
-	% The input is an array of data.
-	if nargin < 2
-	  nn = 1:size(b,1);
+	if nargin > 1
+	  error
 	end
-	br = color_braiding(b,nn);
+	% The input is an array of data.
+	br = color_braiding(b,1:size(b,1));
       else
 	% Store word as row vector.
 	if size(b,1) > size(b,2)
@@ -51,31 +42,9 @@ classdef braid
 	br.word = b;
 	if nargin < 2
 	  br.n = max(abs(b))+1;
-	  br.t = [];
 	else
-	  if isscalar(nn)
-	    if length(b) == 1
-	      % Ambiguous.
-	      error('BRAIDLAB:braid:braid',...
-		    ['Ambiguous scalar as second argument for braid of' ...
-		     ' length 1.'])
-	    end
-	    br.n = nn;
-	    if nargin > 2
-	      br.t = t;
-	    end
-	  else
-	    br.n = max(abs(b))+1;
-	    br.t = nn;
-	    if nargin > 2
-	      error
-	    end
-	  end
+	  br.n = nn;
 	end
-      end
-      % Store time as row vector.
-      if size(br.t,1) > size(br.t,2)
-	br.t = br.t.';
       end
     end
 
@@ -168,5 +137,12 @@ classdef braid
       l = length(b.word);
     end
 
-  end
-end
+  end % methods block
+
+  % Static methods defined in separate files.
+  % Need to execute 'clear classes' to register changes here.
+  methods (Static = true)
+    [b,tc] = crosstimes(XY,t)
+  end % static methods
+
+end % braid classdef

@@ -12,14 +12,14 @@ ii = 1:length(ti);
 XY = XY(ii,:,:); ti = ti(ii);
 
 % Close the braid.
-[XY,ti] = closure(XY,ti);
+XY = closure(XY);
 
 for k =1:4
-  plot(XY(:,1,k),ti,cl{k}), hold on
+  plot(XY(:,1,k),1:size(XY,1),cl{k}), hold on
 end
 hold off
 
-gen1 = braid(XY,ti);
+gen1 = braid(XY);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen1))
 gen1c = compact(gen1);
@@ -38,7 +38,7 @@ disp('Now rotate...')
 
 XYr = [XY(:,2,:) -XY(:,1,:)];
 
-gen2 = braid(XYr,ti);
+gen2 = braid(XYr);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen2))
 gen2c = compact(gen2);

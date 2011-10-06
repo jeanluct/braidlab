@@ -1,13 +1,9 @@
-function [varargout] = closure(XY,t)
+function [varargout] = closure(XY)
 %CLOSURE   Force closure of a set of trajectories to make a physical braid.
 %   XYC = CLOSURE(XY) takes the particle trajectory data in XY and appends
 %   the initial positions to the end of the list, in the correct order so
 %   that no new crossings are created (when projected along the X axis).
 %   The data format is XY(TIMESTEP,COORD,PARTICLES).
-%
-%   [XYC,TC] = CLOSURE(XY,T) appends an extra time to the time vector T,
-%   based on the spacing from the previous timestep, and returns the new
-%   vector as TC.
 %
 %   See also COLOR_BRAIDING.
 
