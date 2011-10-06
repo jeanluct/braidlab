@@ -41,38 +41,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int *w = (int *)mxGetData(wA);
   const int N = max(mxGetM(wA),mxGetN(wA));
 
-  const mxArray *tA = prhs[1];
-  const double *tp = mxGetPr(tA);
-  bool dotimes = true;
-  if (mxIsEmpty(tA)) dotimes = false;
-
   // Convert braid word to list.
   std::list<int> bw;
   for (int i = 0; i < N; ++i) bw.push_back((int)w[i]);
-
-  std::list<double> t;
-  if (dotimes)
-    {
-      for (int i = 0; i < N; ++i) t.push_back(tp[i]);
-    }
 
   // First use the commutation relations to bring generators as far
   // left as possible.  Delete (sig)(-sig) sequences as we go.
   bool sw;
   do {
     sw = false;
-    std::list<double>::iterator itt1 = t.begin(), itt2 = ++(t.begin());
     for (std::list<int>::iterator it1 = bw.begin(), it2 = ++(bw.begin());
-	 it2 != bw.end(); ++it1, ++it2, ++itt1, ++itt2)
+	 it2 != bw.end(); ++it1, ++it2)
       {
 	if (*it1 == -(*it2))
 	  {
 	    // Two adjacent generators cancel: eliminate them.
 	    delete_two(bw,it1,it2);
 	    sw = true;
-
-	    // Also erase the times.
-	    if (dotimes) delete_two(t,itt1,itt2);
 
 	    if (it2 == bw.end()) break;
 	  }
@@ -81,13 +66,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	    // Two adjacent generators commute: swap them.
 	    std::swap(*it1,*it2);
 	    sw = true;
-
-	    // We don't swap the times, to keep them chronological.
 	  }
       }
   } while (sw);
-
-  if (dotimes) assert(bw.size() == t.size());
 
   // Then eventually try to apply the other rules.
   //
@@ -111,18 +92,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        it != bw.end(); ++it, ++k)
     {
       bwp[k] = *it;
-    }
-
-  // Create empty matrix of times.
-  plhs[1] = mxCreateDoubleMatrix(1,t.size(),mxREAL);
-  if (dotimes)
-    {
-      double *tpp = mxGetPr(plhs[1]);
-      int k = 0;
-      for (std::list<double>::const_iterator it = t.begin();
-	   it != t.end(); ++it, ++k)
-	{
-	  tpp[k] = *it;
-	}
     }
 }

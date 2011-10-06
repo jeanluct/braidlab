@@ -14,13 +14,11 @@
       a private foldef.
     * Is it easy to determine the 'true' length of a loop from its
       coords?  That would be useful for Sarah's work.
+    * Should loopcoords become a constructor for a loop (from a braid)?
 
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
-    * crossing times are a real pain, since they don't make sense for
-      most operations.  Get rid of them?  But provide second "consructor"
-      which also returns crossing times (braidcross?).
 
  * cfbraid class: (for braid in canonical form)
 
