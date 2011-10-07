@@ -1,6 +1,14 @@
 %LOOP   Class for representing loops in Dynnikov coordinates.
 %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
-%   coordinates D.
+%   coordinates D.  D must have 2*N-4 elements, where N is the number of
+%   punctures.
+%
+%   L = LOOP(N) where N is an integer (N>1) creates a loop object L with N+1
+%   punctures.  The loop L is a (nonoriented) generating set for the
+%   fundamental group of the sphere with N punctures, with the extra
+%   puncture serving as the basepoint.  This sort of object is convenient
+%   when looking for growth of loops under braid action, or for testing
+%   for braid equality.
 %
 %   References:
 %
@@ -18,9 +26,11 @@
 %
 %   See also BRAID.
 
+% Why not keep a and b separate internally?
+
 classdef loop
   properties
-    coords = [0 1];  % Dynnikov coordinates
+    coords = [0 -1]; % Dynnikov coordinates
   end
   properties (Dependent = true)
     n                % number of strands
@@ -33,6 +43,18 @@ classdef loop
     function l = loop(c)
       % Default loop around first two of three punctures.
       if nargin == 0, return; end
+      if isscalar(c)
+	% Nested generators of the fundamental group of a sphere with c
+        % punctures with an extra basepoint puncture on the right.
+	if c < 2
+	  error('BRAIDLAB:loop:loop', ...
+		'Need at least two punctures.');
+	end
+	n1 = c-1;
+	l.coords = zeros(1,2*n1);
+	l.coords(n1+1:end) = -1;
+	return
+      end
       if isa(c,'braidlab.loop')
 	l.coords = c.coords;
 	return
