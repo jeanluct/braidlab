@@ -11,7 +11,7 @@ function [varargout] = color_braiding(XY,t)
 %
 %   See also COLOR_BRAIDING_SUB.
 
-import braidlab.interpcross braidlab.debugmsg
+import braidlab.debugmsg
 
 debugmsg('Part 1: Initialize parameters for crossing analysis')
 
