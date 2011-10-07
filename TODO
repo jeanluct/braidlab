@@ -5,13 +5,10 @@
       [crossings is for generators; intersections is for loops.]
 
  * Make a @loop subfolder.  Should go in there:
-    * Instead of loopsigma, create a loop object, and have a method to
-      compute the product of a braid and a loop?  Only enfore that the
-      number of punctures be at least n when acting with a braid,
-      since we may want more punctures (as for normal form).
     * What type for the loop entries?
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
-      a private foldef.
+      a private foldef.  [Well, need to keep vectorized version.  Not
+      sure how to do that.  Have a class "loops"?]
     * Is it easy to determine the 'true' length of a loop from its
       coords?  That would be useful for Sarah's work.
     * Should loopcoords become a constructor for a loop (from a braid)?
@@ -29,10 +26,8 @@
     * Do we need color_braiding_sub?  Maybe write something that works
       from the braid directly.
 
- * Move interpcross to private.
-
  * Makefile:
-    * Once @loop folder is added, make another Makefile in there.
+    * Once @loop folder is added, make another Makefile in private subfolder.
     * Avoid rebuilding libcbraid every time a CPP file is compiled:
       can we run a command once at the start of a Makefile?
     * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.

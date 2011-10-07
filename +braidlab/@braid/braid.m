@@ -9,7 +9,7 @@
 %
 %   BNEW = BRAID(B) constructs a new braid from the braid B.
 %
-%   See also CFBRAID.
+%   See also LOOP, CFBRAID.
 
 % set/get methods
 % better naming convention for vars
@@ -64,6 +64,8 @@ classdef braid
     % Make sure it's an int32, internally.
     function obj = set.word(obj,value)
       obj.word = int32(value);
+      % Raise n if necessary, and convert to double (eventually make int32?).
+      obj.n = double(max(obj.n,max(abs(obj.word))+1));
     end
 
     function ee = eq(b1,b2)
@@ -99,7 +101,20 @@ classdef braid
     end
  
     function b12 = mtimes(b1,b2)
-      b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
+      if isa(b2,'braidlab.braid')
+	b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
+      else
+	% Action of braid on a loop.
+	%
+	% Have to define this here, rather than in the loop class, since the
+        % braid goes on the left, and Matlab determines which overloaded
+        % function to call by looking at the first argument.
+	if b1.n > b2.n
+	  error('BRAIDLAB:braid:mtimes', ...
+		'Generator values too lage for the loop.')
+	end
+	b12 = braidlab.loop(braidlab.loopsigma(b1.word,b2.coords));
+      end
     end
 
     function bm = mpower(b,m)
