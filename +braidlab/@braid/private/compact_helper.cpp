@@ -11,7 +11,8 @@
 
 #include <iostream>
 #include <list>
-#include <cassert>
+#include <vector>
+#include <algorithm>
 #include "mex.h"
 
 extern void _main();
@@ -29,35 +30,23 @@ void delete_two(T& b, typename T::iterator& it1, typename T::iterator& it2)
 }
 
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+template<class T>
+inline
+bool sort_and_cancel(T& bw)
 {
-  using std::cout;
-  using std::endl;
-  using std::max;
-
-  // Arguments checked and formatted in compact.m.
-
-  const mxArray *wA = prhs[0];
-  const int *w = (int *)mxGetData(wA);
-  const int N = max(mxGetM(wA),mxGetN(wA));
-
-  // Convert braid word to list.
-  std::list<int> bw;
-  for (int i = 0; i < N; ++i) bw.push_back((int)w[i]);
-
-  // First use the commutation relations to bring generators as far
-  // left as possible.  Delete (sig)(-sig) sequences as we go.
-  bool sw;
+  // Use the commutation relations to bring generators as far left as
+  // possible.  Delete (sig)(-sig) sequences as we go.
+  bool sw, anysw = false;
   do {
     sw = false;
-    for (std::list<int>::iterator it1 = bw.begin(), it2 = ++(bw.begin());
+    for (typename T::iterator it1 = bw.begin(), it2 = ++(bw.begin());
 	 it2 != bw.end(); ++it1, ++it2)
       {
 	if (*it1 == -(*it2))
 	  {
 	    // Two adjacent generators cancel: eliminate them.
 	    delete_two(bw,it1,it2);
-	    sw = true;
+	    sw = anysw = true;
 
 	    if (it2 == bw.end()) break;
 	  }
@@ -65,10 +54,40 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	  {
 	    // Two adjacent generators commute: swap them.
 	    std::swap(*it1,*it2);
-	    sw = true;
+	    sw = anysw = true;
 	  }
       }
   } while (sw);
+
+  return anysw;
+}
+
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  using std::cout;
+  using std::endl;
+  using std::max;
+  typedef std::list<int>::iterator listit;
+
+  // Arguments checked and formatted in compact.m.
+
+  const mxArray *wA = prhs[0];
+  const int *w = (int *)mxGetData(wA);
+  const int N = max(mxGetM(wA),mxGetN(wA));
+  int n = 1;
+
+  // Convert braid word to list.
+  /* Would it be faster to use a vector, and overwrite deleted
+     generators with zeros? */
+  std::list<int> bw;
+  for (int i = 0; i < N; ++i)
+    {
+      n = max(n,abs((int)w[i])+1);
+      bw.push_back((int)w[i]);
+    }
+
+  sort_and_cancel(bw);
 
   // Then eventually try to apply the other rules.
   //
@@ -83,6 +102,67 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // commutativity rule.
   //
   // Another option is to systematically list all shortening rules.
+
+#if 0
+  for (int j = 0; j < 1; ++j) // Doing this a few times often helps.
+    {
+      bool any;
+      do {
+	any = false;
+	for (int i = 1; i <= n-2; ++i)
+	  {
+	    std::vector<int> pat(3);
+	    pat[0] = i;
+	    pat[1] = i+1;
+	    pat[2] = i;
+	    listit it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+	    if (it != bw.end())
+	      {
+		*(it++) = i+1;
+		*(it++) = i;
+		*(it) =   i+1;
+		any = sort_and_cancel(bw);
+	      }
+
+	    pat[0] = -i;
+	    pat[1] = -(i+1);
+	    pat[2] = -i;
+	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+	    if (it != bw.end())
+	      {
+		*(it++) = -(i+1);
+		*(it++) = -i;
+		*(it) =   -(i+1);
+		any = sort_and_cancel(bw);
+	      }
+
+	    pat[0] = i+1;
+	    pat[1] = i;
+	    pat[2] = i+1;
+	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+	    if (it != bw.end())
+	      {
+		*(it++) = i;
+		*(it++) = i+1;
+		*(it) =   i;
+		any = sort_and_cancel(bw);
+	      }
+
+	    pat[0] = -(i+1);
+	    pat[1] = -i;
+	    pat[2] = -(i+1);
+	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+	    if (it != bw.end())
+	      {
+		*(it++) = -i;
+		*(it++) = -(i+1);
+		*(it) =   -i;
+		any = sort_and_cancel(bw);
+	      }
+	  }
+      } while (any);
+    }
+#endif
 
   // Now copy list bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);

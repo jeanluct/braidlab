@@ -32,7 +32,7 @@
  * Move interpcross to private.
 
  * Makefile:
-    * Once +loop folder is added, make another Makefile in there.
+    * Once @loop folder is added, make another Makefile in there.
     * Avoid rebuilding libcbraid every time a CPP file is compiled:
       can we run a command once at the start of a Makefile?
     * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.
