@@ -16,6 +16,7 @@
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
+    * plot method.
 
  * cfbraid class: (for braid in canonical form)
 

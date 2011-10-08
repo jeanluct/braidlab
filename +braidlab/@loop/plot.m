@@ -1,4 +1,4 @@
-function plot(L,color,X,prad)
+function plot(L,colr,X,prad)
 %PLOT   Plot a loop.
 %   PLOT(L,COLOR,X,PRAD) plots a representative of the equivalence class
 %   define by the loop L.  COLOR may be speficied optionally, as well as the
@@ -21,68 +21,34 @@ else
   clf reset
 end
 
-if nargin < 1
-  % Sample loop.
-  Dyn = [ 1 0 2 0 ];
-else
-  Dyn = L.coords;
-end
+n = L.n;
+lw = 2; % default line width
 
-n = (size(Dyn,2)+4)/2;
-lw = 2;
+if nargin < 2, colr = 'b'; end
 
-if nargin<2
-  color = 'b';
-end
-
-if nargin<3
+if nargin < 3
   X = [(1:n)' 0*(1:n)'];
 end
 
 Xs = sortrows(X);
 
-if floor(n)~=n
-  error('There must be an even number of Dynnikov coordinates');
-end
-if n~=size(X,1)
-  error('Number of points does not match Dynnikov coordinates');
+if n ~= length(X)
+  error('BRAIDLAB:loop:badrad','Length of X does not match loop.')
 end
 
 d = zeros(size(Xs,1)-1,1);
-
 for i = 1:n-1
   d(i) = sqrt((Xs(i,1)-Xs(i+1,1))^2+(Xs(i,2)-Xs(i+1,2))^2);
 end
 
-a = Dyn(:,1:n-2);
-b = Dyn(:,(n-1):end);
+[a,b] = L.ab;
 
-% Convert Dynnikov coding to crossing numbers.
-% (make a new dynn2cross function)
-cumb = [zeros(size(Dyn,1),1) cumsum(b,2)];
-% The number of intersections before/after the first and last punctures.
-% See Hall & Yurttas (2009).
-b0 = -max(abs(a) + max(b,0) + cumb(:,1:end-1),[],2);
-bn = -b0 - sum(b,2);
+% Convert Dynnikov coding to intersection numbers.
+[mu,nu] = L.intersec;
+
 % Extend the coordinates.
-
-B = [b0 b bn];
-A = zeros(size(a,1),size(a,2)+2);
-A(:,2:end-1) = a;
-% Find nu, mu (crossing numbers).
-nu(1) = -2*b0;
-for i = 2:n-1
-  nu(i) = nu(i-1) - 2*B(i-1 + 1);
-end
-for i = 1:2*n-4
-  ic = ceil(i/2);
-  mu(i) = (-1)^i * A(ic + 1);
-  if B(ic + 1) >= 0
-    mu(i) = mu(i) + nu(ic)/2;
-  else
-    mu(i) = mu(i) + nu(ic+1)/2;
-  end
-end
+B = [-nu(1)/2 b nu(end)/2];
+A = [0 a 0];
 
 % Convert to older P,M,N notation.
 P = nu/2;
@@ -91,8 +57,7 @@ N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 b = B;
 a = A;
 
-gap = 0*d;
-
+gap = zeros(size(d));
 for i = 1:n-1
   gap(i) = min(d(i)/M(i),d(i)/N(i))*.7;
 end
@@ -143,7 +108,7 @@ for p = 1:n
     xx = sign(nl)*linspace(0,rad,50);
     yy1 = sqrt(rad^2 - xx.^2);
     yy2 = -sqrt(rad^2 - xx(end:-1:1).^2);
-    plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],color,'LineWidth',lw)    
+    plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],colr,'LineWidth',lw)    
   end
 end
 
@@ -174,14 +139,14 @@ for p = 1:n-1
     for s = 1:tojoindown
       y1 = pgap(p)*(nr+s)+Xs(p,2);
       y2 = -pgap(p+1)*(nl-s+tojoindown+1)+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],color,'LineWidth',lw)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],colr,'LineWidth',lw)
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       y1 = pgap(p)*(nr+s)+Xs(p,2);
       y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+Xs(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],color,'LineWidth',lw)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],colr,'LineWidth',lw)
     end
   end
 end
@@ -212,13 +177,13 @@ for p = 1:n-1
     for s = 1:tojoinup
       y1 = -pgap(p)*(nr+s)+Xs(p,2);
       y2 = pgap(p+1)*(nl-s+tojoinup+1)+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],color,'LineWidth',lw)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],colr,'LineWidth',lw)
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
       y1 = -pgap(p)*(nr+s)+Xs(p,2);
       y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],color,'LineWidth',lw)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],colr,'LineWidth',lw)
     end
   end
 end
