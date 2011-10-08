@@ -5,13 +5,13 @@
       [crossings is for generators; intersections is for loops.]
 
  * Make a @loop subfolder.  Should go in there:
-    * What type for the loop entries?
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.  [Well, need to keep vectorized version.  Not
       sure how to do that.  Have a class "loops"?]
+    * recover crossing numbers: see dynn2cross.
+    * What type for the loop entries?
     * Is it easy to determine the 'true' length of a loop from its
       coords?  That would be useful for Sarah's work.
-    * Should loopcoords become a constructor for a loop (from a braid)?
 
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
@@ -28,12 +28,6 @@
     * Projection line angle.
     * Do we need color_braiding_sub?  Maybe write something that works
       from the braid directly.
-
- * Makefile:
-    * Once @loop folder is added, make another Makefile in private subfolder.
-    * Avoid rebuilding libcbraid every time a CPP file is compiled:
-      can we run a command once at the start of a Makefile?
-    * Makefile.matlab for cbraid: build special library. Or Makefile.cbraid.
 
 
 Which functions could benefit from MEXing?

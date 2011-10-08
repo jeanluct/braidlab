@@ -1,7 +1,8 @@
-%LOOP   Class for representing loops in Dynnikov coordinates.
+%LOOP   Class for representing topological loops in Dynnikov coordinates.
 %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
 %   coordinates D.  D must have 2*N-4 elements, where N is the number of
-%   punctures.
+%   punctures.  Here, loop means a "topological loop", or more precisely an
+%   equivalence class of simple closed multicurves under isotopy.
 %
 %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
 %   coordinates, each of length N-2, where N is the number of punctures.
