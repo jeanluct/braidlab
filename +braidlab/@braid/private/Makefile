@@ -18,14 +18,15 @@ CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 
 CBRAID_LIBDIR     = ../../../cbraid/lib
 CBRAID_INCLUDEDIR = ../../../cbraid/include
-CBRAID_LD         = -lcbraid
+CBRAID_LD         = -lcbraid-mex
 
 %.$(MEXSUFFIX): %.c
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
 %.$(MEXSUFFIX): %.cpp
-	# Rebuild libcbraid.a with the MEX-compatible compiler.
-	cd $(CBRAID_LIBDIR); make clean ; make CXX=$(CXX) CC=$(CC)
+	# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
+	cd $(CBRAID_LIBDIR); \
+		make -f ../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
