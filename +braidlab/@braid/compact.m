@@ -3,7 +3,7 @@ function c = compact(b)
 %   C = COMPACT(B) attempts to shorten a braid B by using group properties,
 %   and returns the shortened braid C.  The group relations are
 %
-%     S_i S_j = S_j S_i ,   |i-j| > 1
+%     S_i S_j = S_j S_i ,   |i-j| > 1,   i,j = 1,..,n-1
 %
 %     S_i S_(i+1) S_i = S_(i+1) S_i S_(i+1),   i = 1,..,n-2
 %

@@ -29,7 +29,7 @@ CBRAID_LD         = -lcbraid
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-all: compact_helper.$(MEXSUFFIX)
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
