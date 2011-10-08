@@ -19,6 +19,9 @@
 
  * cfbraid class: (for braid in canonical form)
 
+ * closure: implement various options, in particular "lowest L2" and
+   maybe "lowest entropy".  Do these have to scale as n! ?
+
  * Check types when invoking MEX files.
 
  * creating braids from data:

@@ -3,12 +3,19 @@
 %   coordinates D.  D must have 2*N-4 elements, where N is the number of
 %   punctures.
 %
+%   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
+%   coordinates, each of length N-2, where N is the number of punctures.
+%
 %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with N+1
 %   punctures.  The loop L is a (nonoriented) generating set for the
 %   fundamental group of the sphere with N punctures, with the extra
 %   puncture serving as the basepoint.  This sort of object is convenient
 %   when looking for growth of loops under braid action, or for testing
 %   for braid equality.
+%
+%   LC = LOOP(L) copies the loop L to the loop LC.
+%
+%   METHODS(LOOP) shows a list of methods.
 %
 %   References:
 %
@@ -40,10 +47,10 @@ classdef loop
 
   methods
 
-    function l = loop(c)
+    function l = loop(c,b)
       % Default loop around first two of three punctures.
       if nargin == 0, return; end
-      if isscalar(c)
+      if isscalar(c) & ~isa(c,'braidlab.loop')
 	% Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
 	if c < 2
@@ -59,11 +66,24 @@ classdef loop
 	l.coords = c.coords;
 	return
       end
-      if mod(length(c),2) == 1
-	error('BRAIDLAB:loop:loop', ...
-	      'Coordinate vector must have even number of elements.')
+      if nargin == 1
+	% Create from a single vector of even length.
+	if mod(length(c),2) == 1
+	  error('BRAIDLAB:loop:loop', ...
+		'Loop coordinate vector must have even length.')
+	end
+	l.coords = c;
+      else
+	% Create a,b separately from two vectors of the same length.
+	if length(c) ~= length(b)
+	  error('BRAIDLAB:loop:loop', ...
+		'Loop coordinate vectors must have the same length.')
+	end
+	n1 = length(c);
+	l.coords = zeros(1,2*n1);
+	l.coords(1:n1) = c;
+	l.coords(n1+1:end) = b;
       end
-      l.coords = c;
     end
 
     % Use this to add a puncture?

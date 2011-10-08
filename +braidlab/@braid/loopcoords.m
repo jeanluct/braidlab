@@ -16,36 +16,46 @@ function l = loopcoords(b,conv)
 %   Dynnikov coordinates as (a(1),..,a(n-1),b(1),..,b(n-1)), rather than
 %   (a(1),b(1),...,a(n-1),b(n-1)).
 %
+%   Example: consider the braid of Dehornoy's Example 3.15:
+%
+%   >> b=braid([1 -2 1 2 1 3 -1 -2 -1 -2 -1 2 2 -3 -2]);
+%   >> b.loopcoords('dehornoy')  % use Dehornoy's convention
+%
+%   ans = 
+%
+%   (( 1 -6  1 -7  4 -1 ))
+%
+%   This is the same as Dehornoy's (1,-7,-6,4,1,-1,0,8), since the last two
+%   numbers can be dropped, and his notation is (a1,b1,a2,b2,a3,b3) compared
+%   to our (a1,a2,a3,b1,b2,b3).
+%
 %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
 %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
 %
-%   See also BRAID.
+%   See also BRAID, LOOP.
 
 if nargin < 2
   conv = 'right';
 end
 
-% Add an extra puncture to the Dynnikov coordinates, corresponding to the
-% boundary.
-n1 = b.n-1; u = zeros(1,2*n1);
-
 switch lower(conv)
  case {'left','dehornoy'}
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the left.
-  u(n1+1:2*n1) = 1;
+  n1 = b.n-1;
+  l = braidlab.loop(zeros(1,n1),ones(1,n1));
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
   if strcmp(conv,'dehornoy'), w = -w; end % Dehornoy uses anticlockwise conv.
  case 'right'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the right.
-  u(n1+1:2*n1) = -1;
+  l = braidlab.loop(b.n);
   % No need to convert sigmas.
   w = b.word;
 end
 
-l = braidlab.loopsigma(w,int64(u));
+l = braidlab.loop(loopsigma(w,int64(l.coords)));
 
 % Check for overflow/underflow.
 % This doesn't seem very robust to me, but I can't find another way.
@@ -53,7 +63,9 @@ l = braidlab.loopsigma(w,int64(u));
 % returns intmax as well.  So there is no simple way to know if the quantity
 % overflowed but then was brought below intmax subsequently.  Would need
 % to check for this in loopsigma itself.
-if ~any(l == intmax('int64') | l == intmin('int64')), return; end
+if ~any(l.coords == intmax('int64') | l.coords == intmin('int64'))
+  return
+end
 
 if exist('vpi') == 2
   % Use variable precision integers if available.

@@ -3,11 +3,17 @@
 %   B = BRAID(W,N) specifies the order of the braid group N, which is
 %   otherwise guessed from the maximal elements of W.
 %
+%   The braid group generators are represented as a list of integers I
+%   satisfying -N < I < N.  The usual group operations (multiplication,
+%   inverse, powers) can be performed on braids.
+%
 %   B = BRAID(XY) construst a braid from a trajectory dataset XY.
 %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
 %   of time steps and N is the number of particles.
 %
-%   BNEW = BRAID(B) constructs a new braid from the braid B.
+%   BC = BRAID(B) copies the braid B to the braid BC.
+%
+%   METHODS(BRAID) shows a list of methods.
 %
 %   See also LOOP, CFBRAID.
 
@@ -113,7 +119,7 @@ classdef braid
 	  error('BRAIDLAB:braid:mtimes', ...
 		'Generator values too lage for the loop.')
 	end
-	b12 = braidlab.loop(braidlab.loopsigma(b1.word,b2.coords));
+	b12 = braidlab.loop(loopsigma(b1.word,b2.coords));
       end
     end
 
