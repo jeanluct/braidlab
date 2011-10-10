@@ -80,13 +80,13 @@ classdef braid
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
       % overflow.  Check for that.
-      if ee, ee = ~any(loopcoords(b1) ~= loopcoords(b2)); end
+      if ee, ee = all(loopcoords(b1) == loopcoords(b2)); end
     end
 
     function ee = lexeq(b1,b2)
     %LEXEQ   Test braids for lexicographical equality.
       ee = b1.n == b2.n & length(b1) == length(b2);
-      if ee, ee = ~any(b1.word ~= b2.word); end
+      if ee, ee = all(b1.word == b2.word); end
     end
 
     function ee = ne(b1,b2)

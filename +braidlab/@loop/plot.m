@@ -57,23 +57,22 @@ N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 b = B;
 a = A;
 
+% The gap between lines.
+% (clarify: gap vs pgap?)
+% TODO: Keep punctures same size (need special gap near x-axis).
 gap = zeros(size(d));
 for i = 1:n-1
   gap(i) = min(d(i)/M(i),d(i)/N(i))*.7;
 end
-
 pgap = zeros(n,1);
-
 pgap(1) = gap(1);
 pgap(end) = gap(end);
-
 for i = 2:n-1
   pgap(i) = min(gap(i),gap(i-1));
 end
-
 pgap = min(pgap)/2+zeros(n,1);
 
-if nargin<4
+if nargin < 4
   prad = .15*min(gap);
 end
 
