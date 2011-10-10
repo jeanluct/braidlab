@@ -114,7 +114,7 @@ classdef loop
     function ee = eq(l1,l2)
     %EQ   Test loops for equality.
       ee = l1.n == l2.n;
-      if ee, ee = ~any(l1.coords ~= l2.coords); end
+      if ee, ee = all(l1.coords == l2.coords); end
     end
 
     function ee = ne(l1,l2)
