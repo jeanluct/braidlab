@@ -46,7 +46,7 @@ bool sort_and_cancel(T& b)
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
     }
-  while (sw);
+  while (sw && b.size() > 1);
 
   return anysw;
 }
