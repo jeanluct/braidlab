@@ -11,7 +11,8 @@ function [varargout] = intersec(obj)
 %   [2] J.-L. Thiffeault, "Braids of entangled particle trajectories," Chaos
 %   20 (2010), 017516.
 %
-%   See also LOOP.
+%   This is a method for the LOOP class.
+%   See also LOOP, LOOP.INTAXIS.
 
 n = obj.n;
 [a,b] = obj.ab;

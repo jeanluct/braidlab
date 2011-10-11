@@ -8,11 +8,8 @@ function plot(L,colr,X,prad)
 %   puncture radius can be set with PRAD, otherwise the code selects the
 %   best size for a given loop.
 %
+%   This is a method for the LOOP class.
 %   See also LOOP.
-
-% The code begins with breaking the Dynnikov coordinates into the PMN
-% coordinates then uses these values to determine where the lines that make
-% up the loop are and how to connect them.
 
 if ishold
   holdstate = true;

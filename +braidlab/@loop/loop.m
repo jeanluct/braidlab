@@ -1,20 +1,21 @@
 %LOOP   Class for representing topological loops in Dynnikov coordinates.
-%   L = LOOP(D) creates a loop object L from a vector of Dynnikov
-%   coordinates D.  D must have 2*N-4 elements, where N is the number of
-%   punctures.  Here, loop means a "topological loop", or more precisely an
-%   equivalence class of simple closed multicurves under isotopy.
+%   A LOOP object represents an equivalence class (under isotopy) of simple
+%   closed loops on a disk with N punctures.  The representative loop is
+%   encoded in Dynnikov coordinates.  We use the shorthand "loop" to refer
+%   to the entire equivalence class.  The loops represented may be
+%   multiloops (with disjoint, nonintersecting components), and each
+%   component is essential (not contractible to the punctures or the
+%   boundary).
 %
-%   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
-%   coordinates, each of length N-2, where N is the number of punctures.
+%   The class LOOP has only one data member:
 %
-%   L = LOOP(N) where N is an integer (N>1) creates a loop object L with N+1
-%   punctures.  The loop L is a (nonoriented) generating set for the
-%   fundamental group of the sphere with N punctures, with the extra
-%   puncture serving as the basepoint.  This sort of object is convenient
-%   when looking for growth of loops under braid action, or for testing
-%   for braid equality.
+%    'coords'   vector of Dynnikov coordinates [a,b] of length 2N-4.
 %
-%   LC = LOOP(L) copies the loop L to the loop LC.
+%   In addition, LOOP has the dependent properties
+%
+%    'n'        the number of punctures;
+%    'a'        the 'a' vector of Dynnikov coordinates, of length N-2;
+%    'b'        the 'b' vector of Dynnikov coordinates, of length N-2.
 %
 %   METHODS(LOOP) shows a list of methods.
 %
@@ -32,9 +33,7 @@
 %   J.-L. Thiffeault, "Braids of entangled particle trajectories," Chaos
 %   20 (2010), 017516.
 %
-%   See also BRAID.
-
-% Why not keep a and b separate internally?
+%   See also LOOP.LOOP (constructor), BRAID.
 
 classdef loop
   properties
@@ -49,6 +48,25 @@ classdef loop
   methods
 
     function l = loop(c,b)
+    %LOOP   Construct a loop object.
+    %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
+    %   coordinates D.  D must have 2*N-4 elements, where N is the number of
+    %   punctures.  Here, loop means a "topological loop", or more precisely
+    %   an equivalence class of simple closed multicurves under isotopy.
+    %
+    %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
+    %   coordinates, each of length N-2, where N is the number of punctures.
+    %
+    %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
+    %   N+1 punctures.  The loop L is a (nonoriented) generating set for the
+    %   fundamental group of the sphere with N punctures, with the extra
+    %   puncture serving as the basepoint.  This sort of object is
+    %   convenient when looking for growth of loops under braid action, or
+    %   for testing for braid equality.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
+
       % Default loop around first two of three punctures.
       if nargin == 0, return; end
       if isscalar(c) & ~isa(c,'braidlab.loop')
@@ -105,34 +123,45 @@ classdef loop
     end
 
     function [a,b] = ab(obj)
+    %AB   Return the A and B vectors of Dynnikov coordinates.
+    %   [A,B] = AB(L) returns the A and B Dynnikov coordinate vectors of
+    %   a loop L.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
       a = obj.a; b = obj.b;
     end
-
-    %function obj = set.coords(obj,value)
-    %end
 
     function ee = eq(l1,l2)
     %EQ   Test loops for equality.
     %
     %   This is a method for the LOOP class.
+    %   See also LOOP, BRAID.EQ.
       ee = l1.n == l2.n;
       if ee, ee = all(l1.coords == l2.coords); end
     end
 
     function ee = ne(l1,l2)
+    %NE   Test loops for inequality.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.EQ.
       ee = ~(l1 == l2);
     end
 
-    % Conversion to a vector.
-    function c = double(obj)
-      c = obj.coords;
-    end
- 
     function str = char(obj)
+    %CHAR   Convert loop to string.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.DISP.
       str = ['(( ' num2str(obj.coords) ' ))'];
     end
 
     function disp(obj)
+    %DISP   Display a loop.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.DISP.
        c = char(obj);
        if iscell(c)
 	 disp(['     ' c{:}])
@@ -148,6 +177,7 @@ classdef loop
     %   are one unit apart.
     %
     %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.INTAXIS.
       [~,nu] = obj.intersec;
       l = sum(nu);
     end
@@ -158,6 +188,7 @@ classdef loop
     %   loop L with the real axis.
     %
     %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.LENGTH.
       [a,b] = obj.ab;
 
       % The number of intersections before/after the first and last punctures.

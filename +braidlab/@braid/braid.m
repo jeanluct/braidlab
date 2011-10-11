@@ -1,25 +1,14 @@
 %BRAID   Class for representing braids.
-%   B = BRAID(W) creates a braid object B from a vector of generators W.
-%   B = BRAID(W,N) specifies the number of strings N of the braid group,
-%   which is otherwise guessed from the maximal elements of W.
+%   A BRAID object holds a braid represented in terms of Artin generators.
 %
-%   The braid group generators are represented as a list of integers I
-%   satisfying -N < I < N.  The usual group operations (multiplication,
-%   inverse, powers) can be performed on braids.
+%   The class BRAID has the following data members:
 %
-%   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
-%   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
-%   of time steps and N is the number of particles.
-%
-%   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
-%   object BC.
+%    'word'     vector of signed integers (int32) giving the Artin generators.
+%    'n'        number of strings in the braid.
 %
 %   METHODS(BRAID) shows a list of methods.
 %
-%   See also LOOP, CFBRAID.
-
-% set/get methods
-% better naming convention for vars
+%   See also BRAID.BRAID (constructor), CFBRAID.
 
 classdef braid
   properties
@@ -30,7 +19,26 @@ classdef braid
   methods
 
     function br = braid(b,nn)
-      % Allow default empty braid: return identity with one string.
+    %BRAID   Construct the a braid object.
+    %   B = BRAID(W) creates a braid object B from a vector of generators W.
+    %   B = BRAID(W,N) specifies the number of strings N of the braid group,
+    %   which is otherwise guessed from the maximal elements of W.
+    %
+    %   The braid group generators are represented as a list of integers I
+    %   satisfying -N < I < N.  The usual group operations (multiplication,
+    %   inverse, powers) can be performed on braids.
+    %
+    %   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
+    %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
+    %   of time steps and N is the number of particles.
+    %
+    %   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
+    %   object BC.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, CFBRAID.
+
+      % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
@@ -116,23 +124,30 @@ classdef braid
       ee = ~(b1 == b2);
     end
 
-    %function ee = isempty(b)
-    %  ee = isempty(b.word);
-    %end
-
-    function ee = isidentity(b)
-    %ISIDENTITY   Returns true if braid is the identity braid.
+    function ee = istrivial(b)
+    %ISTRIVIAL   Returns true if braid is the trivial braid.
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.EQ.
       ee = isempty(b.word);
     end
 
-    % Conversion to a vector.
-    %function c = double(obj)
-    %  c = obj.word;
-    %end
- 
+    function ee = ispositive(obj)
+    %ISPURE   Returns true if braid is positive.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.ISPURE, BRAID.INV.
+      ee = all(obj.word > 0);
+    end
+
+    function ee = ispure(obj)
+    %ISPURE   Returns true if braid is a pure braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.PERM.
+      ee = all(obj.perm == 1:obj.n);
+    end
+
     function b12 = mtimes(b1,b2)
     %MTIMES   Multiply two braids together.
     %
@@ -175,7 +190,31 @@ classdef braid
       bi = braidlab.braid(-b.word(end:-1:1),b.n);
     end
 
+    function p = perm(obj)
+    %PERM   Permutation corresponding to a braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.ISPURE.
+      p = 1:obj.n;
+      for i = 1:length(obj.word)
+	s = abs(obj.word(i));
+	p([s s+1]) = p([s+1 s]);
+      end
+    end
+
+    function wr = writhe(obj)
+    %WRITHE   Writhe of a braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID.
+      wr = sum(sign(obj.word));
+    end
+
     function str = char(b)
+    %CHAR   Convert braid to string.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.DISP.
       if isempty(b.word)
 	str = 'e';
       else
@@ -185,6 +224,10 @@ classdef braid
     end
 
     function disp(b)
+    %DISP   Display a braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.CHAR.
        c = char(b);
        if iscell(c)
 	 disp(['     ' c{:}])
