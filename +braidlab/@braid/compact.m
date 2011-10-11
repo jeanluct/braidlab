@@ -9,7 +9,17 @@ function c = compact(b)
 %
 %   where S(i), i = 1,..n-1 are the Artin generators.
 %
-%   Note that COMPACT doesn't guarantee the shortest length.
+%   Note that COMPACT doesn't guarantee the shortest length, since this is a
+%   co-NP-complete problem (Ref. [1]).  But it uses the algorithm in
+%   Ref. [2] which is known to do pretty well at shortening braids.
+%
+%   References
+%
+%   [1] M. S. Paterson and A. A. Razborov, "The set of minimal braids is
+%   co-NP-complete," J. Algorithms 12 (1991), 393-408.
+%
+%   [2] P. D. Bangert, M. A. Berger and R. Prandi, "In search of minimal
+%   random braid configurations," J. Phys. A 35 (2002), 43-59.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID.

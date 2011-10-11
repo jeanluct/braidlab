@@ -69,7 +69,8 @@ classdef cfbraid
    %EQ   Test for equality of braids.
       fac1 = cell2mat(b1.factors);
       fac2 = cell2mat(b2.factors);
-      ee = b1.n == b2.n & b1.delta == b2.delta & all(fac1 == fac2);
+      ee = b1.n == b2.n & b1.delta == b2.delta & length(fac1) == length(fac2);
+      if ee, ee = all(fac1 == fac2); end
     end
 
     function ee = ne(b1,b2)
