@@ -1,7 +1,7 @@
 %BRAID   Class for representing braids.
 %   B = BRAID(W) creates a braid object B from a vector of generators W.
-%   B = BRAID(W,N) specifies the order of the braid group N, which is
-%   otherwise guessed from the maximal elements of W.
+%   B = BRAID(W,N) specifies the number of strings N of the braid group,
+%   which is otherwise guessed from the maximal elements of W.
 %
 %   The braid group generators are represented as a list of integers I
 %   satisfying -N < I < N.  The usual group operations (multiplication,
@@ -22,14 +22,14 @@
 
 classdef braid
   properties
-    n = 1            % number of strands
+    n = 1            % number of strings
     word = int32([]) % braid word in Artin generators
   end
 
   methods
 
     function br = braid(b,nn)
-      % Allow default empty braid: return identity with one strand.
+      % Allow default empty braid: return identity with one string.
       if nargin == 0, return; end
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
@@ -56,12 +56,12 @@ classdef braid
 
     function obj = set.n(obj,value)
       if value < 1
-	error('BRAIDLAB:braid:setn','Need at least one strand.')
+	error('BRAIDLAB:braid:setn','Need at least one string.')
       end
       if ~isempty(obj.word)
         if value < max(abs(obj.word))+1
 	  error('BRAIDLAB:braid:setn',...
-		'Too few strands for generators.')
+		'Too few strings for generators.')
 	end
       end
       obj.n = value;

@@ -7,7 +7,7 @@
 %
 %    'delta'    the power of positive-half twists Delta;
 %    'factors'  cell array of positive factors F;
-%    'n'        order of braid group (number of strands).
+%    'n'        number of strings in the braid.
 %
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
 %   Handbook of Knot Theory, pp. 78-82.
@@ -28,7 +28,8 @@ classdef cfbraid
     %   B = CFBRAID(W) constructs the left canonical form of a braid word W
     %   expressed as a list of Artin generators.  W can also be a BRAID or
     %   CFBRAID object.  If W is a list, CFBRAID(W,N) can be used to specify
-    %   the order N of the braid group, which is otherwise guessed from W.
+    %   the number of strings N of the braid group, which is otherwise
+    %   guessed from W.
     %
     %   See also BRAID.
       if nargin == 0, return; end

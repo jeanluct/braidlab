@@ -41,7 +41,7 @@ classdef loop
     coords = [0 -1]; % Dynnikov coordinates
   end
   properties (Dependent = true)
-    n                % number of strands
+    n                % number of strings
     a                % "a" Dynnikov coord vector
     b                % "b" Dynnikov coord vector
   end

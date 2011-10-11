@@ -5,17 +5,17 @@ function [gen tcr cross_cell_sub] = color_braiding_sub(cross_cell,p_ind)
 %   crossing times of a given braid, CROSS_CELL, and creates a braid with
 %   just the trajectories contained in P_IND.  This code should produce the
 %   generator sequence, GEN, for a braid containing only a subset of the
-%   initial strands within the braid.
+%   initial strings within the braid.
 %
 %   This partial braid is calculated using the crosses between trajectories
 %   that are still in the braid.  For example if the initial braid contained
-%   strainds 1, 2, 3, and 4, but the parital braid contains only strands 1,
+%   strings 1, 2, 3, and 4, but the parital braid contains only strings 1,
 %   2, and 4 then the crossings found previously between 1-2, 1-4, and 2-4,
 %   will be analyzed.
 %
 %   See also COLOR_BRAIDING.
 
-n = length(p_ind); % number of strands in the new braid
+n = length(p_ind); % number of strings in the new braid
 
 cross_cell_sub = cell(n); % new cell structure for the partial braid
 
