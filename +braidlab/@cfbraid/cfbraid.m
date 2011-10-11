@@ -9,6 +9,8 @@
 %    'factors'  cell array of positive factors F;
 %    'n'        number of strings in the braid.
 %
+%   METHODS(CFBRAID) shows a list of methods.
+%
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
 %   Handbook of Knot Theory, pp. 78-82.
 %
@@ -67,8 +69,11 @@ classdef cfbraid
       br.factors = cf.factors;
     end
 
-   function ee = eq(b1,b2)
-   %EQ   Test for equality of braids.
+    function ee = eq(b1,b2)
+    %EQ   Test braids for equality.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID, BRAID, BRAID.EQ, BRAID.LEXEQ.
       fac1 = cell2mat(b1.factors);
       fac2 = cell2mat(b2.factors);
       ee = b1.n == b2.n & b1.delta == b2.delta & length(fac1) == length(fac2);
@@ -76,14 +81,26 @@ classdef cfbraid
     end
 
     function ee = ne(b1,b2)
+    %NE   Test braids for inequality.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID, BRAID, CFBRAID.EQ, BRAID.EQ.
       ee = ~(b1 == b2);
     end
 
-    function ee = isempty(b)
+    function ee = istrivial(b)
+    %ISTRIVIAL   Returns true if braid is the trivial braid.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID.
       ee = isempty(b.factors) & b.delta == 0;
     end
 
     function str = char(b)
+    %CHAR   Convert braid to string.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID, CFBRAID.DISP.
       if b.delta == 0 & isempty(b.factors)
 	str = '< e >';
 	return
@@ -105,6 +122,10 @@ classdef cfbraid
     end
 
     function disp(b)
+    %DISP   Display a braid.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID, CFBRAID.CHAR.
        c = char(b);
        if iscell(c)
 	 disp(['     ' c{:}])

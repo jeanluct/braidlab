@@ -17,6 +17,7 @@
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
     * plot method.
+    * ispositive, entropy, train track.
 
  * cfbraid class: (for braid in canonical form)
 
@@ -32,5 +33,4 @@
 
  * Exceptions instead of errors in some cases?
 
-
-Which functions could benefit from MEXing?
+ * Which functions could benefit from MEXing?
