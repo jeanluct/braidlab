@@ -2,7 +2,7 @@ function [b,tc] = crosstimes(XY,t)
 
 % Call as braid.crosstimes.
 
-% Allow default empty braid: return identity with one strand.
+% Allow default empty braid: return identity with one string.
 if nargin < 1
   error('BRAIDLAB:braid:braidcross:nargin',...
 	'Need at least one input argument.')

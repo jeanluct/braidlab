@@ -15,7 +15,8 @@
 #include <algorithm>
 #include "mex.h"
 
-#define BANGERT_HEURISTIC // define for algorithm of  Bangert et al. (2002)
+#define BRAIDLAB_BANGERT_HEURISTIC // use algorithm of Bangert et al. (2002)
+#undef  BRAIDLAB_BANGERT_RESTORE
 
 extern void _main();
 
@@ -55,18 +56,43 @@ bool sort_and_cancel(T& b)
 }
 
 
+//
+// "Commute-and-cancel" is described succinctly in Bangert et
+// al. (2002), p. 52; for a braid A,
+//
+//   "We begin with the leftmost generator of A and attempt to move it
+//   to the right using both braid group operations. If we can cancel
+//   it along the way, we do so and if we cannot, we move it back to
+//   where it started. In this way, we proceed to move all the
+//   generators as far to the right as possible. Then we begin at the
+//   end and move each generator as far to the left as possible in the
+//   same manner."
+//
+// It isn't completely clear to me what moving a generator using the
+// second relation actually means.  In the implementation below, while
+// moving to the right a sequence such as 121 is turned into 212, and
+// the "position" is updated from the first 1 of 121 to the final 2 of
+// 212.
+//
+// I also don't see the point of moving the generator back to where it
+// started.  It works faster (and even better) to just leave it there.
+// This behavior is controlled by BRAIDLAB_BANGERT_RESTORE.
+//
+
 template<class T>
 inline
 bool commute_and_cancel(T& b, const int dir)
 {
   bool shorter = false;
-  int pos0 = 0;
+  int pos0 = 0; // pos0 is the starting point of the "current" generator.
   do
     {
       bool incrpos = false;
+      // dir=1 means start from the begining, dir=-1 from the end.
       int i = (dir == 1 ? pos0 : b.size()-1-pos0);
-      // Save the braid.
-      T b0(b);
+#ifdef BRAIDLAB_BANGERT_RESTORE
+      T b0(b);      // Save the braid.
+#endif
       do
 	{
 	  if (b[i] == -b[i+dir] && b[i] != 0)
@@ -97,8 +123,12 @@ bool commute_and_cancel(T& b, const int dir)
 		  continue;
 		}
 	    }
-	  // Nothing happened.  Increase pos0 and try again.
-	  b = b0;
+	  // Nothing happened: break out of the loop to increase pos0
+	  // and try again.
+#ifdef BRAIDLAB_BANGERT_RESTORE
+	  b = b0;   // Restore braid, so generator moves back to its
+		    // initial position.
+#endif
 	  incrpos = true;
 	  break;
 	} while (i+dir >= 0 && i+dir <= (int)b.size()-1);
@@ -134,7 +164,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       bw.push_back((int)w[i]);
     }
 
-#ifdef BANGERT_HEURISTIC
+#ifdef BRAIDLAB_BANGERT_HEURISTIC
   // Try to commute_and_cancel from the left/right until nothing changes.
   while (commute_and_cancel(bw,1) || commute_and_cancel(bw,-1)) {}
 #else

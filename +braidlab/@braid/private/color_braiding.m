@@ -3,11 +3,11 @@ function [varargout] = color_braiding(XY,t)
 %   [GEN TCR CROSS_CELL] = COLOR_BRAIDING(XY,T) takes the inputs XY (the
 %   trajectory set) and T (time) and calculates the corresponding generator
 %   sequence via a color braiding method.  The color braiding method takes
-%   pairs of strands and finds the crossings that occur between the two.
+%   pairs of strings and finds the crossings that occur between the two.
 %   This is done for all pairs then the crossings for each pair are
 %   converted to generators.  The outputs are the generator sequence (GEN),
 %   the time of crossing (TCR), and the cell array containing times of
-%   crossings for each pair of strands (CROSS_CELL).
+%   crossings for each pair of strings (CROSS_CELL).
 %
 %   See also COLOR_BRAIDING_SUB.
 
@@ -49,19 +49,19 @@ XYtraj = XY(:,:,idx);
 
 cross_cell = cell(n); % Cell array for crossing times.
 
-debugmsg('Part 2: Search for crossings between pairs of strands')
+debugmsg('Part 2: Search for crossings between pairs of strings')
 
 %
-% Cycle through all pairs of strands and find all crossings.
+% Cycle through all pairs of strings and find all crossings.
 %
 %  The time at which a crossing occured is then storred into CROSS_CELL.
-%  Its location indicates both the strands involved and the direction of
-%  crossing.  For example if strands I and J cross with strand I initially
+%  Its location indicates both the strings involved and the direction of
+%  crossing.  For example if strings I and J cross with string I initially
 %  left of J, the time of the crossing will be stored in CROSS_CELL(I,J);
 %  otherwise the time will be stored in CROSS_CELL(J,I).  The direction of
 %  crossing -- either positive or negative -- is saved in the same cell and
 %  is used to determine the generator sequence later.  The outer I,J loop is
-%  over all pairs of strands.
+%  over all pairs of strings.
 %
 
 for I = 1:n
@@ -99,12 +99,12 @@ end
 debugmsg('Part 3: Sorting the pair crossings into the generator sequence')
 
 % At this point CROSS_CELL contains the crossing times and directions for
-% strand pairings which are initially in the order I,J along the projection
+% string pairings which are initially in the order I,J along the projection
 % line.  These have to be sorted and verified.
 
 % crossdat will be a matrix with crossing information:
-% Column 1: time; Column 2: direction; Column 3: leftmost strand; Column 4:
-% rightmost strand.
+% Column 1: time; Column 2: direction; Column 3: leftmost string; Column 4:
+% rightmost string.
 
 % Precompute the total size of crossdat.  For large number of particles
 % (>60), the recurring memory allocation needed to 'grow' crossdat becomes
@@ -130,7 +130,7 @@ end
 crossdat = sortrows(crossdat);
 
 % To determine the generator, the crossings have to be applied to the
-% particle order.  The location of the lower strand in the crossing will be
+% particle order.  The location of the lower string in the crossing will be
 % the magnitude of the generator.  The direction of crossing calculated
 % earlier is then applied to get the generator value.
 
@@ -143,15 +143,15 @@ tcr = zeros(size(crossdat,1),1);
 % Cycle through each crossing, apply, and calculate the corresponding
 % generator.
 for i = 1:size(crossdat,1)
-  idx1 = find(Iperm == crossdat(i,3));  % Find the location of the lower strand
-  if Iperm(idx1+1) == crossdat(i,4)     % If the higher strand is in fact the
-				        % next strand to the right apply the
+  idx1 = find(Iperm == crossdat(i,3));  % Find the location of the lower string
+  if Iperm(idx1+1) == crossdat(i,4)     % If the higher string is in fact the
+				        % next string to the right apply the
                                         % crossing.
     Iperm(idx1:idx1+1) = [crossdat(i,4) crossdat(i,3)]; % update index vector
     gen(i) = idx1*crossdat(i,2); % save the generator
     tcr(i) = crossdat(i,1);       % save the time of crossing
   else
-    % The two strands crossing are not next to each other.
+    % The two strings crossing are not next to each other.
     fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
 	  ' with permutation [' num2str(Iperm) '].'];
     msg = sprintf(fs,i,crossdat(i,1),idx1);
