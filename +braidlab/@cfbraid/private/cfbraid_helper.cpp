@@ -54,8 +54,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   //
   //  'type'    set to 'lcf' or 'rcf' to indicate the type of normal form;
   //  'delta'   the power of Delta;
-  //  'factors' cell array of positive factors.
-  //  'n'       order of braid group
+  //  'factors' cell array of positive factors;
+  //  'n'       number of strings in braid.
   //
 
   const char *keys[] = { "type", "delta", "factors", "n" };

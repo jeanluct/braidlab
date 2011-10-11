@@ -12,7 +12,7 @@
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
 %   Handbook of Knot Theory, pp. 78-82.
 %
-%   See also BRAID.
+%   See also BRAID, CFBRAID.CFBRAID.
 
 classdef cfbraid
   properties
@@ -31,6 +31,7 @@ classdef cfbraid
     %   the number of strings N of the braid group, which is otherwise
     %   guessed from W.
     %
+    %   This is a method for the CFBRAID class.
     %   See also BRAID.
       if nargin == 0, return; end
       if isa(b,'braidlab.cfbraid')
@@ -117,30 +118,13 @@ classdef cfbraid
     %   L = LENGTH(B) returns the word length of a braid B expressed in
     %   Artin generators, where B is in left canonical form.
     %
+    %   This is a method for the CFBRAID class.
     %   See also CFBRAID.
       if b.delta == 0 & isempty(b.factors), l = 0; return; end
       Dl = b.n*(b.n-1)/2;  % The lengh of the half-twist Delta.
       l = abs(b.delta)*Dl + length(cell2mat(b.factors));
     end
 
-    function w = braid(b)
-    %BRAID   Convert left canonical form of a braid to word form.
-    %   W = BRAID(B) returns the word representation of a braid B in
-    %   terms of braid generators, where B is in left canonical form.
-    %   Here W is an object of type BRAID.
-    %
-    %   See also CFBRAID, BRAID.
-      D = braidlab.halftwist(b.n);
-      w = cell2mat(b.factors);
-      if b.delta < 0
-	k = -b.delta;
-	D = -D(end:-1:1);
-      else
-	k = b.delta;
-      end
-      w = braidlab.braid([repmat(D,[1 k]) w],b.n);
-    end
-
-  end
+  end % methods block
 
 end
