@@ -113,6 +113,8 @@ classdef loop
 
     function ee = eq(l1,l2)
     %EQ   Test loops for equality.
+    %
+    %   This is a method for the LOOP class.
       ee = l1.n == l2.n;
       if ee, ee = all(l1.coords == l2.coords); end
     end
@@ -140,10 +142,22 @@ classdef loop
     end
 
     function l = length(obj)
-    %LENGTH   The number of intersections of a loop with the real axis.
-    %   I = LENGTH(L) computes the minimum number of intersections of a
+    %LENGTH   The minimum length of a loop.
+    %   LEN = LENGTH(L) computes the minimum length of a loop, assuming
+    %   the loop has zero thickness, and the punctures have zero size and
+    %   are one unit apart.
+    %
+    %   This is a method for the LOOP class.
+      [~,nu] = obj.intersec;
+      l = sum(nu);
+    end
+
+    function l = intaxis(obj)
+    %INTAXIS   The number of intersections of a loop with the real axis.
+    %   I = INTAXIS(L) computes the minimum number of intersections of a
     %   loop L with the real axis.
     %
+    %   This is a method for the LOOP class.
       [a,b] = obj.ab;
 
       % The number of intersections before/after the first and last punctures.
