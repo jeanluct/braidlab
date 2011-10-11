@@ -8,11 +8,14 @@
 // possible.
 
 // The sort-and-cancel algorithm was ripped from the braid::braidword class.
+// The commute-and-cancel algorithm is from Bangert et al. (2002).
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include "mex.h"
+
+#define BANGERT_HEURISTIC // define for algorithm of  Bangert et al. (2002)
 
 extern void _main();
 
@@ -52,6 +55,62 @@ bool sort_and_cancel(T& b)
 }
 
 
+template<class T>
+inline
+bool commute_and_cancel(T& b, const int dir)
+{
+  bool shorter = false;
+  int pos0 = 0;
+  do
+    {
+      bool incrpos = false;
+      int i = (dir == 1 ? pos0 : b.size()-1-pos0);
+      // Save the braid.
+      T b0(b);
+      do
+	{
+	  if (b[i] == -b[i+dir] && b[i] != 0)
+	    {
+	      // Cancel with the generator on the left.
+	      b[i] = b[i+dir] = 0;
+	      shorter = true;
+	      break;
+	    }
+	  if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
+	    {
+	      // Commute with the next generator.
+	      std::swap(b[i],b[i+dir]);
+	      i += dir;
+	      incrpos = true;
+	      continue;
+	    }
+	  if (i+2*dir >= 0 && i+2*dir <= (int)b.size()-1)
+	    {
+	      // Try the second type of relation.
+	      if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
+		  && b[i] == b[i+2*dir])
+		{
+		  std::swap(b[i],b[i+dir]);
+		  b[i+2*dir] = b[i];
+		  i += 2*dir;
+		  incrpos = true;
+		  continue;
+		}
+	    }
+	  // Nothing happened.  Increase pos0 and try again.
+	  b = b0;
+	  incrpos = true;
+	  break;
+	} while (i+dir >= 0 && i+dir <= (int)b.size()-1);
+      // remove 0's from the vector.
+      b.erase(remove(b.begin(),b.end(),0),b.end());
+      if (incrpos) ++pos0;
+    } while (pos0 < (int)b.size()-1);
+
+  return shorter; // true if actually shorter than upon entry.
+}
+
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   using std::cout;
@@ -75,6 +134,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       bw.push_back((int)w[i]);
     }
 
+#ifdef BANGERT_HEURISTIC
+  // Try to commute_and_cancel from the left/right until nothing changes.
+  while (commute_and_cancel(bw,1) || commute_and_cancel(bw,-1)) {}
+#else
   sort_and_cancel(bw);
 
   //
@@ -141,6 +204,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	  }
       } while (any);
     }
+#endif
 #endif
 
   // Now copy vector bw to an mxArray of int32's.
