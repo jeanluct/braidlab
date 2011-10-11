@@ -11,7 +11,8 @@
 %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
 %   of time steps and N is the number of particles.
 %
-%   BC = BRAID(B) copies the braid B to the braid BC.
+%   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
+%   object BC.
 %
 %   METHODS(BRAID) shows a list of methods.
 %
@@ -34,6 +35,9 @@ classdef braid
       if isa(b,'braidlab.braid')
 	br.n     = b.n;
 	br.word  = b.word;
+      elseif isa(b,'braidlab.cfbraid')
+        D = braidlab.halftwist(b.n);
+        br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
       elseif max(size(size(b))) == 3
 	if nargin > 1
 	  error

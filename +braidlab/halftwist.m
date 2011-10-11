@@ -7,3 +7,5 @@ D = [];
 for i = 1:n-1
   D = [D n-1:-1:i];
 end
+
+D = braidlab.braid(D,n);
