@@ -32,7 +32,8 @@ function l = loopcoords(b,conv)
 %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
 %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
 %
-%   See also BRAID, LOOP.
+%   This is a method for the BRAID class.
+%   See also BRAID, BRAID.EQ, LOOP.
 
 if nargin < 2
   conv = 'right';

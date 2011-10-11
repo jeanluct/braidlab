@@ -4,6 +4,8 @@
     * loopsigma is also a bad name.
       [crossings is for generators; intersections is for loops.]
 
+ * bug in compact: a=braid([1 -2]); compact(a*a^-1)
+
  * Make a @loop subfolder.  Should go in there:
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.  [Well, need to keep vectorized version.  Not

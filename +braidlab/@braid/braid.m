@@ -7,7 +7,7 @@
 %   satisfying -N < I < N.  The usual group operations (multiplication,
 %   inverse, powers) can be performed on braids.
 %
-%   B = BRAID(XY) construst a braid from a trajectory dataset XY.
+%   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
 %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
 %   of time steps and N is the number of particles.
 %
@@ -76,6 +76,15 @@ classdef braid
 
     function ee = eq(b1,b2)
     %EQ   Test braids for equality.
+    %   EQ(B1,B2) or B1==B2 returns TRUE if the two braids B1 and B2 are
+    %   equal.  The algorithm uses Dynnikov coordinates (action on loops) to
+    %   determine braid equalitty.
+    %
+    %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
+    %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.LEXEQ, LOOP, LOOPCOORDS.
       ee = b1.n == b2.n;
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
@@ -85,28 +94,46 @@ classdef braid
 
     function ee = lexeq(b1,b2)
     %LEXEQ   Test braids for lexicographical equality.
+    %   LEXEQ(B1,B2) return TRUE if the words representing B1 and B2 in
+    %   terms of braid generators are equal, generator by generator.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.EQ, LOOP, LOOPCOORDS.
       ee = b1.n == b2.n & length(b1) == length(b2);
       if ee, ee = all(b1.word == b2.word); end
     end
 
     function ee = ne(b1,b2)
+    %NE   Test braids for inequality.
+    %   NE(B1,B2) or B1~=B2 returns ~EQ(B1,B2).
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.EQ.
       ee = ~(b1 == b2);
     end
 
-    function ee = isempty(b)
-      ee = isempty(b.word);
-    end
+    %function ee = isempty(b)
+    %  ee = isempty(b.word);
+    %end
 
     function ee = isidentity(b)
+    %ISIDENTITY   Returns true if braid is the identity braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.EQ.
       ee = isempty(b.word);
     end
 
     % Conversion to a vector.
-    function c = double(obj)
-      c = obj.word;
-    end
+    %function c = double(obj)
+    %  c = obj.word;
+    %end
  
     function b12 = mtimes(b1,b2)
+    %MTIMES   Multiply two braids together.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.INV, BRAID.MTIMES.
       if isa(b2,'braidlab.braid')
 	b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       else
@@ -124,6 +151,10 @@ classdef braid
     end
 
     function bm = mpower(b,m)
+    %MPOWER   Raise a braid to some positive or negative power.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.INV, BRAID.MPOWER.
       bm = braidlab.braid([],b.n);
       if m > 0
 	bm.word = repmat(b.word,[1 m]);
@@ -133,6 +164,10 @@ classdef braid
     end
 
     function bi = inv(b)
+    %INV   Inverse of a braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, BRAID.MTIMES, BRAID.MPOWER.
       bi = braidlab.braid(-b.word(end:-1:1),b.n);
     end
 
@@ -155,6 +190,13 @@ classdef braid
     end
 
     function l = length(b)
+    %LENGTH   Length of a braid.
+    %   L = LENGTH(B) returns the number of generators in the current
+    %   internal representation of a braid.  Calling COMPACT(B) can reduce
+    %   this length, often dramatically when B is created from data.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID, COMPACT.
       l = length(b.word);
     end
 

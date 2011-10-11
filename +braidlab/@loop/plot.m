@@ -33,7 +33,7 @@ end
 Xs = sortrows(X);
 
 if n ~= length(X)
-  error('BRAIDLAB:loop:badrad','Length of X does not match loop.')
+  error('BRAIDLAB:loop:badlen','Length of X does not match loop.')
 end
 
 d = zeros(size(Xs,1)-1,1);

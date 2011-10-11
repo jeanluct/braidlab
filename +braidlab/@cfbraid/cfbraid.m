@@ -3,9 +3,9 @@
 %   braid word W.  Here D is the positive half-twist, M is a signed integer,
 %   and F is a sequence of positive factors written in Artin generators.
 %
-%   The class CFBRAID has the data members
+%   The class CFBRAID has the following data members:
 %
-%    'delta'    the power M of Delta;
+%    'delta'    the power of positive-half twists Delta;
 %    'factors'  cell array of positive factors F;
 %    'n'        order of braid group (number of strands).
 %
