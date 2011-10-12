@@ -96,6 +96,16 @@ classdef cfbraid
       ee = isempty(b.factors) & b.delta == 0;
     end
 
+    function ee = ispositive(obj)
+    %ISPOSITIVE   Returns true if braid is positive.
+    %   ISPOSITIVE(B) returns true if the braid B can be written with only
+    %   positive crossings.
+    %
+    %   This is a method for the CFBRAID class.
+    %   See also CFBRAID, BRAID.
+      ee = obj.delta >= 0;
+    end
+
     function str = char(b)
     %CHAR   Convert braid to string.
     %
