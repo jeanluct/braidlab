@@ -129,15 +129,8 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.EQ.
-      ee = isempty(b.word);
-    end
-
-    function ee = ispositive(obj)
-    %ISPURE   Returns true if braid is positive.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.ISPURE, BRAID.INV.
-      ee = all(obj.word > 0);
+      if isempty(b.word), ee = true; return; end
+      ee = all(loopcoords(b) == loopcoords(braidlab.braid([],b.n)));
     end
 
     function ee = ispure(obj)
@@ -210,6 +203,17 @@ classdef braid
       wr = sum(sign(obj.word));
     end
 
+    function bs = subbraid(b,s)
+    %SUBBRAID   Extract a subset of strings from a braid.
+    %   BS = SUBBRAID(B,S) returns the subbraid BS, obtained by discarding
+    %   all strings in B but the ones specified in S.  S is a vector which
+    %   is a subset of 1:N, where N is the number of strings in the braid.
+    %
+    %   This is a method for the BRAID class.
+    %   See also BRAID.
+      bs = subbraid_helper(b,s);
+    end
+      
     function str = char(b)
     %CHAR   Convert braid to string.
     %

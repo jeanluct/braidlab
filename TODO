@@ -4,20 +4,17 @@
     * loopsigma is also a bad name.
       [crossings is for generators; intersections is for loops.]
 
- * Make a @loop subfolder.  Should go in there:
+ * loop class:
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.  [Well, need to keep vectorized version.  Not
       sure how to do that.  Have a class "loops"?]
-    * recover crossing numbers: see dynn2cross.
     * What type for the loop entries?
-    * Is it easy to determine the 'true' length of a loop from its
-      coords?  That would be useful for Sarah's work.
 
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
     * plot method.
-    * ispositive, entropy, train track.
+    * entropy, train track.
 
  * cfbraid class: (for braid in canonical form)
 
