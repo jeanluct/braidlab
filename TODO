@@ -9,12 +9,32 @@
       a private foldef.  [Well, need to keep vectorized version.  Not
       sure how to do that.  Have a class "loops"?]
     * What type for the loop entries?
+    * loopplot: puncture size, clipping left/right.
 
  * braid class:
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
     * plot method.
-    * entropy, train track.
+    * entropy, train track, Burau, random braid (see Flop/Matlab).
+    * For data: tube, Matt's "sexify" command to make things look good.
+    * cycliceq: show [1 -2 3 -4] cyclically same as [1 -2 -4 3].
+      [1 -2 3 -4] = [-2 3 -4 1] = [-2 3 1 -4] = [-2 1 3 -4] = [1 3 -2 -4]
+      [1 -2 -4 3] = [-2 -4 3 1] = [-2 -4 1 3] = [3 -2 -4 1] = [1 3 -2 -4]
+      This is the same as saying their closure gives the same knot?
+      Doesn't seem to be a matter of just permnuting and trying possibilities:
+		>> a=braid([1 -2 3 -4]);
+		>> b=braid([1 -2 -4 3]); a==b
+		ans = 0
+		>> b=braid([-2 -4 3 1]); a==b
+		ans = 0
+		>> b=braid([-4 3 1 -2]); a==b
+		ans = 0
+		>> b=braid([3 1 -2 -4]); a==b
+		ans = 0
+      Why?  Because we may have to "commute periodically" several
+      times.  Is this a hard problem?  Or maybe they really aren't the
+      same and I'm cheating somehow by using the periodicity several
+      times.
 
  * cfbraid class: (for braid in canonical form)
 
