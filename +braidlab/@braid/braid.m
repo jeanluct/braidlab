@@ -156,7 +156,7 @@ classdef braid
         % function to call by looking at the first argument.
 	if b1.n > b2.n
 	  error('BRAIDLAB:braid:mtimes', ...
-		'Generator values too lage for the loop.')
+		'Generator values too large for the loop.')
 	end
 	b12 = braidlab.loop(loopsigma(b1.word,b2.coords));
       end

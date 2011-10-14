@@ -1,4 +1,4 @@
-function l = loopcoords(b,conv)
+function l = loopcoords(b,conv,typ)
 %LOOPCOORDS   Loop coordinates of a braid.
 %   L = LOOPCOORDS(B) returns the Dynnikov loop coordinates of a braid, as
 %   defined by Dehornoy.  The are defined by the action of a braid on a
@@ -39,6 +39,26 @@ if nargin < 2
   conv = 'right';
 end
 
+if isempty(conv)
+  conv = 'right';
+end
+
+if nargin < 3
+  typ = 'int64';
+end
+
+switch lower(typ)
+ case 'int32'
+  htyp = @int32;
+  checkoverflow = true;
+ case 'int64'
+  htyp = @int64;
+  checkoverflow = true;
+ case 'double'
+  htyp = @double;
+  checkoverflow = false;
+end
+
 switch lower(conv)
  case {'left','dehornoy'}
   % Nested generators of the fundamental group, anchored to an extra
@@ -56,7 +76,7 @@ switch lower(conv)
   w = b.word;
 end
 
-l = braidlab.loop(loopsigma(w,int64(l.coords)));
+l = braidlab.loop(loopsigma(w,htyp(l.coords)));
 
 % Check for overflow/underflow.
 % This doesn't seem very robust to me, but I can't find another way.
@@ -64,7 +84,11 @@ l = braidlab.loop(loopsigma(w,int64(l.coords)));
 % returns intmax as well.  So there is no simple way to know if the quantity
 % overflowed but then was brought below intmax subsequently.  Would need
 % to check for this in loopsigma itself.
-if ~any(l.coords == intmax('int64') | l.coords == intmin('int64'))
+if checkoverflow
+  if ~any(l.coords == intmax(typ) | l.coords == intmin(typ))
+    return
+  end
+else
   return
 end
 
@@ -80,5 +104,5 @@ if exist('vpi') == 2
 else
   warning('BRAIDLAB:braid:loopcoords:overflow', ...
 	  'Integer overflow... switching to double-precision.')
-  l = braidlab.loopsigma(w,u);
+  l = braidlab.loopsigma(w,double(l.coords));
 end
