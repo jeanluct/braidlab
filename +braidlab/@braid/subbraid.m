@@ -1,6 +1,11 @@
-function bs = subbraid_helper(b,s)
-
-% Helper function for braid.subbraid.
+function bs = subbraid(b,s)
+%SUBBRAID   Extract a subset of strings from a braid.
+%   BS = SUBBRAID(B,S) returns the subbraid BS, obtained by discarding
+%   all strings in B but the ones specified in S.  S is a vector which
+%   is a subset of 1:N, where N is the number of strings in the braid.
+%
+%   This is a method for the BRAID class.
+%   See also BRAID.
 
 if isempty(s)
   error('BRAIDLAB:braid:subbraid:badstring', ...
