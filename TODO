@@ -15,7 +15,7 @@
     * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
     * plot method.
-    * entropy, train track, Burau, random braid (see Flop/Matlab).
+    * train track (see Flop/Matlab).
     * For data: tube, Matt's "sexify" command to make things look good.
     * cycliceq: show [1 -2 3 -4] cyclically same as [1 -2 -4 3].
       [1 -2 3 -4] = [-2 3 -4 1] = [-2 3 1 -4] = [-2 1 3 -4] = [1 3 -2 -4]
@@ -47,7 +47,5 @@
     * Projection line angle.
     * Do we need color_braiding_sub?  Maybe write something that works
       from the braid directly.
-
- * Exceptions instead of errors in some cases?
 
  * Which functions could benefit from MEXing?
