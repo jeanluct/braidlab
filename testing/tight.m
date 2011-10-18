@@ -3,13 +3,11 @@ function tight
 import braidlab.*
 
 % Number of strands.
-n = 4;
+n = 5;
 % Word length to optimise.
-nw = 4;
+nw = 6;
 
 %istight(monster)
-
-printbraids = false;
 
 N = n-1;
 
@@ -44,19 +42,18 @@ while 1
   % If nothing was changed, we're done.
   if ~incr, break; end
 
+  if w == 2, disp(num2str(sig)); end
+
   % Check if all generators are present.
   gens = unique(sort(abs(sig)));
   if length(gens) ~= n-1, continue; end
 
-  if printbraids, fprintf('%s  ',num2str(sig)); end
   if istight(sig,n)
     good = good + 1;
     goodones = [goodones; sig];
   else
-    if printbraids, fprintf(' ...bad'); end
     bad = bad + 1;
   end
-  if printbraids, fprintf('\n'); end
 end
 
 fprintf('\ngood=%d  bad=%d  total=%d\n',...
@@ -67,6 +64,7 @@ warning('off','BRAIDLAD:braid:entropy:noconv');
 
 pAcand = [];
 for i = 1:size(goodones,1)
+  %entr = entropy(braid(goodones(i,:)),'trains');
   entr = entropy(braid(goodones(i,:)));
   if entr > 1e-4
     entrbnd = log(max(abs(eig(burau(braid(goodones(i,:)),'abs')))));
@@ -97,6 +95,7 @@ a = braid(sig,n);
 
 % Compute entropy (not too accurately, to save time).
 entr = a.entropy(1e-3,10);
+%entr = a.entropy('trains');
 entrabs = log(max(abs(eig(burau(a,'abs')))));
 
 % Return true if the entropy is equal to the monoid bound.
@@ -111,7 +110,7 @@ import braidlab.*
 
 % Number of repetitions of the braid to check.
 if nargin < 3
-  nrep = 2;
+  nrep = 10;
 end
 
 ee = true;

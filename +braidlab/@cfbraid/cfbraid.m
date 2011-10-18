@@ -106,6 +106,17 @@ classdef cfbraid
       ee = obj.delta >= 0;
     end
 
+    function w = braid(b)
+    %BRAID   Convert left canonical form of a braid to word form.
+    %   W = BRAID(B) returns the word representation of a braid B in
+    %   terms of braid generators, where B is in left canonical form.
+    %   Here W is an object of type BRAID.
+    %
+    %   See also CFBRAID, BRAID.
+      D = braidlab.halftwist(b.n);
+      w = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
+    end
+
     function str = char(b)
     %CHAR   Convert braid to string.
     %

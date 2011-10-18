@@ -20,6 +20,10 @@ CBRAID_LIBDIR     = ../../../cbraid/lib
 CBRAID_INCLUDEDIR = ../../../cbraid/include
 CBRAID_LD         = -lcbraid-mex
 
+TRAINS_LIBDIR     = ../../../extern/trains
+TRAINS_INCLUDEDIR = ../../../extern
+TRAINS_LD         = -ltrains
+
 %.$(MEXSUFFIX): %.c
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
@@ -30,7 +34,13 @@ CBRAID_LD         = -lcbraid-mex
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX)
+tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
+	cd $(TRAINS_LIBDIR); \
+		make CXX="$(CXX) -fPIC" CC=$(CC)
+	$(MEX) $(MEXFLAGS) $^ \
+		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
+
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
