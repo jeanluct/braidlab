@@ -16,8 +16,8 @@ CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 #INCLUDE   = -I$(MATLABHOME)/extern/include
 #MEXFLAGS  = 
 
-CBRAID_LIBDIR     = ../../../cbraid/lib
-CBRAID_INCLUDEDIR = ../../../cbraid/include
+CBRAID_LIBDIR     = ../../../extern/cbraid/lib
+CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
 CBRAID_LD         = -lcbraid-mex
 
 TRAINS_LIBDIR     = ../../../extern/trains
@@ -30,7 +30,7 @@ TRAINS_LD         = -ltrains
 %.$(MEXSUFFIX): %.cpp
 	# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
 	cd $(CBRAID_LIBDIR); \
-		make -f ../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
+		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
