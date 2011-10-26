@@ -33,11 +33,11 @@ for n = 3:nmax
       if forcepA
 	TN = 'reducible';
 	while ~strcmp(TN,'pseudo-Anosov')
-	  b = randbraid(n,k);
+	  b = braid('random',n,k);
 	  [TN,~] = tntype(b);
 	end
       else
-	b = randbraid(n,k);
+	b = braid('random',n,k);
 	[TN,~] = tntype(b);
       end
 

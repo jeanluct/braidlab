@@ -113,7 +113,7 @@ classdef cfbraid
     %   Here W is an object of type BRAID.
     %
     %   See also CFBRAID, BRAID.
-      D = braidlab.halftwist(b.n);
+      D = braidlab.braid('halftwist',b.n);
       w = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
     end
 

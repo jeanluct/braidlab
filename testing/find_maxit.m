@@ -10,10 +10,10 @@ entr = [];
 entr2 = [];
 for i = n
   i
-  [en,mx] = entropy(hironakakin(i));
+  [en,mx] = entropy(braid('HironakaKin',i));
   entr = [entr en];
   maxit = [maxit length(mx)];
-  en2 = entropy(hironakakin(i),'trains');
+  en2 = entropy(braid('HironakaKin',i),'trains');
   entr2 = [entr2 en2];
 end
 
