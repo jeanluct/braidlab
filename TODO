@@ -9,10 +9,11 @@
       a private foldef.  [Well, need to keep vectorized version.  Not
       sure how to do that.  Have a class "loops"?]
     * What type for the loop entries?
-    * loopplot: puncture size, clipping left/right.
+    * loopplot: puncture size, clipping left/right, join like Toby.
+    * problems: geometric intersection number of two loops, number of
+      connected components.
 
  * braid class:
-    * entropy method.  Use the [010101...01] of Dehornoy?  Try to speed it up.
     * ensure int32 for elements.
     * plot method.
     * train track (see Flop/Matlab).
@@ -47,5 +48,8 @@
     * Projection line angle.
     * Do we need color_braiding_sub?  Maybe write something that works
       from the braid directly.
+
+ * Testing:
+    * Random walk entropy.
 
  * Which functions could benefit from MEXing?

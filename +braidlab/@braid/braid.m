@@ -18,8 +18,8 @@ classdef braid
 
   methods
 
-    function br = braid(b,nn)
-    %BRAID   Construct the a braid object.
+    function br = braid(b,secnd,third)
+    %BRAID   Construct a braid object.
     %   B = BRAID(W) creates a braid object B from a vector of generators W.
     %   B = BRAID(W,N) specifies the number of strings N of the braid group,
     %   which is otherwise guessed from the maximal elements of W.
@@ -35,6 +35,38 @@ classdef braid
     %   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
     %   object BC.
     %
+    %   B = BRAID('random',N,K) returns a random braid of N strings with K
+    %   crossings (generators).  The K generators are chosen uniformly in
+    %   [-(N-1):-1 1:N-1].
+    %
+    %   D = BRAID('halftwist',N) or BRAID('Delta',N) returns the word D in
+    %   Artin generators representing the positive half-twist (Delta) for
+    %   the braid group with N strings.
+    %
+    %   B = BRAID('HironakaKin',M,N) or BRAID('HK',M,N) returns a member of
+    %   the Hironaka & Kin family of braids on M+N+1 strings:
+    %
+    %     sigma(M,N) = s(1) s(2) ... s(M) s(M) ... s(1) s(1) ... s(M+N)
+    %
+    %   B = BRAID('HironakaKin',N) for N odd returns
+    %   BRAID('HironakaKin',(N-3)/2,(N+1)/2), the braid which is thought to
+    %   minimize the entropy on the disk with an odd number N of punctures
+    %   (N>3).  This is useful for checking the "worst-case scenario" for
+    %   computing a positive entropy.  For large N, the entropy of this
+    %   braid is bounded from above by log(2+sqrt(3))/((N-1)/2).
+    %
+    %   B = BRAID('HironakaKin',N) for N even returns
+    %   BRAID('HironakaKin',(N+2)/2,(N-4)/2), which is pseudo-Anosov but
+    %   does not minimize entropy for even N.
+    %
+    %   References:
+    %
+    %   E. Hironaka and E. Kin, "A family of pseudo-Anosov braids with small
+    %   dilatation," Alg. Geom. Topology 6 (2006), 699-738.
+    %
+    %   E. Lanneau and J.-L. Thiffeault, "On the minimum dilatation of
+    %   braids on punctured discs," Geometriae Dedicata 152 (2011), 165-182.
+    %
     %   This is a method for the BRAID class.
     %   See also BRAID, CFBRAID.
 
@@ -44,8 +76,41 @@ classdef braid
 	br.n     = b.n;
 	br.word  = b.word;
       elseif isa(b,'braidlab.cfbraid')
-        D = braidlab.halftwist(b.n);
+        D = braidlab.braid('halftwist',b.n);
         br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
+      elseif isstr(b)
+	% First argument is a string.
+	if any(strcmp(lower(b),{'halftwist','delta'}))
+	  br.n = secnd;
+	  D = [];
+	  for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
+	  br.word = D;
+	elseif any(strcmp(lower(b),{'hironakakin','hironaka-kin','hk'}))
+	  m = secnd;
+	  if nargin < 3
+	    if m < 5
+	      error('BRAIDLAD:braid:badarg','Need at least five strings.')
+	    end
+	    if mod(m,2) == 1
+	      n = (m+1)/2;
+	      m = (m-3)/2;
+	    else
+	      n = (m+2)/2;
+	      m = (m-4)/2;
+	    end
+	  else
+	    n = third;
+	  end
+	  N = m+n+1;
+	  br.n = N;
+	  br.word = [1:m m:-1:1 1:N-1];
+	elseif any(strcmp(lower(b),{'rand','random'}))
+	  br.n = secnd;
+	  k = third;
+	  br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
+	else
+	  error('BRAIDLAD:braid:badarg','Unrecognized string argument.')
+	end
       elseif max(size(size(b))) == 3
 	if nargin > 1
 	  error
@@ -61,7 +126,7 @@ classdef braid
 	if nargin < 2
 	  br.n = max(abs(b))+1;
 	else
-	  br.n = nn;
+	  br.n = secnd;
 	end
       end
     end
