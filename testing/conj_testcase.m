@@ -1,4 +1,4 @@
-load color_braiding_bug_testcase_data
+load testdata4
 
 % Verify independence on projection line.
 % Braids should be conjugate.

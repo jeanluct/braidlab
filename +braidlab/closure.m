@@ -5,7 +5,7 @@ function [varargout] = closure(XY)
 %   that no new crossings are created (when projected along the X axis).
 %   The data format is XY(TIMESTEP,COORD,PARTICLES).
 %
-%   See also COLOR_BRAIDING.
+%   See also BRAID, BRAID.BRAID.
 
 % Currently, the method of closure is tightly related to the axis of
 % projection.  A better method might be to minimize the L^2 norm of
@@ -28,7 +28,7 @@ if nargin > 1
     t = reshape(t,[length(t) 1]);
     % Append an extra t(end), so now t(end) is repeated twice.
     varargout{2} = reshape([t ; t(end)],ts);
-    % Modify the second-to last time, to avoid changing the total time
+    % Modify the second-to-last time, to avoid changing the total time
     % interval.
     varargout{2}(end-1) = t(end) - (t(end)-t(end-1))/2;
   else
