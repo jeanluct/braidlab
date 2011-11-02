@@ -37,6 +37,8 @@
       same and I'm cheating somehow by using the periodicity several
       times.
 
+ * Extract reducing curve from Toby's code? (in Dynnikov coords)
+
  * cfbraid class: (for braid in canonical form)
 
  * closure: implement various options, in particular "lowest L2" and
@@ -46,8 +48,6 @@
 
  * creating braids from data:
     * Projection line angle.
-    * Do we need color_braiding_sub?  Maybe write something that works
-      from the braid directly.
 
  * Testing:
     * Random walk entropy.
