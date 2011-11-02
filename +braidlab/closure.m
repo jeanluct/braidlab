@@ -1,4 +1,4 @@
-function [varargout] = closure(XY)
+function XYc = closure(XY)
 %CLOSURE   Force closure of a set of trajectories to make a physical braid.
 %   XYC = CLOSURE(XY) takes the particle trajectory data in XY and appends
 %   the initial positions to the end of the list, in the correct order so
@@ -19,19 +19,4 @@ function [varargout] = closure(XY)
 XYnew = zeros(size(XY(1,:,:)));
 XYnew(1,:,I1) = XY(1,:,I0);
 
-varargout{1} = [XY; XYnew];
-
-if nargin > 1
-  if nargout > 1
-    % Rigmarole to make sure t remains a row or column vector.
-    ts = size(t); ts = ts + (ts ~= 1);
-    t = reshape(t,[length(t) 1]);
-    % Append an extra t(end), so now t(end) is repeated twice.
-    varargout{2} = reshape([t ; t(end)],ts);
-    % Modify the second-to-last time, to avoid changing the total time
-    % interval.
-    varargout{2}(end-1) = t(end) - (t(end)-t(end-1))/2;
-  else
-    error('BRAIDLAB:closure','Not enough output arguments.')
-  end
-end
+XYc = [XY; XYnew];
