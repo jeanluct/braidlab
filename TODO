@@ -22,7 +22,7 @@
       [1 -2 3 -4] = [-2 3 -4 1] = [-2 3 1 -4] = [-2 1 3 -4] = [1 3 -2 -4]
       [1 -2 -4 3] = [-2 -4 3 1] = [-2 -4 1 3] = [3 -2 -4 1] = [1 3 -2 -4]
       This is the same as saying their closure gives the same knot?
-      Doesn't seem to be a matter of just permnuting and trying possibilities:
+      Doesn't seem to be a matter of just permuting and trying possibilities:
 		>> a=braid([1 -2 3 -4]);
 		>> b=braid([1 -2 -4 3]); a==b
 		ans = 0
@@ -53,3 +53,5 @@
     * Random walk entropy.
 
  * Which functions could benefit from MEXing?
+
+ * Check if MEX file exists, compile?
