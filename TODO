@@ -42,7 +42,11 @@
  * cfbraid class: (for braid in canonical form)
 
  * closure: implement various options, in particular "lowest L2" and
-   maybe "lowest entropy".  Do these have to scale as n! ?
+   maybe "lowest entropy".  Do these have to scale as (n!)?  Maybe
+   find some cases where we have a target entropy, that is, we can
+   generate a very long braid so we can compute the entropy, but we'd
+   like to estimate the entropy from a subset of that.  (Use Duffing
+   in the chaotic sea?)
 
  * Check types when invoking MEX files.
 
@@ -55,3 +59,12 @@
  * Which functions could benefit from MEXing?
 
  * Check if MEX file exists, compile?
+
+ * Good mathematical name for an open braid (tangle is already taken)?
+   How about the process of turning an open braid into a true braid?
+   "Closure" already means something different, but maybe that's the
+   right thing.  "Completion"?  "Closed extension"?  "Braid
+   extension"?  Start writing notes formalizing this.  Can still
+   define topological equivalence rel the punctures.  Form a groupoid
+   or whatever the name is for a group where not all the elements can
+   be multiplied together.

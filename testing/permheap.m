@@ -1,10 +1,10 @@
 function [varargout] = permheap(P,c)
 %PERMHEAP   Heap's algorithm for generating permutations by interchanges.
 %   [P,C] = PERMHEAP(P,C) returns a new permutation given a permutation P.
-%   C is initialized to ones(1,N), where N is the order of the permutation.
-%   The function uses Heap's algorithm, which interchanges entries of P each
-%   time until all permutations have been produced.  C is a bookeeping
-%   vector.
+%   C is a bookeeping vector which should be first initialized to ones(1,N),
+%   where N is the order of the permutation.  The function uses Heap's
+%   algorithm, which interchanges entries of P at each call until all
+%   permutations have been produced.
 %
 %   [P,C,NOTDONE] = PERMHEAP(P,C) sets NOTDONE to false after all
 %   permutations have been cycled over.
@@ -14,7 +14,7 @@ function [varargout] = permheap(P,c)
 %   A typical use of PERMHEAP is as follows, which lists all permutations
 %   of N integers:
 %
-%   P = 1:N; C = ones(1,N); notdone = true;
+%   [P,C] = permheap(N); notdone = true;
 %   while notdone
 %     disp(P)
 %     [P,C,notdone] = permheap(P,C);
@@ -25,7 +25,7 @@ function [varargout] = permheap(P,c)
 %
 %   If memory is not an issue, PP = PERMHEAP(N) returns an array PP of
 %   dimension N! by N giving all the permutations at once, in the same order
-%   that PERMHEAP would normally list them.
+%   that PERMHEAP would normally return them.
 %
 %   Reference: R. Segdewick, "Permutation Generation Methods," Computing
 %   Surveys 9 (1977), 137-164.
@@ -38,6 +38,9 @@ if nargin < 2
     return
   else
     % Return the entire list at once.
+    %   (Use MEX file for this?  Probably not worth it for the rest of the
+    %   file, since the function call overhead probably makes this
+    %   impractical for truly large problems.)
     n = P;
     N = factorial(n);
     [p,c] = permheap(n);
@@ -53,13 +56,12 @@ end
 for i = 1:length(P)
   if c(i) < i
     if mod(i,2) == 0
-      i2 = c(i);
+      j = c(i);
     else
-      i2 = 1;
+      j = 1;
     end
-    temp = P(i2);
-    P(i2) = P(i);
-    P(i) = temp;
+    % Swap content of P(i) and P(j).
+    temp = P(j); P(j) = P(i); P(i) = temp;
     c(i) = c(i) + 1;
     varargout{1} = P;
     if nargout > 1, varargout{2} = c; end
@@ -73,5 +75,3 @@ end
 varargout{1} = P;
 if nargout > 1, varargout{2} = c; end
 if nargout > 2, varargout{3} = false; end
-
-% ====================================================
