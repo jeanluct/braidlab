@@ -9,7 +9,7 @@ permpregen = true;
 paralyze = true;
 
 %XY = readgranular('../anisotropy/parts2_20090406a',n);
-rng(0); XY = randomwalk(n,100,.1);
+rng(0); XY = randomwalk(n,300,.1);
 
 if paralyze
   % Open pool of workers if it isn't already allocated.
@@ -112,7 +112,18 @@ xlabel('permutation')
 ylabel('TN type')
 title('white - finite-order     red - reducible     blue - pA')
 
+entrmindist = entropy(braid(closure(XY,'mindist')));
+entrxproj = entropy(braid(closure(XY,'Xproj')));
+entryproj = entropy(braid(closure(XY,'Yproj')));
+
 figure(3)
 hist(entr,20)
+hold on
+aa = axis;
+plot(entrmindist*[1 1],[0 aa(4)],'r-','LineWidth',2)
+plot(entrxproj*[1 1],[0 aa(4)],'g--','LineWidth',2)
+plot(entryproj*[1 1],[0 aa(4)],'c--','LineWidth',2)
+hold off
 xlabel('entropy')
 ylabel('count')
+legend('','mindist','Xproj','Yproj','Location','NorthWest')
