@@ -31,7 +31,7 @@ bool sort_and_cancel(T& b)
   do
     {
       sw = false;
-      for (int i = 0; i < b.size()-1; ++i)
+      for (mwIndex i = 0; i < b.size()-1; ++i)
 	{
 	  if (b[i] == -b[i+1] && b[i] != 0)
 	    {
@@ -84,12 +84,12 @@ inline
 bool commute_and_cancel(T& b, const int dir)
 {
   bool shorter = false;
-  int pos0 = 0; // pos0 is the starting point of the "current" generator.
+  mwIndex pos0 = 0; // pos0 is the starting point of the "current" generator.
   do
     {
       bool incrpos = false;
       // dir=1 means start from the begining, dir=-1 from the end.
-      int i = (dir == 1 ? pos0 : b.size()-1-pos0);
+      mwIndex i = (dir == 1 ? pos0 : b.size()-1-pos0);
 #ifdef BRAIDLAB_BANGERT_RESTORE
       T b0(b);      // Save the braid.
 #endif
@@ -110,7 +110,7 @@ bool commute_and_cancel(T& b, const int dir)
 	      incrpos = true;
 	      continue;
 	    }
-	  if (i+2*dir >= 0 && i+2*dir <= (int)b.size()-1)
+	  if (i+2*dir >= 0 && i+2*dir <= b.size()-1)
 	    {
 	      // Try the second type of relation.
 	      if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
@@ -131,11 +131,11 @@ bool commute_and_cancel(T& b, const int dir)
 #endif
 	  incrpos = true;
 	  break;
-	} while (i+dir >= 0 && i+dir <= (int)b.size()-1);
+	} while (i+dir >= 0 && i+dir <= b.size()-1);
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
       if (incrpos) ++pos0;
-    } while (pos0 < (int)b.size()-1);
+    } while (pos0 < b.size()-1);
 
   return shorter; // true if actually shorter than upon entry.
 }
@@ -152,16 +152,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Arguments checked and formatted in compact.m.
 
   const mxArray *wA = prhs[0];
-  const int *w = (int *)mxGetData(wA);
-  const int N = max(mxGetM(wA),mxGetN(wA));
+  const int *w = (int *)mxGetData(wA); // wA contains int32's.
+  const mwSize N = max(mxGetM(wA),mxGetN(wA));
   int n = 1;
 
   // Convert braid word to vector.
   std::vector<int> bw;
-  for (int i = 0; i < N; ++i)
+  for (mwIndex i = 0; i < N; ++i)
     {
-      n = max(n,abs((int)w[i])+1);
-      bw.push_back((int)w[i]);
+      n = max(n,abs(w[i])+1);
+      bw.push_back(w[i]);
     }
 
 #ifdef BRAIDLAB_BANGERT_HEURISTIC
@@ -240,7 +240,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Now copy vector bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);
   int *bwp = (int *)mxGetData(plhs[0]);
-  int k = 0;
+  mwIndex k = 0;
   for (veccit it = bw.begin(); it != bw.end(); ++it, ++k)
     {
       bwp[k] = *it;

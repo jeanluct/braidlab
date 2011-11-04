@@ -14,7 +14,7 @@ MATLABHOME  = $(strip $(shell $(MEXENV) | \
 CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
-#MEXFLAGS  = 
+MEXFLAGS  = -largeArrayDims
 
 CBRAID_LIBDIR     = ../../../extern/cbraid/lib
 CBRAID_INCLUDEDIR = ../../../extern/cbraid/include

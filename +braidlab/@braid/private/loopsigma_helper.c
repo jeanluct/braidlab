@@ -10,7 +10,9 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  int i, j, k, l, n, N, Nr, Ngen;
+  int i, n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
+  mwIndex j, k, l;
+  mwSize N, Nr, Ngen;
   const mxArray *iiA, *uA;
   const int *ii;
   const double *u;
@@ -23,7 +25,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   iiA = prhs[0];
-  ii = (int *)mxGetData(iiA);
+  ii = (int *)mxGetData(iiA); /* iiA contains int32's. */
   uA = prhs[1];
   u = mxGetPr(uA);
 
@@ -36,7 +38,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badarg",
 			"u argument should have even number of columns.");
     }
-  n = N/2 + 2;
+  n = (int)(N/2 + 2);
 
   /* Make 1-indexed arrays */
   a = (double *) malloc(N/2 * sizeof(double)) - 1;
