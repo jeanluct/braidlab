@@ -22,18 +22,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Arguments checked and formatted in conjtest.m.
 
   const mxArray *w1A = prhs[0];
-  const int *w1 = (int *)mxGetData(w1A);
-  const int N1 = max(mxGetM(w1A),mxGetN(w1A));
+  const int *w1 = (int *)mxGetData(w1A); // w1A contains int32's.
+  const mwSize N1 = max(mxGetM(w1A),mxGetN(w1A));
   const mxArray *w2A = prhs[1];
-  const int *w2 = (int *)mxGetData(w2A);
-  const int N2 = max(mxGetM(w2A),mxGetN(w2A));
+  const int *w2 = (int *)mxGetData(w2A); // w2A contains int32's.
+  const mwSize N2 = max(mxGetM(w2A),mxGetN(w2A));
 
   int n = (int)mxGetScalar(prhs[2]);
 
   // Convert braid words to list.
   std::list<int> bw1, bw2;
-  for (int i = 0; i < N1; ++i) bw1.push_back(w1[i]);
-  for (int i = 0; i < N2; ++i) bw2.push_back(w2[i]);
+  for (mwIndex i = 0; i < N1; ++i) bw1.push_back(w1[i]);
+  for (mwIndex i = 0; i < N2; ++i) bw2.push_back(w2[i]);
 
   CBraid::ArtinBraid B1(Braiding::WordToBraid(bw1,n));
   CBraid::ArtinBraid B2(Braiding::WordToBraid(bw2,n));
@@ -69,7 +69,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxSetFieldByNumber(plhs[1],0,0,mxCreateString("lcf"));
   mxSetFieldByNumber(plhs[1],0,1,mxCreateDoubleScalar(C.LeftDelta));
   mxSetFieldByNumber(plhs[1],0,3,mxCreateDoubleScalar(n));
-  int fac = 0;
+  mwIndex fac = 0;
   for(std::list<CBraid::ArtinFactor>::iterator it = C.FactorList.begin();
       it != C.FactorList.end(); ++it, ++fac)
     {
@@ -88,7 +88,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       // Now copy list wn to an mxArray.
       mxArray *wnA = mxCreateNumericMatrix(1,wn.size(),mxINT32_CLASS,mxREAL);
       int *wnp = (int *)mxGetData(wnA);
-      int k = 0;
+      mwIndex k = 0;
       for (std::list<int>::const_iterator it2 = wn.begin();
 	   it2 != wn.end(); ++it2, ++k)
 	{

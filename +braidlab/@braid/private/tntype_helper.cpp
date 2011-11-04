@@ -39,14 +39,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Arguments checked and formatted in tntype.m.
 
   const mxArray *wA = prhs[0];
-  const int *w = (int *)mxGetData(wA);
-  const int N = max(mxGetM(wA),mxGetN(wA));
+  const int *w = (int *)mxGetData(wA); // wA contains int32's.
+  const mwSize N = max(mxGetM(wA),mxGetN(wA));
   const int n = (int)mxGetScalar(prhs[1]);
 
   // Convert braid word to vector.
   trains::intarray arr;
   trains::braid b;
-  for (int i = 0; i < N; ++i)
+  for (mwIndex i = 0; i < N; ++i)
     {
       arr.SureAdd((long)w[i]);
     }
