@@ -213,7 +213,7 @@ classdef braid
     %   See also BRAID, BRAID.INV, BRAID.MTIMES.
       if isa(b2,'braidlab.braid')
 	b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
-      else
+      elseif isa(b2,'braidlab.loop')
 	% Action of braid on a loop.
 	%
 	% Have to define this here, rather than in the loop class, since the
@@ -224,6 +224,24 @@ classdef braid
 		'Generator values too large for the loop.')
 	end
 	b12 = braidlab.loop(loopsigma(b1.word,b2.coords));
+      elseif iscell(b2)
+	% Action of a braid on a list of loops.
+	%
+	% A cell argument indicates a list of loops.
+	sz = size(b2);
+	if sz(1) < sz(2), b2 = b2.'; end  % ensure column-vector.
+	% Convert cell array of loops to a single matrix.
+	l = cell2mat(cellfun(@(x)x.coords,b2,'UniformOutput',0));
+	% Use the vectorized loopsigma on all the loops at once.
+	l = loopsigma(b1.word,l);
+	% Convert back to cell array,
+	l = mat2cell(l,ones(1,length(b2)),2*b2{1}.n-4);
+	% ...and convert each cell element to a loop object, reshaping to
+        % preserve the initial size.
+	b12 = reshape(cellfun(@braidlab.loop,l,'UniformOutput',0),sz);
+      else
+	error('BRAIDLAB:braid:mtimes', ...
+	      'Cannot act with a braid on this object.')
       end
     end
 
