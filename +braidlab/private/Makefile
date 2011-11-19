@@ -14,7 +14,7 @@ MATLABHOME  = $(strip $(shell $(MEXENV) | \
 CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
-#MEXFLAGS  = 
+MEXFLAGS  = -compatibleArrayDims  # For now build for arrays of size 2^32-1.
 
 %.$(MEXSUFFIX): %.c
 	$(MEX) $(MEXFLAGS) $(LIBS) $^

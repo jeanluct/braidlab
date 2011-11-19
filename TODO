@@ -1,3 +1,5 @@
+ * Convert tabs to spaces.  Use 'expand' Unix command.
+
  * General, consistent renaming of functions.
     * For instance: no function name should begin with braid, since
       that's part of the namespace now.
