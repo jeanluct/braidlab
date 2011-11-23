@@ -70,38 +70,38 @@ classdef loop
       % Default loop around first two of three punctures.
       if nargin == 0, return; end
       if isscalar(c) & ~isa(c,'braidlab.loop')
-	% Nested generators of the fundamental group of a sphere with c
+        % Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
-	if c < 2
-	  error('BRAIDLAB:loop:loop', ...
-		'Need at least two punctures.');
-	end
-	n1 = c-1;
-	l.coords = zeros(1,2*n1);
-	l.coords(n1+1:end) = -1;
-	return
+        if c < 2
+          error('BRAIDLAB:loop:loop', ...
+                'Need at least two punctures.');
+        end
+        n1 = c-1;
+        l.coords = zeros(1,2*n1);
+        l.coords(n1+1:end) = -1;
+        return
       end
       if isa(c,'braidlab.loop')
-	l.coords = c.coords;
-	return
+        l.coords = c.coords;
+        return
       end
       if nargin == 1
-	% Create from a single vector of even length.
-	if mod(length(c),2) == 1
-	  error('BRAIDLAB:loop:loop', ...
-		'Loop coordinate vector must have even length.')
-	end
-	l.coords = c;
+        % Create from a single vector of even length.
+        if mod(length(c),2) == 1
+          error('BRAIDLAB:loop:loop', ...
+                'Loop coordinate vector must have even length.')
+        end
+        l.coords = c;
       else
-	% Create a,b separately from two vectors of the same length.
-	if length(c) ~= length(b)
-	  error('BRAIDLAB:loop:loop', ...
-		'Loop coordinate vectors must have the same length.')
-	end
-	n1 = length(c);
-	l.coords = zeros(1,2*n1);
-	l.coords(1:n1) = c;
-	l.coords(n1+1:end) = b;
+        % Create a,b separately from two vectors of the same length.
+        if length(c) ~= length(b)
+          error('BRAIDLAB:loop:loop', ...
+                'Loop coordinate vectors must have the same length.')
+        end
+        n1 = length(c);
+        l.coords = zeros(1,2*n1);
+        l.coords(1:n1) = c;
+        l.coords(n1+1:end) = b;
       end
     end
 
@@ -164,9 +164,9 @@ classdef loop
     %   See also LOOP, LOOP.DISP.
        c = char(obj);
        if iscell(c)
-	 disp(['     ' c{:}])
+         disp(['     ' c{:}])
        else
-	 disp(c)
+         disp(c)
        end
     end
 
@@ -199,7 +199,7 @@ classdef loop
 
       % The number of intersections with the real axis.
       l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
-	  + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+          + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
     end
 
   end % methods block

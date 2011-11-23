@@ -17,7 +17,7 @@ end
 
 if ~isa(b1,'braidlab.cfbraid') | ~isa(b2,'braidlab.cfbraid')
   error('BRAIDLAB:cfbraid:conjtest:badargs', ...
-	'Functions takes two CFBRAIDS as arguments.');
+        'Functions takes two CFBRAIDS as arguments.');
 end
 
 if isempty(b1) | isempty(b2)

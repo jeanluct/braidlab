@@ -21,7 +21,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nrhs < 2)
     {
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
-			"2 input arguments required.");
+                        "2 input arguments required.");
     }
 
   iiA = prhs[0];
@@ -36,7 +36,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (N % 2 != 0)
     {
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badarg",
-			"u argument should have even number of columns.");
+                        "u argument should have even number of columns.");
     }
   n = (int)(N/2 + 2);
 
@@ -54,66 +54,66 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       /* Copy initial row data */
       for (k = 1; k <= N/2; ++k)
-	{
-	  a[k] = u[(k-1    )*Nr+l];
-	  b[k] = u[(k-1+N/2)*Nr+l];
-	  ap[k] = a[k];
-	  bp[k] = b[k];
-	}
+        {
+          a[k] = u[(k-1    )*Nr+l];
+          b[k] = u[(k-1+N/2)*Nr+l];
+          ap[k] = a[k];
+          bp[k] = b[k];
+        }
 
       for (j = 0; j < Ngen; ++j) /* Loop over generators */
-	{
-	  i = abs(ii[j]);
-	  if (ii[j] > 0)
-	    {
-	      if (i == 1)
-		{
-		  bp[1] = a[1] + pos(b[1]);
-		  ap[1] = -b[1] + pos(bp[1]);
-		}
-	      else if (i == n-1)
-		{
-		  bp[n-2] = a[n-2] + neg(b[n-2]);
-		  ap[n-2] = -b[n-2] + neg(bp[n-2]);
-		}
-	      else
-		{
-		  c = a[i-1] - a[i] - pos(b[i]) + neg(b[i-1]);
-		  ap[i-1] = a[i-1] - pos(b[i-1]) - pos(pos(b[i]) + c);
-		  bp[i-1] = b[i] + neg(c);
-		  ap[i] = a[i] - neg(b[i]) - neg(neg(b[i-1]) - c);
-		  bp[i] = b[i-1] - neg(c);
-		}
-	    }
-	  else if (ii[j] < 0)
-	    {
-	      if (i == 1)
-		{
-		  bp[1] = -a[1] + pos(b[1]);
-		  ap[1] = b[1] - pos(bp[1]);
-		}
-	      else if (i == n-1)
-		{
-		  bp[n-2] = -a[n-2] + neg(b[n-2]);
-		  ap[n-2] = b[n-2] - neg(bp[n-2]);
-		}
-	      else
-		{
-		  d = a[i-1] - a[i] + pos(b[i]) - neg(b[i-1]);
-		  ap[i-1] = a[i-1] + pos(b[i-1]) + pos(pos(b[i]) - d);
-		  bp[i-1] = b[i] - pos(d);
-		  ap[i] = a[i] + neg(b[i]) + neg(neg(b[i-1]) + d);
-		  bp[i] = b[i-1] + pos(d);
-		}
-	    }
-	  for (k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
-	}
+        {
+          i = abs(ii[j]);
+          if (ii[j] > 0)
+            {
+              if (i == 1)
+                {
+                  bp[1] = a[1] + pos(b[1]);
+                  ap[1] = -b[1] + pos(bp[1]);
+                }
+              else if (i == n-1)
+                {
+                  bp[n-2] = a[n-2] + neg(b[n-2]);
+                  ap[n-2] = -b[n-2] + neg(bp[n-2]);
+                }
+              else
+                {
+                  c = a[i-1] - a[i] - pos(b[i]) + neg(b[i-1]);
+                  ap[i-1] = a[i-1] - pos(b[i-1]) - pos(pos(b[i]) + c);
+                  bp[i-1] = b[i] + neg(c);
+                  ap[i] = a[i] - neg(b[i]) - neg(neg(b[i-1]) - c);
+                  bp[i] = b[i-1] - neg(c);
+                }
+            }
+          else if (ii[j] < 0)
+            {
+              if (i == 1)
+                {
+                  bp[1] = -a[1] + pos(b[1]);
+                  ap[1] = b[1] - pos(bp[1]);
+                }
+              else if (i == n-1)
+                {
+                  bp[n-2] = -a[n-2] + neg(b[n-2]);
+                  ap[n-2] = b[n-2] - neg(bp[n-2]);
+                }
+              else
+                {
+                  d = a[i-1] - a[i] + pos(b[i]) - neg(b[i-1]);
+                  ap[i-1] = a[i-1] + pos(b[i-1]) + pos(pos(b[i]) - d);
+                  bp[i-1] = b[i] - pos(d);
+                  ap[i] = a[i] + neg(b[i]) + neg(neg(b[i-1]) + d);
+                  bp[i] = b[i-1] + pos(d);
+                }
+            }
+          for (k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
+        }
       for (k = 1; k <= N/2; ++k)
-	{
-	  /* Copy final a and b to row of output array */
-	  uo[(k-1    )*Nr+l] = a[k];
-	  uo[(k-1+N/2)*Nr+l] = b[k];
-	}
+        {
+          /* Copy final a and b to row of output array */
+          uo[(k-1    )*Nr+l] = a[k];
+          uo[(k-1+N/2)*Nr+l] = b[k];
+        }
     }
 
   free(a+1);

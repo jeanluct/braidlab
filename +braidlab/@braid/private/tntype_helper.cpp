@@ -59,25 +59,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   do {
     try
       {
-	dil = G.FindTrainTrack();
-	break;
+        dil = G.FindTrainTrack();
+        break;
       }
     catch(trains::Error& E)
       {
-	// Encountered exception... decrease tolerance and try again once.
-	if (++tries > maxtries)
-	  {
-	    mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
-			      "Growth not decreasing in fold and "
-			      "minimum tolerance of %.2Le reached.",
-			      trains::TOL);
-	  }
-	trains::TOL = 1e-14;
+        // Encountered exception... decrease tolerance and try again once.
+        if (++tries > maxtries)
+          {
+            mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
+                              "Growth not decreasing in fold and "
+                              "minimum tolerance of %.2Le reached.",
+                              trains::TOL);
+          }
+        trains::TOL = 1e-14;
       }
     catch(...)
       {
-	mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
-			  "Unknown exception occurred.");
+        mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
+                          "Unknown exception occurred.");
       }
   } while (tries <= maxtries);
 
@@ -104,13 +104,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   else if (G.GetType() == trains::pA_or_red)
     {
       mexWarnMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:pA_or_red",
-			 "Ambiguous type.");
+                         "Ambiguous type.");
       type = "pA_or_reducible";
     }
   else
     {
       mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:unknown",
-			"Unknown type.");
+                        "Unknown type.");
     }
 
   plhs[0] = mxCreateString(type.c_str());

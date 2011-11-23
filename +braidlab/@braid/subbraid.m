@@ -9,12 +9,12 @@ function bs = subbraid(b,s)
 
 if isempty(s)
   error('BRAIDLAB:braid:subbraid:badstring', ...
-	'Specify some substrings.')
+        'Specify some substrings.')
 end
 
 if min(s) < 1 | max(s) > b.n
   error('BRAIDLAB:braid:subbraid:badstring', ...
-	'Substring out of range.')
+        'Substring out of range.')
 end
 
 nn = length(s);

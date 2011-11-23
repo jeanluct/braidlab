@@ -103,6 +103,6 @@ if exist('vpi') == 2
 %  l = braidlab.loopsigma(w,sfi(u,120,0));
 else
   warning('BRAIDLAB:braid:loopcoords:overflow', ...
-	  'Integer overflow... switching to double-precision.')
+          'Integer overflow... switching to double-precision.')
   l = braidlab.loopsigma(w,double(l.coords));
 end

@@ -73,73 +73,73 @@ classdef braid
       % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
       if isa(b,'braidlab.braid')
-	br.n     = b.n;
-	br.word  = b.word;
+        br.n     = b.n;
+        br.word  = b.word;
       elseif isa(b,'braidlab.cfbraid')
         D = braidlab.braid('halftwist',b.n);
         br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
       elseif isstr(b)
-	% First argument is a string.
-	if any(strcmp(lower(b),{'halftwist','delta'}))
-	  br.n = secnd;
-	  D = [];
-	  for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
-	  br.word = D;
-	elseif any(strcmp(lower(b),{'hironakakin','hironaka-kin','hk'}))
-	  m = secnd;
-	  if nargin < 3
-	    if m < 5
-	      error('BRAIDLAD:braid:badarg','Need at least five strings.')
-	    end
-	    if mod(m,2) == 1
-	      n = (m+1)/2;
-	      m = (m-3)/2;
-	    else
-	      n = (m+2)/2;
-	      m = (m-4)/2;
-	    end
-	  else
-	    n = third;
-	  end
-	  N = m+n+1;
-	  br.n = N;
-	  br.word = [1:m m:-1:1 1:N-1];
-	elseif any(strcmp(lower(b),{'rand','random'}))
-	  br.n = secnd;
-	  k = third;
-	  br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
-	else
-	  error('BRAIDLAD:braid:badarg','Unrecognized string argument.')
-	end
+        % First argument is a string.
+        if any(strcmp(lower(b),{'halftwist','delta'}))
+          br.n = secnd;
+          D = [];
+          for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
+          br.word = D;
+        elseif any(strcmp(lower(b),{'hironakakin','hironaka-kin','hk'}))
+          m = secnd;
+          if nargin < 3
+            if m < 5
+              error('BRAIDLAD:braid:badarg','Need at least five strings.')
+            end
+            if mod(m,2) == 1
+              n = (m+1)/2;
+              m = (m-3)/2;
+            else
+              n = (m+2)/2;
+              m = (m-4)/2;
+            end
+          else
+            n = third;
+          end
+          N = m+n+1;
+          br.n = N;
+          br.word = [1:m m:-1:1 1:N-1];
+        elseif any(strcmp(lower(b),{'rand','random'}))
+          br.n = secnd;
+          k = third;
+          br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
+        else
+          error('BRAIDLAD:braid:badarg','Unrecognized string argument.')
+        end
       elseif max(size(size(b))) == 3
-	if nargin > 1
-	  error
-	end
-	% The input is an array of data.
-	br = color_braiding(b,1:size(b,1));
+        if nargin > 1
+          error
+        end
+        % The input is an array of data.
+        br = color_braiding(b,1:size(b,1));
       else
-	% Store word as row vector.
-	if size(b,1) > size(b,2)
-	  b = b.';
-	end
-	br.word = b;
-	if nargin < 2
-	  br.n = max(abs(b))+1;
-	else
-	  br.n = secnd;
-	end
+        % Store word as row vector.
+        if size(b,1) > size(b,2)
+          b = b.';
+        end
+        br.word = b;
+        if nargin < 2
+          br.n = max(abs(b))+1;
+        else
+          br.n = secnd;
+        end
       end
     end
 
     function obj = set.n(obj,value)
       if value < 1
-	error('BRAIDLAB:braid:setn','Need at least one string.')
+        error('BRAIDLAB:braid:setn','Need at least one string.')
       end
       if ~isempty(obj.word)
         if value < max(abs(obj.word))+1
-	  error('BRAIDLAB:braid:setn',...
-		'Too few strings for generators.')
-	end
+          error('BRAIDLAB:braid:setn',...
+                'Too few strings for generators.')
+        end
       end
       obj.n = value;
     end
@@ -212,36 +212,36 @@ classdef braid
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.INV, BRAID.MTIMES.
       if isa(b2,'braidlab.braid')
-	b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
+        b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
-	% Action of braid on a loop.
-	%
-	% Have to define this here, rather than in the loop class, since the
+        % Action of braid on a loop.
+        %
+        % Have to define this here, rather than in the loop class, since the
         % braid goes on the left, and Matlab determines which overloaded
         % function to call by looking at the first argument.
-	if b1.n > b2.n
-	  error('BRAIDLAB:braid:mtimes', ...
-		'Generator values too large for the loop.')
-	end
-	b12 = braidlab.loop(loopsigma(b1.word,b2.coords));
+        if b1.n > b2.n
+          error('BRAIDLAB:braid:mtimes', ...
+                'Generator values too large for the loop.')
+        end
+        b12 = braidlab.loop(loopsigma(b1.word,b2.coords));
       elseif iscell(b2)
-	% Action of a braid on a list of loops.
-	%
-	% A cell argument indicates a list of loops.
-	sz = size(b2);
-	if sz(1) < sz(2), b2 = b2.'; end  % ensure column-vector.
-	% Convert cell array of loops to a single matrix.
-	l = cell2mat(cellfun(@(x)x.coords,b2,'UniformOutput',0));
-	% Use the vectorized loopsigma on all the loops at once.
-	l = loopsigma(b1.word,l);
-	% Convert back to cell array,
-	l = mat2cell(l,ones(1,length(b2)),2*b2{1}.n-4);
-	% ...and convert each cell element to a loop object, reshaping to
+        % Action of a braid on a list of loops.
+        %
+        % A cell argument indicates a list of loops.
+        sz = size(b2);
+        if sz(1) < sz(2), b2 = b2.'; end  % ensure column-vector.
+        % Convert cell array of loops to a single matrix.
+        l = cell2mat(cellfun(@(x)x.coords,b2,'UniformOutput',0));
+        % Use the vectorized loopsigma on all the loops at once.
+        l = loopsigma(b1.word,l);
+        % Convert back to cell array,
+        l = mat2cell(l,ones(1,length(b2)),2*b2{1}.n-4);
+        % ...and convert each cell element to a loop object, reshaping to
         % preserve the initial size.
-	b12 = reshape(cellfun(@braidlab.loop,l,'UniformOutput',0),sz);
+        b12 = reshape(cellfun(@braidlab.loop,l,'UniformOutput',0),sz);
       else
-	error('BRAIDLAB:braid:mtimes', ...
-	      'Cannot act with a braid on this object.')
+        error('BRAIDLAB:braid:mtimes', ...
+              'Cannot act with a braid on this object.')
       end
     end
 
@@ -252,9 +252,9 @@ classdef braid
     %   See also BRAID, BRAID.INV, BRAID.MPOWER.
       bm = braidlab.braid([],b.n);
       if m > 0
-	bm.word = repmat(b.word,[1 m]);
+        bm.word = repmat(b.word,[1 m]);
       else
-	bm.word = repmat(b.inv.word,[1 -m]);
+        bm.word = repmat(b.inv.word,[1 -m]);
       end
     end
 
@@ -273,8 +273,8 @@ classdef braid
     %   See also BRAID, BRAID.ISPURE.
       p = 1:obj.n;
       for i = 1:length(obj.word)
-	s = abs(obj.word(i));
-	p([s s+1]) = p([s+1 s]);
+        s = abs(obj.word(i));
+        p([s s+1]) = p([s+1 s]);
       end
     end
 
@@ -292,9 +292,9 @@ classdef braid
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.DISP.
       if isempty(b.word)
-	str = 'e';
+        str = 'e';
       else
-	str = num2str(b.word);
+        str = num2str(b.word);
       end
       str = ['< ' str ' >'];
     end
@@ -306,9 +306,9 @@ classdef braid
     %   See also BRAID, BRAID.CHAR.
        c = char(b);
        if iscell(c)
-	 disp(['     ' c{:}])
+         disp(['     ' c{:}])
        else
-	 disp(c)
+         disp(c)
        end
     end
 

@@ -27,12 +27,12 @@ if isstr(tol)
   if any(strcmp(lower(tol),{'trains','train','train-tracks','bh'}))
     if nargout > 1
       error('BRAIDLAD:braid:entropy:nargout',...
-	    'Too many output arguments for ''trains'' option.')
+            'Too many output arguments for ''trains'' option.')
     end
     [TN,varargout{1}] = tntype_helper(b.word,b.n);
     if strcmp(TN,'reducible1')
       warning('BRAIDLAD:braid:entropy:reducible',...
-	      'Reducible braid... falling back on iterative method.')
+              'Reducible braid... falling back on iterative method.')
     else
       return
     end
@@ -69,7 +69,7 @@ for i = 1:maxit
     nconv = nconv + 1;
     if i > 10 & entr < .15 & consecutiveconv
       warning('BRAIDLAD:braid:entropy:smallentr', ...
-	      'Braid has small entropy; result may be inaccurate.')
+              'Braid has small entropy; result may be inaccurate.')
       consecutiveconv = false;
     end
     % Only break if we converged nconvreq times, to prevent accidental
@@ -85,8 +85,8 @@ end
 
 if i == maxit
   warning('BRAIDLAD:braid:entropy:noconv', ...
-	  ['Failed to converge to requested tolerance; braid is likely' ...
-	   ' finite-order or has low entropy.'])
+          ['Failed to converge to requested tolerance; braid is likely' ...
+           ' finite-order or has low entropy.'])
   entr = 0;
 end
 
