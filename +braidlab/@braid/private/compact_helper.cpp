@@ -32,21 +32,21 @@ bool sort_and_cancel(T& b)
     {
       sw = false;
       for (mwIndex i = 0; i < b.size()-1; ++i)
-	{
-	  if (b[i] == -b[i+1] && b[i] != 0)
-	    {
-	      // Two adjacent generators cancel: eliminate them.
-	      b[i] = b[i+1] = 0;
-	      ++i;
-	      sw = anysw = true;
-	    }
-	  else if (abs(abs(b[i]) - abs(b[i+1])) > 1 && abs(b[i]) > abs(b[i+1]))
-	    {
-	      // Two adjacent generators commute: swap them.
-	      std::swap(b[i],b[i+1]);
-	      sw = anysw = true;
-	    }
-	}
+        {
+          if (b[i] == -b[i+1] && b[i] != 0)
+            {
+              // Two adjacent generators cancel: eliminate them.
+              b[i] = b[i+1] = 0;
+              ++i;
+              sw = anysw = true;
+            }
+          else if (abs(abs(b[i]) - abs(b[i+1])) > 1 && abs(b[i]) > abs(b[i+1]))
+            {
+              // Two adjacent generators commute: swap them.
+              std::swap(b[i],b[i+1]);
+              sw = anysw = true;
+            }
+        }
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
     }
@@ -94,44 +94,44 @@ bool commute_and_cancel(T& b, const int dir)
       T b0(b);      // Save the braid.
 #endif
       do
-	{
-	  if (b[i] == -b[i+dir] && b[i] != 0)
-	    {
-	      // Cancel with the generator on the left.
-	      b[i] = b[i+dir] = 0;
-	      shorter = true;
-	      break;
-	    }
-	  if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
-	    {
-	      // Commute with the next generator.
-	      std::swap(b[i],b[i+dir]);
-	      i += dir;
-	      incrpos = true;
-	      continue;
-	    }
-	  if (i+2*dir >= 0 && i+2*dir <= b.size()-1)
-	    {
-	      // Try the second type of relation.
-	      if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
-		  && b[i] == b[i+2*dir])
-		{
-		  std::swap(b[i],b[i+dir]);
-		  b[i+2*dir] = b[i];
-		  i += 2*dir;
-		  incrpos = true;
-		  continue;
-		}
-	    }
-	  // Nothing happened: break out of the loop to increase pos0
-	  // and try again.
+        {
+          if (b[i] == -b[i+dir] && b[i] != 0)
+            {
+              // Cancel with the generator on the left.
+              b[i] = b[i+dir] = 0;
+              shorter = true;
+              break;
+            }
+          if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
+            {
+              // Commute with the next generator.
+              std::swap(b[i],b[i+dir]);
+              i += dir;
+              incrpos = true;
+              continue;
+            }
+          if (i+2*dir >= 0 && i+2*dir <= b.size()-1)
+            {
+              // Try the second type of relation.
+              if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
+                  && b[i] == b[i+2*dir])
+                {
+                  std::swap(b[i],b[i+dir]);
+                  b[i+2*dir] = b[i];
+                  i += 2*dir;
+                  incrpos = true;
+                  continue;
+                }
+            }
+          // Nothing happened: break out of the loop to increase pos0
+          // and try again.
 #ifdef BRAIDLAB_BANGERT_RESTORE
-	  b = b0;   // Restore braid, so generator moves back to its
-		    // initial position.
+          b = b0;   // Restore braid, so generator moves back to its
+                    // initial position.
 #endif
-	  incrpos = true;
-	  break;
-	} while (i+dir >= 0 && i+dir <= b.size()-1);
+          incrpos = true;
+          break;
+        } while (i+dir >= 0 && i+dir <= b.size()-1);
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
       if (incrpos) ++pos0;
@@ -180,58 +180,58 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       bool any;
       do {
-	any = false;
-	for (int i = 1; i <= n-2; ++i)
-	  {
-	    std::vector<int> pat(3);
-	    pat[0] = i;
-	    pat[1] = i+1;
-	    pat[2] = i;
-	    vecit it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
-	    if (it != bw.end())
-	      {
-		*(it++) = i+1;
-		*(it++) = i;
-		*(it) =   i+1;
-		any = sort_and_cancel(bw);
-	      }
+        any = false;
+        for (int i = 1; i <= n-2; ++i)
+          {
+            std::vector<int> pat(3);
+            pat[0] = i;
+            pat[1] = i+1;
+            pat[2] = i;
+            vecit it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+            if (it != bw.end())
+              {
+                *(it++) = i+1;
+                *(it++) = i;
+                *(it) =   i+1;
+                any = sort_and_cancel(bw);
+              }
 
-	    pat[0] = -i;
-	    pat[1] = -(i+1);
-	    pat[2] = -i;
-	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
-	    if (it != bw.end())
-	      {
-		*(it++) = -(i+1);
-		*(it++) = -i;
-		*(it) =   -(i+1);
-		any = sort_and_cancel(bw);
-	      }
+            pat[0] = -i;
+            pat[1] = -(i+1);
+            pat[2] = -i;
+            it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+            if (it != bw.end())
+              {
+                *(it++) = -(i+1);
+                *(it++) = -i;
+                *(it) =   -(i+1);
+                any = sort_and_cancel(bw);
+              }
 
-	    pat[0] = i+1;
-	    pat[1] = i;
-	    pat[2] = i+1;
-	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
-	    if (it != bw.end())
-	      {
-		*(it++) = i;
-		*(it++) = i+1;
-		*(it) =   i;
-		any = sort_and_cancel(bw);
-	      }
+            pat[0] = i+1;
+            pat[1] = i;
+            pat[2] = i+1;
+            it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+            if (it != bw.end())
+              {
+                *(it++) = i;
+                *(it++) = i+1;
+                *(it) =   i;
+                any = sort_and_cancel(bw);
+              }
 
-	    pat[0] = -(i+1);
-	    pat[1] = -i;
-	    pat[2] = -(i+1);
-	    it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
-	    if (it != bw.end())
-	      {
-		*(it++) = -i;
-		*(it++) = -(i+1);
-		*(it) =   -i;
-		any = sort_and_cancel(bw);
-	      }
-	  }
+            pat[0] = -(i+1);
+            pat[1] = -i;
+            pat[2] = -(i+1);
+            it = std::search(bw.begin(),bw.end(),pat.begin(),pat.end());
+            if (it != bw.end())
+              {
+                *(it++) = -i;
+                *(it++) = -(i+1);
+                *(it) =   -i;
+                any = sort_and_cancel(bw);
+              }
+          }
       } while (any);
     }
 #endif

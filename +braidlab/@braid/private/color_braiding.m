@@ -22,8 +22,8 @@ n = size(XY,3); % number of punctures
 needsnoise = false;
 for i = 1:size(XY,1)
   if ...
-	length(XY(i,1,:)) ~= length(unique(XY(i,1,:))) | ...
-	length(XY(i,2,:)) ~= length(unique(XY(i,2,:)))
+        length(XY(i,1,:)) ~= length(unique(XY(i,1,:))) | ...
+        length(XY(i,2,:)) ~= length(unique(XY(i,2,:)))
     needsnoise = true; break;
   end
 end
@@ -33,7 +33,7 @@ if needsnoise
   % tiny amount of noise to the data.  Later maybe best to change
   % projection line instead?
   warning('BRAIDLAB:braid:color_braiding:coincident',...
-	  'Coincident coordinates... adding a bit of noise.')
+          'Coincident coordinates... adding a bit of noise.')
   noise = 1e-8;
   XY = XY.*(1 + noise*randn(size(XY)));
   % Maybe check if closed first, and re-close?
@@ -78,7 +78,7 @@ for I = 1:n
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0))
       error('BRAIDLAB:braid:color_braiding:coincident',...
-	    'Somehow there are still coincident trajectories...')
+            'Somehow there are still coincident trajectories...')
     end
 
     ii = 1:length(perm)-1;
@@ -145,7 +145,7 @@ tcr = zeros(size(crossdat,1),1);
 for i = 1:size(crossdat,1)
   idx1 = find(Iperm == crossdat(i,3));  % Find the location of the lower string
   if Iperm(idx1+1) == crossdat(i,4)     % If the higher string is in fact the
-				        % next string to the right apply the
+                                        % next string to the right apply the
                                         % crossing.
     Iperm(idx1:idx1+1) = [crossdat(i,4) crossdat(i,3)]; % update index vector
     gen(i) = idx1*crossdat(i,2); % save the generator
@@ -153,7 +153,7 @@ for i = 1:size(crossdat,1)
   else
     % The two strings crossing are not next to each other.
     fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
-	  ' with permutation [' num2str(Iperm) '].'];
+          ' with permutation [' num2str(Iperm) '].'];
     msg = sprintf(fs,i,crossdat(i,1),idx1);
     error('BRAIDLAB:color_braiding:badcrossing',msg)
   end

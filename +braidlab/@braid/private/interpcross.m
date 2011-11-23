@@ -30,5 +30,5 @@ dY = sign(Y1c-Y2c);
 % The sign of Y1c-Y2c determines if the crossing is g or g^-1.
 if any(dY == 0)
   error('BRAIDLAB:interpcross:cantresolve', ...
-	'Can''t resolve sign of generator -- increase resolution.');
+        'Can''t resolve sign of generator -- increase resolution.');
 end

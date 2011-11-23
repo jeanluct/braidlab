@@ -56,7 +56,7 @@ else
     % Create matrix of distances.
     for i = 1:n
       for j = 1:n
-	D(i,j) = norm(X1(1,:,i)-X0(1,:,j));
+        D(i,j) = norm(X1(1,:,i)-X0(1,:,j));
       end
     end
     % Solve the optimal assignment problem.

@@ -37,32 +37,32 @@ classdef cfbraid
     %   See also BRAID.
       if nargin == 0, return; end
       if isa(b,'braidlab.cfbraid')
-	br.n = b.n;
-	br.factors = b.factors;
-	br.delta = b.delta;
-	if nargin > 1
-	  error('BRAIDLAB:cfbraid:cfbraid:badarg', ...
-		'Cannot specify n if creating from a cfbraid.')
-	end
-	return
+        br.n = b.n;
+        br.factors = b.factors;
+        br.delta = b.delta;
+        if nargin > 1
+          error('BRAIDLAB:cfbraid:cfbraid:badarg', ...
+                'Cannot specify n if creating from a cfbraid.')
+        end
+        return
       elseif isa(b,'braidlab.braid')
-	br.n = b.n;
-	w = b.word;
-	if nargin > 1
-	  error('BRAIDLAB:cfbraid:cfbraid:badarg', ...
-		'Cannot specify n if creating from a braid.')
-	end
+        br.n = b.n;
+        w = b.word;
+        if nargin > 1
+          error('BRAIDLAB:cfbraid:cfbraid:badarg', ...
+                'Cannot specify n if creating from a braid.')
+        end
       else
-	if nargin < 2
-	  br.n = max(abs(b))+1;
-	else
-	  br.n = nn;
-	  if br.n < max(abs(b))+1
-	    error('BRAIDLAB:cfbraid:cfbraid:badgen', ...
-		  'A generator is out of range.');
-	  end
-	end
-	w = b;
+        if nargin < 2
+          br.n = max(abs(b))+1;
+        else
+          br.n = nn;
+          if br.n < max(abs(b))+1
+            error('BRAIDLAB:cfbraid:cfbraid:badgen', ...
+                  'A generator is out of range.');
+          end
+        end
+        w = b;
       end
       cf = cfbraid_helper(int32(w),br.n,0);
       br.delta = cf.delta;
@@ -123,21 +123,21 @@ classdef cfbraid
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID, CFBRAID.DISP.
       if b.delta == 0 & isempty(b.factors)
-	str = '< e >';
-	return
+        str = '< e >';
+        return
       end
       str = '';
       if b.delta ~= 0
-	str = [str sprintf('D^%d',b.delta)];
+        str = [str sprintf('D^%d',b.delta)];
       end
       if ~isempty(b.factors)
-	for i = 1:length(b.factors)
-	  if i == 1 & b.delta == 0
-	    str = [str num2str(b.factors{i})];
-	  else
-	    str = [str ' . ' num2str(b.factors{i})];
-	  end
-	end
+        for i = 1:length(b.factors)
+          if i == 1 & b.delta == 0
+            str = [str num2str(b.factors{i})];
+          else
+            str = [str ' . ' num2str(b.factors{i})];
+          end
+        end
       end
       str = ['< ' str ' >'];
     end
@@ -149,9 +149,9 @@ classdef cfbraid
     %   See also CFBRAID, CFBRAID.CHAR.
        c = char(b);
        if iscell(c)
-	 disp(['     ' c{:}])
+         disp(['     ' c{:}])
        else
-	 disp(c)
+         disp(c)
        end
     end
 

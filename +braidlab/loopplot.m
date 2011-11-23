@@ -104,7 +104,7 @@ end
 
 if prad > min(gap)
     error(['Puncture radius is too large.  For this loop the value can' ...
-	   ' not exceed ' num2str(min(gap)) '.']);
+           ' not exceed ' num2str(min(gap)) '.']);
 end
 
 % Draw punctures.

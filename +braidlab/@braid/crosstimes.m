@@ -5,7 +5,7 @@ function [b,tc] = crosstimes(XY,t)
 % Allow default empty braid: return trivial braid with one string.
 if nargin < 1
   error('BRAIDLAB:braid:braidcross:nargin',...
-	'Need at least one input argument.')
+        'Need at least one input argument.')
 end
 
 if nargin < 1
@@ -14,12 +14,12 @@ end
 
 if size(XY,2) ~= 2 | max(size(size(XY))) ~= 3
   error('BRAIDLAB:braid:braidcross:badarray',...
-	'Bad dimensions for argument XY(:,1:2,:).')
+        'Bad dimensions for argument XY(:,1:2,:).')
 end
 
 if size(XY,1) ~= length(t)
   error('BRAIDLAB:braid:braidcross:badarray',...
-	'Insonsistent sizes for argument XY and t.')
+        'Insonsistent sizes for argument XY and t.')
 end
 
 [b,tc] = color_braiding(XY,t);

@@ -81,25 +81,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       CBraid::ArtinFactor F = *it;
       std::list<int> wn;
       for (int i = 2; i <= n; ++i)
-	{
-	  for (int j = i; j > 1 && F[j] < F[j-1]; --j)
-	    {
+        {
+          for (int j = i; j > 1 && F[j] < F[j-1]; --j)
+            {
 #ifdef BRAIDLAB_MEX_DEBUG
-	      cout << j-1 << " ";
+              cout << j-1 << " ";
 #endif
-	      wn.push_back(j-1);
-	      std::swap(F[j],F[j-1]);
-	    }
-	}
+              wn.push_back(j-1);
+              std::swap(F[j],F[j-1]);
+            }
+        }
       // Now copy list wn to an mxArray.
       mxArray *wnA = mxCreateNumericMatrix(1,wn.size(),mxINT32_CLASS,mxREAL);
       int *wnp = (int *)mxGetPr(wnA);
       mwIndex k = 0;
       for (std::list<int>::const_iterator it2 = wn.begin();
-	   it2 != wn.end(); ++it2, ++k)
-	{
-	  wnp[k] = *it2;
-	}
+           it2 != wn.end(); ++it2, ++k)
+        {
+          wnp[k] = *it2;
+        }
       // And then assign this mxArray to a cell element.
       mxSetCell(factors,fac,wnA);
     }

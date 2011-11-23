@@ -75,8 +75,8 @@ end
 
 if prad > min(gap)
   error('BRAIDLAB:loop:badrad', ...
-	['Puncture radius is too large.  For this loop the value' ...
-	 'can''t exceed %f.'],min(gap))
+        ['Puncture radius is too large.  For this loop the value' ...
+         'can''t exceed %f.'],min(gap))
 end
 
 % Draw punctures.
