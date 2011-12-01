@@ -102,3 +102,15 @@ And we're done!  MEX files should compile correctly now.  It's now
 safe to delete the /tmp/gcc-tmp folder and its contents:
 
     rm -rf /tmp/gcc-tmp
+
+------------------------------------------------------------------------
+Update with Ubuntu 10.11 [2011-11-30]:
+
+Compilation stopped working after upgrade, with complaints that the
+linker couldn't find crti.o.  Kludgy solution:
+
+cd /usr/lib
+sudo ln -s x86_64-linux-gnu/crt*.o .
+
+(Adjust second line for 32-bit if necessary.)  Future versions of GCC
+should fix this.
