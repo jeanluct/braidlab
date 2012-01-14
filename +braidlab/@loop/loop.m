@@ -69,7 +69,7 @@ classdef loop
 
       % Default loop around first two of three punctures.
       if nargin == 0, return; end
-      if isscalar(c) & ~isa(c,'braidlab.loop')
+      if isscalar(c) && ~isa(c,'braidlab.loop')
         % Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
         if c < 2
