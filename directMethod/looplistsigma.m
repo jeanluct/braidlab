@@ -10,13 +10,32 @@ function up = looplistsigma(ii,n,imin,imax)
 
 badbounds = 'Lower bounds must be less than or equal to upper.';
 
+% if the input J is a braid object we will convert the object into a vector
+% of the sequence of generators
+
+if isa(ii,'braidlab.braid')
+    sigma = double(ii.word);
+else
+    sigma = ii;
+end
+
 if length(n) > 1
   if any(n > imin), error(badbounds); end
-  up = looplistsigma_helper(ii,n,imin).';
+  up = looplistsigma_helper(sigma,n,imin).';
   return
 end
 
 if any(imin > imax), error(badbounds); end
 N = 2*n-4;
 
-up = looplistsigma_helper(ii,imin*ones(1,N),imax*ones(1,N)).';
+dyn = looplistsigma_helper(sigma,imin*ones(1,N),imax*ones(1,N)).';
+
+% The creation of a cell which will contain the loops that do not grow
+% under the action of the generator sequence
+
+up = cell(size(dyn,1),1);
+
+for i = 1:length(up)
+    up{i,1} = braidlab.loop(dyn(i,:));
+end
+
