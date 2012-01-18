@@ -5,20 +5,23 @@
       [crossings is for generators; intersections is for loops.]
     * looplistsigma.m and looplistsigma_helper.c: rename to avoid
       sigma?  Adapt so that looplistsigma takes a braid and returns a
-      cell array of loops.  This shouldn't slow it down since the
-      resulting cell array is fairly small.  Should make braid member function.
+      cell array [no! just array is ok] of loops.  This shouldn't slow
+      it down since the resulting cell array is fairly small.  Should
+      make braid member function.
 
  * loop class:
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
       a private foldef.  [Well, need to keep vectorized version.  Not
-      sure how to do that.  Have a class "loops"?]
+      sure how to do that.  Have a class "loops"? 2012-01-18: No, can
+      make an array of classes.]
     * What type for the loop entries?
     * loopplot: puncture size, clipping left/right, join like Toby.
     * problems: geometric intersection number of two loops, number of
       connected components.
 
  * braid class:
-    * ensure int32 for elements.
+    * ensure int32 for elements [2012-01-17: MRA ran into a problem
+      with this; discuss.].
     * plot method.
     * train track (see Flop/Matlab).
     * For data: tube, Matt's "sexify" command to make things look good.

@@ -19,7 +19,7 @@ function [varargout] = entropy(b,tol,maxit)
 %   for long braids this algorithm becomes very inefficient.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP.LENGTH, LOOP.INTAXIS, BRAID.TNTYPE.
+%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE.
 
 if nargin < 2, tol = 1e-6; end
 
@@ -47,7 +47,7 @@ if nargin < 3
   maxit = max(min(90*b.n-500,4100),100);
 end
 
-lenfun = @intaxis; % length function: length or intaxis
+lenfun = @intaxis; % length function: minlength or intaxis
 
 % Number of convergence criteria required to be satisfied.
 % Consecutive convergence is more desirable, but becomes hard to achieve

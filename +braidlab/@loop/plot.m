@@ -11,6 +11,10 @@ function plot(L,colr,X,prad)
 %   This is a method for the LOOP class.
 %   See also LOOP.
 
+if ~isscalar(L)
+  error('BRAIDLAB:loop:plot','Can only plot scalar loop, not array of loops.');
+end
+
 if ishold
   holdstate = true;
 else
