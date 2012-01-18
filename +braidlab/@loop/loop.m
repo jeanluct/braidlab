@@ -13,7 +13,6 @@
 %
 %   In addition, LOOP has the dependent properties
 %
-%    'n'        the number of punctures;
 %    'a'        the 'a' vector of Dynnikov coordinates, of length N-2;
 %    'b'        the 'b' vector of Dynnikov coordinates, of length N-2.
 %
@@ -24,7 +23,7 @@
 %   I. A. Dynnikov, "On a Yang-Baxter map and the Dehornoy ordering,"
 %   Russian Mathematical Surveys 57 (2002), 592-594.
 %
-%   J.-O. Moussafir, "On Computing the Entropy of Braids," Functional
+%   J.-O. Moussafir, "On computing the entropy of braids," Functional
 %   Analysis and Other Mathematics 1 (2006), 37-46.
 %
 %   T. Hall & S. Yurttas, "On the topological entropy of families of
@@ -40,7 +39,6 @@ classdef loop
     coords = [0 -1]; % Dynnikov coordinates
   end
   properties (Dependent = true)
-    n                % number of strings
     a                % "a" Dynnikov coord vector
     b                % "b" Dynnikov coord vector
   end
@@ -54,8 +52,13 @@ classdef loop
     %   punctures.  Here, loop means a "topological loop", or more precisely
     %   an equivalence class of simple closed multicurves under isotopy.
     %
+    %   L = LOOP(D), where D is an array with 2*N-4 columns, creates an
+    %   array of loop objects, one for each row.
+    %
     %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
     %   coordinates, each of length N-2, where N is the number of punctures.
+    %   If A and B are arrays of equal dimension and with N-2 columns, then
+    %   an array of several loop objects is created, one for each row.
     %
     %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
     %   N+1 punctures.  The loop L is a (nonoriented) generating set for the
@@ -86,32 +89,37 @@ classdef loop
         return
       end
       if nargin == 1
-        % Create from a single vector of even length.
-        if mod(length(c),2) == 1
-          error('BRAIDLAB:loop:loop', ...
-                'Loop coordinate vector must have even length.')
+        if isvector(c)
+          % Create from a single vector of even length.
+          if mod(length(c),2)
+            error('BRAIDLAB:loop:loop', ...
+                  'Loop coordinate vector must have even length.')
+          end
+          % Store coordinates as row vector.
+          if size(c,1) > size(c,2), c = c.'; end
+          l.coords = c;
+        else
+          % Create from an array with an even number of columns.
+          if mod(size(c,2),2)
+            error('BRAIDLAB:loop:loop', ...
+                  'Loop coordinate array must have even number of columns.')
+          end
+          l(size(c,1)) = braidlab.loop;  % pre-allocate
+          for k = 1:size(c,1)
+            l(k).coords = c(k,:);
+          end
         end
-        l.coords = c;
       else
         % Create a,b separately from two vectors of the same length.
-        if length(c) ~= length(b)
+        if size(c) ~= size(b)
           error('BRAIDLAB:loop:loop', ...
-                'Loop coordinate vectors must have the same length.')
+                'Loop coordinate vectors must have the same size.')
         end
-        n1 = length(c);
-        l.coords = zeros(1,2*n1);
-        l.coords(1:n1) = c;
-        l.coords(n1+1:end) = b;
+	l(size(c,1)) = braidlab.loop;  % pre-allocate
+        for k = 1:size(c,1)
+          l(k).coords = [c(k,:) b(k,:)];
+        end
       end
-    end
-
-    % Use this to add a puncture?
-    %function obj = set.n(obj,value)
-    %end
-
-    function value = get.n(obj)
-      % Length of coords is 2n-4, where n is the number of punctures.
-      value = length(obj.coords)/2 + 2;
     end
 
     function value = get.a(obj)
@@ -129,7 +137,25 @@ classdef loop
     %
     %   This is a method for the LOOP class.
     %   See also LOOP.
-      a = obj.a; b = obj.b;
+      a = vertcat(obj.a);
+      b = vertcat(obj.b);
+    end
+
+    function value = n(obj)
+    %N   Number of punctures.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+
+      % Note that this used to be a derived property.  However, now that
+      % we support arrays of loops, there is an undersirable behavior:
+      % when calling obj.n with n a derived property, the function get.n
+      % is called for each object.  Thus, what is returned is a
+      % comma-separated of the same value n.  Better to define n as a
+      % function, then.
+
+      % Length of coords is 2n-4, where n is the number of punctures.
+      value = length(obj(1).coords)/2 + 2;
     end
 
     function ee = eq(l1,l2)
@@ -137,8 +163,8 @@ classdef loop
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID.EQ.
-      ee = l1.n == l2.n;
-      if ee, ee = all(l1.coords == l2.coords); end
+      ee = [l1.n] == [l2.n];
+      if ee, ee = all([l1.coords] == [l2.coords]); end
     end
 
     function ee = ne(l1,l2)
@@ -154,7 +180,12 @@ classdef loop
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
-      str = ['(( ' num2str(obj.coords) ' ))'];
+      if isscalar(obj)
+        str = ['(( ' num2str(obj.coords) ' ))'];
+      else
+        error('BRAIDLAB:loop:char', ...
+              'Cannot convert nonscalar loop to string.');
+      end
     end
 
     function disp(obj)
@@ -162,24 +193,21 @@ classdef loop
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
-       c = char(obj);
-       if iscell(c)
-         disp(['     ' c{:}])
-       else
-         disp(c)
-       end
+      for i = 1:size(obj,2)
+        disp(char(obj(i)))
+      end
     end
 
-    function l = length(obj)
-    %LENGTH   The minimum length of a loop.
-    %   LEN = LENGTH(L) computes the minimum length of a loop, assuming
+    function l = minlength(obj)
+    %MINLENGTH   The minimum length of a loop.
+    %   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
     %   the loop has zero thickness, and the punctures have zero size and
     %   are one unit apart.
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.INTAXIS.
       [~,nu] = obj.intersec;
-      l = sum(nu);
+      l = sum(nu,2);
     end
 
     function l = intaxis(obj)
@@ -188,18 +216,25 @@ classdef loop
     %   loop L with the real axis.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.LENGTH.
-      [a,b] = obj.ab;
+    %   See also LOOP, LOOP.MINLENGTH.
+      if ~isscalar(obj)
+        l = zeros(length(obj),1);
+        for k = 1:length(obj)
+          l(k) = intaxis(obj(k));
+        end
+      else
+        [a,b] = obj.ab;
 
-      % The number of intersections before/after the first and last punctures.
-      % See Hall & Yurttas (2009).
-      cumb = [0 cumsum(b,2)];
-      b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
-      bn1 = -b0 - sum(b);
+        % The number of intersections before/after the first and last punctures.
+        % See Hall & Yurttas (2009).
+        cumb = [0 cumsum(b,2)];
+        b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
+        bn1 = -b0 - sum(b);
 
-      % The number of intersections with the real axis.
-      l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
-          + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+        % The number of intersections with the real axis.
+        l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
+            + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+      end
     end
 
   end % methods block

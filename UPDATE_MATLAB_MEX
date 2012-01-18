@@ -63,6 +63,31 @@ Make sure there are no errors.  And finally, compile away!
 
     make
 
+(*** Update with Ubuntu 10.11 [2011-11-30]:
+
+Compilation stopped working after upgrade, with complaints that the
+linker couldn't find crti.o.  Kludgy solution:
+
+cd /usr/lib
+sudo ln -s x86_64-linux-gnu/crt*.o .
+
+(Adjust second line for 32-bit if necessary.)  Future versions of GCC
+should fix this.
+
+Another solution is to specify the library path directly.  If you're
+using bash type
+
+    LIBRARY_PATH=/usr/lib/x86_64-linux-gnu make
+
+For tcsh, [not tested]
+
+    setenv LIBRARY_PATH /usr/lib/x86_64-linux-gnu
+    make
+
+Note that these environment variables also need to be set to compile
+with GCC-4.3 later.  Better to make the links above,  think.
+***)
+
 This should take a while.  After it's done, type
 
     sudo make install
@@ -104,13 +129,3 @@ safe to delete the /tmp/gcc-tmp folder and its contents:
     rm -rf /tmp/gcc-tmp
 
 ------------------------------------------------------------------------
-Update with Ubuntu 10.11 [2011-11-30]:
-
-Compilation stopped working after upgrade, with complaints that the
-linker couldn't find crti.o.  Kludgy solution:
-
-cd /usr/lib
-sudo ln -s x86_64-linux-gnu/crt*.o .
-
-(Adjust second line for 32-bit if necessary.)  Future versions of GCC
-should fix this.
