@@ -22,11 +22,13 @@ if isa(br,'braidlab.braid'), br = double(br.word); end
 if isvector(n)
   % n is a vector: so it specifies VMIN; imin is VMAX and imax is MAXGROWTH.
   if any(n > imin), error(badbounds); end
+  if nargin < 4, imax = 3; end  % default MAXGROWTH is 3
   up = braidlab.loop(looplistsigma_helper(br,n,imin,imax).');
   return
 end
 
 if any(imin > imax), error(badbounds); end
+if nargin < 5, gr = 3; end  % default MAXGROWTH is 3
 
 N = 2*n-4;
 
