@@ -28,7 +28,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const mxArray *iiA;
   const double *ii, *umin, *umax;
   double *a, *b, *ap, *bp, *uo, *u;
-  double c, d, Nrd, len, len0;
+  double c, d, Nrd, len, len0, maxgr;
 
   if (nrhs < 3)
     {
@@ -40,6 +40,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   ii = mxGetPr(iiA);
   umin = mxGetPr(prhs[1]);
   umax = mxGetPr(prhs[2]);
+  maxgr = mxGetScalar(prhs[3]);
 
   Ngen = MAX(mxGetM(iiA),mxGetN(iiA));
 
@@ -145,7 +146,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	  /* Check if the loop has grown too much */
 	  if (len0) len = loopinter(n,a,b)/len0;
-	  if (len > 3) { grow = true; break; }
+	  if (len > maxgr) { grow = true; break; }
 
 	  for (k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
 	}
