@@ -30,12 +30,8 @@ N = 2*n-4;
 
 dyn = looplistsigma_helper(sigma,imin*ones(1,N),imax*ones(1,N)).';
 
-% The creation of a cell which will contain the loops that do not grow
+% The conversion of to an array of loops that do not grow
 % under the action of the generator sequence
 
-up = cell(size(dyn,1),1);
-
-for i = 1:length(up)
-    up{i,1} = braidlab.loop(dyn(i,:));
-end
+up = braidlab.loop(dyn);
 
