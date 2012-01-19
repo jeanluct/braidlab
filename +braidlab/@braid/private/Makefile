@@ -40,7 +40,7 @@ tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) nongrowingloops_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
