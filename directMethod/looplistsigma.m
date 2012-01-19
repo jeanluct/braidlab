@@ -1,22 +1,23 @@
 function up = looplistsigma(ii,n,imin,imax)
-%LOOPLISTSIGMA   Apply generators to loops.
-%   U = LOOPLISTSIGMA(J,VMIN,VMAX) returns applies the sequence of
-%   generators J to a list of loops with indices bounded from below by the
-%   vector VMIN, and from above by the vector VMAX.
+%LOOPLISTSIGMA   Apply generators to loops, keep only non-growing ones.
+%   L = LOOPLISTSIGMA(B,VMIN,VMAX) applies the braid B to a list of loops
+%   with indices bounded from below by the vector VMIN, and from above by
+%   the vector VMAX.  L is an array that contains only the non-growing
+%   loops, that is, those that do not grow exponentially under the action
+%   of B.
 %
-%   U = LOOPLISTSIGMA(J,N,IMIN,IMAX) applies J to all loops for N particles,
-%   where the loop coordinates are each bounded by the scalars IMIN and
-%   IMAX.
+%   L = LOOPLISTSIGMA(B,N,IMIN,IMAX) applies B to all loops for N particles,
+%   where the loop coordinates are all bounded by the scalars IMIN and IMAX.
+
+% TODO: Make part of braid class.  Add threshold for "non-growing"?
 
 badbounds = 'Lower bounds must be less than or equal to upper.';
 
-% if the input J is a braid object we will convert the object into a vector
-% of the sequence of generators
-
+% If the input ii is a braid object, convert it to a vector of generators.
 if isa(ii,'braidlab.braid')
-    sigma = double(ii.word);
+  sigma = double(ii.word);
 else
-    sigma = ii;
+  sigma = ii;
 end
 
 if length(n) > 1
@@ -28,10 +29,9 @@ end
 if any(imin > imax), error(badbounds); end
 N = 2*n-4;
 
+% Apply generators to all loops, and return an array of non-growing loop
+% coordinates.
 dyn = looplistsigma_helper(sigma,imin*ones(1,N),imax*ones(1,N)).';
 
-% The conversion of to an array of loops that do not grow
-% under the action of the generator sequence
-
+% Convert to an array of loops.
 up = braidlab.loop(dyn);
-
