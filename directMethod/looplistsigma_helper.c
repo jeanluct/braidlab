@@ -30,9 +30,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   double *a, *b, *ap, *bp, *uo, *u;
   double c, d, Nrd, len, len0, maxgr;
 
-  if (nrhs < 3)
+  if (nrhs < 4)
     {
-      mexErrMsgTxt("3 input arguments required.");
+      mexErrMsgTxt("4 input arguments required.");
       exit(1);
     }
 
