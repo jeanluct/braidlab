@@ -7,7 +7,8 @@
       sigma?  Adapt so that looplistsigma takes a braid and returns a
       cell array [no! just array is ok] of loops.  This shouldn't slow
       it down since the resulting cell array is fairly small.  Should
-      make braid member function.
+      make braid member function. [no, better to put it as part of lcs
+      namespace.]
 
  * loop class:
     * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in

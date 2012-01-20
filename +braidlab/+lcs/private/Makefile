@@ -34,13 +34,7 @@ TRAINS_LD         = -ltrains
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
-	cd $(TRAINS_LIBDIR); \
-		make CXX="$(CXX) -fPIC" CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
-		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
-
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
+all: nongrowingloops_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
