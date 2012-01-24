@@ -29,7 +29,7 @@ P_connected = 0*P_in;
 % all the basic ways that the two punctures can be simply connected when
 % all other punctures in the structure have been removed.
 
-[pairLoops, pairLoopIndex] = p2ploop(length(P_out)+2);
+[pairLoops, pairLoopIndex] = braidlab.lcs.p2ploop(length(P_out)+2);
 
 Dyn_set = [];
 
@@ -108,7 +108,7 @@ while sum(P_connected) ~= length(P_connected) && kill == 0;
         % as if it was a straight line from puncture to puncture.  This is
         % done by the code LOOPLINE.
         
-        loopLine = loopline(p1,p2,Xini_part);
+        loopLine = braidlab.lcs.loopline(p1,p2,Xini_part);
         
         % The resulting loop from loopline will only be added if it is a
         % unique loop when compared to the other loops listed above
@@ -122,7 +122,7 @@ while sum(P_connected) ~= length(P_connected) && kill == 0;
         % Finally we account for the case where the loops can wrap around
         % the end
                   
-        loopLinks(4:7) = loopwrap(p1,p2,numPunc);
+        loopLinks(4:7) = braidlab.lcs.loopwrap(p1,p2,numPunc);
         
         % At this point the generator sequence is applied to the considered
         % loops.
@@ -233,7 +233,7 @@ end
 % Get the Dynnikov coordinates for all the loops that simply connect a pair
 % of punctures
 
-[pairLoopsFull loopIndexFull] = p2ploop(length(punctureAssignment));
+[pairLoopsFull loopIndexFull] = braidlab.lcs.p2ploop(length(punctureAssignment));
 
 % Now we will cycle through all the connections and try to combine them to
 % form one loop.
@@ -254,11 +254,11 @@ for i = 1:length(Dyn_set)
         % If the connection is a line loop
 
         else
-            loopLine = loopline(real(Dyn_set(i)),abs(imag(Dyn_set(i))),Xini);
+            loopLine = braidlab.lcs.loopline(real(Dyn_set(i)),abs(imag(Dyn_set(i))),Xini);
             linkDyn = loopLine.coords;
         end
     else
-        loopWraps = loopwrap(abs(real(Dyn_set(i))),abs(imag(Dyn_set(i))),length(punctureAssignment));
+        loopWraps = braidlab.lcs.loopwrap(abs(real(Dyn_set(i))),abs(imag(Dyn_set(i))),length(punctureAssignment));
         if abs(real(Dyn_set(i))) < abs(imag(Dyn_set(i)))
             if imag(Dyn_set(i)) < 0
                 linkDyn = loopWraps(3).coords;

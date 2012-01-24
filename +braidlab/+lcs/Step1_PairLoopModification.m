@@ -1,5 +1,4 @@
 function [loops loopIndex] = Step1_PairLoopModification(b)
-
 %STEP1_PAIRLOOPMODIFICATION calculates a set of pair loops for a given
 % braid and applies the braid.
 %  DYN = STEP1_PAIRLOOPMODIFICATION(B) returns a set of loops which are the
@@ -20,7 +19,7 @@ end
 % Dyn_ind is the list of indexes of punctures enclosed by the loop in the
 % corresponding row in Dyn.
 
-[pairLoops, loopIndex] = p2ploop(braid.n);
+[pairLoops, loopIndex] = braidlab.lcs.p2ploop(braid.n);
 
 % The generators are applied to the pair-loops.
 
