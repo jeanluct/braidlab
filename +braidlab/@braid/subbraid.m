@@ -12,7 +12,7 @@ if isempty(s)
         'Specify some substrings.')
 end
 
-if min(s) < 1 | max(s) > b.n
+if min(s) < 1 || max(s) > b.n
   error('BRAIDLAB:braid:subbraid:badstring', ...
         'Substring out of range.')
 end
@@ -25,7 +25,7 @@ bs = [];
 for i = 1:length(b)
   gen = abs(b.word(i)); % unsigned generator
   i1 = find(p(gen) == s); i2 = find(p(gen+1) == s);
-  if ~isempty(i1) & ~isempty(i2)
+  if ~isempty(i1) && ~isempty(i2)
     % The current generator involves two of our substrings.
     % Find the position of all sub-strings in p.
     pos = find(ismember(p,s));

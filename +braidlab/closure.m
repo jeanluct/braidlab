@@ -27,7 +27,7 @@ end
 
 XYnew = zeros(size(XY(1,:,:)));
 
-if ~isstr(ctype)
+if ~ischar(ctype)
   if length(unique(ctype)) ~= length(ctype)
     error('BRAIDLAB:closure:badarg','Second argument must be a permutation.')
   end

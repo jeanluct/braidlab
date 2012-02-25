@@ -19,7 +19,7 @@ else
   entr = 0;
 end
 
-if any(strcmp(TN,{'reducible1','reducible2'}))
+if any(strcmpi(TN,{'reducible1','reducible2'}))
   varargout{1} = 'reducible';
 else
   varargout{1} = TN;
