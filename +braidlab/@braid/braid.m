@@ -78,14 +78,14 @@ classdef braid
       elseif isa(b,'braidlab.cfbraid')
         D = braidlab.braid('halftwist',b.n);
         br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
-      elseif isstr(b)
+      elseif ischar(b)
         % First argument is a string.
-        if any(strcmp(lower(b),{'halftwist','delta'}))
+        if any(strcmpi(b,{'halftwist','delta'}))
           br.n = secnd;
           D = [];
           for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
           br.word = D;
-        elseif any(strcmp(lower(b),{'hironakakin','hironaka-kin','hk'}))
+        elseif any(strcmpi(b,{'hironakakin','hironaka-kin','hk'}))
           m = secnd;
           if nargin < 3
             if m < 5
@@ -104,7 +104,7 @@ classdef braid
           N = m+n+1;
           br.n = N;
           br.word = [1:m m:-1:1 1:N-1];
-        elseif any(strcmp(lower(b),{'rand','random'}))
+        elseif any(strcmpi(b,{'rand','random'}))
           br.n = secnd;
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
@@ -176,7 +176,7 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.EQ, LOOP, LOOPCOORDS.
-      ee = b1.n == b2.n & length(b1) == length(b2);
+      ee = b1.n == b2.n && length(b1) == length(b2);
       if ee, ee = all(b1.word == b2.word); end
     end
 

@@ -14,7 +14,7 @@ function m = burau(b,t)
 if nargin < 2, t = -1; end
 
 if ischar(t)
-  if any(strcmp(lower(t),{'abs','monoid'}))
+  if any(strcmpi(t,{'abs','monoid'}))
     t = -1;
     afun = @abs;
   else

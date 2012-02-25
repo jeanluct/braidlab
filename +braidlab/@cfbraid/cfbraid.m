@@ -76,7 +76,7 @@ classdef cfbraid
     %   See also CFBRAID, BRAID, BRAID.EQ, BRAID.LEXEQ.
       fac1 = cell2mat(b1.factors);
       fac2 = cell2mat(b2.factors);
-      ee = b1.n == b2.n & b1.delta == b2.delta & length(fac1) == length(fac2);
+      ee = b1.n == b2.n && b1.delta == b2.delta && length(fac1) == length(fac2);
       if ee, ee = all(fac1 == fac2); end
     end
 
@@ -93,7 +93,7 @@ classdef cfbraid
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID.
-      ee = isempty(b.factors) & b.delta == 0;
+      ee = isempty(b.factors) && b.delta == 0;
     end
 
     function ee = ispositive(obj)
@@ -122,7 +122,7 @@ classdef cfbraid
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID, CFBRAID.DISP.
-      if b.delta == 0 & isempty(b.factors)
+      if b.delta == 0 && isempty(b.factors)
         str = '< e >';
         return
       end
@@ -132,7 +132,7 @@ classdef cfbraid
       end
       if ~isempty(b.factors)
         for i = 1:length(b.factors)
-          if i == 1 & b.delta == 0
+          if i == 1 && b.delta == 0
             str = [str num2str(b.factors{i})];
           else
             str = [str ' . ' num2str(b.factors{i})];
@@ -162,7 +162,7 @@ classdef cfbraid
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID.
-      if b.delta == 0 & isempty(b.factors), l = 0; return; end
+      if b.delta == 0 && isempty(b.factors), l = 0; return; end
       Dl = b.n*(b.n-1)/2;  % The lengh of the half-twist Delta.
       l = abs(b.delta)*Dl + length(cell2mat(b.factors));
     end

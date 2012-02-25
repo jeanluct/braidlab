@@ -67,7 +67,7 @@ switch lower(conv)
   l = braidlab.loop(zeros(1,n1),ones(1,n1));
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
-  if strcmp(conv,'dehornoy'), w = -w; end % Dehornoy uses anticlockwise conv.
+  if strcmpi(conv,'dehornoy'), w = -w; end % Dehornoy uses anticlockwise conv.
  case 'right'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the right.
