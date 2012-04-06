@@ -1,4 +1,4 @@
-function [varargout] = color_braiding(XY,t)
+function [varargout] = color_braiding(XY,t,proj)
 %COLOR_BRAIDING   Find braid generators from trajectories using colored braids.
 %   [GEN TCR CROSS_CELL] = COLOR_BRAIDING(XY,T) takes the inputs XY (the
 %   trajectory set) and T (time) and calculates the corresponding generator
@@ -16,6 +16,21 @@ import braidlab.debugmsg
 debugmsg('Part 1: Initialize parameters for crossing analysis')
 
 n = size(XY,3); % number of punctures
+
+if nargin < 3
+  % Default projection lien is X axis.
+  proj = 0;
+end
+
+% Rotate coordinates according to angle proj.
+% Note that since the projection line is supposed to be rotated by proj,
+% we rotate the data by -proj.
+if proj ~= 0
+  XYr = zeros(size(XY));
+  XYr(:,1,:) = cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+  XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
+  XY = XYr; clear XYr;
+end
 
 % Check for coincident coordinate values.
 % This is too slow... need to vectorize somehow.

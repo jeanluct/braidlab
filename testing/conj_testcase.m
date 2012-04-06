@@ -36,9 +36,7 @@ fprintf('             Length of canonical form: %d\n',length(cf1))
 % ROTATE
 disp('Now rotate...')
 
-XYr = [XY(:,2,:) -XY(:,1,:)];
-
-gen2 = braid(XYr);
+gen2 = braid(XY,-pi/4);
 
 fprintf('      Number of crossings in raw form: %d\n',length(gen2))
 gen2c = compact(gen2);
