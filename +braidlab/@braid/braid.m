@@ -32,6 +32,10 @@ classdef braid
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
     %   of time steps and N is the number of particles.
     %
+    %   B = BRAID(XY,PROJANG) uses a projection line with angle PROJANG (in
+    %   radians) from the X axis to determine crossings.  The default is to
+    %   project onto the X axis (PROJANG = 0).
+    %
     %   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
     %   object BC.
     %
@@ -112,11 +116,14 @@ classdef braid
           error('BRAIDLAD:braid:badarg','Unrecognized string argument.')
         end
       elseif max(size(size(b))) == 3
-        if nargin > 1
-          error
+        if nargin > 2
+          error('BRAIDLAD:braid:badarg','Too many input arguments.')
+	elseif nargin < 2
+	  % Use a zero projection angle.
+	  secnd = 0;
         end
         % The input is an array of data.
-        br = color_braiding(b,1:size(b,1));
+        br = color_braiding(b,1:size(b,1),secnd);
       else
         % Store word as row vector.
         if size(b,1) > size(b,2)
@@ -313,7 +320,7 @@ classdef braid
   % Static methods defined in separate files.
   % Need to execute 'clear classes' to register changes here.
   methods (Static = true)
-    [b,tc] = crosstimes(XY,t)
+    [b,tc] = crosstimes(XY,t,proj)
   end % static methods
 
 end % braid classdef
