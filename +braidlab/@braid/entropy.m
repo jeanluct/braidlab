@@ -21,7 +21,8 @@ function [varargout] = entropy(b,tol,maxit)
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE.
 
-if nargin < 2, tol = 1e-6; end
+toldef = 1e-6;
+if nargin < 2, tol = toldef; end
 
 if ischar(tol)
   if any(strcmpi(tol,{'trains','train','train-tracks','bh'}))
@@ -33,6 +34,7 @@ if ischar(tol)
     if strcmpi(TN,'reducible1')
       warning('BRAIDLAD:braid:entropy:reducible',...
               'Reducible braid... falling back on iterative method.')
+      tol = toldef;
     else
       return
     end

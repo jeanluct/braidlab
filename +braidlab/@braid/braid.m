@@ -118,9 +118,9 @@ classdef braid
       elseif max(size(size(b))) == 3
         if nargin > 2
           error('BRAIDLAD:braid:badarg','Too many input arguments.')
-	elseif nargin < 2
-	  % Use a zero projection angle.
-	  secnd = 0;
+        elseif nargin < 2
+          % Use a zero projection angle.
+          secnd = 0;
         end
         % The input is an array of data.
         br = color_braiding(b,1:size(b,1),secnd);
