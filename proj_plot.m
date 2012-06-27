@@ -1,4 +1,5 @@
-projr33
+%projr33
+projr50
 
 n = size(A,3);
 
@@ -33,10 +34,10 @@ for i = 1:length(t)
   mindist(i) = min(min(Dist(i,:,:)));
 end
 
-proj = linspace(0,2*pi,10);
+proj = linspace(0,pi,6);
 proj = proj + .01*rand(size(proj));
 Ac = closure(A,'mindist');
-cb0 = cfbraid(braid(Ac,.0012321));
+%cb0 = cfbraid(braid(Ac,.0012321));
 for i = 1:length(proj)
   b = braid(Ac,proj(i));
 %  conjtest(cb0,cfbraid(b))
