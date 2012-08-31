@@ -21,6 +21,16 @@
       connected components.
 
  * braid class:
+
+    * color_braiding: Check if actually coincident?  Sarah
+      accidentally repeated a trajectory, and was getting a different
+      answer every time she ran the code because of the randomization.
+      This is not the right behavior: coincident trajectories in both
+      X and Y should generate an error.  See also next point.
+    * color_braiding: perturb projection line rather than trajectories
+      when coincidence found?  Or just report error message.  Maybe
+      better to just report error and let user deal with it by
+      changing the projection line.
     * ensure int32 for elements [2012-01-17: MRA ran into a problem
       with this; discuss.].
     * plot method.
