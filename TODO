@@ -33,7 +33,7 @@
       changing the projection line.
     * ensure int32 for elements [2012-01-17: MRA ran into a problem
       with this; discuss.].
-    * plot method.
+    * plot method: draw a braid in standard form.  Different conventions?
     * train track (see Flop/Matlab).
     * For data: tube, Matt's "sexify" command to make things look good.
     * cycliceq: show [1 -2 3 -4] cyclically same as [1 -2 -4 3].
