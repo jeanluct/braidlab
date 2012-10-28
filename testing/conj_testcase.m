@@ -1,4 +1,4 @@
-load testdata4
+load testdata
 
 % Verify independence on projection line.
 % Braids should be conjugate.
@@ -17,6 +17,8 @@ XY = closure(XY);
 for k =1:4
   plot(XY(:,1,k),1:size(XY,1),cl{k}), hold on
 end
+xlabel('X')
+ylabel('t')
 hold off
 
 gen1 = braid(XY);
