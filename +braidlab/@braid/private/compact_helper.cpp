@@ -14,9 +14,21 @@
 #include <algorithm>
 #include "mex.h"
 
-#undef  BRAIDLAB_BANGERT_RESTORE
+#undef BRAIDLAB_BANGERT_RESTORE
+#undef BRAIDLAB_COMPACT_DEBUG
 
 extern void _main();
+
+
+#ifdef BRAIDLAB_COMPACT_DEBUG
+// Print a vector (only needed in debug mode).
+void printvec(const std::vector<int>& b)
+{
+  if (b.empty()) return;
+  for (int k = 0; k < b.size()-1; ++k) std::cerr << b[k] << " ";
+  std::cerr << b.back() << std::endl;
+}
+#endif
 
 
 //
@@ -46,7 +58,11 @@ template<class T>
 inline
 bool commute_and_cancel(T& b, const int dir)
 {
-  if (b.empty()) return false;
+#ifdef BRAIDLAB_COMPACT_DEBUG
+  using std::cerr;
+  using std::endl;
+#endif
+  if (b.size() < 2) return false;
 
   bool shorter = false;
   mwIndex pos0 = 0; // pos0 is the starting point of the "current" generator.
@@ -55,22 +71,62 @@ bool commute_and_cancel(T& b, const int dir)
       bool incrpos = false;
       // dir=1 means start from the begining, dir=-1 from the end.
       mwIndex i = (dir == 1 ? pos0 : b.size()-1-pos0);
+#ifdef BRAIDLAB_COMPACT_DEBUG
+      cerr << "Position i = " << i << endl;
+#endif
 #ifdef BRAIDLAB_BANGERT_RESTORE
       T b0(b);      // Save the braid.
 #endif
       do
         {
-          if (b[i] == -b[i+dir] && b[i] != 0)
-            {
-              // Cancel with the generator on the left.
-              b[i] = b[i+dir] = 0;
-              shorter = true;
-              break;
-            }
+	  if (i > 0)
+	    {
+	      if (b[i-1] == -b[i] && b[i] != 0)
+		{
+		  // Cancel with the generator on the left.
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << "Cancelling adjacent generators at position ";
+		  cerr << i-1 << " and " << i << endl;
+		  cerr << "before: "; printvec(b);
+#endif
+		  b[i-1] = b[i] = 0;
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << " after: "; printvec(b);
+#endif
+		  shorter = true;
+		  break;
+		}
+	    }
+	  if (i < b.size()-1)
+	    {
+	      if (b[i+1] == -b[i] && b[i] != 0)
+		{
+		  // Cancel with the generator on the right.
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << "Cancelling adjacent generators at position ";
+		  cerr << i << " and " << i+1 << endl;
+		  cerr << "before: "; printvec(b);
+#endif
+		  b[i+1] = b[i] = 0;
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << " after: "; printvec(b);
+#endif
+		  shorter = true;
+		  break;
+		}
+	    }
           if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
             {
               // Commute with the next generator.
+#ifdef BRAIDLAB_COMPACT_DEBUG
+	      cerr << "Commuting adjacent generators at position ";
+	      cerr << i << " and " << i+dir << endl;
+	      cerr << "before: "; printvec(b);
+#endif
               std::swap(b[i],b[i+dir]);
+#ifdef BRAIDLAB_COMPACT_DEBUG
+ 	      cerr << " after: "; printvec(b);
+#endif
               i += dir;
               incrpos = true;
               continue;
@@ -81,8 +137,16 @@ bool commute_and_cancel(T& b, const int dir)
               if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
                   && b[i] == b[i+2*dir])
                 {
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << "Using second relation at position ";
+		  cerr << i << "," << i+dir << "," << i+2*dir << endl;
+		  cerr << "before: "; printvec(b);
+#endif
                   std::swap(b[i],b[i+dir]);
                   b[i+2*dir] = b[i];
+#ifdef BRAIDLAB_COMPACT_DEBUG
+		  cerr << " after: "; printvec(b);
+#endif
                   i += 2*dir;
                   incrpos = true;
                   continue;
@@ -99,7 +163,7 @@ bool commute_and_cancel(T& b, const int dir)
         } while (i+dir >= 0 && i+dir <= b.size()-1);
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
-      if (b.empty()) break;
+      if (b.size() < 2) break;
       if (incrpos) ++pos0;
     } while (pos0 < b.size()-1);
 
@@ -117,6 +181,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   // Arguments checked and formatted in compact.m.
 
+#ifdef BRAIDLAB_COMPACT_DEBUG
+  std::cerr << "Entering compact_helper...\n";
+#endif
+
   const mxArray *wA = prhs[0];
   const int *w = (int *)mxGetData(wA); // wA contains int32's.
   const mwSize N = max(mxGetM(wA),mxGetN(wA));
@@ -131,7 +199,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   // Try to commute_and_cancel from the left/right until nothing changes.
-  while (commute_and_cancel(bw,1) || commute_and_cancel(bw,-1)) {}
+  while (commute_and_cancel(bw,-1) || commute_and_cancel(bw,-1)) {}
 
   // Now copy vector bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);
