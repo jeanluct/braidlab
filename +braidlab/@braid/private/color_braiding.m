@@ -18,7 +18,7 @@ debugmsg('Part 1: Initialize parameters for crossing analysis')
 n = size(XY,3); % number of punctures
 
 if nargin < 3
-  % Default projection lien is X axis.
+  % Default projection line is X axis.
   proj = 0;
 end
 

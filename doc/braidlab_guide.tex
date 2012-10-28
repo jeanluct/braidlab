@@ -5,6 +5,7 @@
 \usepackage{listings}
 \usepackage{natbib}
 \usepackage{graphicx}
+\usepackage{subfigure}
 
 \graphicspath{{figs/}}
 
@@ -226,10 +227,16 @@ media~\cite{Puckett2012}.  Figure~\ref{fig:testdata_trajs} shows
 %
 \begin{figure}
 \begin{center}
-\includegraphics[width=.5\textwidth]{testdata_trajs}
+\subfigure[]{
+  \includegraphics[height=.25\textheight]{testdata_trajs}
+  \label{fig:testdata_trajs}
+}\hspace{2em}
+\subfigure[]{
+  \includegraphics[height=.25\textheight]{testdata_braid}
+  \label{fig:testdata_braid}
+}
 \end{center}
 \caption{}
-\label{fig:testdata_trajs}
 \end{figure}
 %
 the~$X$ coordinate of these four trajectories, with time plotted
@@ -254,20 +261,20 @@ data, we simply execute
 ans = 896
 \end{lstlisting}
 This is a very long braid!  But Figure~\ref{fig:testdata_trajs}
-suggests that this is perhaps misleading: many of the crossings are
-`wiggles' that cancel each other out.  Indeed, if we attempt to
-shorten the braid:
+suggests that this is misleading: many of the crossings are `wiggles'
+that cancel each other out.  Indeed, if we attempt to shorten the
+braid:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = compact(b)
 
-b = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1  3  1  3  2  1 >
+b = < -2 -2 -2 -2 -2 -2 -1 -2 -1  3 -1  3  2  1 >
 >> b.length
 
-ans = 16
+ans = 14
 \end{lstlisting}
-\jlt{This could be shorter! Why is $-1,3,1$ not getting simplified to
-  $3$?}  we find the number of generators (the length) has dropped
-to~$16$!
+we find the number of generators (the length) has dropped to~$14$!  We
+can then plot this shortened braid as a braid diagram using
+\lstinline{plot(b)} to produce Figure~\ref{fig:testdata_braid}.
 
 \jlt{Discuss closure?}
 
