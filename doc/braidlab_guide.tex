@@ -221,26 +221,14 @@ matrices.
 \label{sec:braidfromdata}
 
 One of the main purposes of \braidlab\ is to analyze two-dimensional
-trajectory data using braids.  The folder \lstinline{testing} contains
-a dataset of trajectories, from laboratory data for granular
-media~\cite{Puckett2012}.  Figure~\ref{fig:testdata_trajs} shows
-%
-\begin{figure}
-\begin{center}
-\subfigure[]{
-  \includegraphics[height=.25\textheight]{testdata_trajs}
-  \label{fig:testdata_trajs}
-}\hspace{2em}
-\subfigure[]{
-  \includegraphics[height=.25\textheight]{testdata_braid}
-  \label{fig:testdata_braid}
-}
-\end{center}
-\caption{}
-\end{figure}
-%
-the~$X$ coordinate of these four trajectories, with time plotted
-vertically.  From the \lstinline{testing} folder, we load the data:
+trajectory data using braids.  We can assign a braid to trajectory
+data by looking for \emph{crossings} along a projection
+line~\citep{Thiffeault2005,Thiffeault2010}.  The \braid\ constructor
+allows us to do this easily.
+
+The folder \lstinline{testing} contains a dataset of trajectories,
+from laboratory data for granular media~\cite{Puckett2012}.  From the
+\lstinline{testing} folder, we load the data:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> clear; load testdata
 >> whos
@@ -252,13 +240,36 @@ vertically.  From the \lstinline{testing} folder, we load the data:
 Here \lstinline{ti} is the vector of times, and \lstinline{XY} is a
 three-dimensional array: its first component specifies the timestep,
 its second specifies the $X$ or $Y$ coordinate, and its third
-specifies one of the~$4$ particles.  To construct a braid from this
-data, we simply execute
+specifies one of the~$4$ particles.  Figure~\ref{fig:testdata_trajs3}
+shows
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{testdata_trajs3}
+  \label{fig:testdata_trajs3}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{testdata_trajs}
+  \label{fig:testdata_trajs}
+}\hspace{2em}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{testdata_braid}
+  \label{fig:testdata_braid}
+}
+\end{center}
+\caption{}
+\end{figure}
+%
+the~$X$ and~$Y$ coordinates of these four trajectories, with time
+plotted vertically.  Figure~\ref{fig:testdata_trajs} shows the same
+data, but projected along the~$X$ direction.  To construct a braid
+from this data, we simply execute
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid(XY);
 >> b.length
 
-ans = 896
+ans = 894
 \end{lstlisting}
 This is a very long braid!  But Figure~\ref{fig:testdata_trajs}
 suggests that this is misleading: many of the crossings are `wiggles'
@@ -274,9 +285,81 @@ ans = 14
 \end{lstlisting}
 we find the number of generators (the length) has dropped to~$14$!  We
 can then plot this shortened braid as a braid diagram using
-\lstinline{plot(b)} to produce Figure~\ref{fig:testdata_braid}.
+\lstinline{plot(b)} to produce Figure~\ref{fig:testdata_braid}.  The
+braid diagram allows us to see topological information clearly, such
+as the fact that the second and third particles undergo a large number
+of twists around each other; we can check this by creating a subbraid
+with only those two strands:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> subbraid(bX,[2 3])
 
-\jlt{Discuss closure?}
+ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
+\end{lstlisting}
+which shows that the winding number between these two strands is~$-4$.
+
+The braid was constructed from the data by assuming a projection along
+the~$X$ axis (the default).  We can choose a different projection by
+specifying an optional angle for the projection line; for instance, to
+project along the~$Y$ axis we invoke
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid(XY,pi/2);
+>> b.length
+
+ans = 673
+>> b.compact
+
+ans = < -3 -3 -3 -3 -1 -3 -3 -3  1 -3  1 >
+\end{lstlisting}
+In general, a change of projection line only changes the braid by
+conjugation~\cite[p.~271]{Boyland1994,Thiffeault2010}.  We can test
+for conjugacy:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> bX = compact(braid(XY,0)); bY = compact(braid(XY,pi/2));
+>> conjtest(bX,bY);
+
+ans = 0
+\end{lstlisting}
+The braids are not conjugate.  This is because the trajectories here
+are not `true' braids: the final points do not line up exactly with
+the initial points, as a set.  If we truly want a
+rotationally-conjugate braid out of our data, we need to enforce a
+closure method:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> XY = closure(XY);
+>> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
+
+bX = < -2 -2 -2 -2 -2 -2 -1 -2 -1  3 -1  3  2  1 >
+
+bY = < -3 -3 -3 -3 -1 -3 -3  1 -3  1 -3  1 >
+\end{lstlisting}
+This default closure simply draws line segments from the final points
+to the initial points in such a way that no new crossings are created
+in the~$X$ projection.  Hence, the $X$-projected braid \lstinline{bX}
+is unchanged by the closure, but the $Y$-projected braid
+\lstinline{bY} is longer by one generator.  This is enough to make the
+braids conjugate:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> [~,c] = conjtest(bX,bY)
+
+c = < 3  2 >
+\end{lstlisting}
+where the optional second argument \lstinline{c} is the conjugating
+braid, as we can verify:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> bX == c*bY*c^-1
+
+ans = 1
+\end{lstlisting}
+There are other ways to enforce closure of a braid (see
+\lstinline{help closure}), in particular
+\lstinline{closure(XY,'mindist')}, which minimizes the total distance
+between the initial and final points.
+
+Note that \lstinline{conjtest} uses the library \texttt{CBraid} (by
+Jae Choon Cha) to first convert the braids to Garside canonical
+form~\citep{Birman2005}, then to determine conjugacy.  This is very
+inefficient, so is impractical for large braids.
+
 
 % \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
 

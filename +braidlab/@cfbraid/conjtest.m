@@ -1,11 +1,11 @@
 function [varargout] = conjtest(b1,b2)
 %CONJTEST   Conjugacy test for braids.
-%   CONJ = CONJTEST(B1,B2) returns true if B1 and B2 are conjugate
+%   ISCONJ = CONJTEST(B1,B2) returns true if B1 and B2 are conjugate
 %   braids, that is, if there exists a braid C such that
 %
 %     B1 = C B2 C^-1
 %
-%   [CONJ,C] = CONJTEST(B1,B2) also returns the conjugating braid C.
+%   [ISCONJ,C] = CONJTEST(B1,B2) also returns the conjugating braid C.
 %
 %   B1 and B2 must be CFBRAID objects.
 %
@@ -17,7 +17,7 @@ end
 
 if ~isa(b1,'braidlab.cfbraid') | ~isa(b2,'braidlab.cfbraid')
   error('BRAIDLAB:cfbraid:conjtest:badargs', ...
-        'Functions takes two CFBRAIDS as arguments.');
+        'Function takes two CFBRAIDS as arguments.');
 end
 
 if isempty(b1) | isempty(b2)
@@ -33,9 +33,9 @@ end
 % TODO: The braids are aleady in canonical form, but that's recomputed in
 % the helper. Rewrite so the helper function accepts a struct.
 
-[conj,C] = conjtest_helper(b1.braid.word,b2.braid.word,b1.n);
+[isconj,C] = conjtest_helper(b1.braid.word,b2.braid.word,b1.n);
 
-varargout{1} = conj;
+varargout{1} = isconj;
 if nargout > 1
   c = braidlab.cfbraid;
   c.delta = C.delta;

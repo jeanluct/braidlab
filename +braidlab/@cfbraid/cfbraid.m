@@ -12,7 +12,7 @@
 %   METHODS(CFBRAID) shows a list of methods.
 %
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
-%   Handbook of Knot Theory, pp. 78-82.
+%   Handbook of Knot Theory (2005), pp. 78-82.
 %
 %   See also BRAID, CFBRAID.CFBRAID.
 
