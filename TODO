@@ -31,6 +31,7 @@
       when coincidence found?  Or just report error message.  Maybe
       better to just report error and let user deal with it by
       changing the projection line.
+    * color_braiding: option to minimize crossings over projection line?
     * ensure int32 for elements [2012-01-17: MRA ran into a problem
       with this; discuss.].
     * train track (see Flop/Matlab).

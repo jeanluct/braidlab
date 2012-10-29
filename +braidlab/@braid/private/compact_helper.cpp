@@ -199,7 +199,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   // Try to commute_and_cancel from the left/right until nothing changes.
-  while (commute_and_cancel(bw,-1) || commute_and_cancel(bw,-1)) {}
+  while (commute_and_cancel(bw,1) || commute_and_cancel(bw,-1)) {}
 
   // Now copy vector bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);

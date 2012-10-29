@@ -177,17 +177,16 @@ Warning: Failed to converge to requested tolerance; braid is likely finite-order
 
 ans = 0
 \end{lstlisting}
-
 To force the entropy to be computed using
 the Bestvina--Handel train track algorithm~\cite{Bestvina1995}, we add
-a flag:
+an optional parameter:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(braid([1 2]),'trains')
 
 ans = 0
 \end{lstlisting}
 Note that for large braids the Bestvina--Handel algorithm is
-impractical.  But when it can be used it can also determine the
+impractical.  But when applicable it can also determine the
 Thurton--Nielsen type of the
 braid~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}:
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -204,7 +203,7 @@ ans = reducible
 \braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
 algorithm~\citep{HallTrain}.
 
-Finally, we can also find the Burau
+Finally, we can also find the Burau matrix
 representation~\citep{Burau1936,Birman1975} of a braid:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> burau(braid([1 -2]),-1)
@@ -252,13 +251,23 @@ shows
 \subfigure[]{
   \includegraphics[height=.3\textheight]{testdata_trajs}
   \label{fig:testdata_trajs}
-}\hspace{2em}
+}\hspace{1em}
 \subfigure[]{
   \includegraphics[height=.3\textheight]{testdata_braid}
   \label{fig:testdata_braid}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{testdata_braidY}
+  \label{fig:testdata_braidY}
 }
 \end{center}
-\caption{}
+\caption{(a) A dataset of four trajectories, (b) projected alond
+  the~$X$ axis.  (c) The compacted braid~$ \sigma_1^{-1} \sigma_2^{-1}
+  \sigma_1^{-8}\sigma_3^2\sigma_2\sigma_1$ corresponding to the~$X$
+  projection in (b).  (d) The compacted
+  braid~$\sigma_3^{-7}\sigma_1\sigma_3^{-1}\sigma_1$ corresponding to
+  the~$Y$ projection, with closure enforced.  The braids in (c) and
+  (d) are conjugate.}
 \end{figure}
 %
 the~$X$ and~$Y$ coordinates of these four trajectories, with time
@@ -278,7 +287,7 @@ braid:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = compact(b)
 
-b = < -2 -2 -2 -2 -2 -2 -1 -2 -1  3 -1  3  2  1 >
+b = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
 >> b.length
 
 ans = 14
@@ -308,19 +317,19 @@ project along the~$Y$ axis we invoke
 ans = 673
 >> b.compact
 
-ans = < -3 -3 -3 -3 -1 -3 -3 -3  1 -3  1 >
+ans = < -3 -3 -3 -3 -3 -3 -3  1 -3 >
 \end{lstlisting}
 In general, a change of projection line only changes the braid by
-conjugation~\cite[p.~271]{Boyland1994,Thiffeault2010}.  We can test
-for conjugacy:
+conjugation~\citep{Boyland1994,Thiffeault2010}.  We can test for
+conjugacy:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> bX = compact(braid(XY,0)); bY = compact(braid(XY,pi/2));
 >> conjtest(bX,bY);
 
 ans = 0
 \end{lstlisting}
-The braids are not conjugate.  This is because the trajectories here
-are not `true' braids: the final points do not line up exactly with
+The braids are not conjugate.  This is because our trajectories do not
+form a `true' braid: the final points do not correspond exactly with
 the initial points, as a set.  If we truly want a
 rotationally-conjugate braid out of our data, we need to enforce a
 closure method:
@@ -328,15 +337,16 @@ closure method:
 >> XY = closure(XY);
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
 
-bX = < -2 -2 -2 -2 -2 -2 -1 -2 -1  3 -1  3  2  1 >
+bX = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
 
-bY = < -3 -3 -3 -3 -1 -3 -3  1 -3  1 -3  1 >
+bY = < -3 -3 -3 -3 -3 -3 -3  1 -3  1 >
 \end{lstlisting}
 This default closure simply draws line segments from the final points
 to the initial points in such a way that no new crossings are created
 in the~$X$ projection.  Hence, the $X$-projected braid \lstinline{bX}
-is unchanged by the closure, but the $Y$-projected braid
-\lstinline{bY} is longer by one generator.  This is enough to make the
+is unchanged by the closure, but here the $Y$-projected braid
+\lstinline{bY} is longer by one generator (\lstinline{bY} is plotted
+in Figure~\ref{fig:testdata_braidY}).  This is enough to make the
 braids conjugate:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> [~,c] = conjtest(bX,bY)
@@ -361,9 +371,14 @@ form~\citep{Birman2005}, then to determine conjugacy.  This is very
 inefficient, so is impractical for large braids.
 
 
-% \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
+\subsection{The \loopc\ class}
+\label{sec:loop}
+
+A closed loop on the punctured disk is shown in Figure~
 
 \bibliographystyle{jfm}
 \bibliography{braidlab_guide}
+
+% \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
 
 \end{document}
