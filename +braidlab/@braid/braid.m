@@ -245,7 +245,7 @@ classdef braid
       bm = braidlab.braid([],b.n);
       if m > 0
         bm.word = repmat(b.word,[1 m]);
-      else
+      elseif m < 0
         bm.word = repmat(b.inv.word,[1 -m]);
       end
     end
