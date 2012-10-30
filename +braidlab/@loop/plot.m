@@ -191,5 +191,10 @@ end
 if ~holdstate
   hold off
   axis equal
+  % Make a small margin, to avoid cutting off the thick lines.
+  axx = axis;
+  addx = .03*(axx(2)-axx(1));
+  addy = .03*(axx(4)-axx(3));
+  axis([axx(1)-addx axx(2)+addx axx(3)-addy axx(4)+addy]);
   axis off
 end

@@ -1,5 +1,11 @@
 \documentclass[12pt]{article}
+\pdfoutput=1
 
+\usepackage{amsmath}
+\usepackage{amssymb,amsfonts}
+\usepackage{bm}
+\usepackage[mathcal]{euscript}
+\usepackage[letterpaper]{geometry}
 \usepackage[letterpaper]{geometry}
 \usepackage{color}
 \usepackage{listings}
@@ -11,11 +17,30 @@
 
 \definecolor{beige}{RGB}{245,245,220}
 
+%
+% Commands
+%
+
 \newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
 \newcommand{\loopc}{\texttt{loop}}%{\lstinline{loop}}
+
+\newcommand{\mathnotation}[2]{\newcommand{#1}{\ensuremath{#2}}}
+
+
+%
+% Symbols
+%
+\renewcommand{\l}{\left}			% \left
+\renewcommand{\r}{\right}			% \right
+\mathnotation{\nn}{n}				% # of strands
+\mathnotation{\ac}{a}				% Dynnikov coord a
+\mathnotation{\bc}{b}				% Dynnikov coord b
+\mathnotation{\abv}{\bm{u}}			% Dynnikov coord vector
+\mathnotation{\ip}{i}				% Counter for braid elements
+
 
 \begin{document}
 
@@ -120,9 +145,10 @@ constructor, invoke
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> help braid.braid
 \end{lstlisting}
-which refers to a method within the class \braid.  There are other
-ways to construct a \braid, such as using random generators, here a
-braid with~$5$ strings and~$10$ random generators:
+which refers to the method \braid\ within the class \braid.  (Use
+\lstinline{methods(braid)} to list all the methods in the class.)
+There are other ways to construct a \braid, such as using random
+generators, here a braid with~$5$ strings and~$10$ random generators:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> braid('random',5,10)
 
@@ -374,7 +400,95 @@ inefficient, so is impractical for large braids.
 \subsection{The \loopc\ class}
 \label{sec:loop}
 
-A closed loop on the punctured disk is shown in Figure~
+A simple closed loop on a disk with~$5$ punctures is shown in
+Figure~\ref{fig:dynn_loop}.
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.22\textheight]{dynn_loop}
+  \label{fig:dynn_loop}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[height=.22\textheight]{dynn_def}
+  \label{fig:dynn_def}
+}
+\end{center}
+\caption{(a) A simple close loop in a disk with~$\nn=5$ punctures.
+  (b) Definition of intersection numbers~$\mu_i$ and~$\nu_i$.
+  [From~\citet{Thiffeault2010}.]}
+\end{figure}
+%
+We consider equivalence classes of such loops under homotopies
+relative to the punctures.  In particular, the loops are
+\emph{essential}, meaning that they are not null-homotopic or
+homotopic to the boundary or a puncture.  The \emph{intersection
+  numbers} are also shown in Figure~\ref{fig:dynn_loop}: these count
+the minimum number of intersections of an equivalence class of loops
+with the fixed vertical lines shown.  For~$\nn$ punctures, we define
+the intersection numbers~$\mu_i$ and~$\nu_i$ in
+Figure~\ref{fig:dynn_def}.
+
+Any given loop will lead to a unique set of intersection numbers, but
+a general collection of intersection numbers do not typically
+correspond to a loop.  It is therefore more convenient to define
+\begin{equation}
+  \ac_\ip = \tfrac12\l(\mu_{2\ip} - \mu_{2\ip-1}\r), \qquad
+  \bc_\ip = \tfrac12\l(\nu_\ip - \nu_{\ip+1}\r), \qquad
+  \ip=1,\ldots,\nn-2.
+\end{equation}
+We then combine these in vector of length~$(2\nn-4)$,
+\begin{equation}
+  \abv = (\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2}),
+  \label{eq:abvdef}
+\end{equation}
+which gives the \emph{loop coordinates} (or \emph{Dynnikov
+  coordinates}) for the loop.  (Some authors such
+as~\citet{Dehornoy2008} give the coordinates
+as~$(\ac_1,\bc_1,\ldots,\ac_{\nn-2},\bc_{\nn-2})$.)  There is now a
+bijection between~$\mathbb{Z}^{2\nn-4}$ and essential simple closed
+loops~\citep{Dynnikov2002,Moussafir2006,Hall2009,Thiffeault2010}.
+Actually, \emph{multiloops}: loop coordinates can describe unions of
+disjoint loops.
+
+Let's create the loop in Figure~\ref{fig:dynn_loop} as a \loopc\ object:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> l = loop([-1 1 -2 0 -1 0])
+
+l = (( -1 1 -2 0 -1 0 ))
+\end{lstlisting}
+Figure~\ref{fig:dynn_loop2} shows the output of the
+\lstinline{plot(l)} command.  Now we can act on this loop with braids.
+For example, we define the braid \lstinline{b} to be~$\sigma_1^{-1}$
+with~$5$ strings, corresponding to the~$5$ punctures, and then act on
+the loop \lstinline{l} by using the multiplication operator:
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[width=.6\textwidth]{dynn_loop2}
+  \label{fig:dynn_loop2}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[width=.6\textwidth]{dynn_loop2_sigm1}
+  \label{fig:dynn_loop2_sigm1}
+}
+\end{center}
+\caption{}
+\end{figure}
+%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([-1],5);
+>> b*l
+
+ans = (( -1  1 -2  1 -1  0 ))
+\end{lstlisting}
+Figure~\ref{fig:dynn_loop2_sigm1} shows the output of
+\lstinline{plot(b*l)}.  The first and second punctures were
+interchanged counterclockwise (the action of~$\sigma_1^{-1}$),
+dragging the loop along.
+
+
 
 \bibliographystyle{jfm}
 \bibliography{braidlab_guide}
