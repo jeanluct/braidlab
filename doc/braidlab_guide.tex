@@ -172,7 +172,8 @@ ans = 1
 \end{lstlisting}
 These are the same braid.  Equality is determined efficiently by
 acting on loop (Dynnikov) coordinates~\citep{Dynnikov2002}, as
-described by \citet{Dehornoy2008}.
+described by \citet{Dehornoy2008}.  See
+Sections~\ref{sec:loop}--\ref{sec:loopcoords} for more details.
 
 We can extract a subbraid by choosing specific strings: for example,
 if we take the~$4$-string braid~$\sigma_1\sigma_2\sigma_3^{-1}$ and
@@ -483,12 +484,92 @@ the loop \lstinline{l} by using the multiplication operator:
 
 ans = (( -1  1 -2  1 -1  0 ))
 \end{lstlisting}
-Figure~\ref{fig:dynn_loop2_sigm1} shows the output of
-\lstinline{plot(b*l)}.  The first and second punctures were
-interchanged counterclockwise (the action of~$\sigma_1^{-1}$),
-dragging the loop along.
+Figure~\ref{fig:dynn_loop2_sigm1} shows \lstinline{plot(b*l)}.  The
+first and second punctures were interchanged counterclockwise (the
+action of~$\sigma_1^{-1}$), dragging the loop along.
+
+The minimum length of an equivalence class of loops is determined by
+assuming the punctures are one unit of length apart and have zero
+size.  After pulling tight the loop on the punctures, it is thus made
+up of unit-length segments.  The minimum length is thus an integer.
+For the loop in Figure~\ref{fig:dynn_loop2},
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> minlength(l)
+
+ans = 12
+\end{lstlisting}
+The \lstinline{entropy} method computes the topological entropy of a
+braid by repeatedly acting on a loop, and monitoring the growth rate
+of the loop.
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 2 3 -4]);
+>> log(minlength(b^100*l)/minlength(l)) / 100
+
+ans = 0.7637
+>> entropy(b)
+
+ans = 0.7672
+\end{lstlisting}
+The entropy value returned by \lstinline{entropy(b)} is more precise,
+since that method monitors convergence and adjusts the number of
+iterations accordingly.
 
 
+\subsection{Loop coordinates for a braid}
+\label{sec:loopcoords}
+
+The loop coordinates allow us to define a unique normal form for
+braids.  Consider the multiloop depicted in
+Figure~\ref{fig:fundloops}, which is the output of \lstinline{plot(loop(5))}.
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[width=.7\textwidth]{fundloops}
+  \label{fig:fundloops}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[width=\textwidth]{fundloops_act}
+  \label{fig:fundloops_act}
+}
+\end{center}
+\caption{(a) The multiloop created by \lstinline{loop(5)}.  (b) The
+  multiloop \lstinline{b*loop(5)}, where \lstinline{b} is the braid
+  $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$.}
+\end{figure}
+%
+Notice that \lstinline{loop(5)} defaulted to a loop on a disk with $6$
+punctures.  The reason is that this default multiloop is used to
+define loop coordinates for braids.  The extra puncture is regarded as
+the outer boundary of the disk, and the loops form a generating set
+for the fundamental group of the disk with $5$ punctures.  The
+canonical loops coordinates for braids exploit the fact that two
+braids are equal if and only if they act the same way on the
+fundamental group of the disk.  Hence, if we take a braid and act on
+\lstinline{loop(5)},
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 2 3 -4]);
+>> b*loop(5)
+
+ans = (( 0  0  3 -1 -1 -1 -4  3 ))
+\end{lstlisting}
+then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))} can be
+thought of as \emph{uniquely} characterizing the braid.  It is this
+property that is used to rapidly determine equality of
+braids~\cite{Dehornoy2008}.  (The loop \lstinline{b*loop(5)} is plotted
+in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates for the
+braid can be obtained without creating an intermediate loop with
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> loopcoords(b)
+
+ans = (( 0  0  3 -1 -1 -1 -4  3 ))
+\end{lstlisting}
+
+
+\section*{Acknowledgments}
+
+The development of \braidlab\ was supported by the US National Science
+Foundation, under grants DMS-0806821 and CMMI-1233935.
 
 \bibliographystyle{jfm}
 \bibliography{braidlab_guide}
