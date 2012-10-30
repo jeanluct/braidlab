@@ -54,6 +54,7 @@
       times.  Is this a hard problem?  Or maybe they really aren't the
       same and I'm cheating somehow by using the periodicity several
       times.
+    * compact_helper: group same generators together.
 
  * Extract reducing curve from Toby's code? (in Dynnikov coords)
 
