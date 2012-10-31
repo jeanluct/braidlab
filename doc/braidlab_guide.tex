@@ -53,7 +53,7 @@
 basicstyle=\small\ttfamily,
 keywordstyle=\small\ttfamily,
 identifierstyle=,
-commentstyle=\small\ttfamily,
+commentstyle=\small\rmfamily\itshape,%\ttfamily,
 stringstyle=\small\ttfamily,
 showstringspaces=false}
 
@@ -65,19 +65,20 @@ showstringspaces=false}
 \section{Installing \braidlab}
 
 The package \braidlab\ is defined inside a Matlab namespace, which are
-specified as subfolders beginning with a `+' character.  The Matlab
+specified as subfolders beginning with a `\lstinline{+}' character.  The Matlab
 path must contain the folder that contains the subfolder
 \lstinline{+braidlab}, and not the \lstinline{+braidlab} folder
 itself:
-\begin{lstlisting}[frame=single,framerule=0pt]
->> addpath <folder containing +braidlab>
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
+>> addpath '*\it path to folder containing +braidlab*'
 \end{lstlisting}
-Then, to execute a braidlab function, either call it using the syntax
-\lstinline{braidlab.<function>}, or import the whole namespace:
+To execute a braidlab \textit{function}, either call it using the
+syntax \hbox{\lstinline{braidlab.}\textit{function}}, or import the
+whole namespace:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> import braidlab.*
 \end{lstlisting}
-This allows execution of \lstinline{<function>} by itself, without the
+This allows invoking \textit{function} by itself, without the
 \lstinline{braidlab} prefix.  For the remainder of this document, we
 assume this has been done and omit the \lstinline{braidlab} prefix.
 
@@ -88,14 +89,14 @@ assume this has been done and omit the \lstinline{braidlab} prefix.
 \braidlab\ defines a number of classes, most importantly \braid\ and
 \loopc.  The braid~$\sigma_1\sigma_2^{-1}$ is defined by
 \begin{lstlisting}[frame=single,framerule=0pt]
->> a = braid([1 -2])
+>> a = braid([1 -2])   % defaults to 3 strings
 
 a = < 1 -2 >
 \end{lstlisting}
-which defaults to the minimum required strands,~$3$.  To same braid
-on~$4$ strands is defined by
+which defaults to the minimum required strings,~$3$.  To same braid
+on~$4$ strings is defined by
 \begin{lstlisting}[frame=single,framerule=0pt]
-> a4 = braid([1 -2],4)
+> a4 = braid([1 -2],4)   % force 4 strings
 
 a4 = < 1 -2 >
 \end{lstlisting}
@@ -180,7 +181,7 @@ if we take the~$4$-string braid~$\sigma_1\sigma_2\sigma_3^{-1}$ and
 discard the third string, we obtain~$\sigma_1\sigma_2^{-1}$:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> a = braid([1 2 -3]);
->> subbraid(a,[1 2 4])
+>> subbraid(a,[1 2 4])   % subbraid using strings 1,2,4
 
 ans = < 1 -2 >
 \end{lstlisting}
@@ -223,7 +224,7 @@ ans = pseudo-Anosov
 >> tntype(braid([1 2]))
 
 ans = finite-order
->> tntype(braid([1 2],4))
+>> tntype(braid([1 2],4))  % reducing curve around 1,2,3
 
 ans = reducible
 \end{lstlisting}
@@ -325,20 +326,20 @@ can then plot this shortened braid as a braid diagram using
 braid diagram allows us to see topological information clearly, such
 as the fact that the second and third particles undergo a large number
 of twists around each other; we can check this by creating a subbraid
-with only those two strands:
+with only those two strings:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> subbraid(bX,[2 3])
 
 ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
 \end{lstlisting}
-which shows that the winding number between these two strands is~$-4$.
+which shows that the winding number between these two strings is~$-4$.
 
 The braid was constructed from the data by assuming a projection along
 the~$X$ axis (the default).  We can choose a different projection by
 specifying an optional angle for the projection line; for instance, to
 project along the~$Y$ axis we invoke
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid(XY,pi/2);
+>> b = braid(XY,pi/2);   % project onto Y axis
 >> b.length
 
 ans = 673
@@ -351,7 +352,7 @@ conjugation~\citep{Boyland1994,Thiffeault2010}.  We can test for
 conjugacy:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> bX = compact(braid(XY,0)); bY = compact(braid(XY,pi/2));
->> conjtest(bX,bY);
+>> conjtest(bX,bY)   % test for conjugacy of braids
 
 ans = 0
 \end{lstlisting}
@@ -361,7 +362,7 @@ the initial points, as a set.  If we truly want a
 rotationally-conjugate braid out of our data, we need to enforce a
 closure method:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> XY = closure(XY);
+>> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
 
 bX = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
@@ -376,7 +377,7 @@ is unchanged by the closure, but here the $Y$-projected braid
 in Figure~\ref{fig:testdata_braidY}).  This is enough to make the
 braids conjugate:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [~,c] = conjtest(bX,bY)
+>> [~,c] = conjtest(bX,bY)  % ~ means discard first return arg
 
 c = < 3  2 >
 \end{lstlisting}
@@ -479,8 +480,8 @@ the loop \lstinline{l} by using the multiplication operator:
 \end{figure}
 %
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([-1],5);
->> b*l
+>> b = braid([-1],5);   % one generator with 5 strings
+>> b*l                  % act on a loop with a braid
 
 ans = (( -1  1 -2  1 -1  0 ))
 \end{lstlisting}
@@ -503,6 +504,7 @@ braid by repeatedly acting on a loop, and monitoring the growth rate
 of the loop.
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3 -4]);
+% apply braid 100 times to l, then compute growth of length
 >> log(minlength(b^100*l)/minlength(l)) / 100
 
 ans = 0.7637
@@ -556,14 +558,18 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))} can be
 thought of as \emph{uniquely} characterizing the braid.  It is this
 property that is used to rapidly determine equality of
-braids~\cite{Dehornoy2008}.  (The loop \lstinline{b*loop(5)} is plotted
-in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates for the
-braid can be obtained without creating an intermediate loop with
+braids~\citep{Dehornoy2008}.  (The loop \lstinline{b*loop(5)} is
+plotted in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates
+for the braid can be obtained without creating an intermediate loop
+with
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> loopcoords(b)
 
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \end{lstlisting}
+
+\jlt{Move cfraid to private?}
+\jlt{Next section: Braid from random walks?  Compute runs of same gen.}
 
 
 \section*{Acknowledgments}
@@ -572,6 +578,7 @@ The development of \braidlab\ was supported by the US National Science
 Foundation, under grants DMS-0806821 and CMMI-1233935.  The author
 thanks Michael Allshouse for extensive testing, comments, and for
 contributing some of the code.
+\jlt{Add code used: CBraid, Juan's, Toby's, optimal matching.}
 
 \bibliographystyle{jfm}
 \bibliography{braidlab_guide}
