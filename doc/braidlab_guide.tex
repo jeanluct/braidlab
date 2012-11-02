@@ -35,7 +35,7 @@
 %
 \renewcommand{\l}{\left}			% \left
 \renewcommand{\r}{\right}			% \right
-\mathnotation{\nn}{n}				% # of strands
+\mathnotation{\nn}{n}				% # of strings
 \mathnotation{\ac}{a}				% Dynnikov coord a
 \mathnotation{\bc}{b}				% Dynnikov coord b
 \mathnotation{\abv}{\bm{u}}			% Dynnikov coord vector
@@ -81,6 +81,10 @@ whole namespace:
 This allows invoking \textit{function} by itself, without the
 \lstinline{braidlab} prefix.  For the remainder of this document, we
 assume this has been done and omit the \lstinline{braidlab} prefix.
+The \lstinline{addpath} and \lstinline{import} commands can be added
+to \lstinline{startup.m} to ensure they are executed at the start of
+every Matlab session.
+
 
 \section{A tour of \braidlab}
 
@@ -93,7 +97,7 @@ assume this has been done and omit the \lstinline{braidlab} prefix.
 
 a = < 1 -2 >
 \end{lstlisting}
-which defaults to the minimum required strings,~$3$.  To same braid
+which defaults to the minimum required strings,~$3$.  The same braid
 on~$4$ strings is defined by
 \begin{lstlisting}[frame=single,framerule=0pt]
 > a4 = braid([1 -2],4)   % force 4 strings
@@ -439,7 +443,7 @@ correspond to a loop.  It is therefore more convenient to define
   \bc_\ip = \tfrac12\l(\nu_\ip - \nu_{\ip+1}\r), \qquad
   \ip=1,\ldots,\nn-2.
 \end{equation}
-We then combine these in vector of length~$(2\nn-4)$,
+We then combine these in a vector of length~$(2\nn-4)$,
 \begin{equation}
   \abv = (\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2}),
   \label{eq:abvdef}
@@ -451,7 +455,9 @@ as~$(\ac_1,\bc_1,\ldots,\ac_{\nn-2},\bc_{\nn-2})$.)  There is now a
 bijection between~$\mathbb{Z}^{2\nn-4}$ and essential simple closed
 loops~\citep{Dynnikov2002,Moussafir2006,Hall2009,Thiffeault2010}.
 Actually, \emph{multiloops}: loop coordinates can describe unions of
-disjoint loops.
+disjoint loops. \jlt{MRA suggests `You mention multiloops here in a
+  sort of fragment thought at the end of the second paragraph.
+  Perhaps leave this concept out till section 2.4.'}
 
 Let's create the loop in Figure~\ref{fig:dynn_loop} as a \loopc\ object:
 \begin{lstlisting}[frame=single,framerule=0pt]
