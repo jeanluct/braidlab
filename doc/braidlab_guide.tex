@@ -123,7 +123,7 @@ Powers can also be taken, including the inverse:
 
 ans = < 1 -2  1 -2  1 -2  1 -2  1 -2 >
 
-ans = <2 -1>
+ans = < 2 -1 >
 
 ans = < 1 -2  2 -1 >
 \end{lstlisting}
@@ -401,9 +401,9 @@ There are other ways to enforce closure of a braid (see
 \lstinline{closure(XY,'mindist')}, which minimizes the total distance
 between the initial and final points.
 
-Note that \lstinline{conjtest} uses the library \texttt{CBraid} (by
-Jae Choon Cha) to first convert the braids to Garside canonical
-form~\citep{Birman2005}, then to determine conjugacy.  This is very
+Note that \lstinline{conjtest} uses the library \emph{CBraid}
+\citep{CBraid} to first convert the braids to Garside canonical
+form \citep{Birman2005}, then to determine conjugacy.  This is very
 inefficient, so is impractical for large braids.
 
 
@@ -578,7 +578,6 @@ with
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \end{lstlisting}
 
-\jlt{Move cfraid to private?}
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
 
 

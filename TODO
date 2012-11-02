@@ -1,4 +1,5 @@
  * General, consistent renaming of functions.
+    * This is less important now with private methods and functions.
     * For instance: no function name should begin with braid, since
       that's part of the namespace now.
     * loopsigma is also a bad name.
@@ -11,12 +12,8 @@
       namespace.]
 
  * loop class:
-    * loopplot.m, loopsigma.m, loopinter.m, and loopsigma_helper.c in
-      a private foldef.  [Well, need to keep vectorized version.  Not
-      sure how to do that.  Have a class "loops"? 2012-01-18: No, can
-      make an array of classes.]
     * What type for the loop entries?
-    * loopplot: puncture size, clipping left/right, join like Toby.
+    * loop.plot: puncture size, clipping left/right, join like Toby.
     * problems: geometric intersection number of two loops, number of
       connected components.
 
