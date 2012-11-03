@@ -16,13 +16,15 @@
    other functions in the folder.  They must use the braidlab. prefix
    or import functions.
 
- * Subfolders with a + are also allowed.  For instance, a subfolder
-   +loop might be a good idea.  The functions therein would be invoked
-   with braidlab.loop.<function>.
+ * Subfolders with a + are also allowed.  For instance, the subfolder
+   +lcs contains the Lagrangian coherent structures functions.  The
+   functions therein are invoked with braidlab.lcs.<function>.
 
  * A subfolder beginning with "@" contains a class, such as @braid.
    Subversion has trouble with this, so the folder must be refereed to
    @braid@ within SVN.
+
+ * Classes cannot be private, since the @ folder must be on the path.
 
 See
 http://www.mathworks.com/help/techdoc/matlab_oop/brfynt_-1.html

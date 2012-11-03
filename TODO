@@ -66,9 +66,6 @@
 
  * Check types when invoking MEX files.
 
- * creating braids from data:
-    * Projection line angle.
-
  * Testing:
     * Random walk entropy.
 
@@ -81,6 +78,6 @@
    "Closure" already means something different, but maybe that's the
    right thing.  "Completion"?  "Closed extension"?  "Braid
    extension"?  Start writing notes formalizing this.  Can still
-   define topological equivalence rel the punctures.  Form a groupoid
-   or whatever the name is for a group where not all the elements can
-   be multiplied together.
+   define topological equivalence rel the punctures.  Form a groupoid,
+   a group-like structure where not all the elements can be multiplied
+   together.
