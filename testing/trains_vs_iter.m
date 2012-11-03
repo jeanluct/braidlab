@@ -62,7 +62,7 @@ for n = 3:nmax
       if ~isnan(entr_trains(n,k))
 	discr = abs(entr_trains(n,k) - entr_iter(n,k));
       else
-	disc = -1;
+	discr = -1;
       end
       entr_diff(n,k) = max(entr_diff(n,k),discr);
 

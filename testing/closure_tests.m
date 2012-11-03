@@ -1,5 +1,4 @@
 addpath ..
-addpath ../anisotropy
 import braidlab.*
 
 n = 6;
@@ -8,7 +7,6 @@ dotntype = true;
 permpregen = true;
 paralyze = true;
 
-%XY = readgranular('../anisotropy/parts2_20090406a',n);
 rng(0); XY = randomwalk(n,300,.1);
 
 if paralyze
