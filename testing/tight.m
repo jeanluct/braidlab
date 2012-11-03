@@ -1,6 +1,7 @@
 function tight
 
 import braidlab.*
+warning('off','BRAIDLAD:braid:entropy:noconv');
 
 % Number of strands.
 n = 5;
@@ -59,8 +60,6 @@ end
 fprintf('\ngood=%d  bad=%d  total=%d\n',...
 	good,bad,good+bad)
 fprintf('\n\nThe best ones (pA candidates):\n\n')
-
-warning('off','BRAIDLAD:braid:entropy:noconv');
 
 pAcand = [];
 for i = 1:size(goodones,1)
