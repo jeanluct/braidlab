@@ -6,6 +6,15 @@ function X = randomwalk(n,N,eps)
 %
 %   See also BRAID, BRAID.BRAID.
 
+% TODO:
+%
+% 'brownian': choose stepsize from normal distribution.  Normalize
+% eps to have same diffusion constant as random walk?
+%
+% 'lattice': eps specifies the spacing.
+%
+% circular domain.
+
 % Particles are uniformly distributed in [0,1]^2.
 X0 = rand(1,2,n);
 
