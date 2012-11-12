@@ -19,7 +19,7 @@ MEXFLAGS  = -compatibleArrayDims  # For now build for arrays of size 2^32-1.
 %.$(MEXSUFFIX): %.c
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
-all: assignmentoptimal.$(MEXSUFFIX)
+all: assignmentoptimal.$(MEXSUFFIX) randomwalk_helper.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
