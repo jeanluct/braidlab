@@ -4,7 +4,7 @@
    on Matlab's path, then functions inside the subfolder can be invoked
    in Matlab as braidlab.<function>.
 
- * To avoid having to use the braidlab. perfix, a function can import
+ * To avoid having to use the braidlab. prefix, a function can import
    the namespace using 'import braidlab.<function>' 'or import
    braidlab.*' to import all functions.
 
