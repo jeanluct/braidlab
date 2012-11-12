@@ -16,22 +16,50 @@ extern void _main();
 //
 //
 
+#define SQUARE 0
+#define DISK   1
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   using std::cout;
   using std::endl;
 
-  mwSize n = (mwSize) mxGetScalar(prhs[0]);
-  mwSize N = (mwSize) mxGetScalar(prhs[1]);
-  double eps = mxGetScalar(prhs[2]);
+  const mwSize n = (mwSize) mxGetScalar(prhs[0]);
+  const mwSize N = (mwSize) mxGetScalar(prhs[1]);
+  const double eps = mxGetScalar(prhs[2]);
+  const int domain = (int) mxGetScalar(prhs[3]);
 
-  // Particles are uniformly distributed in [0,1]^2.
-  // Execute Matlab command "X0 = rand(2,n);"
   mxArray *X0A, *prhs2[2];
+  double *X0;
   prhs2[0] = mxCreateDoubleScalar(2);
   prhs2[1] = mxCreateDoubleScalar(n);
-  mexCallMATLAB(1,&X0A,2,prhs2,"rand");
-  double *X0 = mxGetPr(X0A);
+  if (domain == SQUARE)
+    {
+      // Particles are uniformly distributed in the unit square.
+      //
+      // Execute Matlab command "X0 = rand(2,n);"
+      mexCallMATLAB(1,&X0A,2,prhs2,"rand");
+      X0 = mxGetPr(X0A);
+    }
+  else if (domain == DISK)
+    {
+      // Particles are uniformly distributed in the unit disk.
+      //
+      // Execute Matlab command "R2ang = rand(2,n);" to generate
+      // random squared-radius and angle.
+      mxArray *R2angA;
+      mexCallMATLAB(1,&R2angA,2,prhs2,"rand");
+      double *R2ang = mxGetPr(R2angA);
+      
+      X0A = mxCreateDoubleMatrix(2,n,mxREAL);
+      X0 = mxGetPr(X0A);
+      for (mwIndex p = 0; p < n; ++p)
+	{
+	  X0[0 + p*2] = sqrt(R2ang[0 + p*2])*cos(2*M_PI*R2ang[1 + p*2]);
+	  X0[1 + p*2] = sqrt(R2ang[0 + p*2])*sin(2*M_PI*R2ang[1 + p*2]);
+	}
+      mxDestroyArray(R2angA);
+    }
 
   // Allocate memory for particle paths and copy initial conditions.
   const mwSize dim[3] = {N+1,2,n};
@@ -61,16 +89,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       for (mwIndex i = 1; i <= N; ++i)
 	{
+	  // Update particle position.
 	  int idx = i-1 + p*N;
-	  double d[2] = {eps*cos(2*M_PI*theta[idx]),eps*sin(2*M_PI*theta[idx])};
-	  for (mwIndex ixy = 0; ixy < 2; ++ixy)
+	  double dx = eps*cos(2*M_PI*theta[idx]);
+	  double dy = eps*sin(2*M_PI*theta[idx]);
+	  int ix = i + 0*(N+1) + p*2*(N+1);
+	  int iy = i + 1*(N+1) + p*2*(N+1);
+	  X[ix] = X[ix-1] + dx;
+	  X[iy] = X[iy-1] + dy;
+
+	  //
+	  // Reflect if walk leaves domain.
+	  //
+	  // Note: this requires a small step size to avoid
+	  // "double-reflections".
+	  //
+	  if (domain == SQUARE)
 	    {
-	      int iixy = i + ixy*(N+1) + p*2*(N+1);
-	      X[iixy] = X[iixy-1] + d[ixy];
-	      // Reflect if walk leaves interval.
-	      // Note: this requires a small step size.
-	      if (X[iixy] > 1) X[iixy] = 2-X[iixy];
-	      if (X[iixy] < 0) X[iixy] = -X[iixy];
+	      if (X[ix] > 1) X[ix] = 2-X[ix];
+	      if (X[ix] < 0) X[ix] = -X[ix];
+	      if (X[iy] > 1) X[iy] = 2-X[iy];
+	      if (X[iy] < 0) X[iy] = -X[iy];
+	    }
+	  else if (domain == DISK)
+	    {
+	      double r = hypot(X[ix],X[iy]);
+	      if (r > 1)
+		{
+		  double th = atan2(X[iy],X[ix]);
+		  r = 2-r; // Cheap reflection: just reflect radius.
+		  X[ix] = r*cos(th); X[iy] = r*sin(th);
+		}
 	    }
 	}
     }
