@@ -15,6 +15,18 @@ function X = randomwalk(n,N,eps)
 %
 % circular domain.
 
+if n < 1
+  error('BRAIDLAD:randomwalk:badarg','Need at least one particle.')
+end
+
+if N < 1
+  error('BRAIDLAD:randomwalk:badarg','Need at least one step.')
+end
+
+if eps <= 0
+  error('BRAIDLAD:randomwalk:badarg','Need EPS > 0.')
+end
+
 if 1
   % Call MEX file.
   X = randomwalk_helper(n,N,eps);
