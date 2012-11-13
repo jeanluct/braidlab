@@ -16,8 +16,9 @@ extern void _main();
 //
 //
 
-#define SQUARE 0
-#define DISK   1
+#define PLANE  0
+#define SQUARE 1
+#define DISK   2
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -41,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexCallMATLAB(1,&X0A,2,prhs2,"rand");
       X0 = mxGetPr(X0A);
     }
-  else if (domain == DISK)
+  else if (domain == DISK || domain == PLANE)
     {
       // Particles are uniformly distributed in the unit disk.
       //
@@ -104,6 +105,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	  // Note: this requires a small step size to avoid
 	  // "double-reflections".
 	  //
+	  // (Could insert extra point at reflection location?)
 	  if (domain == SQUARE)
 	    {
 	      if (X[ix] > 1) X[ix] = 2-X[ix];
