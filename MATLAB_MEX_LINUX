@@ -88,6 +88,15 @@ Note that these environment variables also need to be set to compile
 with GCC-4.3 later.  Better to make the links above,  think.
 ***)
 
+(*** With Ubuntu 12.10 32bit, I had some other problems.  I had to install gcc-multilib to get things like bits/prefix.h.  But I'm not sure that was really the problem, as I also had to do (on bash)
+
+export LIBRARY_PATH=/usr/lib/i386-linux-gnu/
+export C_INCLUDE_PATH=/usr/include/i386-linux-gnu
+export CPLUS_INCLUDE_PATH=/usr/include/i386-linux-gnu
+
+To be confirmed...
+***)
+
 This should take a while.  After it's done, type
 
     sudo make install
