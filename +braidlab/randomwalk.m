@@ -8,6 +8,9 @@ function X = randomwalk(n,N,eps,opts)
 %   'square', specifies the shape of the domain.  Reflecting boundary
 %   conditions are applied at the boundaries.
 %
+%   XY = RANDOMWALK(X0,K,EPS,...) uses the N initial particle positions in
+%   the vector X0, of size [2 N], one column per particle.
+%
 %   See also BRAID, BRAID.BRAID.
 
 % TODO:
@@ -18,8 +21,12 @@ function X = randomwalk(n,N,eps,opts)
 % 'lattice': eps specifies the spacing.
 %
 
-if n < 1
-  error('BRAIDLAD:randomwalk:badarg','Need at least one particle.')
+if isscalar(n)
+  if n < 1
+    error('BRAIDLAD:randomwalk:badarg','Need at least one particle.')
+  end
+elseif size(n,1) ~= 2
+  error('BRAIDLAD:randomwalk:badarg','Vector X0 should have two rows.')
 end
 
 if N < 1
@@ -37,11 +44,28 @@ end
 % Call MEX file.
 switch lower(opts)
  case 'plane'
-  X = randomwalk_helper(n,N,eps,0);
+  if isscalar(n)
+    r2 = rand(1,n); th = rand(1,n);
+    X0 = [r2.*cos(th);r2.*sin(th)];
+  else
+    X0 = n;
+  end
+  X = randomwalk_helper(X0,N,eps,0);
  case {'square','box'}
-  X = randomwalk_helper(n,N,eps,1);
+  if isscalar(n)
+    X0 = rand(2,n);
+  else
+    X0 = n;
+  end
+  X = randomwalk_helper(X0,N,eps,1);
  case 'disk'
-  X = randomwalk_helper(n,N,eps,2);
+  if isscalar(n)
+    r2 = rand(1,n); th = rand(1,n);
+    X0 = [r2.*cos(th);r2.*sin(th)];
+  else
+    X0 = n;
+  end
+  X = randomwalk_helper(X0,N,eps,2);
  otherwise
   error('BRAIDLAD:randomwalk:badarg','Unknown option %s.',opts)
 end
