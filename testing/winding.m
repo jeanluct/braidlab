@@ -1,6 +1,9 @@
 N = 1000000;
 T = 20000; Tkeep = 2000;
 eps = .025;
+r0 = .5;
+% D T = a^2/4
+% r^2 = 2 D t = (a^2/2) T n = eps^2 n
 
 fonttype = 'Times';
 fsize = 20; fcsize = 15; lw = 2;
@@ -10,7 +13,7 @@ txtattrib2 = {txtattrib{:},'Interpreter','Latex'};
 
 rng(0); wind = zeros(N,floor(T/Tkeep));
 for i = 1:N
-  X = randomwalk(1,T,eps,'disk');
+  X = randomwalk([r0;0],T,eps,'disk');
   th = atan2(X(:,2),X(:,1));
   th2 = th(1:end-1); th2(find(abs(diff(th)) <= pi)) = 0;
   th = th-th(1) + 2*pi*[0;cumsum(sign(th2))];
@@ -28,7 +31,9 @@ for it = 1:2:floor(T/Tkeep)
   t = Tkeep*it;
   %a = .425/eps/sqrt(t);% N =  50000; T =  10000; Tkeep =  2000; eps = .05;
   a = .39/eps/sqrt(t);  % N = 100000; T = 100000; Tkeep = 20000; eps = .01;
+  %a = 2/log(t);%2/log(2*t*eps^2/r0^2);
   Pf = .5*a*sech(.5*a*pi*w);
+  %Pf = 1/pi * 1/a ./ (w.^2 + a.^-2);
   minP = min(P(find(P~=0))); ii = find(Pf>minP);
   semilogy(w(ii),Pf(ii),'r','LineWidth',lw);
 end
