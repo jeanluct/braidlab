@@ -1,4 +1,47 @@
-Tutorial: how to get MEX files to run on Ubuntu 11.04.
+Tutorial: how to get MEX files to run on Ubuntu.
+
+==========================================================================
+MATLAB >= 2012a
+
+These versions support gcc-4.4, which is included in the Ubuntu 12.04
+repo (12.10?).  Simply run
+
+sudo apt-get install gcc-4.4 g++-4.4 gfortran-4.4
+
+Now that this is done, let's configure MEX/Matlab.  Type
+
+    mex -setup
+
+(*** If you get an error "mex: unrecognized option '-setup'", your mex
+command in /usr/local/bin is being shadowed by the Polish latex
+packages in /usr/bin.  If you don't need those, run
+
+    sudo apt-get remove texlive-lang-polish
+
+This removes the package.  Then log out and into a new terminal window
+to update the path variable. ***)
+
+Choose option 1, configure for gcc.  Then tell it to save to to
+the home folder by answering 'y'.  Now the mexopts.sh file is
+read-only, so type
+
+    chmod u+w ~/.matlab/<Matlab version>/mexopts.sh
+
+<Matlab version> is probably R2012a or R2012b.  Next edit the file.
+Search and replace the *first two* instances of each of these:
+
+ * 'gcc'      and replace with 'gcc-4.4'
+ * 'g++'      and replace with 'g++-4.4'
+ * 'gfortran' and replace with 'gfortran-4.4'
+
+So you should be replacing a total of 6 items.  (Well, it doesn't hurt
+to replace the other instances, but it's not necessary.)
+
+And we're done!
+
+==========================================================================
+
+MATLAB < 2012
 
 The problem is that Ubuntu >= 11.04 uses GCC-4.5, and Matlab MEX files
 require GCC-4.3 or earlier (for Matlab R2011a and R2011b).  The second
@@ -13,11 +56,23 @@ see http://morganbye.net/blog/2011/05/matlab-ubuntu-1104
 
 For 64 bit:
 
+    For <= 11.10 (?)
+
     sudo ln -s /lib64/x86_64-linux-gnu/libc-2.13.so /lib64/libc.so.6
+
+    or with more recent distributions (>= 12.04)
+
+    sudo ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6
 
 For 32 bit:
 
+    For <= 11.10 (?)
+
     sudo ln -s /lib/i386-linux-gnu/libc-2.13.so /lib/libc.so.6
+
+    or with more recent distributions (>= 12.04) ** check **
+
+    sudo ln -s /lib/i386-linux-gnu/libc.so.6 /lib/libc.so.6
 ***)
 
 Check that the commands 'matlab' and 'mex' are on your path.
