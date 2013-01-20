@@ -1,4 +1,4 @@
-function plot(L,colr,X,prad)
+function plot(L,colr,X,prad,lw,point7)
 %PLOT   Plot a loop.
 %   PLOT(L,COLOR,X,PRAD) plots a representative of the equivalence class
 %   define by the loop L.  COLOR may be speficied optionally, as well as the
@@ -23,12 +23,19 @@ else
 end
 
 n = L.n;
-lw = 2; % default line width
 
 if nargin < 2, colr = 'b'; end
 
 if nargin < 3
   X = [(1:n)' 0*(1:n)'];
+end
+
+if nargin < 5
+  lw = 2; % default line width
+end
+
+if nargin < 6
+  point7 = .7; % 'shrink' factor for gap.  Needs work...
 end
 
 Xs = sortrows(X);
@@ -63,7 +70,7 @@ a = A;
 % TODO: Keep punctures same size (need special gap near x-axis).
 gap = zeros(size(d));
 for i = 1:n-1
-  gap(i) = min(d(i)/M(i),d(i)/N(i))*.7;
+  gap(i) = min(d(i)/M(i),d(i)/N(i))*point7;
 end
 pgap = zeros(n,1);
 pgap(1) = gap(1);
@@ -78,9 +85,9 @@ if nargin < 4
 end
 
 if prad > min(gap)
-  error('BRAIDLAB:loop:badrad', ...
-        ['Puncture radius is too large.  For this loop the value' ...
-         'can''t exceed %f.'],min(gap))
+  warning('BRAIDLAB:loop:badrad', ...
+	  ['Puncture radius is too large.  For this loop the value ' ...
+	   'can''t exceed %f.'],min(gap))
 end
 
 % Draw punctures.
