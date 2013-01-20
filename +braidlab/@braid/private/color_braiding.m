@@ -36,9 +36,17 @@ end
 % This is too slow... need to vectorize somehow.
 needsnoise = false;
 for i = 1:size(XY,1)
-  if ...
-        length(XY(i,1,:)) ~= length(unique(XY(i,1,:))) | ...
-        length(XY(i,2,:)) ~= length(unique(XY(i,2,:)))
+  XYi = squeeze(XY(i,:,:))';
+  % Check if some particles occupy the exact same location, which
+  % invalidates the braid computation.
+  if size(unique(XYi,'rows'),1) ~= size(XYi,1)
+    error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
+	  'Coincident particles: braid not defined.')
+  end
+  % Check if some particles have one coordinate in common.  The braid is
+  % still well-defined, but warn the user.
+  if (length(XYi(:,1)) ~= length(unique(XYi(:,1))) | ...
+      length(XYi(:,2)) ~= length(unique(XYi(:,2))))
     needsnoise = true; break;
   end
 end
