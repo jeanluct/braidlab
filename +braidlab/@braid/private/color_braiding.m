@@ -166,19 +166,44 @@ tcr = zeros(size(crossdat,1),1);
 % Cycle through each crossing, apply, and calculate the corresponding
 % generator.
 for i = 1:size(crossdat,1)
-  idx1 = find(Iperm == crossdat(i,3));  % Find the location of the lower string
-  if Iperm(idx1+1) == crossdat(i,4)     % If the higher string is in fact the
-                                        % next string to the right apply the
-                                        % crossing.
-    Iperm(idx1:idx1+1) = [crossdat(i,4) crossdat(i,3)]; % update index vector
-    gen(i) = idx1*crossdat(i,2); % save the generator
-    tcr(i) = crossdat(i,1);       % save the time of crossing
-  else
-    % The two strings crossing are not next to each other.
-    fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
-          ' with permutation [' num2str(Iperm) '].'];
-    msg = sprintf(fs,i,crossdat(i,1),idx1);
-    error('BRAIDLAB:color_braiding:badcrossing',msg)
+  notcrossed = true;
+  while notcrossed
+    % Find the location of the lower string.
+    idx1 = find(Iperm == crossdat(i,3));
+    if Iperm(idx1+1) == crossdat(i,4)  % If the higher string is in fact the
+				       % next string to the right, then
+				       % apply the crossing.
+      Iperm(idx1:idx1+1) = [crossdat(i,4) crossdat(i,3)]; % update index vector
+      gen(i) = idx1*crossdat(i,2); % save the generator
+      tcr(i) = crossdat(i,1);      % save the time of crossing
+      notcrossed = false;          % everything is ok: we crossed, so move on
+    else
+      % The higher string is not the next string.  This possibly indicates a
+      % simultaneous crossing of three or more strings.  Let's look for a
+      % plausible crossing occuring at the same time.
+      icm = find(crossdat(:,1) == crossdat(i,1)); % crossings at same time
+      goodcross = [];
+      for j = icm'  % Loop over these crossings, looking for one that
+                    % involves adjacent particles.
+	idx1 = find(Iperm == crossdat(j,3));
+	idx2 = find(Iperm == crossdat(j,4));
+	if idx1+1 == idx2, goodcross = j; break; end  % adjacent: we're done
+      end
+      if isempty(goodcross)
+	% Cannot find two strings crossing that are not next to each other.
+	fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
+	      ' with permutation [' num2str(Iperm) '].'];
+	msg = sprintf(fs,i,crossdat(i,1),idx1);
+	error('BRAIDLAB:color_braiding:badcrossing',msg)
+      end
+      % Swap the good crossing with the current one.
+      debugmsg(sprintf('Swap crossings %d and %d',i,j))
+      temp = crossdat(i,:);
+      crossdat(i,:) = crossdat(j,:);
+      crossdat(j,:) = temp;
+      % Since notcrossed is still false, the while loop will force a
+      % recheck and detect the j crossing.
+    end
   end
 end
 
