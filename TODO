@@ -47,6 +47,7 @@
       same and I'm cheating somehow by using the periodicity several
       times.
     * compact_helper: group same generators together.
+    * burau rep: use rational polynomials, somehow.
 
  * Extract reducing curve from Toby's code? (in Dynnikov coords)
 
