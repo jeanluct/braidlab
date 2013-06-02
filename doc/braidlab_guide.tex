@@ -65,6 +65,7 @@ showstringspaces=false}
 
 \title{\braidlab\ user's guide}
 \author{Jean-Luc Thiffeault}
+\date{}
 \maketitle
 
 \section{Installing \braidlab}
@@ -92,8 +93,10 @@ every Matlab session.
 
 
 \section{A tour of \braidlab}
+\label{sec:tour}
 
 \subsection{The \braid\ class}
+\label{sec:braidclass}
 
 \braidlab\ defines a number of classes, most importantly \braid\ and
 \loopc.  The braid~$\sigma_1\sigma_2^{-1}$ is defined by
@@ -487,7 +490,8 @@ the loop \lstinline{l} by using the multiplication operator:
   \label{fig:dynn_loop2_sigm1}
 }
 \end{center}
-\caption{}
+\caption{(a) The loop \texttt{((-1 1 -2 0 -1 0))}.  (b) The braid generator
+  $\sigma_1^{-1}$ applied to the loop in (a).}
 \end{figure}
 %
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -582,6 +586,134 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \jlt{List of loops.}
 
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
+
+
+\section{Side note: On filling-in punctures}
+
+Recall the command~\texttt{subbraid} from Section~\ref{sec:braidclass}.  We
+took the~$4$-string braid~$\sigma_1\sigma_2\sigma_3^{-1}$ and discarded the
+third string, to obtain~$\sigma_1\sigma_2^{-1}$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> a = braid([1 2 -3]);
+>> b = subbraid(a,[1 2 4])   % discard string 3, keep 1,2,4
+
+b = < 1 -2 >
+\end{lstlisting}
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[width=.22\textwidth]{s1s2s-3_diagram}
+  \label{fig:s1s2s-3_diagram}
+}\hspace{5em}
+\subfigure[]{
+  \includegraphics[width=.22\textwidth]{s1s-2_diagram}
+  \label{fig:s1s-2_diagram}
+}
+\end{center}
+\caption{Removing the third string from the braid
+  (a)~$\sigma_1\sigma_2\sigma_3^{-1}$ yields the braid
+  (b)~$\sigma_1\sigma_2^{-1}$.}
+\end{figure}
+\label{fig:subbraid}
+%
+The braids \texttt{a} and \texttt{b} are shown in Fig.~\ref{fig:subbraid};
+their entropy is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> a.entropy, b.entropy
+
+ans = 0.8314
+ans = 0.9624
+\end{lstlisting}
+Note that the entropy of the subbraid~\texttt{b} is \emph{higher} than the
+original braid.  This is counterintuitive: shouldn't removing strings cause
+loops to shorten, therefore lowering their growth?
+
+In some sense this must be true: consider the mixing device shown in
+Fig.~\ref{fig:s1s2s-3_no_text}, where the rods move according the to
+braid~$\sigma_1\sigma_2\sigma_3^{-1}$.
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{s1s2s-3_no_text}
+  \label{fig:s1s2s-3_no_text}
+}\hspace{2em}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{s1s2s-3_4_diagram}
+  \label{fig:s1s2s-3_4_diagram}
+}\hspace{2em}
+\subfigure[]{
+  \includegraphics[height=.3\textheight]{s1s-2s1s-2s1s2_diagram}
+  \label{fig:s1s-2s1s-2s1s2_diagram}
+}
+\end{center}
+\caption{(a) The mixing device described by the
+  braid~$\sigma_1\sigma_2\sigma_3^{-1}$ \citep{Thiffeault2008b}.  The inset
+  shows how the rods are moved.  (b) The pure
+  braid~$(\sigma_1\sigma_2\sigma_3^{-1})^4$.  (c)~The
+  braid~$(\sigma_1\sigma_2^{-1})^2\sigma_1\sigma_2$, obtained by removing the
+  third string from~(b).}
+\label{fig:s1s2s-3_no_text}
+\end{figure}
+%
+Removing the third string can be regarded as \emph{filling-in} the third
+puncture (rod); clearly then the material line can be shortened, leading to a
+decrease in entropy.
+
+The flaw in the argument is that even though we can remove any string, we
+cannot fill in a puncture that is permuted, since the resulting braid does not
+define a homeomorphism on the filled-in surface.  To remedy this, let us take
+enough powers of the braid~$\sigma_1\sigma_2\sigma_3^{-1}$ to ensure that the
+third puncture returns to its original position, using the method
+\texttt{perm} to find the permutation induced by the braid:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> perm(a)
+
+ans = 2     3     4     1
+\end{lstlisting}
+The permutation is cyclic (it can be constructed with exactly one cycle), so
+the fourth power should do it:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> perm(a^4)
+
+ans = 1     2     3     4
+\end{lstlisting}
+This is now a \emph{pure} braid: all the strings return to their original
+position.  Now here's the surprise: the subbraid obtained by removing the
+third string from \texttt{a\^{}4} is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b2 = (subbraid(a^4,[1 2 4]))
+
+b2 = < 1 -2  1 -2  1  2 >
+\end{lstlisting}
+which is \emph{not} \texttt{b\^{}4}!  However, now there is no paradox in the
+entropies:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> entropy(a^4), entropy(b2)
+
+ans = 3.3258
+
+Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.
+> In braid.entropy at 89
+
+ans = 0
+\end{lstlisting}
+\braidlab\ has trouble computing the entropy because the braid \texttt{b2}
+appears to be finite-order.  Indeed, the braid \texttt{b2} is conjugate
+to~$\sigma_1^2$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> c = braid([2 -1],3)
+
+c = < 2 -1 >
+>> compact(c*b2*c^-1)
+
+ans = < 1  1 >
+\end{lstlisting}
+The moral is: when filling-in punctures, make sure that the strings being
+removed are permuted only among themselves.  For very long, random braids, we
+still expect that removing a string will decrease the entropy, since the
+string being removed will have returned to its initial position many times.
 
 
 \section*{Acknowledgments}
