@@ -627,7 +627,11 @@ ans = 0.9624
 \end{lstlisting}
 Note that the entropy of the subbraid~\texttt{b} is \emph{higher} than the
 original braid.  This is counterintuitive: shouldn't removing strings cause
-loops to shorten, therefore lowering their growth?
+loops to shorten, therefore lowering their growth?\footnote{In fact, the
+  entropy obtained by the removal of a string is constrained by the minimum
+  possible entropy for the remaining number of strings
+  \citep{LanneauThiffeault2011_braids}.  So here the entropy of the 3-braid
+  could only be zero or $\ge 0.9624$.}
 
 In some sense this must be true: consider the mixing device shown in
 Fig.~\ref{fig:s1s2s-3_no_text}, where the rods move according the to
@@ -710,6 +714,8 @@ c = < 2 -1 >
 
 ans = < 1  1 >
 \end{lstlisting}
+showing that its entropy is indeed zero.
+
 The moral is: when filling-in punctures, make sure that the strings being
 removed are permuted only among themselves.  For very long, random braids, we
 still expect that removing a string will decrease the entropy, since the
