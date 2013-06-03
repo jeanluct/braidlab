@@ -227,7 +227,7 @@ ans = 0
 \end{lstlisting}
 Note that for large braids the Bestvina--Handel algorithm is
 impractical.  But when applicable it can also determine the
-Thurton--Nielsen type of the
+Thurston--Nielsen type of the
 braid~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> tntype(braid([1 2 -3]))
@@ -301,7 +301,7 @@ shows
   \label{fig:testdata_braidY}
 }
 \end{center}
-\caption{(a) A dataset of four trajectories, (b) projected alond
+\caption{(a) A dataset of four trajectories, (b) projected along
   the~$X$ axis.  (c) The compacted braid~$ \sigma_1^{-1} \sigma_2^{-1}
   \sigma_1^{-8}\sigma_3^2\sigma_2\sigma_1$ corresponding to the~$X$
   projection in (b).  (d) The compacted
@@ -626,7 +626,7 @@ ans = 0.8314
 ans = 0.9624
 \end{lstlisting}
 Note that the entropy of the subbraid~\texttt{b} is \emph{higher} than the
-original braid.  This is counterintuitive: shouldn't removing strings cause
+original braid.  This is counter-intuitive: shouldn't removing strings cause
 loops to shorten, therefore lowering their growth?\footnote{In fact, the
   entropy obtained by the removal of a string is constrained by the minimum
   possible entropy for the remaining number of strings
@@ -634,7 +634,7 @@ loops to shorten, therefore lowering their growth?\footnote{In fact, the
     Ham2007,Venzke_thesis,LanneauThiffeault2011_braids}.  So here the entropy
   of the 3-braid could only be zero or $\ge 0.9624$.}
 
-In some sense this must be true: consider the mixing device shown in
+In some sense this must be true: consider the rod-stirring device shown in
 Fig.~\ref{fig:s1s2s-3_no_text}, where the rods move according the to
 braid~$\sigma_1\sigma_2\sigma_3^{-1}$.
 %
@@ -659,7 +659,6 @@ braid~$\sigma_1\sigma_2\sigma_3^{-1}$.
   braid~$(\sigma_1\sigma_2\sigma_3^{-1})^4$.  (c)~The
   braid~$(\sigma_1\sigma_2^{-1})^2\sigma_1\sigma_2$, obtained by removing the
   third string from~(b).}
-\label{fig:s1s2s-3_no_text}
 \end{figure}
 %
 Removing the third string can be regarded as \emph{filling-in} the third
@@ -685,16 +684,17 @@ the fourth power should do it:
 ans = 1     2     3     4
 \end{lstlisting}
 This is now a \emph{pure} braid: all the strings return to their original
-position.  Now here's the surprise: the subbraid obtained by removing the
-third string from \texttt{a\^{}4} is
+position (Fig.~\ref{fig:s1s2s-3_4_diagram}).  Now here's the surprise: the
+subbraid obtained by removing the third string from \texttt{a\^{}4} is
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b2 = subbraid(a^4,[1 2 4])
 
 b2 = < 1 -2  1 -2  1  2 >
 \end{lstlisting}
-which is \emph{not} \texttt{b\^{}4}!  However, now there is no paradox in the
-entropies:\footnote{\citet{Song2005} showed that the entropy of a pure braid
-  is greater than~$1.4436$, if it is nonzero.}
+which is \emph{not} \texttt{b\^{}4} (Fig.~\ref{fig:s1s-2s1s-2s1s2_diagram})!
+However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
+  showed that the entropy of a pure braid is greater than~$1.4436$, if it is
+  nonzero.}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(a^4), entropy(b2)
 
