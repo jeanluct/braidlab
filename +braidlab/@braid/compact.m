@@ -24,7 +24,7 @@ function c = compact(b)
 %   This is a method for the BRAID class.
 %   See also BRAID.
 
-if isempty(b), c = b; return; end
+if istrivial(b), c = b; return; end
 
 bc = compact_helper(b.word);
 
