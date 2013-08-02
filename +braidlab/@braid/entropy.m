@@ -21,6 +21,18 @@ function [varargout] = entropy(b,tol,maxit)
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE.
 
+lenfun = @intaxis; % length function: minlength or intaxis
+
+if istrivial(b)
+  varargout{1} = 0;
+  if nargout > 1
+    % Only one entry for the loop lengths (initial one).
+    u = braidlab.loop(b.n);
+    varargout{2} = log(lenfun(u));
+  end
+  return
+end
+
 toldef = 1e-6;
 if nargin < 2, tol = toldef; end
 
@@ -48,8 +60,6 @@ if nargin < 3
   % Empirical formula (see find_maxit).
   maxit = max(min(90*b.n-500,4100),100);
 end
-
-lenfun = @intaxis; % length function: minlength or intaxis
 
 % Number of convergence criteria required to be satisfied.
 % Consecutive convergence is more desirable, but becomes hard to achieve
