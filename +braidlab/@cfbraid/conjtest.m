@@ -20,7 +20,7 @@ if ~isa(b1,'braidlab.cfbraid') | ~isa(b2,'braidlab.cfbraid')
         'Function takes two CFBRAIDS as arguments.');
 end
 
-if isempty(b1) | isempty(b2)
+if istrivial(b1) | istrivial(b2)
   error('BRAIDLAB:cfbraid:conjtest:empty','Empty braid word.');
 end
 
