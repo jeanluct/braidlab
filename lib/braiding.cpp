@@ -1531,7 +1531,6 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
   list<ArtinFactor>::iterator itMin;
   list<sint16>::iterator itprev;
   list<ArtinFactor>::iterator itmins;
-  sint16 current=0, cur;
 
   if(cl==0 && sup%2==0)
     {
@@ -1559,7 +1558,6 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
 
   for(it=uss.begin(); it!=uss.end(); it++)
     {
-      cur=current++;
       D=TreePath(*(*it).begin(),uss,mins,prev);
       C=D;
       for(itb=(*it).begin(); itb!=(*it).end(); itb++)
