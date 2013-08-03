@@ -7,7 +7,8 @@ end
 
 import matlab.unittest.*
 
-%suite = TestSuite.fromFolder(pwd);
-suite = TestSuite.fromClass(?braidTest);
+suite = TestSuite.fromFolder(pwd);
+%suite = TestSuite.fromClass(?braidTest);
+%suite = TestSuite.fromClass(?conjTest);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite)
