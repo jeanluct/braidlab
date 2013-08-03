@@ -169,11 +169,19 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.LEXEQ, LOOP, LOOPCOORDS.
-      ee = b1.n == b2.n;
+      ee = b1.n == b2.n; if ~ee, return; end
+      if isempty(b1.word)
+	if isempty(b2.word)
+	  ee = true;
+	else
+	  ee = false;
+	end
+	return
+      end
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
       % overflow.  Check for that.
-      if ee, ee = all(loopcoords(b1) == loopcoords(b2)); end
+      ee = all(loopcoords(b1) == loopcoords(b2));
     end
 
     function ee = lexeq(b1,b2)
@@ -255,7 +263,7 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.MTIMES, BRAID.MPOWER.
-      bi = braidlab.braid(-b.word(end:-1:1),b.n);
+      bi = braidlab.braid(-fliplr(b.word),b.n);
     end
 
     function p = perm(obj)
