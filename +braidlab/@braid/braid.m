@@ -173,10 +173,8 @@ classdef braid
       if isempty(b1.word)
 	if isempty(b2.word)
 	  ee = true;
-	else
-	  ee = false;
+	  return
 	end
-	return
       end
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
