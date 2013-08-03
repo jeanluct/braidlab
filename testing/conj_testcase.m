@@ -1,4 +1,4 @@
-load testdata
+load ../testsuite/testdata
 
 % Verify independence on projection line.
 % Braids should be conjugate.
