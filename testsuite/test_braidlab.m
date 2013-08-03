@@ -9,7 +9,7 @@ import matlab.unittest.*
 
 suite = TestSuite.fromFolder(pwd);
 %suite = TestSuite.fromClass(?braidTest);
-%suite = TestSuite.fromClass(?conjTest);
+%suite = TestSuite.fromClass(?conjtestTest);
 %suite = TestSuite.fromClass(?compactTest);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite)
