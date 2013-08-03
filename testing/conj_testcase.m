@@ -44,7 +44,7 @@ if gen2c ~= gen2
   error('Something went wrong when compacting...')
 end
 
-[conj,C] = conjtest(gen1,gen2);
+[conj,C] = conjtest(gen1c,gen2c);
 
 if conj
   disp('Braids are conjugate!  Conjugating braid:')
