@@ -1,4 +1,4 @@
-load testdata
+load ../testsuite/testdata
 
 cl = {'r' 'g' 'b' 'm'};
 
