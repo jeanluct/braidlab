@@ -530,7 +530,7 @@ local m,i,j,k,n,mmaaxx,ind,IND ;
     fi;
 end:
 
-arel:=proc(IND,L,c)
+arel:=proc(IND,L,c,showsteps)
 local i,j,LL,IN,IN1,d,g,Tr,k;
     IN:=IND:
     IN1:=IND[1]:
@@ -555,7 +555,7 @@ local i,j,LL,IN,IN1,d,g,Tr,k;
         for i from 1 to nops(LL) do
             for j from 1 to nops(LL[i][1])-1 do
                 if (LL[i][1][j][2]=g-1) and (LL[i][1][j+1][1]=d+1)
-                then   if i=IN1 then print(`mouvement spiralant`)
+                then   if i=IN1 then if showsteps then print(`mouvement spiralant`) fi;
                        else k:=1:
                            g:=LL[i][1][j][1]:
                            d:=LL[i][1][j+1][2]:
@@ -565,7 +565,7 @@ local i,j,LL,IN,IN1,d,g,Tr,k;
                        fi;
                 fi;
                 if (LL[i][1][j+1][2]=g-1) and (LL[i][1][j][1]=d+1)
-                then  if i=IN1 then print(`mouvement spiralant`)
+                then  if i=IN1 then if showsteps then print(`mouvement spiralant`) fi;
                       else k:=1:
                           g:=LL[i][1][j+1][1]:
                           d:=LL[i][1][j][2]:
@@ -793,7 +793,7 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
     return [LL,cc,[bb]];
 end:
 
-finalproc:=proc(b,n)
+transmrelax:=proc(b,n,{showsteps := false})
 local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
 
     ctrivial:=[[],[]]:
@@ -808,28 +808,36 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
     B:=b:
     BD:=[]:
     Long:=0;
-    print(`Le diagramme de tresse est:`);
-    draw(B,n);
+    if showsteps then
+        print(`Le diagramme de tresse est:`);
+        draw(B,n);
+    fi;
     while c<>ctrivial do
-        print(`Les rectangles sont maintenant:`);
-        print(tracerect(c,L));
+        if showsteps then
+            print(`Les rectangles sont maintenant:`);
+            print(tracerect(c,L));
+        fi;
         M := neworder(L):
         T := transmission(M,c) :
-        print(`Apres transmission les rectangles sont:`);
-        print(tracerect(c,T));
+        if showsteps then
+            print(`Apres transmission les rectangles sont:`);
+            print(tracerect(c,T));
+        fi;
         bb:=[];lon:=1;
         IND:=relaxable(T,c):
-        if nops(IND)>=1 then AR:=[arel(IND,T,c)] fi:
+        if nops(IND)>=1 then AR:=[arel(IND,T,c,showsteps)] fi:
 
         while nops(IND)>=1 do
 
             while AR[2]=1 do
-                print(`Avant de pouvoir relaxer, une nouvelle transmission est necessaire`):
                 M := neworder(T):
                 T := transmission(M,c):
-                print(tracerect(c,T));
+                if showsteps then
+                    print(`Avant de pouvoir relaxer, une nouvelle transmission est necessaire`):
+                    print(tracerect(c,T));
+                fi;
                 IND:=relaxable(T,c):
-                AR:=[arel(IND,T,c)]:
+                AR:=[arel(IND,T,c,showsteps)]:
             od;
 
             R:=relaxation(T,AR[1],c):
@@ -848,7 +856,7 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
                 lon:=lon+1:
                 if nops(IND)>=1 then
                     if c<>ctrivial then
-                        AR:=[arel(IND,T,c)]
+                        AR:=[arel(IND,T,c,showsteps)]
                     fi:
                 fi;
             fi;
@@ -857,16 +865,19 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
         Long:=Long+lon;
         L:=T:
 
-        if nops(bb)>=1 then
-            print(`On peut alors relaxer par la tresse `, bb ,` de longueur `,lon);
-            print(`Le nouveau diagramme de tresse est maintenant:`);
-            draw(B,n);
+        if showsteps then
+            if nops(bb)>=1 then
+                print(`On peut alors relaxer par la tresse `, bb ,` de longueur `,lon);
+                print(`Le nouveau diagramme de tresse est maintenant:`);
+                draw(B,n);
+            fi;
         fi;
 
     od;
 
     print(`La longueur totale de la tresse est:`,Long,`ie`,evalf(Long));
     print(`La tresse totale utilisee pour demeler est:`,BD);
+
     return BD;
 end:
 
