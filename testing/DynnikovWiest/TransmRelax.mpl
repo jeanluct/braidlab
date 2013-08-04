@@ -111,7 +111,7 @@ local i,j,k,tot,K1,K2,K,counter,y2,l,t,circles,newcircles,y,d,u,p,x,join;
 end:
 
 diagram:=proc(c)
-local i,j,k,r,x,y,n,t,left,right,counterx,countery,circup,circdown,center,radius,total;
+local i,j,k,r,x,y,n,t,left,right,counterx,countery,circup,circdown,centr,radius,total;
     n:=nops(c[1])-2:
     total:=0:
     r:=[seq(0,i=1..n+2)]:
@@ -134,10 +134,9 @@ local i,j,k,r,x,y,n,t,left,right,counterx,countery,circup,circdown,center,radius
                 left:=sum(c[1][i][l],l=i+1..j-1):
                 right:=sum(c[1][j][l],l=i+1..j-1):
                 for k from 1 to x do
-### WARNING: `center` might conflict with Maple's meaning of that name
-                    center:=((i-1-(left+k)/r[i])+(j-2+(right+k)/r[j]))/2:
-                    radius:=center-(i-1-(left+k)/r[i]):
-                    circup[counterx+k]:=plot([center+radius*cos(t),radius*sin(t),t=0..Pi]);
+                    centr:=((i-1-(left+k)/r[i])+(j-2+(right+k)/r[j]))/2:
+                    radius:=centr-(i-1-(left+k)/r[i]):
+                    circup[counterx+k]:=plot([centr+radius*cos(t),radius*sin(t),t=0..Pi]);
                 od;
                 counterx:=counterx+x;
             fi;
@@ -145,11 +144,9 @@ local i,j,k,r,x,y,n,t,left,right,counterx,countery,circup,circdown,center,radius
                 left:=sum(c[2][i][l],l=i+1..j-1):
                 right:=sum(c[2][j][l],l=i+1..j-1):
                 for k from 1 to y do
-### WARNING: `center` might conflict with Maple's meaning of that name
-                    center:=((i-1-(left+k)/r[i])+(j-2+(right+k)/r[j]))/2:
-                    radius:=center-(i-1-(left+k)/r[i]):
-### WARNING: `center` might conflict with Maple's meaning of that name
-                    circdown[countery+k]:=plot([center+radius*cos(t),radius*sin(t),t=Pi..2*Pi]):
+                    centr:=((i-1-(left+k)/r[i])+(j-2+(right+k)/r[j]))/2:
+                    radius:=centr-(i-1-(left+k)/r[i]):
+                    circdown[countery+k]:=plot([centr+radius*cos(t),radius*sin(t),t=Pi..2*Pi]):
                 od;
                 countery:=countery+y;
             fi;
