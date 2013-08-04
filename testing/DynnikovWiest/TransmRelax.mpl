@@ -11,11 +11,11 @@ local i,j,k,tot,K1,K2,K,counter,y2,l,t,circles,newcircles,y,d,u,p,x,join;
     for i from 1 to nops(b) do
         if b[i]<=-n or b[i]>=n then
             print(`The indices of the letters must be smaller than n`);
-            RETURN();
+            return;
         fi;
         if b[i]=0 then
             print(`The indices of the letters must be nonzero`);
-            RETURN();
+            return;
         fi;
     od;
     circles:=[[],[]];
@@ -107,7 +107,7 @@ local i,j,k,tot,K1,K2,K,counter,y2,l,t,circles,newcircles,y,d,u,p,x,join;
         fi;
         circles:=newcircles;
     od;
-    RETURN(circles);
+    return circles;
 end:
 
 diagram:=proc(c)
@@ -153,13 +153,13 @@ local i,j,k,r,x,y,n,t,left,right,counterx,countery,circup,circdown,centr,radius,
         od;
     od;
     print(display({seq(circup[i],i=1..counterx),seq(circdown[i],i=1..countery)},scaling=constrained));
-    RETURN():
+    return:
 end:
 
 ### Type "draw([1,-2,1],3);" in order to see the curve diagram of the
 ### 3-strand braid sigma_1 sigma_2^{-1} sigma_1
 draw:=proc(a,b)
-    RETURN(diagram(crossings(a,b)));
+    return diagram(crossings(a,b));
 end:
 
 petirond := proc(c)
@@ -178,7 +178,7 @@ local i,j,k,e,f,A,B,L,n :
         od;
     od;
 
-    RETURN([L]) ;
+    return [L];
 
 end:
 
@@ -218,7 +218,7 @@ local i,j,k,m,n,recol ,g,h, V;
         fi;
         j:=j+1:
     od;
-    RETURN(V) ;
+    return V;
 end:
 
 touslesrect := proc(b,n)
@@ -234,7 +234,7 @@ local P,c,c2,m,j :
 ### for j from 1 to m do       THIS DOESN'T WORK, I (B.W.) DON'T UNDERSTAND WHY)
 ###   P[j][2] := 1;
 ### od;
-    RETURN([P],m) ;
+    return [P],m;
 end:
 
 tracerect := proc(c,L)
@@ -324,7 +324,7 @@ local m, epsilon,i,RR:
         RR[2]:=R[2]*(-1)^m ;
 
     fi:
-    RETURN(RR);
+    return RR;
 end:
 
 rectordre := proc(R,T)
@@ -359,7 +359,7 @@ local mr,mt,reponse  :
         fi;
     fi;
 
-    RETURN(reponse) ;
+    return reponse;
 end:
 
 neworder := proc(L)
@@ -381,7 +381,7 @@ local i,k,LL,m,j,P :
         LL[m-j]:=P:
 
     od:
-    RETURN([seq(LL[i],i=1..m)]);
+    return [seq(LL[i],i=1..m)];
 end:
 
 lexnum:=proc(pt,c)
@@ -393,7 +393,7 @@ local i,num,n:
         num:=num+eval(sum('c[1][i][k]','k'=1..n+2)):
     od:
     num:=num+pt[2]:
-    RETURN(num);
+    return num;
 end:
 
 numlex:=proc(nb,c)
@@ -409,7 +409,7 @@ local i,k,n,A,m:
     od:
     k:=k :
     m:=nb-eval(sum('A[i]','i'=1..k-1)) :
-    RETURN([k,m]);
+    return [k,m];
 end:
 
 transmission:=proc(L,c)
@@ -492,7 +492,7 @@ local H,g,h,a,b,aa,bb,k,l,m,i,j,AB,Ab,u,v,uu,vv,Segp,Segv,compteur,larg,LL,LLL:
             LLL:=[seq(LL[i],i=1..m-1),H]
         fi:
     fi;
-    RETURN(LLL);
+    return LLL;
 end:
 
 relaxable := proc(L,c)
@@ -525,8 +525,8 @@ local m,i,j,k,n,mmaaxx,ind,IND ;
         for i from 1 to eval(nops(IND)) do
             if IND[i][4]>=IND[mmaaxx][4] then mmaaxx:=i fi;
         od;
-        RETURN(IND[mmaaxx]) ;
-    else RETURN(IND)
+        return IND[mmaaxx];
+    else return IND;
     fi;
 end:
 
@@ -577,7 +577,7 @@ local i,j,LL,IN,IN1,d,g,Tr,k;
             od;
         od;
     od;
-    RETURN([IN],Tr)
+    return [IN],Tr
 end:
 
 cross:=proc(c,b,n)
@@ -669,7 +669,7 @@ local circles,newcircles,i,j,k,l,K,join,counter,x,y,y2,cc,u,d,p;
         fi;
         circles:=newcircles;
     od;
-    RETURN(circles);
+    return circles;
 end:
 
 relaxation:=proc(L,IND,c)
@@ -707,7 +707,7 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                 pta:=numlex(k,c)[1]-1+K:
                 K:=K+1:
 
-                if pta=0 then print(`erreur pta=0`):RETURN('A') fi:
+                if pta=0 then print(`erreur pta=0`):return 'A'; fi:
                 if pta<ptd then for l from ptd-1 to pta by -1 do
                                     bb:=bb,-epsilon*l
                                 od;
@@ -733,7 +733,7 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                     pta:=numlex(k,c)[1]-1+K:
                     K:=K+1:
 
-                    if pta=0 then print(`erreur pta=0`):RETURN('A') fi:
+                    if pta=0 then print(`erreur pta=0`):return 'A'; fi:
                     if pta<ptd then for l from ptd-1 to pta by -1 do
                                         bb:=bb,-epsilon*l
                                     od;
@@ -758,7 +758,7 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                 pta:=numlex(k,c)[1]-1+K:
                 K:=K+1:
 
-                if pta=0 then print(`erreur pta=0`):RETURN('A') fi:
+                if pta=0 then print(`erreur pta=0`):return 'A'; fi:
                 if pta<ptd then for l from ptd-1 to pta by -1 do
                                     bb:=bb,-epsilon*l
                                 od;
@@ -790,7 +790,7 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
             LL[i][1][j][2]:=numlex(LL[i][1][j][2],cc)
         od;
     od;
-    RETURN([LL,cc,[bb]]);
+    return [LL,cc,[bb]];
 end:
 
 finalproc:=proc(b,n)
@@ -836,7 +836,7 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
             if R=A then nar:=nops(AR[1]):
                 if nar>1 then
                     AR[1]:=[seq(AR[1][m],m=1..nar-1)]:
-                else RETURN(ERREUR?)
+                else return ERREUR?
                 fi:
             else
                 T:=R[1]:
@@ -867,7 +867,7 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
 
     print(`La longueur totale de la tresse est:`,Long,`ie`,evalf(Long));
     print(`La tresse totale utilisee pour demeler est:`,BD);
-    RETURN(BD);
+    return BD;
 end:
 
 invers:=proc(b)
@@ -877,5 +877,5 @@ local i,m,B;
     for i to m do
         B[i] := -b[m+1-i]
     end do;
-    RETURN(B)
+    return B;
 end:
