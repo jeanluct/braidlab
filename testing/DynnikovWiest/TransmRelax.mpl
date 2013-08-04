@@ -162,65 +162,6 @@ draw:=proc(a,b)
     RETURN(diagram(crossings(a,b)));
 end:
 
-petironu := proc(c)     ### THIS PROCEDURE MAY CONTAIN A BUG - IT IS NOT USED.
-local i,j,k,e,f,A,B,L,n :
-    n := nops(c[1][1])-2 :
-    L := NULL :
-    for i from 1 to n+2 do
-        k:=1+sum('c[1][i][l]','l'=1..i) ;
-        for j from n+2 to i+1 by -1 do
-            if c[1][i][j]>0 then
-                f:=c[1][i][j] ; e:=sum('c[1][j][l]','l'=i+1..j) ;
-                A:=[[i,k],[i,k+f-1]] ; B:=[[j,1+e],[j,f+e]] ;
-                k := k+f ;
-                L := L,[[A,B],1] ;
-            fi ;
-        od;
-    od;
-
-    RETURN([L]) ;
-
-end:
-
-groronu := proc(L,c)      ### THIS PROCEDURE MAY CONTAIN A BUG - IT IS NOT USED.
-local i,j,k,m,n,recol,V,g,h;
-    m := nops(L) ;
-    n := nops(c[1])-2 ;
-    recol:=[seq(0,i=1..m)] ;
-    for i from 1 to m-1 do
-
-        if L[i][1][2][1][2]>1 then
-
-            if L[i][1][2][1][2]>1
-            then
-                if L[i][1][2][1]=L[i+1][1][2][2]+[0,1] then
-                    recol[i]:=1 ;
-                fi;
-            else g:=round(L[i+1][1][2][2][1]); h:=eval(sum('c[1][g][j]','j=1..n+2'));
-                if
-                L[i][1][2][1]=L[i+1][1][2][2]+[1,1-h] then
-                    recol[i]:=1 ;
-                fi;
-            fi;
-
-        fi;
-    od;
-
-    V:=NULL:
-    j:=1;
-    while j <= m do
-        if recol[j]=0
-        then V := V,L[j] :
-        else k:=j :
-            while recol[j]=1 do
-                j:=j+1 od :
-            V:=V,[[[L[k][1][1][1],L[j][1][1][2]],[L[j][1][2][1],L[k][1][2][2]]],1] :
-        fi;
-        j:=j+1 :
-    od;
-    RETURN(V) ;
-end:
-
 petirond := proc(c)
 local i,j,k,e,f,A,B,L,n :
     n := nops(c[1][1])-2 :
@@ -288,7 +229,6 @@ touslesrect := proc(b,n)
 ### OF THE BRAID WHERE ALL CROSSINGS ARE REPLACED BY THEIR NEGATIVE.
 local P,c,c2,m,j :
     c := crossings(b,n) ;
-### P := groronu(petironu(c),c),grorond(petirond(c),c) ;
     c2 := crossings(b*(-1),n);m := nops([grorond(petirond(c2),c2)]);
     P := grorond(petirond(c2),c2),grorond(petirond(c),c);
 ### for j from 1 to m do       THIS DOESN'T WORK, I (B.W.) DON'T UNDERSTAND WHY)
