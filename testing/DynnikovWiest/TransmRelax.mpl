@@ -4,18 +4,45 @@
 ### AN EARLIER PROGRAM FOR DRAWING CURVE DIAGRAMS BY JUAN
 ### GONZALEZ-MENESES. A BUG WAS LATER FIXED BY BERT WIEST.
 
+lang := `english`:
+
 with(plots):
+
+if lang = `english` then
+    mouvement_spirallant := `spiralling move`:
+    le_diagramme_de_tresse_est := `The curve diagram of the braid is:`:
+    les_rectangles_sont_maintenant := `The rectangles are now:`:
+    apres_transmission_les_rectangles_sont := `After transmission the rectangles are:`:
+    avant_de_pouvoir_relaxer_une_nouvelle_transmission_est_necessaire := `Before being able to relax, a new transmission is needed`:
+    on_peut_alors_relaxer_par_la_tresse := `We can then relax using the braid `:
+    de_longueur := ` with length `:
+    le_nouveau_diagramme_de_tresse_est_maintenant := `The new curve diagram for the braid is now:`:
+    la_longueur_totale_de_la_tresse_est := `The total length of the braid is:`:
+    la_tresse_totale_utilisee_pour_demeler_est := `The total braid use to untangle is:`:
+elif lang = `francais` then
+    mouvement_spirallant := `mouvement spirallant`:
+    le_diagramme_de_tresse_est := `Le diagramme de tresse est:`:
+    les_rectangles_sont_maintenant := `Les rectangles sont maintenant:`:
+    apres_transmission_les_rectangles_sont := `Apres transmission les rectangles sont:`:
+    avant_de_pouvoir_relaxer_une_nouvelle_transmission_est_necessaire := `Avant de pouvoir relaxer, une nouvelle transmission est necessaire`:
+    on_peut_alors_relaxer_par_la_tresse := `On peut alors relaxer par la tresse `:
+    de_longueur := ` de longueur `:
+    le_nouveau_diagramme_de_tresse_est_maintenant := `Le nouveau diagramme de tresse est maintenant:`:
+    la_longueur_totale_de_la_tresse_est := `La longueur totale de la tresse est:`:
+    la_tresse_totale_utilisee_pour_demeler_est := `La tresse totale utilisee pour demeler est:`:
+else
+    error "unknown language %1", lang
+fi:
+
 
 crossings:=proc(b,n)
 local i,j,k,tot,K1,K2,K,counter,y2,l,t,circles,newcircles,y,d,u,p,x,join;
     for i from 1 to nops(b) do
         if b[i]<=-n or b[i]>=n then
-            print(`The indices of the letters must be smaller than n`);
-            return;
+            error "the indices of the letters must be smaller than n"
         fi;
         if b[i]=0 then
-            print(`The indices of the letters must be nonzero`);
-            return;
+            error "the indices of the letters must be nonzero"
         fi;
     od;
     circles:=[[],[]];
@@ -555,7 +582,7 @@ local i,j,LL,IN,IN1,d,g,Tr,k;
         for i from 1 to nops(LL) do
             for j from 1 to nops(LL[i][1])-1 do
                 if (LL[i][1][j][2]=g-1) and (LL[i][1][j+1][1]=d+1)
-                then   if i=IN1 then if showsteps then print(`mouvement spiralant`) fi;
+                then   if i=IN1 then if showsteps then print(mouvement_spirallant) fi;
                        else k:=1:
                            g:=LL[i][1][j][1]:
                            d:=LL[i][1][j+1][2]:
@@ -565,7 +592,7 @@ local i,j,LL,IN,IN1,d,g,Tr,k;
                        fi;
                 fi;
                 if (LL[i][1][j+1][2]=g-1) and (LL[i][1][j][1]=d+1)
-                then  if i=IN1 then if showsteps then print(`mouvement spiralant`) fi;
+                then  if i=IN1 then if showsteps then print(mouvement_spirallant) fi;
                       else k:=1:
                           g:=LL[i][1][j+1][1]:
                           d:=LL[i][1][j][2]:
@@ -707,11 +734,11 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                 pta:=numlex(k,c)[1]-1+K:
                 K:=K+1:
 
-                if pta=0 then print(`erreur pta=0`):return 'A'; fi:
+                if pta=0 then error "pta = 0": return 'A'; fi:
                 if pta<ptd then for l from ptd-1 to pta by -1 do
                                     bb:=bb,-epsilon*l
                                 od;
-                else print(`erreur pta>=ptd`)
+                else error "pta >= ptd (pta = %1, ptd = %2)", pta, ptd
                 fi;
             fi;
         od;fi;
@@ -733,11 +760,11 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                     pta:=numlex(k,c)[1]-1+K:
                     K:=K+1:
 
-                    if pta=0 then print(`erreur pta=0`):return 'A'; fi:
+                    if pta=0 then error "pta = 0": return 'A'; fi:
                     if pta<ptd then for l from ptd-1 to pta by -1 do
                                         bb:=bb,-epsilon*l
                                     od;
-                    else print(`erreur pta>=ptd`)
+                    else error "pta >= ptd (pta = %1, ptd = %2)", pta, ptd
                     fi;
                 fi;
             od;
@@ -758,11 +785,11 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                 pta:=numlex(k,c)[1]-1+K:
                 K:=K+1:
 
-                if pta=0 then print(`erreur pta=0`):return 'A'; fi:
+                if pta=0 then error "pta = 0": return 'A'; fi:
                 if pta<ptd then for l from ptd-1 to pta by -1 do
                                     bb:=bb,-epsilon*l
                                 od;
-                else print(`erreur pta>=ptd`)
+                else error "pta >= ptd (pta = %1, ptd = %2)", pta, ptd
                 fi;
             fi;
         od;
@@ -809,18 +836,18 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
     BD:=[]:
     Long:=0;
     if showsteps then
-        print(`Le diagramme de tresse est:`);
+        print(le_diagramme_de_tresse_est);
         draw(B,n);
     fi;
     while c<>ctrivial do
         if showsteps then
-            print(`Les rectangles sont maintenant:`);
+            print(les_rectangles_sont_maintenant);
             print(tracerect(c,L));
         fi;
         M := neworder(L):
         T := transmission(M,c) :
         if showsteps then
-            print(`Apres transmission les rectangles sont:`);
+            print(apres_transmission_les_rectangles_sont);
             print(tracerect(c,T));
         fi;
         bb:=[];lon:=1;
@@ -833,7 +860,7 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
                 M := neworder(T):
                 T := transmission(M,c):
                 if showsteps then
-                    print(`Avant de pouvoir relaxer, une nouvelle transmission est necessaire`):
+                    print(avant_de_pouvoir_relaxer_une_nouvelle_transmission_est_necessaire):
                     print(tracerect(c,T));
                 fi;
                 IND:=relaxable(T,c):
@@ -867,16 +894,16 @@ local mm,X,j,c,L,M,T,ctrivial,B,R,bb,BD,lon,Long,IND,AR,nar;
 
         if showsteps then
             if nops(bb)>=1 then
-                print(`On peut alors relaxer par la tresse `, bb ,` de longueur `,lon);
-                print(`Le nouveau diagramme de tresse est maintenant:`);
+                print(on_peut_alors_relaxer_par_la_tresse, bb ,de_longueur,lon);
+                print(le_nouveau_diagramme_de_tresse_est_maintenant);
                 draw(B,n);
             fi;
         fi;
 
     od;
 
-    print(`La longueur totale de la tresse est:`,Long,`ie`,evalf(Long));
-    print(`La tresse totale utilisee pour demeler est:`,BD);
+    print(la_longueur_totale_de_la_tresse_est,Long,`ie`,evalf(Long));
+    print(la_tresse_totale_utilisee_pour_demeler_est,BD);
 
     return BD;
 end:
