@@ -6,27 +6,27 @@
 
 # Functions defined in this file:
 #
-#   name            called by
-#   ------------------------------------------------------
-#   crossings       draw,touslesrect,transmrelax
-#   diagram         draw
-#   draw            transmrelax
-#   petirond        touslesrect
-#   grorond         touslesrect
-#   touslesrect     transmrelax
-#   tracerect       transmrelax
-#   bonsens         neworder
-#   rectordre       neworder
-#   neworder        transmrelax
-#   lexnum          transmission,relaxable,arel,relaxation
-#   numlex          transmission,relaxation
-#   transmission    transmrelax
-#   relaxable       transmrelax
-#   arel            transmrelax
-#   cross           relaxation
-#   relaxation      transmrelax
-#   transmrelax     -
-#   invers          -
+#   name            called by                                  lines
+#   ----------------------------------------------------------------
+#   crossings       draw,touslesrect,transmrelax               101
+#   diagram         draw                                       45
+#   draw            transmrelax                                3
+#   petirond        touslesrect                                19
+#   grorond         touslesrect                                38
+#   touslesrect     transmrelax                                15
+#   tracerect       transmrelax                                66
+#   bonsens         neworder                                   22
+#   rectordre       neworder                                   34
+#   neworder        transmrelax                                21
+#   lexnum          transmission,relaxable,arel,relaxation     11
+#   numlex          transmission,relaxation                    15
+#   transmission    transmrelax                                80
+#   relaxable       transmrelax                                84
+#   arel            transmrelax                                49
+#   cross           relaxation                                 91
+#   relaxation      transmrelax                                118
+#   transmrelax     -                                          87
+#   invers          -                                          9
 
 lang := `english`:
 
@@ -529,8 +529,6 @@ local H,g,h,a,b,aa,bb,k,l,m,i,j,AB,Ab,u,v,uu,vv,Segp,Segv,compteur,larg,LL,LLL:
             i:=i-1:
         od:
 
-
-
         larg:=h-g-l:
 
         if larg<0 then LLL:=[seq(LL[i],i=1..m-1)]
@@ -724,7 +722,6 @@ local circles,newcircles,i,j,k,l,K,join,counter,x,y,y2,cc,u,d,p;
 end:
 
 relaxation:=proc(L,IND,c)
-
 local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,newcircles,u,d,p,x,y,K,join,counter,y2;
     IN:=IND:
     LL:=L:
@@ -766,7 +763,6 @@ local i,j,ni,k,l,m,IN,n,maxi,nbfil,NBFIL,LL,b,bb,pta,ptd,e,epsilon,circles,cc,ne
                 fi;
             fi;
         od;fi;
-
 
     if ni>1 then
         for i from ni-1 to 1 by -1 do
