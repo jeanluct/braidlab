@@ -15,5 +15,7 @@ function c = complexity(b)
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.LOOPCOORDS, LOOP.INTAXIS.
 
+% Canonical set of loops, with extra boundary puncture (n+1).
 E = braidlab.loop(b.n);
-c = log2(intaxis(b*E)-2) - log2(intaxis(E)-2);
+% Subtract b.n-1 to remove extra crossings due to boundary (n+1) puncture.
+c = log2(intaxis(b*E)-b.n+1) - log2(intaxis(E)-b.n+1);
