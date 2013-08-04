@@ -4,6 +4,30 @@
 ### AN EARLIER PROGRAM FOR DRAWING CURVE DIAGRAMS BY JUAN
 ### GONZALEZ-MENESES. A BUG WAS LATER FIXED BY BERT WIEST.
 
+# Functions defined in this file:
+#
+#   name            called by
+#   ------------------------------------------------------
+#   crossings       draw,touslesrect,transmrelax
+#   diagram         draw
+#   draw            transmrelax
+#   petirond        touslesrect
+#   grorond         touslesrect
+#   touslesrect     transmrelax
+#   tracerect       transmrelax
+#   bonsens         neworder
+#   rectordre       neworder
+#   neworder        transmrelax
+#   lexnum          transmission,relaxable,arel,relaxation
+#   numlex          transmission,relaxation
+#   transmission    transmrelax
+#   relaxable       transmrelax
+#   arel            transmrelax
+#   cross           relaxation
+#   relaxation      transmrelax
+#   transmrelax     -
+#   invers          -
+
 lang := `english`:
 
 with(plots):
