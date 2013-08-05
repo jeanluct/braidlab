@@ -9,12 +9,12 @@
 #   name            called by                                  lines
 #   ----------------------------------------------------------------
 #   crossings       draw,touslesrect,transmrelax               101
-#   diagram         draw                                       45
-#   draw            transmrelax                                3
+#   diagram *       draw                                       45
+#   draw *          transmrelax                                3
 #   petirond        touslesrect                                19
 #   grorond         touslesrect                                38
 #   touslesrect     transmrelax                                15
-#   tracerect       transmrelax                                66
+#   tracerect *     transmrelax                                66
 #   bonsens         neworder                                   22
 #   rectordre       neworder                                   34
 #   neworder        transmrelax                                21
@@ -27,6 +27,8 @@
 #   relaxation      transmrelax                                118
 #   transmrelax     -                                          87
 #   invers          -                                          9
+#
+#   * plotting functions
 
 lang := `english`:
 
@@ -42,7 +44,7 @@ if lang = `english` then
     de_longueur := ` with length `:
     le_nouveau_diagramme_de_tresse_est_maintenant := `The new curve diagram for the braid is now:`:
     la_longueur_totale_de_la_tresse_est := `The total length of the braid is:`:
-    la_tresse_totale_utilisee_pour_demeler_est := `The total braid use to untangle is:`:
+    la_tresse_totale_utilisee_pour_demeler_est := `The total braid used to untangle is:`:
 elif lang = `francais` then
     mouvement_spirallant := `mouvement spirallant`:
     le_diagramme_de_tresse_est := `Le diagramme de tresse est:`:
@@ -328,7 +330,6 @@ local n,m,i,j,k,q,P,Q,R,S,rect,inter,nbsegrect,pt1,pt2,pt3,pt4,ray1,ray2,T,centr
             P[i][k] := plot([centre1+ray1*cos(E*t),ray1*sin(E*t),t=eval(0.03/ray1)..eval(Pi-0.03/ray1)]):
             Q[i][k] := plot([centre2+ray2*cos(E*t),ray2*sin(E*t),t=eval(0.03/ray2)..eval(Pi-0.03/ray2)]):
         od:
-
 
         A:=rect[1][1] : B:=rect[1][eval(nbsegrect[i])]:
         pt1:=A[1][1]-2+A[1][2]/inter[A[1][1]];
