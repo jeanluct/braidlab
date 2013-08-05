@@ -1,14 +1,22 @@
 N = 16384;
 Nreal = 1;
-Nsub = 3:2:100;
-period = 5;
+Nsub = 3:2:500;
+period = inf;%5;
 
 plotalltrajs = true;
 rereaddata = true;
 
 if rereaddata
   % Load data: position of disks at each time step.
-  dat = load([mat2str(N) '/snaps.0.09.dat']); %snaps.0.15.dat
+  fprintf('Reading data...\n')
+  datadir = [getenv('HOME') '/tmp/ido/'];
+
+  %dat = load([datadir mat2str(N) '/snaps.0.09.dat']); %snaps.0.15.dat
+  %strain = 120; % 50 to 120
+  %dat = load([datadir 'transition/' mat2str(strain) '/snaps.dat']);
+  dat = load([datadir mat2str(N) '/snaps.0.15.dat']);
+
+  fprintf('Converting to braidlab format...\n')
   tmax = size(dat,1)/N;
   % Convert to format required by braidlab.
   XY = zeros(tmax,2,N);
@@ -17,38 +25,44 @@ if rereaddata
     XY(i,:,:) = dat(i0:i0+N-1,:).';
   end
 
-  % Verify periodicity.
-  XYperiod = XY((end-period+1):end,:,:);
-  gap = squeeze(abs(XYperiod(end,:,:)-XYperiod(1,:,:)));
-  % Some orbits wrap around the horizontal periodic direction.
-  bad = find(gap(1,:) > .1);
-  gap = min(gap,1-gap);
-  fprintf('Max difference between start/end: %f\n',max(max(gap)))
-
   % Fix the orbits that wrap around.
   %   (Instead of this find the 'radius' of each orbit.)
-  badx = find(XYperiod(1,1,:) < .1 | XYperiod(1,1,:) > .95);
-  for i = 1:size(badx,1)
-    badpts = find(XYperiod(:,1,badx(i)) > .8);
-    XYperiod(badpts,1,badx(i)) = XYperiod(badpts,1,badx(i))-1;
-  end
-  bady = find(XYperiod(1,2,:) < .1 | XYperiod(1,2,:) > .95);
-  for i = 1:size(bady,1)
-    badpts = find(XYperiod(:,2,bady(i)) > .8);
-    XYperiod(badpts,2,bady(i)) = XYperiod(badpts,2,bady(i))-1;
+  fprintf('Fixing wraparound...\n')
+  dXY = diff(XY);
+  dX = squeeze(dXY(:,1,:)); dY = squeeze(dXY(:,2,:));
+  Xsign = [zeros(1,N) ; cumsum(sign(dX).*(abs(dX) > .5),1)];
+  X = squeeze(XY(:,1,:)) - Xsign;
+  Ysign = [zeros(1,N) ; cumsum(sign(dY).*(abs(dY) > .5),1)];
+  Y = squeeze(XY(:,2,:)) - Ysign;
+  XY = reshape([X;Y],[tmax 2 N]);
+
+  dXY = diff(XY);
+  if any(abs(dX) > .5) | any(abs(dY) > .5)
+    error('Something went wrong in fixing wraparound.')
   end
 
-  gap2 = squeeze(abs(XYperiod(end,:,:)-XYperiod(1,:,:)));
-  max(max(gap2))
+  if ~isinf(period)
+    fprintf('Enforcing closure...\n')
+    % Verify periodicity.
+    XY = XY((end-period+1):end,:,:);
+    gap = squeeze(abs(XY(end,:,:)-XY(1,:,:)));
+    % Some orbits wrap around the horizontal periodic direction.
+    bad = find(gap(1,:) > .1);
+    gap = min(gap,1-gap);
+    fprintf('  Max difference between start/end: %f\n',max(max(gap)))
 
-  % Force closure.
-  XYperiod(end,:,:) = XYperiod(1,:,:);
+    gap2 = squeeze(abs(XY(end,:,:)-XY(1,:,:)));
+    max(max(gap2))
+
+    % Force closure.
+    XY(end,:,:) = XY(1,:,:);
+  end
 end
 
 if plotalltrajs
   figure(101), hold off
-  for i = 1:N
-    plot(XYperiod(:,1,i),XYperiod(:,2,i),'-'), hold on
+  for i = 1:min(N,1000)
+    plot(XY(:,1,i),XY(:,2,i),'-'), hold on
   end
   hold off
 end
@@ -64,9 +78,10 @@ for r = 1:Nreal
   perm = randperm(Nsub(end));
   entr = [];
   for n = Nsub
-    XYsub = XYperiod(:,:,perm(1:n));  % subset of trajectories
-    b = compact(braid(XYsub))         % extract braid
+    XYsub = XY(:,:,perm(1:n));        % subset of trajectories
+    b = compact(braid(XYsub));        % extract braid
     entr = [entr;entropy(b)];         % compute entropy
+    fprintf('entropy = %f\n',entr(end))
   end
   plot(Nsub,entr,'.-')
   hold on
