@@ -79,9 +79,12 @@ for r = 1:Nreal
   entr = [];
   for n = Nsub
     XYsub = XY(:,:,perm(1:n));        % subset of trajectories
-    b = compact(braid(XYsub));        % extract braid
-    entr = [entr;entropy(b)];         % compute entropy
-    fprintf('entropy = %f\n',entr(end))
+    b = braid(XYsub);                 % extract braid
+    bc = compact(b);                  % compact braid
+    entr = [entr;entropy(bc)];        % compute entropy
+    fprintf('n = %d   entropy = %f',n,entr(end))
+    fprintf('  braid length = %d',length(bc))
+    fprintf(' (%d before compact)\n',length(b))
   end
   plot(Nsub,entr,'.-')
   hold on
