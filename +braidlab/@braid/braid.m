@@ -43,7 +43,7 @@ classdef braid
     %   crossings (generators).  The K generators are chosen uniformly in
     %   [-(N-1):-1 1:N-1].
     %
-    %   D = BRAID('halftwist',N) or BRAID('Delta',N) returns the word D in
+    %   B = BRAID('halftwist',N) or BRAID('Delta',N) returns the word D in
     %   Artin generators representing the positive half-twist (Delta) for
     %   the braid group with N strings.
     %
