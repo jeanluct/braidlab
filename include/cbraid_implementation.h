@@ -1041,15 +1041,15 @@ Braid<P>& Braid<P>::MakeLCF()
 {
     if (RightDelta != 0) {
         transform(FactorList.begin(), FactorList.end(), FactorList.begin(),
-                 bind2nd(mem_fun_ref(&Factor<P>::Flip), RightDelta));
+                 std::bind2nd(std::mem_fun_ref(&Factor<P>::Flip), RightDelta));
         LeftDelta += RightDelta;
         RightDelta = 0;
     }
     bubble_sort(FactorList.begin(), FactorList.end(),
-                ptr_fun(MakeLeftWeighted<P>));
+                std::ptr_fun(MakeLeftWeighted<P>));
     LeftDelta += erase_front_if(
-        FactorList, bind2nd(mem_fun_ref(&Factor<P>::CompareWithDelta), 1));
-    erase_back_if(FactorList, mem_fun_ref(&Factor<P>::CompareWithIdentity));
+        FactorList, std::bind2nd(std::mem_fun_ref(&Factor<P>::CompareWithDelta), 1));
+    erase_back_if(FactorList, std::mem_fun_ref(&Factor<P>::CompareWithIdentity));
     return *this;
 }
 
@@ -1059,15 +1059,15 @@ Braid<P>& Braid<P>::MakeRCF()
 {
     if (LeftDelta != 0) {
         transform(FactorList.begin(), FactorList.end(), FactorList.begin(),
-                 bind2nd(mem_fun_ref(&Factor<P>::Flip), -LeftDelta));
+                 std::bind2nd(std::mem_fun_ref(&Factor<P>::Flip), -LeftDelta));
         RightDelta += LeftDelta;
         LeftDelta = 0;
     }
     bubble_sort(FactorList.begin(), FactorList.end(),
-                ptr_fun(&MakeRightWeighted<P>));
+                std::ptr_fun(&MakeRightWeighted<P>));
     RightDelta += erase_back_if(
-        FactorList, bind2nd(mem_fun_ref(&Factor<P>::CompareWithDelta), 1));
-    erase_front_if(FactorList, mem_fun_ref(&Factor<P>::CompareWithIdentity));
+        FactorList, std::bind2nd(std::mem_fun_ref(&Factor<P>::CompareWithDelta), 1));
+    erase_front_if(FactorList, std::mem_fun_ref(&Factor<P>::CompareWithIdentity));
     return *this;
 }
 
@@ -1125,8 +1125,8 @@ Braid<P> Braid<P>::ReduceLeftSub(const Factor<P>& SmallDelta)
             break;
         b.RightMultiply(p);
         apply_binfun(FactorList.begin(), FactorList.end(),
-                     ptr_fun(MakeLeftWeighted<P>));
-        erase_back_if(FactorList, mem_fun_ref(&Factor<P>::CompareWithIdentity));
+                     std::ptr_fun(MakeLeftWeighted<P>));
+        erase_back_if(FactorList, std::mem_fun_ref(&Factor<P>::CompareWithIdentity));
     }
     return b;
 }
@@ -1157,8 +1157,8 @@ Braid<P> Braid<P>::ReduceRightSub(const Factor<P>& SmallDelta)
             break;
         b.LeftMultiply(p);
         reverse_apply_binfun(FactorList.begin(), FactorList.end(),
-                     ptr_fun(MakeRightWeighted<P>));
-        erase_front_if(FactorList, mem_fun_ref(&Factor<P>::CompareWithIdentity));
+                     std::ptr_fun(MakeRightWeighted<P>));
+        erase_front_if(FactorList, std::mem_fun_ref(&Factor<P>::CompareWithIdentity));
     }
     return b;
 }
