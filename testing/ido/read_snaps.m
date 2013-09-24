@@ -1,7 +1,7 @@
-N = 16384;
+N = 1024;
 Nreal = 1;
 Nsub = 3:2:500;
-period = inf;%5;
+period = inf;%4741;
 
 plotalltrajs = true;
 rereaddata = true;
@@ -12,9 +12,9 @@ if rereaddata
   datadir = [getenv('HOME') '/tmp/ido/'];
 
   %dat = load([datadir mat2str(N) '/snaps.0.09.dat']); %snaps.0.15.dat
-  %strain = 120; % 50 to 120
-  %dat = load([datadir 'transition/' mat2str(strain) '/snaps.dat']);
-  dat = load([datadir mat2str(N) '/snaps.0.15.dat']);
+
+  strain = 122; % 115 to 130, 121 is the last limit-cycle before chaos.
+  dat = load([datadir 'transition3/' mat2str(strain) '/snaps.dat']);
 
   fprintf('Converting to braidlab format...\n')
   tmax = size(dat,1)/N;
@@ -61,7 +61,7 @@ end
 
 if plotalltrajs
   figure(101), hold off
-  for i = 1:min(N,1000)
+  for i = 1:min(N,1024)
     plot(XY(:,1,i),XY(:,2,i),'-'), hold on
   end
   hold off
