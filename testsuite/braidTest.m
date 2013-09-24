@@ -16,7 +16,7 @@ classdef braidTest < matlab.unittest.TestCase
 
   methods (TestMethodSetup)
     function createBraid(testCase)
-      import braidlab.*
+      import braidlab.braid
       testCase.b1 = braid([1 -2 3 5],7);
       testCase.b2 = braid([1 2 4 6],7);
       testCase.b3 = braid([1 -2 3 5 2 1 2 -1 -2 -1],7);
