@@ -1,18 +1,29 @@
 It can be a little tricky to get MEX files to work with Matlab.  The
-XCode developer SDK needs to be installed (to get GCC).  Then, after
-running 'mex -setup' (mex has to be in the search path), edit
+XCode developer SDK needs to be installed (to get GCC) and, preferrably,
+Command Line Tools. (In  XCode - Preferences - Downloads )
+
+Then, after running 'mex -setup' (mex has to be in the search path), edit
 .matlab/R201xx/mexopts.sh.  Look for the line
 
 SDKROOT='/Developer/SDKs/MacOSX10.6.sdk'
 
 and change to
 
-SDKROOT='/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk'
+SDKROOT=`xcrun --show-sdk-path`
 
-Make sure to doublecheck that this folder exists.
+(these are not plain apostrophes but backticks). This command will automatically find current directory for the XCode SDK that you have selected.
 
-You might also update
-
+You might also update all instances of "10.7" or whichever version is specified by default your version, e.g., "10.8" (Snow Leopard), 
+for example in 
 MACOSX_DEPLOYMENT_TARGET='10.7'
+but this might not be needed
 
-though I'm not sure that's needed.
+Finally, find lines (or analogous)
+CC='xcrun  -sdk macosx10.8  clang'
+CXX='xcrun  -sdk macosx10.8  clang++'
+
+and change to
+CC=gcc
+CXX=g++
+
+
