@@ -1,6 +1,6 @@
 % Verify independence on projection line.
 % Braids should be conjugate.
-classdef conjTest < matlab.unittest.TestCase
+classdef conjtestTest < matlab.unittest.TestCase
 
   properties
     gen1
