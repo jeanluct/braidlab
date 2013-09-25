@@ -1,0 +1,10 @@
+syntax: glob
+
+*.mex*
+*.o
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+doc/braidlab_guide.pdf
