@@ -4,11 +4,12 @@ Tutorial: how to get MEX files to run on Ubuntu.
 MATLAB >= 2012a
 
 These versions support gcc-4.4, which is included in the Ubuntu 12.04
-repo (12.10?).  Simply run
+repo (maybe also later versions?).  Simply run
 
 sudo apt-get install gcc-4.4 g++-4.4 gfortran-4.4
 
-Now that this is done, let's configure MEX/Matlab.  Type
+Now that this is done, let's configure MEX/Matlab.  Type (assuming the
+mex command is in a folder in your PATH variable)
 
     mex -setup
 
@@ -27,15 +28,12 @@ read-only, so type
 
     chmod u+w ~/.matlab/<Matlab version>/mexopts.sh
 
-<Matlab version> is probably R2012a or R2012b.  Next edit the file.
-Search and replace the *first two* instances of each of these:
+<Matlab version> is something like R2012a or R2012b.  Next edit the
+file.  Search and replace instances of each of these:
 
  * 'gcc'      and replace with 'gcc-4.4'
  * 'g++'      and replace with 'g++-4.4'
  * 'gfortran' and replace with 'gfortran-4.4'
-
-So you should be replacing a total of 6 items.  (Well, it doesn't hurt
-to replace the other instances, but it's not necessary.)
 
 And we're done!
 
