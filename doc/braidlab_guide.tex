@@ -506,7 +506,7 @@ action of~$\sigma_1^{-1}$), dragging the loop along.
 
 The minimum length of an equivalence class of loops is determined by
 assuming the punctures are one unit of length apart and have zero
-size.  After pulling tight the loop on the punctures, it is thus made
+size.  After pulling tight the loop on the punctures, it is then made
 up of unit-length segments.  The minimum length is thus an integer.
 For the loop in Figure~\ref{fig:dynn_loop2},
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -514,6 +514,7 @@ For the loop in Figure~\ref{fig:dynn_loop2},
 
 ans = 12
 \end{lstlisting}
+
 The \lstinline{entropy} method computes the topological entropy of a
 braid by repeatedly acting on a loop, and monitoring the growth rate
 of the loop.
@@ -560,7 +561,7 @@ punctures.  The reason is that this default multiloop is used to
 define loop coordinates for braids.  The extra puncture is regarded as
 the outer boundary of the disk, and the loops form a generating set
 for the fundamental group of the disk with $5$ punctures.  The
-canonical loops coordinates for braids exploit the fact that two
+canonical loop coordinates for braids exploit the fact that two
 braids are equal if and only if they act the same way on the
 fundamental group of the disk.  Hence, if we take a braid and act on
 \lstinline{loop(5)},
