@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Quick script to tar up the braidlab distribution files.
+#   exclude version-control folders
+#   exclude LCS toolbox for now
+#   the README needs work
+
+cd doc
+pdflatex braidlab_guide.tex
+bibtex braidlab_guide
+pdflatex braidlab_guide.tex
+pdflatex braidlab_guide.tex
+cd ..
+
+# Make 32 and 64 bit, cross-compile for Mac, Windows (we wish).
+# Or compile separately and add to subfolders.
+make all
+
+rm -f braidlab-1.0.tar.gz braidlab-1.0.zip
+cd ..
+tar cvzf braidlab/braidlab-1.0.tar.gz \
+    --exclude-vcs \
+    --exclude='braidlab/+braidlab/+lcs' \
+    braidlab/+braidlab \
+    braidlab/README.md \
+    braidlab/Makefile \
+    braidlab/Makefile.cbraid-mex \
+    braidlab/testsuite \
+    braidlab/extern/braid-code \
+    braidlab/extern/cbraid \
+    braidlab/extern/trains \
+    braidlab/doc/braidlab_guide.pdf
+cd braidlab
+
+# Also make a zip.
+mkdir tmp-zip
+cd tmp-zip
+tar xvzf ../braidlab-1.0.tar.gz
+zip -r ../braidlab-1.0.zip braidlab
+cd ..
+rm -rf tmp-zip
