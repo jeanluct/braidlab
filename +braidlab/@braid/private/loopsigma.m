@@ -9,6 +9,11 @@ function up = loopsigma(ii,u)
 %   U is specified as a row vector, or rows of row vectors containing
 %   several loops.
 
+if isempty(ii)
+  up = u;
+  return
+end
+
 if isa(u,'double') && exist('loopsigma_helper') == 3
   % If MEX file is available, use that.
   % Only works on double precision numbers.
