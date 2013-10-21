@@ -1,7 +1,8 @@
-function P = nextprime(N,direction)
+function P = nextprime(N,direction,kprimes)
 % nextprime: finds the next larger prime number directly above (or below) N
 % usage: P = nextprime(N)
 % usage: P = nextprime(N,direction)
+% usage: P = nextprime(N,direction,kprimes)
 %
 % arguments: (input)
 %  N - a positive scalar numeric variable or vpi number)

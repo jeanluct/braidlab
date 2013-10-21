@@ -59,8 +59,8 @@ elseif Nint > 1
     maxord = max(Nord(:));
     
     % they are small enough to dump out in columns
-    ncols = min(Isize(2),floor(80/(maxord+4)));
-    colsize = maxord+4;
+    ncols = min(Isize(2),floor(80/(maxord+5)));
+    colsize = maxord + 5;
     colindex = 1:ncols;
     
     % the while loop will grab ncols columns at a time
@@ -93,6 +93,26 @@ elseif Nint > 1
 else
   % A scalar vpi
   
+  % first, is this an inf or nan vpi?
+  if ~isfinite(INT.digits)
+    if isnan(INT.digits(1))
+      expression = '  NaN';
+    else
+      % it must be an inf
+      if INT.sign > 0
+        expression = '  Inf';
+      else
+        expression = ' -Inf';
+      end
+    end
+    
+    if nargout == 0
+      disp(expression)
+      clear expression
+    end
+    return
+  end
+  
   % how many non-zero digits, in case of any
   % "leading" zeros
   n = find(INT.digits,1,'last');
@@ -103,10 +123,10 @@ else
   % do we need a minus sign in front?
   if INT.sign>0
     % no
-    expression = ['   ',sprintf('%1d',INT.digits(n:-1:1))];
+    expression = ['    ',sprintf('%1d',INT.digits(n:-1:1))];
   else
     % yes
-    expression = ['  -',sprintf('%1d',INT.digits(n:-1:1))];
+    expression = ['   -',sprintf('%1d',INT.digits(n:-1:1))];
   end
   
   % is it longer than one line?

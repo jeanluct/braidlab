@@ -76,9 +76,13 @@ phi = N;
 for i = 1:nn
   Ni = N(i);
   
-  % 
+  % catch Ni == 1, or less than that
   if Ni <= 1
-    phi(i) = 0;
+    if Ni == 1
+      phi(i) = 1;
+    else
+      phi(i) = 0;
+    end
     continue
   end
   
