@@ -45,7 +45,7 @@ if (nargin == 0)
   % this mode creates a zero variable, as a constant == 0
   N = 0;
 elseif isa(N,'vpi')
-  % Its already a vpi variable. A no-op.
+  % It is already a vpi variable. A no-op.
   INT = N;
   return
 elseif ~ischar(N) && ~isnumeric(N)
@@ -85,6 +85,17 @@ elseif ischar(N)
   % or a decimal point at the very end?
   if N(end) == '.'
     N(end) = [];
+  end
+  
+  switch lower(N)
+    case 'inf'
+      INT.digits = inf;
+      N = '';
+    case 'nan'
+      INT.digits = nan;
+      N = '';
+    otherwise
+      INT.digits = [];
   end
   
   % are there any other characters here than a valid digit?
@@ -136,45 +147,54 @@ else
   % A numeric scalar
   
   if ~isfinite(N)
-    error('N must be a finite number')
+    if isnan(N)
+      INT.sign = 1;
+      INT.digits = nan;
+    else
+      % must be /-inf
+      INT.sign = sign(N);
+      INT.digits = inf;
+    end
+    
   elseif isa(N,'double') && (abs(N)>=(2^53))
     error('If N is a double, it may be no larger than 2^53 - 1')
+    
+  else
+    % set the sign bit
+    INT.sign = 1;
+    if N<0
+      INT.sign = -1;
+      N = abs(double(N));
+    end
+    
+    % is N a true float or an integer float?
+    if (rem(N,1) ~= 0)
+      warning('VPI:float','Converted a real float to a vpi integer form')
+      N = fix(N);
+    end
+    
+    % recover the individual digits
+    INT.digits = zeros(1,16);
+    i = 1;
+    while N~=0
+      U = rem(N,10);
+      INT.digits(i) = U;
+      N = (N-U)/10;
+      i = i + 1;
+    end
+    
+    % do we need to trim of any trailing zeros?
+    % actually, these are leading zeros due to the
+    % reversed storage order of the digits.
+    k = find(INT.digits,1,'last');
+    if isempty(k)
+      INT.digits = 0;
+    elseif k < length(INT.digits)
+      % trim
+      INT.digits = INT.digits(1:k);
+    end
+    
   end
-  
-  % set the sign bit
-  INT.sign = 1;
-  if N<0
-    INT.sign = -1;
-    N = abs(double(N));
-  end
-  
-  % is N a true float or an integer float?
-  if (rem(N,1) ~= 0)
-    warning('VPI:float','Converted a real float to a vpi integer form')
-    N = fix(N);
-  end
-  
-  % recover the individual digits
-  INT.digits = zeros(1,16);
-  i = 1;
-  while N~=0
-    U = rem(N,10);
-    INT.digits(i) = U;
-    N = (N-U)/10;
-    i = i + 1;
-  end
-  
-  % do we need to trim of any trailing zeros?
-  % actually, these are leading zeros due to the
-  % reversed storage order of the digits.
-  k = find(INT.digits,1,'last');
-  if isempty(k)
-    INT.digits = 0;
-  elseif k < length(INT.digits)
-    % trim 
-    INT.digits = INT.digits(1:k);
-  end
-  
 end
 
 % set the class for this variable as a vpi

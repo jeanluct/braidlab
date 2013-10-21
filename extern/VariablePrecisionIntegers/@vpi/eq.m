@@ -65,7 +65,7 @@ elseif isempty(INT1) || isempty(INT2)
   return
 else
   % two non-scalar, non-empty arrays. Are they
-  % compatible in size for cp,arison?
+  % compatible in size for comparison?
   S1 = size(INT1);
   S2 = size(INT2);
   

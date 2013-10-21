@@ -1,6 +1,7 @@
-function [Fn,Ln] = fibonacci(n)
+function [Fn,Ln] = fibonacci(n,modulus)
 % fibonacci: vpi tool to efficiently compute the n'th Fibonacci number and the n'th Lucas number
 % usage: [Fn,Ln] = fibonacci(n)
+% usage: [Fn,Ln] = fibonacci(n,modulus)
 %
 % Compute the nth Fibonacci number as well as the nth Lucas
 % Lucas number. In the event that all members of these
@@ -45,6 +46,11 @@ function [Fn,Ln] = fibonacci(n)
 %      generate each of the indicated Fibonacci and
 %      Lucas numbers.
 %
+%  modulus - (OPTIONAL) - allows the computation of the
+%      indicated Fibonacci/Lucas numbers modulo a given
+%      modulus. This enables the computation of such
+%      numbers for truly immense index.
+%
 % Arguments: (output)
 %  Fn, Ln - scalar vpi number, containing the nth
 %      Fibonacci number and nth Lucas numbers in
@@ -65,16 +71,26 @@ function [Fn,Ln] = fibonacci(n)
 %  Release: 1.0
 %  Release date: 4/30/09
 
-if (nargin ~= 1)
-  error('fibonacci accepts only 1 argument')
+if (nargin < 1) || (nargin > 2)
+  error('fibonacci accepts only 1 or 2 arguments')
 elseif any(n(:)~=round(n(:))) || any(abs(n) > 2^53)
   error('n must be an integer, <= 2^53 in absolute value')
+end
+
+% was a modulus provided?
+if (nargin < 2)
+  modulus = [];
 end
 
 % The first 15 Fibonacci and Lucas numbers to
 % start things off efficiently.
 Fseq = [0 1 1 2 3  5  8 13 21 34  55  89 144 233 377  610];
 Lseq = [2 1 3 4 7 11 18 29 47 76 123 199 322 521 843 1364];
+
+if ~isempty(modulus)
+  Fseq = mod(Fseq,modulus);
+  Lseq = mod(Lseq,modulus);
+end
 
 % intialize Fn and Ln to the proper size,
 % in case n is a vector or array
@@ -117,7 +133,7 @@ if numel(n) > 1
       % the smallest value of n is > 15,
       % or the difference from the last value
       % computed was too large
-      [Fn(i),Ln(i)] = fibonacci(n(i));
+      [Fn(i),Ln(i)] = fibonacci(n(i),modulus);
       
       flag = false;
     elseif n(i) == n(i-1)
@@ -136,10 +152,18 @@ if numel(n) > 1
         % two term recurrence
         Fn(i) = (Fn(i-1) + Fn(i-2));
         Ln(i) = (Ln(i-1) + Ln(i-2));
+        if ~isempty(modulus)
+          Fn(i) = mod(Fn(i),modulus);
+          Ln(i) = mod(Ln(i),modulus);
+        end
       else
         % we must use the addition formula
         Fn(i) = (Fn(i-1) + Ln(i-1))./2;
         Ln(i) = (5 .*Fn(i-1) + Ln(i-1))./2;
+        if ~isempty(modulus)
+          Fn(i) = mod(Fn(i),modulus);
+          Ln(i) = mod(Ln(i),modulus);
+        end
         
         % flag indicates whether the last two
         % numbers were consecutive
@@ -155,7 +179,11 @@ if numel(n) > 1
       % use an addition formula
       Fn(i) = (Fm.*Ln(i-1) + Lm.*Fn(i-1))./2;
       Ln(i) = (5 .*Fm.*Fn(i-1) + Lm.*Ln(i-1))./2;
-      
+      if ~isempty(modulus)
+        Fn(i) = mod(Fn(i),modulus);
+        Ln(i) = mod(Ln(i),modulus);
+      end
+
       flag = false;
     end
     
@@ -211,12 +239,20 @@ else
       
       Fn = (L2n + F2n)./2;
       Ln = (5 .*F2n + L2n)./2;
+      if ~isempty(modulus)
+        Fn = mod(Fn,modulus);
+        Ln = mod(Ln,modulus);
+      end
     else
       % the next bit was even. Use the 2*n
       % rule to step up.
       F2n = Fn.*Ln;
       Ln = Ln.*Ln + 2*(-1)^(nhigh+1);
       Fn = F2n;
+      if ~isempty(modulus)
+        Fn = mod(Fn,modulus);
+        Ln = mod(Ln,modulus);
+      end
     end
     
     % update the top bits of n
@@ -233,6 +269,11 @@ if any(nsign < 0)
 
   k = (~neven) & (nsign < 0);
   Ln(k) = -Ln(k);
+  
+  if ~isempty(modulus)
+    Fn(k) = mod(Fn(k),modulus);
+    Ln(k) = mod(Ln(k),modulus);
+  end
 end
 
 % ==================================

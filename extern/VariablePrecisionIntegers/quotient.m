@@ -1,6 +1,6 @@
 function [Q,R] = quotient(numerator,denominator)
 % quotient: divides two integers, computing a quotient and remainder
-% usage: mp = quotient(numerator,denominator);
+% usage: [Q,R] = quotient(numerator,denominator);
 % 
 % quotient is used by the rdivide and rem functions.
 % When numerator and/or demonimator represent negative

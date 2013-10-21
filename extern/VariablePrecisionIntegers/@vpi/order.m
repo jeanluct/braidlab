@@ -2,9 +2,11 @@ function ord = order(INT)
 % vpi/order: power of 10 associated with the highest order digit of a vpi object
 % usage: ord = order(INT);
 % 
+% This result will always be one less than the number of
+% decimal digits in the VPI number.
+%
 % arguments: (input)
 %  INT - a vpi object
-%
 %
 % arguments: (input)
 %  ord - scalar numeric integer
@@ -12,16 +14,13 @@ function ord = order(INT)
 %       order decimal digit of INT. If INT is zero, then
 %       ord will be zero.
 %
-%
 % Example:
 %  order(vpi(1234567))
 %  ans = 
 %     6
 %
-%
 %  See also: sign
 %  
-% 
 %  Author: John D'Errico
 %  e-mail: woodchips@rochester.rr.com
 %  Release: 1.0

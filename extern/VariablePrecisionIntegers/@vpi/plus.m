@@ -62,16 +62,6 @@ if (numel1 == 1) && (numel2 == 1)
     end
   end
   
-  % get the sign of the result from the sign of
-  % the argument with the largest magnitude
-  if comparemagnitudes(INT1,INT2)
-    % INT1 was the larger, or both were equal
-    finalsign = INT1.sign;
-  else
-    % INT2 was the larger
-    finalsign = INT2.sign;
-  end
-  
   % both are vpi numbers. Make them the same
   % number of digits.
   n1 = length(INT1.digits);
@@ -88,9 +78,18 @@ if (numel1 == 1) && (numel2 == 1)
   INT = INT1;
   INT.digits = INT1.sign*INT1.digits + INT2.sign*INT2.digits;
 
-  % if finalsign was negative, then flip the signs
+  % if the most significant digit was negative, then flip the signs
   % on all of the digits.
-  if finalsign<0
+  mostsigdigit = find(INT.digits,1,'last');
+  if isempty(mostsigdigit)
+    % the result was zero
+    finalsign = 1;
+  elseif INT.digits(mostsigdigit) > 0
+    % the result was apparently positive
+    finalsign = 1;
+  else
+    % a negative result
+    finalsign = -1;
     INT.digits = -INT.digits;
   end
   INT.sign = finalsign;
@@ -139,7 +138,7 @@ if (numel1 == 1) && (numel2 == 1)
     
   end
 
-  % were there trailing zero digits? if so,
+  % were there trailing (high end) zero digits? if so,
   % then trim them off of the result.
   lastdigitindex = find(INT.digits,1,'last');
   if isempty(lastdigitindex)

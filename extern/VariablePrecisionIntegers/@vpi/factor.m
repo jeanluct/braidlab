@@ -95,6 +95,8 @@ if INT.sign < 0
 elseif iszero(INT)
   factorlist = vpi(0);
   return
+elseif ~isfinite(INT)
+  error('VPI:FACTOR:finite','INT must be a finite number')
 end
 
 % use this number in a few places

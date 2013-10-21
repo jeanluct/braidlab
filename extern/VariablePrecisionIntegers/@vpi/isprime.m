@@ -43,7 +43,7 @@ function prediction = isprime(N,ntests,method)
 %  predictions - logical result, of the same shape as
 %      N, when more than one number is tested for primality.
 %
-%      True if all of the witnesss predicted N to be
+%      True if all of the witnesses predicted N to be
 %      prime. If any of the predictions indicated N
 %      to be composite, then N is definitely composite.
 %
@@ -90,7 +90,12 @@ else
 
   % make sure that N is a vpi, and positive
   N = abs(vpi(N));
-
+  
+  % is it finite?
+  if ~isfinite(N)
+    error('VPI:ISPRIME:finite','N must be a finite number')
+  end
+  
   % simple cases. check to see if N is an even number, > 1
   if isunit(N)
     % 1 is not prime by definition.
@@ -183,7 +188,7 @@ else
         % if x is 1 or -1 at this point, then
         % we are done, with a prime prediction
         % for this specific witness.
-        if (s == 1) & (x ~= 1) && (x ~= Nm1)
+        if (s == 1) && (x ~= 1) && (x ~= Nm1)
           % a is a witness that N is composite
           prediction = false;
           notdone = false;
