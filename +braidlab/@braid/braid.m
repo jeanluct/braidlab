@@ -220,8 +220,8 @@ classdef braid
     end
 
     function b12 = mtimes(b1,b2)
-    %MTIMES   Multiply two braids together.
-    %
+    %MTIMES   Multiply two braids together (if second argument is a braid)
+    %         or act on a loop by a braid (if second argument is a loop).
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.INV, BRAID.MTIMES.
       if isa(b2,'braidlab.braid')
