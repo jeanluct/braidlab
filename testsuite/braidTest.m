@@ -102,5 +102,20 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(testCase.b1.length,4);
       testCase.verifyEqual(testCase.id.length,0);
     end
+    
+    function test_loop_length_overflow(testCase)
+        % test that manual iteration of loop coordinates and computation of
+        % entropy handles integer overflow well
+        
+        expEntropy = entropy(testCase.b3);
+        l = loopcoords(testCase.b3);
+        
+        Niter = 100;
+        loopEntropy = log(minlength(testCase.b3^Niter*l)/minlength(l)) / Niter;
+
+        testCase.verifyEqual( loopEntropy,expEntropy, 'AbsTol', 1e-3, ...
+            'Manual and built-in computations of entropy do not match. Possible integer overflow.');
+    end
+    
   end
 end
