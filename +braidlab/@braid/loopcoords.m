@@ -57,6 +57,14 @@ switch lower(typ)
  case 'double'
   htyp = @double;
   checkoverflow = false;
+ case 'vpi'
+  % Use variable precision integers if available.
+  if ~(exist('vpi') == 2)
+    error('BRAIDLAB:braid:loopcoords:novpi',...
+	  'VPI (VariablePrecisionIntegers) not on path.')
+  end
+  htyp = @vpi;
+  checkoverflow = false;
 end
 
 switch lower(conv)
@@ -77,32 +85,3 @@ switch lower(conv)
 end
 
 l = braidlab.loop(loopsigma(w,htyp(l.coords)));
-
-% Check for overflow/underflow.
-% This doesn't seem very robust to me, but I can't find another way.
-% The problem is that for matlab intmax+1 returns intmax, but intmax-1
-% returns intmax as well.  So there is no simple way to know if the quantity
-% overflowed but then was brought below intmax subsequently.  Would need
-% to check for this in loopsigma itself.
-if checkoverflow
-  if ~any(l.coords == intmax(typ) | l.coords == intmin(typ))
-    return
-  end
-else
-  return
-end
-
-if exist('vpi') == 2
-  % Use variable precision integers if available.
-  % Improve by checking for overflow first to see if needed, since vpi is
-  % slooooow.  Maybe even print warning.
-  l = braidlab.loopsigma(w,vpi(u));
-%elseif exist('fi') == 2
-%  % Another option might be to use fi (fixed-point toolbox) with a
-%  % specified large number of digits.
-%  l = braidlab.loopsigma(w,sfi(u,120,0));
-else
-  warning('BRAIDLAB:braid:loopcoords:overflow', ...
-          'Integer overflow... switching to double-precision.')
-  l = braidlab.loopsigma(w,double(l.coords));
-end
