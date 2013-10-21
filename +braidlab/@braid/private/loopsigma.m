@@ -25,10 +25,7 @@ n = size(u,2)/2 + 2;
 a = u(:,1:n-2); b = u(:,(n-1):end);
 ap = a; bp = b;
 
-% The pure function defs don't work for vpi, since it doesn't overlad min/max.
-%pos = @(x)max(x,0); neg = @(x)min(x,0);
-function x = pos(x), x(find(x < 0)) = 0; end
-function x = neg(x), x(find(x > 0)) = 0; end
+pos = @(x)max(x,0); neg = @(x)min(x,0);
 
 for j = 1:length(ii)
   i = abs(ii(j));
@@ -66,5 +63,3 @@ for j = 1:length(ii)
   a = ap; b = bp;
 end
 up = [ap bp];
-
-end
