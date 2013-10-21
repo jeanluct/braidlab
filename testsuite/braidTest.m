@@ -124,7 +124,8 @@ classdef braidTest < matlab.unittest.TestCase
         
         % this is the actual overflow test
         Niter = 100;
-        testCase.verifyError(@()loopEntropy(Niter),'BRAIDLAB:braid:loopsigma:sumG') 
+        testCase.verifyError(@()loopEntropy(Niter),...
+			     'BRAIDLAB:braid:loopsigma:sumg') 
     end
     
   end
