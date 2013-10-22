@@ -29,6 +29,11 @@ function l = loopcoords(b,conv,typ)
 %   numbers can be dropped, and his notation is (a1,b1,a2,b2,a3,b3) compared
 %   to our (a1,a2,a3,b1,b2,b3).
 %
+%   L = LOOPCOORDS(B,CONV,TYPE) creates a loop with entries of type TYPE,
+%   which can be 'int32', 'int64' (default), 'double', or 'vpi' (variable
+%   precision integers).  Use CONV=[] for the default convention.  Note
+%   that fixed-precision integer types can overflow for long braids.
+%
 %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
 %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
 %
@@ -50,13 +55,10 @@ end
 switch lower(typ)
  case 'int32'
   htyp = @int32;
-  checkoverflow = true;
  case 'int64'
   htyp = @int64;
-  checkoverflow = true;
  case 'double'
   htyp = @double;
-  checkoverflow = false;
  case 'vpi'
   % Use variable precision integers if available.
   if ~(exist('vpi') == 2)
@@ -65,7 +67,6 @@ switch lower(typ)
 	   'extern/VariablePrecisionIntegers'' from braidlab folder.'])
   end
   htyp = @vpi;
-  checkoverflow = false;
 end
 
 switch lower(conv)
