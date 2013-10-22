@@ -179,7 +179,15 @@ classdef braid
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
       % overflow.  Check for that.
-      ee = all(loopcoords(b1) == loopcoords(b2));
+      try
+	ee = all(loopcoords(b1) == loopcoords(b2));
+      catch err
+	if (strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow'))
+	  % An overflow error was thrown: retry with variable-precision
+          % integers.
+	  ee = all(loopcoords(b1,[],'vpi') == loopcoords(b2,[],'vpi'));
+	end
+      end
     end
 
     function ee = lexeq(b1,b2)
