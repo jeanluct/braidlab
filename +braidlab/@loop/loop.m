@@ -183,8 +183,10 @@ classdef loop
             %   This is a method for the LOOP class.
             %   See also LOOP, LOOP.DISP.
             if isscalar(obj)
-                str = ['(( ' num2str(obj.coords) ' ))'];
-            else
+	        if ~isa(obj.coords,'vpi')
+		  str = ['(( ' num2str(obj.coords) ' ))'];
+		end
+	      else
                 error('BRAIDLAB:loop:char', ...
                     'Cannot convert nonscalar loop to string.');
             end
@@ -195,9 +197,15 @@ classdef loop
             %
             %   This is a method for the LOOP class.
             %   See also LOOP, LOOP.DISP.
-            for i = 1:size(obj,2)
-                disp(char(obj(i)))
-            end
+	      for i = 1:size(obj,2)
+		if ~isa(obj.coords,'vpi')
+		  disp(char(obj(i)))
+		else
+		  % VPI objects are hard to display.  Is there even a
+		  % conversion to string?
+		  disp(obj(i).coords)
+		end
+	      end
         end
         
         function l = minlength(obj)
