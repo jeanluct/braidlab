@@ -61,7 +61,8 @@ switch lower(typ)
   % Use variable precision integers if available.
   if ~(exist('vpi') == 2)
     error('BRAIDLAB:braid:loopcoords:novpi',...
-	  'VPI (VariablePrecisionIntegers) not on path.')
+	  ['vpi type not on path.  Try ''addpath ' ...
+	   'extern/VariablePrecisionIntegers'' from braidlab folder.'])
   end
   htyp = @vpi;
   checkoverflow = false;
