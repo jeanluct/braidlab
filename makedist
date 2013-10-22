@@ -4,7 +4,11 @@
 #   exclude version-control folders
 #   exclude LCS toolbox for now
 #   the README needs work
-TARCMD=tar # set to a tar command that supports --exclude-vcs option, e.g., GNU tar
+
+# set to a tar command that supports --exclude-vcs option, e.g., GNU tar
+TARCMD=tar
+
+VERSION=1.0.1
 
 cd doc
 pdflatex braidlab_guide.tex
@@ -17,9 +21,9 @@ cd ..
 # Or compile separately and add to subfolders.
 make all
 
-rm -f braidlab-1.0.tar.gz braidlab-1.0.zip
+rm -f braidlab-${VERSION}.tar.gz braidlab-${VERSION}.zip
 cd ..
-${TARCMD} cvzf braidlab/braidlab-1.0.tar.gz \
+${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
     --exclude-vcs \
     --exclude='braidlab/+braidlab/+lcs' \
     braidlab/+braidlab \
@@ -30,13 +34,14 @@ ${TARCMD} cvzf braidlab/braidlab-1.0.tar.gz \
     braidlab/extern/braid-code \
     braidlab/extern/cbraid \
     braidlab/extern/trains \
+    braidlab/extern/VariablePrecisionIntegers \
     braidlab/doc/braidlab_guide.pdf
 cd braidlab
 
 # Also make a zip.
 mkdir tmp-zip
 cd tmp-zip
-${TARCMD} xvzf ../braidlab-1.0.tar.gz
-zip -r ../braidlab-1.0.zip braidlab
+${TARCMD} xvzf ../braidlab-${VERSION}.tar.gz
+zip -r ../braidlab-${VERSION}.zip braidlab
 cd ..
 rm -rf tmp-zip
