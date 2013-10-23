@@ -76,7 +76,7 @@ classdef loop
       % Nested generators of the fundamental group of a sphere with c
       % punctures with an extra basepoint puncture on the right.
       if c < 2
-	error('BRAIDLAB:loop:loop', ...
+	error('BRAIDLAB:loop:loop:toofewpunc', ...
 	      'Need at least two punctures.');
       end
       n1 = c-1;
@@ -92,7 +92,7 @@ classdef loop
       if isvector(c)
 	% Create from a single vector of even length.
 	if mod(length(c),2)
-	  error('BRAIDLAB:loop:loop', ...
+	  error('BRAIDLAB:loop:loop:oddlength', ...
 		'Loop coordinate vector must have even length.')
 	end
 	% Store coordinates as row vector.
@@ -101,7 +101,7 @@ classdef loop
       else
 	% Create from an array with an even number of columns.
 	if mod(size(c,2),2)
-	  error('BRAIDLAB:loop:loop', ...
+	  error('BRAIDLAB:loop:loop:oddlength', ...
 		'Loop coordinate array must have even number of columns.')
 	end
 	l(size(c,1)) = braidlab.loop;  % pre-allocate
@@ -111,8 +111,8 @@ classdef loop
       end
     else
       % Create a,b separately from two vectors of the same length.
-      if size(c) ~= size(b)
-	error('BRAIDLAB:loop:loop', ...
+      if any(size(c) ~= size(b))
+	error('BRAIDLAB:loop:loop:badsize', ...
 	      'Loop coordinate vectors must have the same size.')
       end
       l(size(c,1)) = braidlab.loop;  % pre-allocate
@@ -183,7 +183,7 @@ classdef loop
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
       if isscalar(obj)
-	if ~isa(obj.coords,'vpi')
+	if ~isa(obj(1).coords,'vpi')
 	  str = ['(( ' num2str(obj.coords) ' ))'];
 	end
       else
@@ -198,7 +198,7 @@ classdef loop
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
       for i = 1:size(obj,2)
-	if ~isa(obj.coords,'vpi')
+	if ~isa(obj(i).coords,'vpi')
 	  disp(char(obj(i)))
 	else
 	  % VPI objects are hard to display.  Is there even a
