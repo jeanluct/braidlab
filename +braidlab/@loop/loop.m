@@ -150,7 +150,7 @@ classdef loop
     %   See also LOOP.
 
     % Note that this used to be a derived property.  However, now that
-    % we support arrays of loops, there is an undersirable behavior:
+    % we support arrays of loops, there is an undesirable behavior:
     % when calling obj.n with n a derived property, the function get.n
     % is called for each object.  Thus, what is returned is a
     % comma-separated of the same value n.  Better to define n as a
@@ -187,7 +187,7 @@ classdef loop
 	  str = ['(( ' num2str(obj.coords) ' ))'];
 	end
       else
-	error('BRAIDLAB:loop:char', ...
+	error('BRAIDLAB:loop:char:notscalar', ...
 	      'Cannot convert nonscalar loop to string.');
       end
     end
