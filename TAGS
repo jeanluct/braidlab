@@ -1,578 +1,0 @@
-
-Batch.cpp,271
-#define _CRT_SECURE_NO_DEPRECATE 2,19
-namespace trains 18,290
-#define THRO(46,1095
-#define THRO(50,1227
-#define THRO(55,1420
-int stringtoint(trains::stringtoint60,1565
-uint Par(69,1655
-void Display(85,2142
-bool BatchProcess(128,3075
-bool BatchProcess(147,3383
-
-Batch.h,23
-#define __BATCH_H2,18
-
-Batch.o,14
-0€HãH4,3944
-
-General.cpp,214
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 14,197
-Error::Error(trains::Error::Error25,326
-void Error::Report(32,403
-void Memory(38,456
-void LowerCase(43,524
-void Report(49,640
-void ftos(61,803
-
-General.h,491
-#define __GENERAL_H4,43
-#define VERSION 7,79
-#define VERSION_NUMBER 8,112
-#define VERSION 10,145
-#define VERSION_NUMBER 11,177
-#define __WINDOWSVERSION16,234
-#define __WINDOWSVERSION19,279
-#define __UNIXVERSION21,310
-#undef __CHARPOLY29,416
-typedef unsigned int 35,457
-#define ARRAYSIZ 39,559
-#define ARRAYDELTA 40,579
-#define MAXITER 42,603
-#define MAXARRAYLENGTH 44,625
-#define TRY 47,657
-#define THROW(48,673
-#define CATCH(49,710
-class Error 51,736
-	int GetType(57,930
-
-General.o,12
-HãH2,1036
-
-Graphalg.cpp,351
-#define _CRT_SECURE_NO_DEPRECATE 4,39
-namespace trains 11,138
-bool graph::CollapseInvariantForest(trains::graph::CollapseInvariantForest15,180
-bool graph::PerformValenceTwoIsotopies(96,2085
-bool graph::FoldToDecreaseLambda(119,2537
-decimal graph::FindTrainTrack(206,4679
-bool graph::AbsorbIntoP(245,5346
-bool graph::MakeIrreducible(631,20323
-
-Graphalg.o,16
-t3HÉt3H7,8103
-
-Graphset.cpp,720
-#define _CRT_SECURE_NO_DEPRECATE 4,47
-namespace trains 17,239
-void graph::UserInput(trains::graph::UserInput22,296
-void graph::Set(162,3842
-void graph::BoundaryPeripheralSet(176,4093
-void graph::Print(416,10611
-graph::graph(459,11445
-void graph::IdentityGraph(471,11711
-void graph::ActOn(561,13366
-void graph::VertexImageSwap(637,14561
-void graph::PrintTurns(666,15142
-void graph::PrintLoops(672,15271
-void graph::PrintSingularities(681,15433
-void graph::PrintGates(718,16914
-void graph::ReLabel(762,17823
-void graph::Save(859,20232
-void graph::Load(910,21939
-void graph::Load(920,22165
-void graph::OldLoad(1029,24372
-bool graph::SanityCheck(1156,27157
-void graph::OrientPeripheralEdges(1180,27800
-
-Graphset.o,104
-HâQHÉ¡0¿à√Ä„HÉ∆HâQHÉ¡0¿à√Ä„HÉ3,3184
-ˇDâ„HDâ„12,6938
-HâQHÉ¡0¿à√Ä„HHâQHÉ¡0¿à√Ä„63,39920
-
-Graputil.cpp,1319
-#define _CRT_SECURE_NO_DEPRECATE 6,35
-namespace trains 21,279
-uint graph::FindEdge(trains::graph::FindEdge26,322
-uint graph::FindVertex(33,488
-long graph::Derivative(39,632
-long graph::Derivative(47,858
-long graph::AltDerivative(57,1007
-void graph::Replace(72,1349
-void graph::LoopReplace(81,1491
-void graph::RemoveAll(89,1646
-void graph::LoopRemoveAll(98,1776
-bool graph::Tighten(106,1917
-decimal graph::Growth(120,2208
-std::vector<std::string> graph::TransitionMatrix(126,2279
-std::string graph::CharacteristicPolynomial(197,4076
-bool graph::IntersectsP(375,8171
-uint graph::OnPInd(383,8354
-uint graph::OnP(394,8575
-bool graph::IsPeripheral(406,8826
-void graph::FindTypes(412,8942
-uint graph::From(458,9735
-void graph::Flush(464,9863
-bool graph::IsProperSubForest(485,10261
-void graph::IterateTurn(541,11903
-turn graph::FindTurns(547,11989
-ostream& operator<<(608,13402
-turnplace graph::LocateTurn(614,13530
-bool graph::HasIrreducibleMatrix(639,13950
-bool graph::RetractsOntoP(645,14035
-bool graph::NeedToAbsorb(707,16017
-bool graph::Collapses(720,16327
-void graph::FindReduction(747,17088
-void graph::FindSingularities(761,17474
-void graph::FindGates(947,24089
-void graph::FindTrack(1007,26065
-void graph::TampDown(1042,26885
-bool graph::SingleVertexEmbeddingTighten(1100,28347
-
-Graputil.o,32
-HÉ«ÎHÉ«MHÉ«ÎHÉ«33,23814
-
-Makefile,284
-OBJSOURCES 1,0
-SRCDIR 16,199
-CXX 18,211
-CXXFLAGS 19,221
-LIBS 21,255
-OBJS 23,272
-.cpp.o:.cpp.o26,352
-.o:.o30,463
-lib libtrains:lib libtrains33,529
-libtrains.a:libtrains.a35,557
-frontend:frontend39,626
-train:train41,662
-clean:clean44,758
-distclean:distclean48,850
-
-Makefile.orig,16
-OBJSOURCES 1,0
-
-Matrix.cpp,366
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 8,95
-matrix::matrix(trains::matrix::matrix10,115
-matrix::matrix(16,278
-matrix::~matrix(70,1646
-void matrix::GrowthCalc(78,1743
-decimal matrix::EvecModulus(113,2566
-decimal matrix::GrowthRate(120,2692
-bool matrix::IsBigger(128,2845
-bool matrix::IsIrreducible(138,3052
-void matrix::Transpose(199,4492
-
-Matrix.h,113
-#define __MATRIX_H2,19
-class matrix 14,182
-	uint size(28,602
-	long element(29,627
-	decimal EvecEntry(32,775
-
-Matrix.o,22
-fêHˇ√MãfêHˇ√M3,1198
-
-SConscript,14
-liblist 5,97
-
-SConstruct,9
-env 1,0
-
-braid.cpp,230
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 8,94
-ostream& operator << trains::operator <<12,136
-istream& operator >> operator >>22,279
-void braid::Set(45,830
-void braid::Set(61,1161
-uint braid::Permute(74,1467
-
-braid.h,138
-#define __BRAID_H2,18
-class braid 10,100
-	void Tighten(13,138
-	uint Size(15,187
-	uint Length(16,218
-	long& operator[operator18,312
-
-braid.o,67
-HâJHÉ¬0¿à¡Ä·HÉ∆I9u∏HÉ¬Ñ…HE◊IâWHãE¿HÉƒ[A\A]A^A_]A_2,1760
-
-decimal.h,169
-#define __DECIMAL_H3,88
-#define STARTTOL 8,165
-#define STARTTOL 10,197
-#define STARTTOL 13,241
-#define SQRT 15,277
-#define FABS 16,295
-typedef long double 20,334
-
-edgevert.cpp,2464
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 8,97
-edgelist::edgelist(trains::edgelist::edgelist12,139
-edgelist::~edgelist(trains::edgelist::~edgelist15,264
-long edgelist::TopIndex(trains::edgelist::TopIndex17,341
-edge& edgelist::operator [](trains::edgelist::operator []19,403
-edge& edgelist::Element(24,610
-uint edgelist::GetSize(36,1109
-void edgelist::Flush(42,1196
-edgelist::edgelist(53,1533
-edgelist& edgelist::operator=(edgelist::operator=59,1812
-long edgelist::Find(69,2087
-void edgelist::_Remove(75,2350
-void edgelist::Remove(82,2652
-void edgelist::Append(87,2767
-void edgelist::Prepend(94,3003
-void edgelist::_Split(105,3305
-void edgelist::Split(115,3670
-void edgelist::Print(120,3813
-void edgelist::Rotate(128,3958
-void edgelist::Insert(143,4389
-bool edgelist::Agrees(152,4527
-bool edgelist::Add(159,4737
-void edgelist::SureAdd(166,4864
-uint edgelist::AgreesTo(171,4943
-edgeiterator::edgeiterator(179,5155
-edge& edgeiterator::Now(181,5222
-edge& edgeiterator::operator++(183,5281
-edge& edgeiterator::operator++(190,5458
-bool edgeiterator::AtOrigin(197,5594
-void edgeiterator::Reset(202,5709
-vertexlist::vertexlist(208,5754
-vertexlist::~vertexlist(211,5885
-long vertexlist::TopIndex(213,5970
-vertex& vertexlist::operator [](vertexlist::operator []215,6034
-vertex& vertexlist::Element(220,6106
-uint vertexlist::GetSize(231,6454
-void vertexlist::Flush(237,6543
-vertexlist::vertexlist(248,6675
-vertexlist& vertexlist::operator=(vertexlist::operator=254,6911
-long vertexlist::Find(264,7106
-void vertexlist::_Remove(270,7240
-void vertexlist::Remove(277,7464
-void vertexlist::Append(282,7532
-void vertexlist::Prepend(289,7725
-void vertexlist::_Split(300,7963
-void vertexlist::Split(310,8210
-void vertexlist::Print(315,8283
-void vertexlist::Rotate(323,8410
-void vertexlist::Insert(338,8680
-bool vertexlist::Agrees(346,8821
-bool vertexlist::Add(353,9035
-void vertexlist::SureAdd(360,9251
-uint vertexlist::AgreesTo(365,9390
-vertexiterator::vertexiterator(373,9606
-vertex& vertexiterator::Now(375,9679
-vertex& vertexiterator::operator++(377,9742
-vertex& vertexiterator::operator++(384,10004
-bool vertexiterator::AtOrigin(391,10216
-void vertexiterator::Reset(396,10275
-static const char* EdgeType[EdgeType404,10336
-void edge::Set(406,10411
-void edge::Print(416,10608
-ostream& operator<<(433,11016
-void vertex::Set(450,11414
-void vertex::Print(457,11525
-ostream& operator<<(465,11769
-
-edgevert.h,772
-#define __EDGEVERT_H3,59
-enum edgetype 11,148
-enum edgetype {Main,Main11,148
-enum edgetype {Main, Peripheral,11,148
-enum edgetype {Main, Peripheral, Preperipheral}Preperipheral11,148
-class edge 17,227
-	edgetype GetType(31,852
-	long GetLabel(32,887
-	intarray GetImage(33,920
-class edgelist 40,1198
-	uint GetOrigin(edgelist::GetOrigin62,1951
-class edgeiterator 79,2905
-class vertex 91,3193
-	uint Valence(vertex::Valence102,3621
-	uint GetLabel(vertex::GetLabel103,3666
-	uint GetImage(vertex::GetImage104,3699
-	intarray GetEdges(vertex::GetEdges105,3732
-	vertex operator-(vertex::operator-106,3769
-	bool operator==(vertex::operator==107,3843
-class vertexlist 111,3991
-	uint GetOrigin(vertexlist::GetOrigin133,4770
-class vertexiterator 150,5742
-
-embedding.cpp,372
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 10,139
-bool EmbeddingInformation::single_tighten(trains::EmbeddingInformation::single_tighten14,181
-void EmbeddingInformation::prepend(32,465
-void EmbeddingInformation::append(38,616
-void EmbeddingInformation::prependinverse(44,760
-void EmbeddingInformation::appendinverse(50,912
-ostream& operator<<(56,1061
-
-embedding.h,243
-#define embeddingH3,97
-class EmbeddingInformation 10,174
-	EmbeddingInformation(12,211
-	void append(EmbeddingInformation::append16,417
-	void prepend(EmbeddingInformation::prepend17,458
-	void tighten(EmbeddingInformation::tighten22,858
-
-frontend.cpp,115
-#define _CRT_SECURE_NO_DEPRECATE 1,0
-namespace trains 18,315
-uint Parse(trains::Parse43,1262
-int main(74,1918
-
-graph.cpp,1327
-#define _CRT_SECURE_NO_DEPRECATE 5,48
-namespace trains 11,128
-turnlist::turnlist(trains::turnlist::turnlist15,170
-turnlist::~turnlist(trains::turnlist::~turnlist18,295
-long turnlist::TopIndex(trains::turnlist::TopIndex20,372
-turn& turnlist::operator [](trains::turnlist::operator []22,434
-turn& turnlist::Element(27,586
-uint turnlist::GetSize(39,1119
-void turnlist::Flush(45,1279
-turnlist::turnlist(56,1471
-turnlist& turnlist::operator=(turnlist::operator=62,1765
-long turnlist::Find(72,2131
-void turnlist::_Remove(78,2381
-void turnlist::Remove(85,2760
-void turnlist::Append(90,2853
-void turnlist::Prepend(97,3146
-void turnlist::_Split(107,3508
-void turnlist::Split(117,3984
-void turnlist::Print(122,4147
-void turnlist::Rotate(130,4410
-void turnlist::Insert(145,4841
-bool turnlist::Agrees(153,5025
-bool turnlist::Add(160,5235
-void turnlist::SureAdd(167,5362
-uint turnlist::AgreesTo(172,5441
-void graph::Split(180,5653
-void graph::Collapse(240,7157
-void graph::Push(365,11271
-void graph::Subdivide(403,12232
-void graph::SubdivideAllBut(409,12311
-void graph::SubdivideHere(417,12536
-bool graph::PullTight(433,13048
-void graph::ValenceTwoIsotopy(472,13881
-void graph::ValenceTwoIsotopy(483,14233
-void graph::FoldAsMuchAsPossible(517,15332
-void graph::CarefulFoldAsMuchAsPossible(700,21084
-
-graph.h,1650
-#define __GRAPH_H2,18
-enum thurstontype 24,340
-enum thurstontype {pA,pA24,340
-enum thurstontype {pA, fo,24,340
-enum thurstontype {pA, fo, Reducible1,24,340
-enum thurstontype {pA, fo, Reducible1, Reducible2,24,340
-enum thurstontype {pA, fo, Reducible1, Reducible2, pA_or_red,24,340
-enum thurstontype {pA, fo, Reducible1, Reducible2, pA_or_red, Unknown}Unknown24,340
-enum matrixformat 27,502
-enum matrixformat {raw,raw27,502
-enum matrixformat {raw, maple,27,502
-enum matrixformat {raw, maple, latex}latex27,502
-struct singularity29,542
-	singularity(31,563
-struct singularityOrbit37,760
-	bool operator< singularityOrbit::operator<41,844
-struct vertexGateInformation51,1231
-struct cuspCounter57,1373
-	cuspCounter(cuspCounter::cuspCounter59,1394
-class turn 65,1650
-	bool IsDegenerate(turn::IsDegenerate70,1798
-	turn operator-(turn::operator-72,1844
-	bool operator==(turn::operator==73,1916
-struct turnplace 77,2064
-class turnlist 82,2192
-	uint GetOrigin(turnlist::GetOrigin103,2917
-class graph 120,3875
-	bool IntersectsP(graph::IntersectsP156,5724
-	bool IsPeripheral(graph::IsPeripheral160,6033
-	uint FromP(graph::FromP161,6108
-	uint NumberEdges(graph::NumberEdges163,6202
-	uint NumberVertices(graph::NumberVertices164,6249
-	uint To(graph::To166,6349
-	void VertexEmbeddingTighten(graph::VertexEmbeddingTighten177,7263
-	void TightenAllVertexEmbeddings(graph::TightenAllVertexEmbeddings178,7351
-	void AddLoop(graph::AddLoop196,8713
-	graph(graph::graph199,8850
-	void PrintReduction(graph::PrintReduction206,9254
-	thurstontype GetType(graph::GetType222,9992
-	void SetType(graph::SetType223,10031
-
-graph.o,75
-Hç–IâOÎH) HãH12,12358
-Hç–IâOÎH) HãH14,12641
-ˇ)”H9ÀrH9À40,31216
-
-help.cpp,110
-#define _CRT_SECURE_NO_DEPRECATE 1,0
-namespace trains 10,152
-bool PAK(trains::PAK24,695
-void Help(38,881
-
-help.h,22
-#define __HELP_H2,17
-
-help.o,11
-HãH2,987
-
-hshoe.cpp,1188
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 9,112
-codelist::codelist(trains::codelist::codelist14,155
-codelist::~codelist(trains::codelist::~codelist17,280
-long codelist::TopIndex(trains::codelist::TopIndex19,357
-code& codelist::operator [](trains::codelist::operator []21,419
-code& codelist::Element(26,487
-uint codelist::GetSize(38,868
-void codelist::Flush(44,955
-codelist::codelist(55,1081
-codelist& codelist::operator=(codelist::operator=61,1309
-long codelist::Find(71,1498
-void codelist::_Remove(77,1628
-void codelist::Remove(84,1850
-void codelist::Append(89,1916
-void codelist::Prepend(96,2105
-void codelist::_Split(106,2338
-void codelist::Split(116,2581
-void codelist::Print(121,2650
-void codelist::Rotate(129,2775
-void codelist::Insert(144,3131
-bool codelist::Agrees(151,3268
-bool codelist::Add(158,3478
-void codelist::SureAdd(165,3821
-uint codelist::AgreesTo(170,3900
-bool code::operator <(code::operator <178,4235
-bool code::operator ==(code::operator ==198,4585
-istream& operator >> operator >>205,4753
-ostream& operator << operator <<219,5017
-int horseshoe::FindPermutation(226,5137
-istream& operator >> operator >>284,6432
-
-hshoe.h,156
-#define __HSHOE_H2,18
-class code 10,102
-	long Length(19,399
-class codelist 25,568
-	uint GetOrigin(codelist::GetOrigin46,1293
-class horseshoe 63,2247
-
-libtrains.a,510
-Image 125,90911
-Try 235,152961
-Gates 431,273696
-H9H 566,325926
-Type 676,419475
-GRAPH 679,419568
-GRAPH 682,419637
-ALGORITHM 685,419715
-OTHER 688,419798
-Help 691,419918
-This 694,419936
-QUIT	800,424488
-HORSESHOE	952,430581
-TOLERANCE	978,431921
-PRECISION	1000,433192
-The 1110,437134
-to 1126,437863
-br 1127,437875
-save 1128,437887
-str 1129,437897
-out 1130,437903
-br 1131,437917
-CHARPOLY	1134,437932
-ADDLOOP	1153,438608
-SHORTPRINT	1168,439157
-SHORTPRINTTO	1176,439317
-TRANSMAT	1191,439782
-
-newarray.h,1598
-#define __ARRAY_H2,18
-template<typename T> class MyArray 51,877
-	T& Element(MyArray::Element61,1150
-	T& Element(MyArray::Element63,1287
-	void _Remove(MyArray::_Remove65,1379
-	void _Split(MyArray::_Split66,1524
-	MyArray(MyArray::MyArray68,1699
-	MyArray(MyArray::MyArray69,1775
-	MyArray& operator=(MyArray::operator=70,1833
-	T& operator [](MyArray::operator []73,1969
-	bool Add(MyArray::Add76,2109
-	void SureAdd(MyArray::SureAdd77,2284
-	void Flush(MyArray::Flush78,2367
-	long Find(MyArray::Find79,2424
-	long TopIndex(MyArray::TopIndex80,2632
-	void Remove(MyArray::Remove81,2715
-	void Append(MyArray::Append82,2831
-	void Prepend(MyArray::Prepend83,2925
-	void Insert(MyArray::Insert84,3007
-	void Invert(MyArray::Invert85,3126
-	void Split(MyArray::Split92,3429
-	void Print(MyArray::Print93,3534
-	void RemoveAll(MyArray::RemoveAll95,3672
-	void Rotate(MyArray::Rotate96,3869
-	void Replace(MyArray::Replace97,4080
-	void Replace(MyArray::Replace108,4607
-	bool Tighten(MyArray::Tighten111,4768
-	void CyclicTighten(MyArray::CyclicTighten114,4880
-	bool Agrees(MyArray::Agrees128,5161
-	uint AgreesTo(MyArray::AgreesTo131,5375
-template<typename T> class arrayiterator 139,5600
-	arrayiterator(arrayiterator::arrayiterator143,5799
-	T& Now(arrayiterator::Now144,5855
-	T& operator++(arrayiterator::operator++145,5891
-	T& operator++(arrayiterator::operator++146,6047
-	bool AtOrigin(arrayiterator::AtOrigin147,6162
-	void Reset(arrayiterator::Reset148,6259
-typedef MyArray<long> intarray;152,6350
-typedef arrayiterator<long> intiterator;153,6382
-
-train.cpp,42
-namespace trains 18,285
-int main(33,581
-
-trainhelp.pdf,1494
-xúÌ\Yo‹6~7‡ˇ†«»nDJ‘ë∑¶9ã4Õ±@ö>8>Éxm«±Î§øæR$ŒpWüIÆ(e†	êU(q8¸f83ü#1OÍ?QÛ◊x‹_ÓÓÏÓ|ﬁ›È V.è£≥(ÈænT•Ê≤»≤®Ãƒº¨ˇDóá—Q‘Pyc%îÅyû÷’T™Ê™)(îúK’|‘j»‘≠M—M˝êÁy±ˆÛˆY§r—~R¡eî¶kEß—;_zΩ∫K–Ñ¶}é-vwíhqYˇvwíhqY79,7160
-xúÌ\Yo‹6~7‡ˇ†«»nDJ‘ë∑¶9ã4Õ±@ö>8>Éxm«±Î§øæR$ŒpWüIÆ(e†	êU(q8¸f83ü#1OÍ?QÛ◊x‹_ÓÓÏÓ|ﬁ›È V.è£≥(ÈænT•Ê≤»≤®Ãƒº¨ˇDóá—Q‘Pyc%îÅyû÷’T™Ê™)(îúK’|‘j»‘≠M—M˝êÁy±ˆÛˆY§r—~R¡eî¶kEß—;_zΩ∫K–Ñ¶}é-vwíhqYˇªÇO¢;ºªÛ‡©åÑäGªG79,7160
-y°}4LÀ	†f√p¡!èÕb	b81,7916
-êΩEé’pÃ8Eé’pÃ883,9152
-êΩEé’pÃ8@9≈1∏±‚á˜åóÕ©Ï˘ch;êt@√16Ìπœb&àW˙æá¸h#7`Ô¥&q◊∏ñÒ¶q◊∏ñÒ83,9152
-?YMqã⁄60Æ∫É>c`¨i˘c<⁄–"”ûÆ‚´7^&q]Æ‡U“wÜ1Iêù@6;ÙÚãˆìyÑó°8Æ¥¬	ÑÜ‹ÇÑ]ò?Æˆ¯ÊjºWåﬂﬂ#BSåÕ–h>4°ûVπ◊‡u,n9bJ4•6vóÕ ∞9‡›´(`ÖS˝¿.Æ¥j<ïËŒ	9‡4u¡ö–YÒ‹weÂoŸﬂm§º¿ $^ÂÎ7\é”±«:„;d¿dñxâÍ1òzoê¨^ù/∫#8˛ÂähÇë´∫-üñÆVΩÓ9B¯(Ó˛`C∑]™˝>¶ÍΩåø«ÖÍ≥˙!ÕÖ‰’+_®n!CW$µów+YÍÂ„ˆ˜ñkŸ%´µ„ı¥j©∑®Î"x)x84,9283
-?YMqã⁄60Æ∫É>c`¨i˘c<⁄–"”ûÆ‚´7^&q]Æ‡U“wÜ1Iêù@6;ÙÚãˆìyÑó°8Æ¥¬	ÑÜ‹ÇÑ]ò?Æˆ¯ÊjºWåﬂﬂ#BSåÕ–h>4°ûVπ◊‡u,n9bJ4•6vóÕ ∞9‡›´(`ÖS˝¿.Æ¥j<ïËŒ	9‡4u¡ö–YÒ‹weÂoŸﬂm§º¿ $^ÂÎ7\é”±«:„;d¿dñxâÍ1òzoê¨^ù/∫#8˛ÂähÇë´∫-üñÆVΩÓ9B¯(Ó˛`C∑]™˝>¶ÍΩåø«ÖÍ≥˙!ÕÖ‰’+_®n!CW$µów+YÍÂ„ˆ˜ñkŸ%´µ„ı¥j©∑®Î"x);¶÷´ªÏ5pÀïÏÄ^´8¢£÷\§∂É,íRö3IRûeZXû|aª~{@ï#Æ|œ»ñdUØˆ…JdUØˆ…84,9283
-Ù™¨f∂/Rú©JùZxl√Rú©JùZxl132,23613
-}m◊B%«∂ßel∂ˇ*”‹Õπñ∆≈u¥"Íu¥"4935,1133173
-;ê˛€<l28úˇ≤¯we.≥C†⁄éõ°®.‹z†¥¡pNÄﬁ‰új·Æà©JÇ},kd=kd4936,1133536
-öˆ∏⁄8º+ßM·+Œd¸G¯≥‡oÑ¯F_ﬂÎÚ¯˜∆⁄O√øÈæáå|sÆÎ˛.÷lıMR€M∞˜ÅtklıMR€M∞˜Åt4991,1151402
-
-ttt.cpp,196
-#define _CRT_SECURE_NO_DEPRECATE 2,14
-namespace trains 12,250
-TTT::TTT(trains::TTT::TTT14,270
-ostream& operator << operator <<113,3001
-bool TTT::operator<(132,3486
-int TTT::Euler(149,4083
-
-ttt.h,149
-#define tttH3,91
-typedef list<int> intlist;15,293
-typedef list<intlist> intintlist;16,320
-typedef map<int, intlist> key;17,354
-class TTT 19,386
-
-ttt.o,15
-ãA;A14,6826
-
-hshoe.o,0
-
-embedding.o,0
-
-edgevert.o,0
