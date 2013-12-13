@@ -28,6 +28,8 @@ ${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
     --exclude='braidlab/+braidlab/+lcs' \
     braidlab/+braidlab \
     braidlab/README.md \
+    braidlab/COPYING \
+    braidlab/LICENSE \
     braidlab/Makefile \
     braidlab/Makefile.cbraid-mex \
     braidlab/testsuite \
