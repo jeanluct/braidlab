@@ -1,8 +1,6 @@
 # braidlab
 
-Copyright (c) 2013 [Jean-Luc Thiffeault][1]
-
-*braidlab* is a [Matlab][2] package for analyzing data using braids.
+*braidlab* is a [Matlab][2] package for analyzing data using braids.  It was originally created and is maintained by [Jean-Luc Thiffeault][1].
 
 ### contributors
 
