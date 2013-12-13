@@ -8,7 +8,7 @@
 # set to a tar command that supports --exclude-vcs option, e.g., GNU tar
 TARCMD=tar
 
-VERSION=1.0.1
+VERSION=1.0.2
 
 cd doc
 pdflatex braidlab_guide.tex
@@ -33,7 +33,6 @@ ${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
     braidlab/Makefile \
     braidlab/Makefile.cbraid-mex \
     braidlab/testsuite \
-    braidlab/extern/braid-code \
     braidlab/extern/cbraid \
     braidlab/extern/trains \
     braidlab/extern/VariablePrecisionIntegers \
