@@ -1,2 +1,1 @@
-extern/cbraid = [svn]https://cbraid.googlecode.com/svn/trunk
 extern/braid-code = ssh://hg@bitbucket.org/jeanluc/braid-code
