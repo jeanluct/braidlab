@@ -12,7 +12,7 @@ Copyright (c) 2013 [Jean-Luc Thiffeault][2]
 
 ### license
 
-*braidlab* is released under the [Gnu Public License v3](http://www.gnu.org/licenses/gpl-3.0.html).  See COPYING and LICENSE in the root folder of the source code.
+*braidlab* is released under the [GNU General Public License v3](http://www.gnu.org/licenses/gpl-3.0.html).  See [COPYING](http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING) and [LICENSE](http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE).
 
 ### support
 
