@@ -1,6 +1,23 @@
 Changelog for CBraid and Braiding (lightly edited svn log):
 
 ------------------------------------------------------------------------
+r5 | jeanlucth@gmail.com | 2011-10-18 22:23:24 -0500 (Tue, 18 Oct 2011) | 1 line
+
+Update svn:ignore.
+------------------------------------------------------------------------
+r4 | jeanlucth@gmail.com | 2011-10-07 15:30:32 -0500 (Fri, 07 Oct 2011) | 1 line
+
+Remove -fPIC compile flag.
+------------------------------------------------------------------------
+r3 | jeanlucth@gmail.com | 2011-09-19 15:20:47 -0500 (Mon, 19 Sep 2011) | 6 lines
+
+  * Updated GPL (renamed LICENSE).
+  * Improve Makefile for programs.
+  * Moved remaining .h files to include.
+  * Updated CHANGELOG to reflect move to Google code.
+  * Tiny INSTALL file.
+
+------------------------------------------------------------------------
 r2 | jeanlucth@gmail.com | 2011-09-19 12:36:31 -0500 (Mon, 19 Sep 2011) | 2 lines
 
 Imported sources from jeanluc's private braid project (braid:trunk/cbraid r447).
