@@ -1,5 +1,7 @@
+assignment_2011_07_05.zip is obtained from http://www.mathworks.com/matlabcentral/fileexchange/6543.  The relevant files have been copied to the private folder of +braidlab (along with the license).
+
 CBraid is obtained from https://cbraid.googlecode.com/svn/trunk (rev 9).
 
-VariablePrecisionIntegers is obtained from http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic (Version 31 Jul 2013).  The functions not used by braidlab are not included.
+trains is obtained from https://bitbucket.org/jeanluc/braid-code/raw/tip/trains (rev 66).
 
-assignment_2011_07_05.zip is obtained from http://www.mathworks.com/matlabcentral/fileexchange/6543.  The relevant files have been copied to the private folder of +braidlab (along with the license).
+VariablePrecisionIntegers is obtained from http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic (Version 31 Jul 2013).  The functions not used by braidlab are not included.
