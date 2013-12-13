@@ -1,3 +1,6 @@
+[This file is somewhat out of date.  Some remaining issues should be
+moved to the issues tracker on BitBucket.]
+
  * General, consistent renaming of functions.
     * This is less important now with private methods and functions.
     * For instance: no function name should begin with braid, since
