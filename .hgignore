@@ -7,4 +7,3 @@ syntax: glob
 *.blg
 *.log
 *.out
-doc/braidlab_guide.pdf

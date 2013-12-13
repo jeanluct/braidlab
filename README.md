@@ -14,9 +14,13 @@ Copyright (c) 2013 [Jean-Luc Thiffeault][1]
 
 *braidlab* is released under the [GNU General Public License v3][9].  See [COPYING][10] and [LICENSE][11].
 
+### documentation
+
+See the [*braidlab* user's guide][12].
+
 ### support
 
-The development of *braidlab* was supported by the [US National Science Foundation][12], under grants DMS-0806821 and CMMI-1233935.
+The development of *braidlab* was supported by the [US National Science Foundation][13], under grants DMS-0806821 and CMMI-1233935.
 
 [1]: http://www.math.wisc.edu/~jeanluc/
 [2]: http://www.mathworks.com/products/matlab/
@@ -29,4 +33,5 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [9]: http://www.gnu.org/licenses/gpl-3.0.html
 [10]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
 [11]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
-[12]: http://www.nsf.gov
+[12]: http://bitbucket.org/jeanluc/braidlab/raw/tip/doc/braidlab_guide.pdf
+[13]: http://www.nsf.gov
