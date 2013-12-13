@@ -2,8 +2,10 @@ syntax: glob
 
 *.mex*
 *.o
+*.a
 *.aux
 *.bbl
 *.blg
 *.log
 *.out
+.depends
