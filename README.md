@@ -10,6 +10,10 @@ Copyright (c) 2013 [Jean-Luc Thiffeault][2]
 
 *braidlab* uses Toby Hall's [Train][6]; Jae Choon Cha's [CBraid][7]; Juan Gonzalez-Meneses's [Braiding][8]; and Markus Buehren's [assignmentoptimal][9].
 
+### license
+
+*braidlab* is released under the [Gnu Public License v3](http://www.gnu.org/licenses/gpl-3.0.html).  See COPYING and LICENSE in the root folder of the source code.
+
 ### support
 
 The development of *braidlab* was supported by the [US National Science Foundation][3], under grants DMS-0806821 and CMMI-1233935.
