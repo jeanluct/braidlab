@@ -298,4 +298,8 @@ if ~holdstate
   hold off
   axis equal
   axis off
+  % Add a gap on the left and right, to avoid clipping the figure.
+  ax = axis;
+  sc = .1*max(abs(ax(1)),abs(ax(2)));
+  axis([ax(1)-sc ax(2)+sc ax(3) ax(4)])
 end
