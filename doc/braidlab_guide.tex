@@ -70,6 +70,32 @@ showstringspaces=false}
 
 \section{Installing \braidlab}
 
+\subsection{Precompiled packages}
+
+Some zip and tar files of the precompiled latest released version are
+available at \url{http://bitbucket.org/jeanluc/braidlab/downloads}.  If one of
+those suits your system, then download and untar/unzip.
+
+
+\subsection{Cloning the repository}
+
+If you prefer to have the latest (possibly unstable) development version, and
+know how to compile Matlab MEX files on your system, then you can clone the
+Mercurial source repository with the terminal command
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
+# hg clone https://bitbucket.org/jeanluc/braidlab
+\end{lstlisting}
+assuming Mercurial is installed on your system.  After this finishes, type
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
+# cd braidlab; make all
+\end{lstlisting}
+to compile the MEX files.  Note that you can still use \braidlab\ even if
+you're unable to compile the MEX files, but some commands will be unavailable
+or run more slowly.
+
+
+\subsection{Setting Matlab's path}
+
 The package \braidlab\ is defined inside a Matlab namespace, which are
 specified as subfolders beginning with a `\lstinline{+}' character.  The Matlab
 path must contain the folder that contains the subfolder
