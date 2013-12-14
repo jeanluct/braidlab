@@ -1,25 +1,33 @@
 function plot_mod(varargin)
 %PLOT   Plot a loop.
-%   PLOT(L,COLOR,X,PRAD) plots a representative of the equivalence class
-%   define by the loop L.  COLOR may be speficied optionally, as well as the
-%   position X of the punctures (default integers).  strings. Position of
-%   the punctures can also be selected by inputing their positions as X.
-%   The default is to have them at integer values along the x-axis.  The
-%   puncture radius can be set with PRAD, otherwise the code selects the
-%   best size for a given loop.
+%   PLOT(L) plots a representative of the equivalence class
+%   defined by the loop L.
+%
+%   PLOT(L,'PROPNAME',VALUE,...) can be used to set property PROPNAME to
+%   VALUE.  Valid properties are
+%
+%   LineColor          The line color used to draw the loop.
+%   LineStyle          The line style used to draw the loop.
+%   LineWidth          The line width used to draw the loop.
+%   PunctureColor      The color of the punctures.
+%   PunctureEdgeColor  The color of the boundary of the punctures.
+%   PunctureSize       The size of the punctures.
+%   PuncturePosition   A vector of positions for the punctures, one
+%                      coordinate pair per row.  The default is to have
+%                      the punctures at integer values on the X-axis.
 %
 %   This is a method for the LOOP class.
 %   See also LOOP.
 
 %% List of option names that can be used
-
 optionNames = [
-    'LineColor       '
-    'LineStyle       '
-    'LineWidth       '
-    'PunctureColor   '
-    'PunctureSize    '
-    'PuncturePosition'
+    'LineColor        '
+    'LineStyle        '
+    'LineWidth        '
+    'PunctureColor    '
+    'PunctureEdgeColor'
+    'PunctureSize     '
+    'PuncturePosition '
     ];
 
 names = lower(optionNames);
@@ -38,8 +46,8 @@ end
 % Must be of the form L then option name then option value
 
 if rem(nargin,2) ~= 1
-  error(message('BRAIDLAB:loop:plot:ArgNameValueMismatch',...
-                'Number of inputs must be odd'));
+  error('BRAIDLAB:loop:plot:oddarg',...
+	'Number of inputs must be odd.');
 end
 
 %% Assigning input options
@@ -47,7 +55,8 @@ end
 L = varargin{1};
 
 if ~isscalar(L)
-  error('BRAIDLAB:loop:plot','Can only plot scalar loop, not array of loops.');
+  error('BRAIDLAB:loop:plot:onlyscalar',...
+	'Can only plot scalar loop, not array of loops.');
 end
 
 i = 2;
@@ -59,24 +68,27 @@ while i <= nargin
 
   if ~val
     if ~ischar(arg)
-      error(message('BRAIDLAB:loop:plot:NoPropName', i));
+      error('BRAIDLAB:loop:plot:notaprop',...
+	    'Argument %d should be a string.',i);
     end
 
     lowArg = lower(arg);
     j = strmatch(lowArg,names);
     if isempty(j)                       % if no matches
-      error(message('BRAIDLAB:loop:plot:InvalidPropName', arg));
+      error('BRAIDLAB:loop:plot:invalidpropname',...
+	    'Invalid property ''%s''.',arg);
     elseif length(j) > 1                % if more than one match
       % Check for any exact matches (in case any names are subsets of others)
       k = strmatch(lowArg,names,'exact');
       if length(k) == 1
-        j = k;
+	j = k;
       else
-            matches = deblank(optionNames(j(1),:));
-        for k = j(2:length(j))'
-                matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
-        end
-            error(message('BRAIDLAB:loop:plot:AmbiguousPropName',arg,matches));
+	matches = deblank(optionNames(j(1),:));
+	for k = j(2:length(j))'
+	  matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
+	end
+	error('BRAIDLAB:loop:plot:ambiguouspropname',...
+	      'Property %s is ambiguous; matches %s.',arg,matches);
       end
     end
     val = 1;                      % we expect a value next
@@ -93,6 +105,7 @@ if isempty(options.LineColor);  options.LineColor = 'b'; end
 if isempty(options.LineStyle);  options.LineStyle = '-'; end
 if isempty(options.LineWidth);  options.LineWidth = 2; end
 if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
+if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 
 
 %% Set the coordinates of the loop
@@ -115,13 +128,13 @@ b = B;
 %% Set the position of the punctures
 
 if isempty(options.PuncturePosition);
-    options.PuncturePosition = [(1:n)' 0*(1:n)'];
+  options.PuncturePosition = [(1:n)' 0*(1:n)'];
 end
 
 X = options.PuncturePosition;
 
 if n ~= length(X)
-  error('BRAIDLAB:loop:badlen','Length of X does not match loop.')
+  error('BRAIDLAB:loop:plot:badlen','Bad number of puncture positions.')
 end
 
 Xs = sortrows(X);
@@ -146,16 +159,16 @@ end
 pgap = min(pgap)/2+zeros(n,1);
 
 if isempty(options.PunctureSize);
-    options.PunctureSize = .15*min(gap);
+  options.PunctureSize = .15*min(gap);
 end
 
 prad = options.PunctureSize;
 
 if prad > min(gap)
-  warning('BRAIDLAB:loop:badrad', ...
-        ['Puncture radius is too large.  For this loop the value' ...
-         'can''t exceed %f.'],min(gap))
-     prad = .15*min(gap);
+  warning('BRAIDLAB:loop:plot:badrad', ...
+	  ['Puncture radius is too large.  For this loop the value ' ...
+	   'can''t exceed %f.'],min(gap))
+  prad = .15*min(gap);
 end
 
 %% Identify hold state of the current figure
@@ -174,7 +187,8 @@ for p = 1:n
   yy1 = sqrt(prad^2 - xx.^2);
   yy2 = -sqrt(prad^2 - xx(end:-1:1).^2);
   col = 'r-';
-  patch(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],options.PunctureColor)
+  patch(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
+	options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
   hold on
 end
 
@@ -192,7 +206,9 @@ for p = 1:n
     xx = sign(nl)*linspace(0,rad,50);
     yy1 = sqrt(rad^2 - xx.^2);
     yy2 = -sqrt(rad^2 - xx(end:-1:1).^2);
-    plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],options.LineColor,'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+    plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
+	 options.LineColor,'LineWidth',options.LineWidth,...
+	 'LineStyle',options.LineStyle)
   end
 end
 
@@ -224,14 +240,16 @@ for p = 1:n-1
     for s = 1:tojoindown
       y1 = pgap(p)*(nr+s)+Xs(p,2);
       y2 = -pgap(p+1)*(nl-s+tojoindown+1)+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       y1 = pgap(p)*(nr+s)+Xs(p,2);
       y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+Xs(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
 end
