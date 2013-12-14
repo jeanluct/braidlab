@@ -1,0 +1,22 @@
+------------------------------------------------------------------------
+1.0.2 [2013-12-13]
+
+* loopTest.m in testsuite.
+
+* Clean up files.  Eliminate subrepos.
+
+* First public release.
+
+------------------------------------------------------------------------
+1.0.1 [2013-12-12]
+
+* Check for overflow of loop coordinates.
+
+* Several bugfixes.
+
+* Improved support for VPI (Variable Precision Integers).
+
+------------------------------------------------------------------------
+1.0 [2013-10-02]
+
+First release of braidlab.

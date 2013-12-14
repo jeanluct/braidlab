@@ -1,0 +1,82 @@
+[This file is somewhat out of date.  Some remaining issues should be
+moved to the issues tracker on BitBucket.]
+
+ * General, consistent renaming of functions.
+    * This is less important now with private methods and functions.
+    * For instance: no function name should begin with braid, since
+      that's part of the namespace now.
+    * loopsigma is also a bad name.
+      [crossings is for generators; intersections is for loops.]
+    * looplistsigma.m and looplistsigma_helper.c: rename to avoid
+      sigma?  Adapt so that looplistsigma takes a braid and returns a
+      cell array [no! just array is ok] of loops.  This shouldn't slow
+      it down since the resulting cell array is fairly small.  Should
+      make braid member function. [no, better to put it as part of lcs
+      namespace.]
+
+ * loop class:
+    * What type for the loop entries?
+    * loop.plot: puncture size, clipping left/right, join like Toby.
+    * problems: geometric intersection number of two loops, number of
+      connected components.
+
+ * braid class:
+
+    * color_braiding: perturb projection line rather than trajectories
+      when coincidence found?  Or just report error message.  Maybe
+      better to just report error and let user deal with it by
+      changing the projection line.
+    * color_braiding: option to minimize crossings over projection line?
+    * ensure int32 for elements [2012-01-17: MRA ran into a problem
+      with this; discuss.].
+    * train track (see Flop/Matlab).
+    * For data: tube, Matt's "sexify" command to make things look good.
+    * cycliceq: show [1 -2 3 -4] cyclically same as [1 -2 -4 3].
+      [1 -2 3 -4] = [-2 3 -4 1] = [-2 3 1 -4] = [-2 1 3 -4] = [1 3 -2 -4]
+      [1 -2 -4 3] = [-2 -4 3 1] = [-2 -4 1 3] = [3 -2 -4 1] = [1 3 -2 -4]
+      This is the same as saying their closure gives the same knot?
+      Doesn't seem to be a matter of just permuting and trying possibilities:
+		>> a=braid([1 -2 3 -4]);
+		>> b=braid([1 -2 -4 3]); a==b
+		ans = 0
+		>> b=braid([-2 -4 3 1]); a==b
+		ans = 0
+		>> b=braid([-4 3 1 -2]); a==b
+		ans = 0
+		>> b=braid([3 1 -2 -4]); a==b
+		ans = 0
+      Why?  Because we may have to "commute periodically" several
+      times.  Is this a hard problem?  Or maybe they really aren't the
+      same and I'm cheating somehow by using the periodicity several
+      times.
+    * compact_helper: group same generators together.
+    * burau rep: use rational polynomials, somehow.
+
+ * Extract reducing curve from Toby's code? (in Dynnikov coords)
+
+ * cfbraid class: (for braid in canonical form)
+
+ * closure: implement various options, in particular "lowest L2" and
+   maybe "lowest entropy".  Do these have to scale as (n!)?  Maybe
+   find some cases where we have a target entropy, that is, we can
+   generate a very long braid so we can compute the entropy, but we'd
+   like to estimate the entropy from a subset of that.  (Use Duffing
+   in the chaotic sea?)
+
+ * Check types when invoking MEX files.
+
+ * Testing:
+    * Random walk entropy.
+
+ * Which functions could benefit from MEXing?
+
+ * Check if MEX file exists, compile?
+
+ * Good mathematical name for an open braid (tangle is already taken)?
+   How about the process of turning an open braid into a true braid?
+   "Closure" already means something different, but maybe that's the
+   right thing.  "Completion"?  "Closed extension"?  "Braid
+   extension"?  Start writing notes formalizing this.  Can still
+   define topological equivalence rel the punctures.  Form a groupoid,
+   a group-like structure where not all the elements can be multiplied
+   together.
