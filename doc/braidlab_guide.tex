@@ -95,6 +95,7 @@ or run more slowly.
 
 
 \subsection{Setting Matlab's path}
+\label{sec:path}
 
 The package \braidlab\ is defined inside a Matlab namespace, which are
 specified as subfolders beginning with a `\lstinline{+}' character.  The Matlab
@@ -116,6 +117,17 @@ assume this has been done and omit the \lstinline{braidlab} prefix.
 The \lstinline{addpath} and \lstinline{import} commands can be added
 to \lstinline{startup.m} to ensure they are executed at the start of
 every Matlab session.
+
+
+\subsection{Testing your installation}
+
+To check that everything is working, \braidlab\ includes a testsuite.  From
+Matlab, change to the \lstinline{testsuite} folder, and run
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> test_braidlab
+\end{lstlisting}
+making sure the path is set properly (Section~\ref{sec:path}).
+Note that running the testsuite requires Matlab version 2013a or later.
 
 
 \section{A tour of \braidlab}
