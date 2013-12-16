@@ -6,7 +6,6 @@
 \usepackage{bm}
 \usepackage[mathcal]{euscript}
 \usepackage[letterpaper]{geometry}
-\usepackage[letterpaper]{geometry}
 \usepackage{color}
 \usepackage{listings}
 \usepackage{natbib}
@@ -553,9 +552,37 @@ For the loop in Figure~\ref{fig:dynn_loop2},
 ans = 12
 \end{lstlisting}
 
-The \lstinline{entropy} method computes the topological entropy of a
-braid by repeatedly acting on a loop, and monitoring the growth rate
-of the loop.
+Sometimes we wish to study a large set of different loops.  The loop
+constructor vectorizes:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> ll = loop ([-1 1 -2 0; 1 -2 3 4])
+
+ll = (( -1  1 -2  0 ))
+     (( 1 -2  3  4 ))
+\end{lstlisting}
+We can then, for instance, compute the length of every loop:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> minlength(ll)
+
+ans = 14
+      34
+\end{lstlisting}
+or even act on all the loops with the same braid:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2);
+>> b*ll
+
+ans = (( 2  1 -2  1 ))
+      (( 5  -2  -3  11 ))
+\end{lstlisting}
+Some commands, such as \lstinline{plot}, do not vectorize.  Different loops
+can then be accessed by indexing, such as~\lstinline{plot(ll(2))}.
+
+The \lstinline{entropy} method of the \lstinline{braid} class
+(Section~\ref{sec:braidclass}) computes the topological entropy of a braid by
+repeatedly acting on a loop, and monitoring the growth rate of the loop.  For
+example, let us compare the entropy obtained by acting~$100$ times on an
+initial loop, compared with the \lstinline{entropy} method:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3 -4]);
 % apply braid 100 times to l, then compute growth of length
