@@ -215,7 +215,7 @@ classdef loop
     %   are one unit apart.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.INTAXIS.
+    %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
       [~,nu] = obj.intersec;
       l = sum(nu,2);
     end
@@ -226,7 +226,7 @@ classdef loop
     %   loop L with the real axis.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.MINLENGTH.
+    %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
       if ~isscalar(obj)
 	l = zeros(length(obj),1);
 	for k = 1:length(obj)

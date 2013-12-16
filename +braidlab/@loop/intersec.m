@@ -1,7 +1,8 @@
 function [varargout] = intersec(obj)
 %INTERSEC   Convert Dynnikov coding of loop to intersection numbers.
-%   [MU,NU] = INTERSEC(L) returns the intersection numbers corresponding
-%   to the loop L, as defined in figure 9 of ref. [2] below.
+%   [MU,NU] = INTERSEC(L) returns the intersection numbers corresponding to
+%   the loop L, as defined in figure 9 of ref. [2] below, reproduced in
+%   figure 2(b) of the braidlab guide.
 %
 %   References:
 %
