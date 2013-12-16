@@ -13,7 +13,7 @@ function c = complexity(b)
 %   Journal of the European Mathematical Society 9 (2007), 801-840.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, BRAID.LOOPCOORDS, LOOP.INTAXIS.
+%   See also BRAID, BRAID.LOOPCOORDS, LOOP.MINLENGTH, LOOP.INTAXIS.
 
 % Canonical set of loops, with extra boundary puncture (n+1).
 E = braidlab.loop(b.n);
