@@ -268,8 +268,8 @@ ans = < 1 -2 >
 There are a few methods that exploit the connection between braids and
 homeomorphisms \index{homeomorphism} of the punctured disk. %
 \index{disk, punctured} Braids label \emph{isotopy classes} %
-\index{isotopy classes}
-of homeomorphisms, so we can assign a topological entropy %
+\index{homeomorphism!isotopy classes} of homeomorphisms, so we can assign a
+topological entropy %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
 \index{braid!entropy|(}%
 \index{topological entropy|see{braid entropy}}%
@@ -450,8 +450,9 @@ b = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
 ans = 14
 \end{lstlisting}
 we find the number of generators (the length) has dropped to~$14$!  We can
-then plot this shortened braid as a braid diagram using \lstinline{plot(b)} to
-produce Figure~\ref{fig:testdata_braid}.  The braid diagram allows us to see
+then plot this shortened braid as a braid diagram using \lstinline{plot(b)} %
+\index{braid class@\braid\ class!plot@\lstinline{plot}} to produce
+Figure~\ref{fig:testdata_braid}.  The braid diagram allows us to see
 topological information clearly, such as the fact that the second and third
 particles undergo a large number of twists around each other; we can check
 this by creating a subbraid %
@@ -571,19 +572,23 @@ Figure~\ref{fig:dynn_loop}.
   [From~\citet{Thiffeault2010}.]}
 \end{figure}
 %
-We consider equivalence classes of such loops under homotopies
-relative to the punctures.  In particular, the loops are
-\emph{essential}, meaning that they are not null-homotopic or
-homotopic to the boundary or a puncture.  The \emph{intersection
-  numbers} are also shown in Figure~\ref{fig:dynn_loop}: these count
-the minimum number of intersections of an equivalence class of loops
-with the fixed vertical lines shown.  For~$\nn$ punctures, we define
-the intersection numbers~$\mu_i$ and~$\nu_i$ in
-Figure~\ref{fig:dynn_def}.
+We consider equivalence classes of such loops under homotopies %
+\index{loop!homotopy classes}%
+relative to the punctures.  In particular, the loops are \emph{essential}, %
+\index{loop!essential}%
+meaning that they are not null-homotopic or homotopic to the boundary or a
+puncture.  The \emph{intersection numbers} %
+\index{loop!intersection numbers|(}%
+are also shown in Figure~\ref{fig:dynn_loop}: these count the minimum number
+of intersections of an equivalence class of loops with the fixed vertical
+lines shown.  For~$\nn$ punctures, we define the intersection numbers~$\mu_i$
+and~$\nu_i$ in Figure~\ref{fig:dynn_def}.
 
 Any given loop will lead to a unique set of intersection numbers, but
 a general collection of intersection numbers do not typically
-correspond to a loop.  It is therefore more convenient to define
+correspond to a loop. %
+\index{loop!coordinates|(}
+It is therefore more convenient to define
 \begin{equation}
   \ac_\ip = \tfrac12\l(\mu_{2\ip} - \mu_{2\ip-1}\r), \qquad
   \bc_\ip = \tfrac12\l(\nu_\ip - \nu_{\ip+1}\r), \qquad
@@ -594,9 +599,8 @@ We then combine these in a vector of length~$(2\nn-4)$,
   \abv = (\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2}),
   \label{eq:abvdef}
 \end{equation}
-which gives the \emph{loop coordinates}\index{loop!coordinates} (or
-\emph{Dynnikov coordinates}) for the loop.  (Some authors such
-as~\citet{Dehornoy2008} give the coordinates
+which gives the \emph{loop coordinates} (or \emph{Dynnikov coordinates}) for
+the loop.  (Some authors such as~\citet{Dehornoy2008} give the coordinates
 as~$(\ac_1,\bc_1,\ldots,\ac_{\nn-2},\bc_{\nn-2})$.)  There is now a bijection
 between~$\mathbb{Z}^{2\nn-4}$ and essential simple closed
 loops~\citep{Dynnikov2002,Moussafir2006,Hall2009,Thiffeault2010}.  Actually,
@@ -605,13 +609,16 @@ loops. \jlt{MRA suggests `You mention multiloops here in a sort of fragment
   thought at the end of the second paragraph.  Perhaps leave this concept out
   till section 2.4.'}
 
+\index{loop class@\loopc\ class!constructor|(}
 Let's create the loop in Figure~\ref{fig:dynn_loop} as a \loopc\ object:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> l = loop([-1 1 -2 0 -1 0])
 
 l = (( -1 1 -2 0 -1 0 ))
 \end{lstlisting}
-Figure~\ref{fig:dynn_loop2} shows the output of the \lstinline{plot(l)}
+\index{loop class@\loopc\ class!constructor|)}
+Figure~\ref{fig:dynn_loop2} shows the output of the \lstinline{plot(l)} %
+\index{loop class@\loopc\ class!plot@\lstinline{plot}}
 command.  We can convert from loop coordinates\index{loop!coordinates} to
 intersection numbers with
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -621,6 +628,7 @@ ans = 2 0 1 3 4 0 2 2 4 4   % [mu1 ... mu6 nu1 ... nu4]
 \end{lstlisting}
 which returns~$\mu_1\dots\mu_{2n-4}$ followed by~$\nu_1\dots\mu_{n-1}$, as
 defined in Figure~\ref{fig:dynn_def}.
+\index{loop!intersection numbers|)}%
 
 Now we can act on this loop with braids.  For example, we define the braid
 \lstinline{b} to be~$\sigma_1^{-1}$ with~$5$ strings, corresponding to the~$5$
@@ -642,6 +650,7 @@ operator:
   $\sigma_1^{-1}$ applied to the loop in (a).}
 \end{figure}
 %
+\index{braid class@\braid\ class!multiplication (\lstinline{*})|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([-1],5);   % one generator with 5 strings
 >> b*l                  % act on a loop with a braid
@@ -651,7 +660,11 @@ ans = (( -1  1 -2  1 -1  0 ))
 Figure~\ref{fig:dynn_loop2_sigm1} shows \lstinline{plot(b*l)}.  The
 first and second punctures were interchanged counterclockwise (the
 action of~$\sigma_1^{-1}$), dragging the loop along.
+\index{loop!coordinates|)}
+\index{braid class@\braid\ class!multiplication (\lstinline{*})|)}
 
+\index{loop class@\loopc\ class!minlength@\lstinline{minlength}|(}
+\index{loop!minimum length}
 The minimum length of an equivalence class of loops is determined by
 assuming the punctures are one unit of length apart and have zero
 size.  After pulling tight the loop on the punctures, it is then made
@@ -662,6 +675,8 @@ For the loop in Figure~\ref{fig:dynn_loop2},
 
 ans = 12
 \end{lstlisting}
+\index{loop class@\loopc\ class!minlength@\lstinline{minlength}|)}
+\index{loop class@\loopc\ class!intaxis@\lstinline{intaxis}|(}
 Another useful measure of a loop's complexity is its minimum intersection
 number with the real axis~\citep{Moussafir2006,Hall2009,Thiffeault2010}, which
 for this loop is the same as its minimum length:
@@ -675,15 +690,20 @@ complexity, %
 \index{braid!complexity|(}%
 \index{braid class@\braid\ class!complexity@\lstinline{complexity}|(}%
 as defined by~\citet{Dynnikov2007}.
+\index{loop class@\loopc\ class!intaxis@\lstinline{intaxis}|)}
 
+\index{loop class@\loopc\ class!constructor|(}
+\index{loop class@\loopc\ class!vectorized|(}
 Sometimes we wish to study a large set of different loops.  The loop
 constructor vectorizes:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> ll = loop ([-1 1 -2 0; 1 -2 3 4])
+>> ll = loop([-1 1 -2 0; 1 -2 3 4])
 
 ll = (( -1  1 -2  0 ))
      (( 1 -2  3  4 ))
 \end{lstlisting}
+\index{loop class@\loopc\ class!constructor|)}
+\index{loop class@\loopc\ class!minlength@\lstinline{minlength}|(}
 We can then, for instance, compute the length of every loop:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> minlength(ll)
@@ -691,7 +711,9 @@ We can then, for instance, compute the length of every loop:
 ans = 14
       34
 \end{lstlisting}
+\index{loop class@\loopc\ class!minlength@\lstinline{minlength}|)}
 or even act on all the loops with the same braid:
+\index{braid class@\braid\ class!multiplication (\lstinline{*})|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 -2);
 >> b*ll
@@ -699,8 +721,10 @@ or even act on all the loops with the same braid:
 ans = (( 2  1 -2  1 ))
       (( 5  -2  -3  11 ))
 \end{lstlisting}
+\index{braid class@\braid\ class!multiplication (\lstinline{*})|)}
 Some commands, such as \lstinline{plot}, do not vectorize.  Different loops
 can then be accessed by indexing, such as~\lstinline{plot(ll(2))}.
+\index{loop class@\loopc\ class!vectorized|)}
 
 The \lstinline{entropy} method %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
@@ -730,9 +754,26 @@ iterations accordingly. %
 \subsection{Loop coordinates for a braid}
 \label{sec:loopcoords}
 
-The loop coordinates allow us to define a unique normal form for
-braids.  Consider the multiloop depicted in
-Figure~\ref{fig:fundloops}, which is the output of \lstinline{plot(loop(5))}.
+\index{braid!loop coordinates|(}
+\index{loop!coordinates|(}
+\index{loop class@\loopc\ class!constructor|(}
+
+The command \lstinline{loop(n)} returns a \emph{canonical set of loops}
+for~$n$ punctures:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> loop(5)
+
+ans = (( 0  0  0  0 -1 -1 -1 -1 ))
+\end{lstlisting}
+This multiloop is depicted in Figure~\ref{fig:fundloops}.  Note that the
+multiloop returned by \hbox{\lstinline{loop(5)}} actually has 6 punctures!
+The rightmost puncture is meant to represent the boundary of a disk, or a base
+point for the fundamental group on a sphere with $n$ punctures.  The loops
+form a generating set for the fundamental group of the disk with $n$
+punctures.  \index{loop class@\loopc\ class!constructor|)}
+
+The canonical set of loops allows us to define loop coordinates for a braid,
+which is a unique normal form.
 %
 \begin{figure}
 \begin{center}
@@ -750,14 +791,9 @@ Figure~\ref{fig:fundloops}, which is the output of \lstinline{plot(loop(5))}.
   $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$.}
 \end{figure}
 %
-Notice that \lstinline{loop(5)} defaulted to a loop on a disk with $6$
-punctures.  The reason is that this default multiloop is used to
-define loop coordinates for braids.  The extra puncture is regarded as
-the outer boundary of the disk, and the loops form a generating set
-for the fundamental group of the disk with $5$ punctures.  The
-canonical loop coordinates for braids exploit the fact that two
-braids are equal if and only if they act the same way on the
-fundamental group of the disk.  Hence, if we take a braid and act on
+The canonical loop coordinates for braids exploit the fact that two braids are
+equal if and only if they act the same way on the fundamental group of the
+disk \citep{Dehornoy2008}.  Hence, if we take a braid and act on
 \lstinline{loop(5)},
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3 -4]);
@@ -765,13 +801,12 @@ fundamental group of the disk.  Hence, if we take a braid and act on
 
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \end{lstlisting}
-then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))} can be
-thought of as \emph{uniquely} characterizing the braid.  It is this
-property that is used to rapidly determine equality of
-braids~\citep{Dehornoy2008}.  (The loop \lstinline{b*loop(5)} is
-plotted in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates
-for the braid can be obtained without creating an intermediate loop
-with
+then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))} can be thought
+of as \emph{uniquely} characterizing the braid.  It is this property that is
+used to rapidly determine equality of braids.  (The loop \lstinline{b*loop(5)}
+is plotted in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates for
+the braid can be obtained without creating an intermediate loop with %
+\index{braid class@\braid\ class!loopcoords@\lstinline{loopcoords}}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> loopcoords(b)
 
@@ -779,6 +814,8 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \end{lstlisting}
 
 \index{loop class@\loopc\ class|)}
+\index{loop!coordinates|)}
+\index{braid!loop coordinates|)}
 
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
 
