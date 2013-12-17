@@ -8,4 +8,8 @@ syntax: glob
 *.blg
 *.log
 *.out
+*.idx
+*.ilg
+*.ind
+*.toc
 .depends
