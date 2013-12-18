@@ -76,7 +76,7 @@ showstringspaces=false}
 
 \section{Installing \braidlab}
 \label{sec:install}
-\index{installing braidlab}
+\index{installing \braidlab}
 
 \subsection{Precompiled packages}
 
@@ -207,6 +207,7 @@ The number of strings is %
 ans = 3
 \end{lstlisting}
 Note that
+\index{help@\lstinline{help}|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> help braid
 \end{lstlisting}
@@ -216,9 +217,10 @@ constructor, invoke %
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> help braid.braid
 \end{lstlisting}
-which refers to the method \braid\ within the class \braid.  (Use
-\lstinline{methods(braid)} to list all the methods in the class.)  There are
-other ways to construct a \braid, such as using random %
+which refers to the method \braid\ within the class \braid. %
+\index{help@\lstinline{help}|)}%
+(Use \lstinline{methods(braid)} to list all the methods in the class.)  There
+are other ways to construct a \braid, such as using random %
 \index{braid class@\braid\ class!constructor!random braid} generators, here a
 braid with~$5$ strings and~$10$ random generators:
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -245,7 +247,9 @@ The \braid\ class also handles equality of braids:
 
 ans = 1
 \end{lstlisting}
-These are the same braid.  Equality is determined efficiently by %
+These are the same braid, even though they appear different from their
+generator sequence~\citep{Birman1975}.  Equality is determined efficiently
+by %
 \index{loop!coordinates}%
 \index{Dynnikov coordinates|see{loop coordinates}}%
 acting on loop coordinates~\citep{Dynnikov2002}, as described by
@@ -267,7 +271,9 @@ ans = < 1 -2 >
 
 There are a few methods that exploit the connection between braids and
 homeomorphisms \index{homeomorphism} of the punctured disk. %
-\index{disk, punctured} Braids label \emph{isotopy classes} %
+\index{disk, punctured}%
+\index{punctures}
+Braids label \emph{isotopy classes} %
 \index{homeomorphism!isotopy classes} of homeomorphisms, so we can assign a
 topological entropy %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
@@ -280,9 +286,10 @@ to a braid:
 
 ans = 0.8314
 \end{lstlisting}
-The entropy is computed by iterated action on a
-loop~\citep{Moussafir2006}.  This can fail if the braid is
-finite-order or has very low entropy:
+The entropy is computed by iterated action on a loop~\citep{Moussafir2006}.
+This can fail if the braid is finite-order %
+\index{braid!finite-order|(}%
+or has very low entropy:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(braid([1 2]))
 Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy. 
@@ -299,11 +306,14 @@ we add an optional parameter:
 
 ans = 0
 \end{lstlisting}
+\index{braid!finite-order|)}%
 Note that for large braids the Bestvina--Handel algorithm is impractical.  But
 when applicable it can also determine the Thurston--Nielsen type %
 \index{braid!Thurston--Nielsen type}%
 of the braid~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}:
 \index{braid class@\braid\ class!tntype@\lstinline{tntype}|(}%
+\index{braid!pseudo-Anosov|(}%
+\index{braid!reducible|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> tntype(braid([1 2 -3]))
 
@@ -315,6 +325,8 @@ ans = finite-order
 
 ans = reducible
 \end{lstlisting}
+\index{braid!pseudo-Anosov|)}%
+\index{braid!reducible|)}%
 \braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
 algorithm~\citep{HallTrain}. %
 \index{Bestvina--Handel algorithm|)}%
@@ -325,14 +337,16 @@ The topological entropy is a measure of braid complexity that relies on %
 \index{braid!entropy|)}%
 iterating the braid.  It gives the maximum growth rate of a `rubber band'
 anchored on the braid, as the rubber band slides up many repeated copies of
-the braid.  For finite-order braids, this will converge to zero.  The
-\emph{geometric complexity} %
+the braid.  For finite-order braids, %
+\index{braid!finite-order}%
+this will converge to zero.  The \emph{geometric complexity} %
 \index{braid!complexity|(}%
 \index{braid class@\braid\ class!complexity@\lstinline{complexity}|(}%
 \index{geometric complexity|see{braid complexity}}%
-of a braid~\citep{Dynnikov2007}, is defined in
-terms of the $\log_2$ of the number of intersections of a set of curves with
-the real axis, after one application of the braid:
+\index{complexity|see{braid complexity}}%
+of a braid~\citep{Dynnikov2007}, is defined in terms of the $\log_2$ of the
+number of intersections of a set of curves with the real axis, after one
+application of the braid:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> complexity(braid([1 -2]))
 
@@ -436,10 +450,11 @@ from this data, we simply execute %
 
 ans = 894
 \end{lstlisting}
-This is a very long braid!  But Figure~\ref{fig:testdata_trajs}
-suggests that this is misleading: many of the crossings are `wiggles'
-that cancel each other out.  Indeed, if we attempt to shorten the
-braid: %
+This is a very long braid!  But Figure~\ref{fig:testdata_trajs} suggests that
+this is misleading: many of the crossings %
+\index{crossings}%
+are `wiggles' that cancel each other out.  Indeed, if we attempt to shorten
+the braid: %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = compact(b)
@@ -499,6 +514,7 @@ closure method: %
 \index{braid!closure|(}%
 \index{braid class@\braid\ class!closure@\lstinline{closure}|(}%
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
+\index{crossings!in braid closure|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
@@ -507,13 +523,14 @@ bX = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
 
 bY = < -3 -3 -3 -3 -3 -3 -3  1 -3  1 >
 \end{lstlisting}
-This default closure simply draws line segments from the final points
-to the initial points in such a way that no new crossings are created
-in the~$X$ projection.  Hence, the $X$-projected braid \lstinline{bX}
-is unchanged by the closure, but here the $Y$-projected braid
-\lstinline{bY} is longer by one generator (\lstinline{bY} is plotted
-in Figure~\ref{fig:testdata_braidY}).  This is enough to make the
-braids conjugate:
+This default closure simply draws line segments from the final points to the
+initial points in such a way that no new crossings are created in the~$X$
+projection. %
+\index{crossings!in braid closure|)}%
+Hence, the $X$-projected braid \lstinline{bX} is unchanged by the closure, but
+here the $Y$-projected braid \lstinline{bY} is longer by one generator
+(\lstinline{bY} is plotted in Figure~\ref{fig:testdata_braidY}).  This is
+enough to make the braids conjugate:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> [~,c] = conjtest(bX,bY)  % ~ means discard first return arg
 
@@ -553,8 +570,10 @@ large braids.
 
 \index{loop class@\loopc\ class|(}
 
-A simple closed loop on a disk with~$5$ punctures is shown in
-Figure~\ref{fig:dynn_loop}.
+A simple closed loop on a disk with~$5$ punctures %
+\index{disk, punctured}%
+\index{punctures}%
+is shown in Figure~\ref{fig:dynn_loop}.
 %
 \begin{figure}
 \begin{center}
@@ -569,16 +588,19 @@ Figure~\ref{fig:dynn_loop}.
 \end{center}
 \caption{(a) A simple close loop in a disk with~$\nn=5$ punctures.
   (b) Definition of intersection numbers~$\mu_i$ and~$\nu_i$.
-  [From~\citet{Thiffeault2010}.]}
+  [From~\citet{Thiffeault2010}.] \index{loop!intersection numbers}}
 \end{figure}
 %
 We consider equivalence classes of such loops under homotopies %
 \index{loop!homotopy classes}%
-relative to the punctures.  In particular, the loops are \emph{essential}, %
+relative to the punctures.  %
+\index{punctures}%
+In particular, the loops are \emph{essential}, %
 \index{loop!essential}%
 meaning that they are not null-homotopic or homotopic to the boundary or a
 puncture.  The \emph{intersection numbers} %
 \index{loop!intersection numbers|(}%
+\index{intersection numbers|see{loop intersection numbers}}%
 are also shown in Figure~\ref{fig:dynn_loop}: these count the minimum number
 of intersections of an equivalence class of loops with the fixed vertical
 lines shown.  For~$\nn$ punctures, we define the intersection numbers~$\mu_i$
@@ -603,11 +625,15 @@ which gives the \emph{loop coordinates} (or \emph{Dynnikov coordinates}) for
 the loop.  (Some authors such as~\citet{Dehornoy2008} give the coordinates
 as~$(\ac_1,\bc_1,\ldots,\ac_{\nn-2},\bc_{\nn-2})$.)  There is now a bijection
 between~$\mathbb{Z}^{2\nn-4}$ and essential simple closed
-loops~\citep{Dynnikov2002,Moussafir2006,Hall2009,Thiffeault2010}.  Actually,
-\emph{multiloops}: loop coordinates can describe unions of disjoint
-loops. \jlt{MRA suggests `You mention multiloops here in a sort of fragment
-  thought at the end of the second paragraph.  Perhaps leave this concept out
-  till section 2.4.'}
+loops~\citep{Dynnikov2002,Moussafir2006,Hall2009,Thiffeault2010}.  Actually, %
+\index{multiloop|see{loop, multi-}}%
+\index{loop!multi-} \emph{multiloops}: loop coordinates can describe unions of
+disjoint loops (see Section~\ref{sec:loopcoords}).%
+\footnote{%
+  Here we use multiloop \index{loop!multi-} as a convenient mnemonic.  The
+  technical term is \emph{integral lamination}: %
+  \index{integral lamination|see{loop, multi-}}%
+  a set of disjoint non-homotopic simple closed curves~\citep{Moussafir2006}.}
 
 \index{loop class@\loopc\ class!constructor|(}
 Let's create the loop in Figure~\ref{fig:dynn_loop} as a \loopc\ object:
@@ -632,8 +658,9 @@ defined in Figure~\ref{fig:dynn_def}.
 
 Now we can act on this loop with braids.  For example, we define the braid
 \lstinline{b} to be~$\sigma_1^{-1}$ with~$5$ strings, corresponding to the~$5$
-punctures, and then act on the loop \lstinline{l} by using the multiplication
-operator:
+punctures, %
+\index{punctures}%
+and then act on the loop \lstinline{l} by using the multiplication operator:
 %
 \begin{figure}
 \begin{center}
@@ -657,19 +684,21 @@ operator:
 
 ans = (( -1  1 -2  1 -1  0 ))
 \end{lstlisting}
-Figure~\ref{fig:dynn_loop2_sigm1} shows \lstinline{plot(b*l)}.  The
-first and second punctures were interchanged counterclockwise (the
-action of~$\sigma_1^{-1}$), dragging the loop along.
-\index{loop!coordinates|)}
-\index{braid class@\braid\ class!multiplication (\lstinline{*})|)}
+Figure~\ref{fig:dynn_loop2_sigm1} shows \lstinline{plot(b*l)}.  The first and
+second punctures %
+\index{punctures|(}%
+were interchanged counterclockwise (the action of~$\sigma_1^{-1}$), dragging
+the loop along. %
+\index{loop!coordinates|)}%
+\index{braid class@\braid\ class!multiplication (\lstinline{*})|)}%
 
 \index{loop class@\loopc\ class!minlength@\lstinline{minlength}|(}
-\index{loop!minimum length}
-The minimum length of an equivalence class of loops is determined by
-assuming the punctures are one unit of length apart and have zero
-size.  After pulling tight the loop on the punctures, it is then made
-up of unit-length segments.  The minimum length is thus an integer.
-For the loop in Figure~\ref{fig:dynn_loop2},
+\index{loop!minimum length} The minimum length of an equivalence class of
+loops is determined by assuming the punctures are one unit of length apart and
+have zero size.  After pulling tight the loop on the punctures, %
+\index{punctures|)}%
+it is then made up of unit-length segments.  The minimum length is thus an
+integer.  For the loop in Figure~\ref{fig:dynn_loop2},
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> minlength(l)
 
@@ -759,18 +788,23 @@ iterations accordingly. %
 \index{loop class@\loopc\ class!constructor|(}
 
 The command \lstinline{loop(n)} returns a \emph{canonical set of loops}
-for~$n$ punctures:
+for~$n$ punctures:%
+\index{punctures|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> loop(5)
 
 ans = (( 0  0  0  0 -1 -1 -1 -1 ))
 \end{lstlisting}
-This multiloop is depicted in Figure~\ref{fig:fundloops}.  Note that the
-multiloop returned by \hbox{\lstinline{loop(5)}} actually has 6 punctures!
-The rightmost puncture is meant to represent the boundary of a disk, or a base
-point for the fundamental group on a sphere with $n$ punctures.  The loops
-form a generating set for the fundamental group of the disk with $n$
+\index{loop!multi-|(} This multiloop is depicted in
+Figure~\ref{fig:fundloops}.  Note that the multiloop returned by
+\hbox{\lstinline{loop(5)}} actually has 6 punctures!  The rightmost puncture
+is meant to represent the boundary of a disk, %
+\index{disk, punctured}%
+or a base point for the fundamental group on a sphere with $n$ punctures.  The
+loops form a generating set for the fundamental group of the disk with $n$
 punctures.  \index{loop class@\loopc\ class!constructor|)}
+\index{punctures|)}%
+\index{loop!multi-|)}
 
 The canonical set of loops allows us to define loop coordinates for a braid,
 which is a unique normal form.
@@ -788,7 +822,7 @@ which is a unique normal form.
 \end{center}
 \caption{(a) The multiloop created by \lstinline{loop(5)}.  (b) The
   multiloop \lstinline{b*loop(5)}, where \lstinline{b} is the braid
-  $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$.}
+  $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$. \index{loop!multi-}}
 \end{figure}
 %
 The canonical loop coordinates for braids exploit the fact that two braids are
@@ -821,6 +855,8 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 
 
 \section{Side note: On filling-in punctures}
+
+\index{punctures!filling-in|(}
 
 Recall the command~\texttt{subbraid}
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}}%
@@ -865,7 +901,9 @@ Note that the entropy of the subbraid~\texttt{b} is \emph{higher} than the
 original braid.  This is counter-intuitive: shouldn't removing strings cause
 loops to shorten, therefore lowering their growth?\footnote{In fact, the
   entropy obtained by the removal of a string is constrained by the minimum
-  possible entropy for the remaining number of strings
+  possible entropy %
+  \index{braid!entropy!minimum}%
+  for the remaining number of strings
   \citep{Song2002,Hironaka2006,Thiffeault2006,
     Ham2007,Venzke_thesis,LanneauThiffeault2011_braids}.  So here the entropy
   of the 3-braid could only be zero or $\ge 0.9624$.}
@@ -889,9 +927,9 @@ braid~$\sigma_1\sigma_2\sigma_3^{-1}$.
   \label{fig:s1s-2s1s-2s1s2_diagram}
 }
 \end{center}
-\caption{(a) The mixing device described by the
+\caption{(a) The mixing protocol specified by the
   braid~$\sigma_1\sigma_2\sigma_3^{-1}$ \citep{Thiffeault2008b}.  The inset
-  shows how the rods are moved.  (b) The pure
+  shows how the rods are moved.  (b)~The pure \index{braid!pure}
   braid~$(\sigma_1\sigma_2\sigma_3^{-1})^4$.  (c)~The
   braid~$(\sigma_1\sigma_2^{-1})^2\sigma_1\sigma_2$, obtained by removing the
   third string from~(b).}
@@ -930,8 +968,8 @@ b2 = < 1 -2  1 -2  1  2 >
 \end{lstlisting}
 which is \emph{not} \texttt{b\^{}4} (Fig.~\ref{fig:s1s-2s1s-2s1s2_diagram})!
 However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
-  showed that the entropy of a pure braid is greater than~$1.4436$, if it is
-  nonzero.}
+  showed that the entropy of a pure braid \index{braid!pure} is greater
+  than~$1.4436$, if it is nonzero.}  \index{braid!finite-order|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(a^4), entropy(b2)
 
@@ -947,14 +985,13 @@ appears to be finite-order.  Indeed, the braid \texttt{b2} is conjugate
 to~$\sigma_1^2$:
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> c = braid([2 -1],3)
-
-c = < 2 -1 >
+>> c = braid([2 -1],3);
 >> compact(c*b2*c^-1)
 
 ans = < 1  1 >
 \end{lstlisting}
 showing that its entropy is indeed zero.
+\index{braid!finite-order|)}%
 
 The moral is: when filling-in punctures, make sure that the strings being
 removed are permuted only among themselves.  For very long, random braids, we
@@ -963,6 +1000,7 @@ string being removed will have returned to its initial position many times. %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|)}%
 \index{braid!entropy|)}%
 \index{braid class@\braid\ class!perm@\lstinline{perm}|)}%
+\index{punctures!filling-in|)}
 
 
 \section*{Acknowledgments}
@@ -985,6 +1023,9 @@ test data from their granular medium experiments~\citep{Puckett2012}.
 \addcontentsline{toc}{section}{References}
 
 % \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
+
+\index{crossings|seealso{projection line}}%
+\index{projection line|seealso{crossings}}
 
 \clearpage
 \addcontentsline{toc}{section}{Index}
