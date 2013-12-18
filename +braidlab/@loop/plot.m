@@ -12,7 +12,7 @@ function plot_mod(varargin)
 %   PunctureColor      The color of the punctures.
 %   PunctureEdgeColor  The color of the boundary of the punctures.
 %   PunctureSize       The size of the punctures.
-%   PuncturePosition   A vector of positions for the punctures, one
+%   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
 %
@@ -27,7 +27,7 @@ optionNames = [
     'PunctureColor    '
     'PunctureEdgeColor'
     'PunctureSize     '
-    'PuncturePosition '
+    'PuncturePositions'
     ];
 
 names = lower(optionNames);
@@ -127,11 +127,11 @@ b = B;
 
 %% Set the position of the punctures
 
-if isempty(options.PuncturePosition);
-  options.PuncturePosition = [(1:n)' 0*(1:n)'];
+if isempty(options.PuncturePositions);
+  options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 
-X = options.PuncturePosition;
+X = options.PuncturePositions;
 
 if n ~= length(X)
   error('BRAIDLAB:loop:plot:badlen','Bad number of puncture positions.')
