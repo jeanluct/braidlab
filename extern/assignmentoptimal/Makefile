@@ -22,7 +22,7 @@ MEXFLAGS  = -compatibleArrayDims  # For now build for arrays of size 2^32-1.
 %.$(MEXSUFFIX): %.cpp
 	$(MEX) $(MEXFLAGS) $^
 
-all: randomwalk_helper.$(MEXSUFFIX)
+all: assignmentoptimal.$(MEXSUFFIX)
 
 showvars:
 	@echo "$(MEXSUFFIX)"
