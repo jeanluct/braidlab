@@ -76,8 +76,8 @@ classdef loop
       % Nested generators of the fundamental group of a sphere with c
       % punctures with an extra basepoint puncture on the right.
       if c < 2
-	error('BRAIDLAB:loop:loop:toofewpunc', ...
-	      'Need at least two punctures.');
+        error('BRAIDLAB:loop:loop:toofewpunc', ...
+              'Need at least two punctures.');
       end
       n1 = c-1;
       l.coords = zeros(1,2*n1);
@@ -90,34 +90,34 @@ classdef loop
     end
     if nargin == 1
       if isvector(c)
-	% Create from a single vector of even length.
-	if mod(length(c),2)
-	  error('BRAIDLAB:loop:loop:oddlength', ...
-		'Loop coordinate vector must have even length.')
-	end
-	% Store coordinates as row vector.
-	if size(c,1) > size(c,2), c = c.'; end
-	l.coords = c;
+        % Create from a single vector of even length.
+        if mod(length(c),2)
+          error('BRAIDLAB:loop:loop:oddlength', ...
+                'Loop coordinate vector must have even length.')
+        end
+        % Store coordinates as row vector.
+        if size(c,1) > size(c,2), c = c.'; end
+        l.coords = c;
       else
-	% Create from an array with an even number of columns.
-	if mod(size(c,2),2)
-	  error('BRAIDLAB:loop:loop:oddlength', ...
-		'Loop coordinate array must have even number of columns.')
-	end
-	l(size(c,1)) = braidlab.loop;  % pre-allocate
-	for k = 1:size(c,1)
-	  l(k).coords = c(k,:);
-	end
+        % Create from an array with an even number of columns.
+        if mod(size(c,2),2)
+          error('BRAIDLAB:loop:loop:oddlength', ...
+                'Loop coordinate array must have even number of columns.')
+        end
+        l(size(c,1)) = braidlab.loop;  % pre-allocate
+        for k = 1:size(c,1)
+          l(k).coords = c(k,:);
+        end
       end
     else
       % Create a,b separately from two vectors of the same length.
       if any(size(c) ~= size(b))
-	error('BRAIDLAB:loop:loop:badsize', ...
-	      'Loop coordinate vectors must have the same size.')
+        error('BRAIDLAB:loop:loop:badsize', ...
+              'Loop coordinate vectors must have the same size.')
       end
       l(size(c,1)) = braidlab.loop;  % pre-allocate
       for k = 1:size(c,1)
-	l(k).coords = [c(k,:) b(k,:)];
+        l(k).coords = [c(k,:) b(k,:)];
       end
     end
     end
@@ -183,12 +183,12 @@ classdef loop
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
       if isscalar(obj)
-	if ~isa(obj(1).coords,'vpi')
-	  str = ['(( ' num2str(obj.coords) ' ))'];
-	end
+        if ~isa(obj(1).coords,'vpi')
+          str = ['(( ' num2str(obj.coords) ' ))'];
+        end
       else
-	error('BRAIDLAB:loop:char:notscalar', ...
-	      'Cannot convert nonscalar loop to string.');
+        error('BRAIDLAB:loop:char:notscalar', ...
+              'Cannot convert nonscalar loop to string.');
       end
     end
 
@@ -198,13 +198,13 @@ classdef loop
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.DISP.
       for i = 1:size(obj,2)
-	if ~isa(obj(i).coords,'vpi')
-	  disp(char(obj(i)))
-	else
-	  % VPI objects are hard to display.  Is there even a
-	  % conversion to string?
-	  disp(obj(i).coords)
-	end
+        if ~isa(obj(i).coords,'vpi')
+          disp(char(obj(i)))
+        else
+          % VPI objects are hard to display.  Is there even a
+          % conversion to string?
+          disp(obj(i).coords)
+        end
       end
     end
 
@@ -228,22 +228,22 @@ classdef loop
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
       if ~isscalar(obj)
-	l = zeros(length(obj),1);
-	for k = 1:length(obj)
-	  l(k) = intaxis(obj(k));
-	end
+        l = zeros(length(obj),1);
+        for k = 1:length(obj)
+          l(k) = intaxis(obj(k));
+        end
       else
-	[a,b] = obj.ab;
+        [a,b] = obj.ab;
 
-	% The number of intersections before/after the first and last punctures.
-	% See Hall & Yurttas (2009).
-	cumb = [0 cumsum(b,2)];
-	b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
-	bn1 = -b0 - sum(b);
+        % The number of intersections before/after the first and last punctures.
+        % See Hall & Yurttas (2009).
+        cumb = [0 cumsum(b,2)];
+        b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
+        bn1 = -b0 - sum(b);
 
-	% The number of intersections with the real axis.
-	l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
-	    + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+        % The number of intersections with the real axis.
+        l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
+            + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
       end
     end
 

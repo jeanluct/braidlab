@@ -171,22 +171,22 @@ classdef braid
     %   See also BRAID, BRAID.LEXEQ, LOOP, LOOPCOORDS.
       ee = b1.n == b2.n; if ~ee, return; end
       if isempty(b1.word)
-	if isempty(b2.word)
-	  ee = true;
-	  return
-	end
+        if isempty(b2.word)
+          ee = true;
+          return
+        end
       end
       % Check if the loop coordinates are the same.
       % This can fail if the braids are too long, since the coordinates
       % overflow.  Check for that.
       try
-	ee = all(loopcoords(b1) == loopcoords(b2));
+        ee = all(loopcoords(b1) == loopcoords(b2));
       catch err
-	if (strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow'))
-	  % An overflow error was thrown: retry with variable-precision
+        if (strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow'))
+          % An overflow error was thrown: retry with variable-precision
           % integers.
-	  ee = all(loopcoords(b1,[],'vpi') == loopcoords(b2,[],'vpi'));
-	end
+          ee = all(loopcoords(b1,[],'vpi') == loopcoords(b2,[],'vpi'));
+        end
       end
     end
 

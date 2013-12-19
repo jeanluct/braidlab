@@ -18,7 +18,7 @@ lat = {'LineWidth',2};
 
 if ~isscalar(b)
   error('BRAIDLAB:braid:plot',['Can only plot scalar braid, not array of' ...
-		    ' braids.']);
+                    ' braids.']);
 end
 
 if ishold

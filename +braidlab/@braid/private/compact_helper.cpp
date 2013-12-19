@@ -79,53 +79,53 @@ bool commute_and_cancel(T& b, const int dir)
 #endif
       do
         {
-	  if (i > 0)
-	    {
-	      if (b[i-1] == -b[i] && b[i] != 0)
-		{
-		  // Cancel with the generator on the left.
+          if (i > 0)
+            {
+              if (b[i-1] == -b[i] && b[i] != 0)
+                {
+                  // Cancel with the generator on the left.
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << "Cancelling adjacent generators at position ";
-		  cerr << i-1 << " and " << i << endl;
-		  cerr << "before: "; printvec(b);
+                  cerr << "Cancelling adjacent generators at position ";
+                  cerr << i-1 << " and " << i << endl;
+                  cerr << "before: "; printvec(b);
 #endif
-		  b[i-1] = b[i] = 0;
+                  b[i-1] = b[i] = 0;
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << " after: "; printvec(b);
+                  cerr << " after: "; printvec(b);
 #endif
-		  shorter = true;
-		  break;
-		}
-	    }
-	  if (i < b.size()-1)
-	    {
-	      if (b[i+1] == -b[i] && b[i] != 0)
-		{
-		  // Cancel with the generator on the right.
+                  shorter = true;
+                  break;
+                }
+            }
+          if (i < b.size()-1)
+            {
+              if (b[i+1] == -b[i] && b[i] != 0)
+                {
+                  // Cancel with the generator on the right.
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << "Cancelling adjacent generators at position ";
-		  cerr << i << " and " << i+1 << endl;
-		  cerr << "before: "; printvec(b);
+                  cerr << "Cancelling adjacent generators at position ";
+                  cerr << i << " and " << i+1 << endl;
+                  cerr << "before: "; printvec(b);
 #endif
-		  b[i+1] = b[i] = 0;
+                  b[i+1] = b[i] = 0;
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << " after: "; printvec(b);
+                  cerr << " after: "; printvec(b);
 #endif
-		  shorter = true;
-		  break;
-		}
-	    }
+                  shorter = true;
+                  break;
+                }
+            }
           if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
             {
               // Commute with the next generator.
 #ifdef BRAIDLAB_COMPACT_DEBUG
-	      cerr << "Commuting adjacent generators at position ";
-	      cerr << i << " and " << i+dir << endl;
-	      cerr << "before: "; printvec(b);
+              cerr << "Commuting adjacent generators at position ";
+              cerr << i << " and " << i+dir << endl;
+              cerr << "before: "; printvec(b);
 #endif
               std::swap(b[i],b[i+dir]);
 #ifdef BRAIDLAB_COMPACT_DEBUG
- 	      cerr << " after: "; printvec(b);
+              cerr << " after: "; printvec(b);
 #endif
               i += dir;
               incrpos = true;
@@ -138,14 +138,14 @@ bool commute_and_cancel(T& b, const int dir)
                   && b[i] == b[i+2*dir])
                 {
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << "Using second relation at position ";
-		  cerr << i << "," << i+dir << "," << i+2*dir << endl;
-		  cerr << "before: "; printvec(b);
+                  cerr << "Using second relation at position ";
+                  cerr << i << "," << i+dir << "," << i+2*dir << endl;
+                  cerr << "before: "; printvec(b);
 #endif
                   std::swap(b[i],b[i+dir]);
                   b[i+2*dir] = b[i];
 #ifdef BRAIDLAB_COMPACT_DEBUG
-		  cerr << " after: "; printvec(b);
+                  cerr << " after: "; printvec(b);
 #endif
                   i += 2*dir;
                   incrpos = true;
