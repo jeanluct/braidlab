@@ -38,7 +38,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (mwIndex p = 0; p < n; ++p)
     {
       for (mwIndex ixy = 0; ixy < 2; ++ixy)
-	X[0 + ixy*(N+1) + p*2*(N+1)] = X0[ixy + p*2];
+        X[0 + ixy*(N+1) + p*2*(N+1)] = X0[ixy + p*2];
     }
 
   //
@@ -65,46 +65,46 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (mwIndex p = 0; p < n; ++p)
     {
       for (mwIndex i = 1; i <= N; ++i)
-	{
-	  // Update particle position.
-	  int idx = i-1 + p*N;
-	  /*
-	  // Nonuniform step size.
-	  double dx = eps*sqrt(eps2[idx])*cos(2*M_PI*theta[idx]);
-	  double dy = eps*sqrt(eps2[idx])*sin(2*M_PI*theta[idx]);
-	  */
-	  double dx = eps*cos(2*M_PI*theta[idx]);
-	  double dy = eps*sin(2*M_PI*theta[idx]);
-	  int ix = i + 0*(N+1) + p*2*(N+1);
-	  int iy = i + 1*(N+1) + p*2*(N+1);
-	  X[ix] = X[ix-1] + dx;
-	  X[iy] = X[iy-1] + dy;
+        {
+          // Update particle position.
+          int idx = i-1 + p*N;
+          /*
+          // Nonuniform step size.
+          double dx = eps*sqrt(eps2[idx])*cos(2*M_PI*theta[idx]);
+          double dy = eps*sqrt(eps2[idx])*sin(2*M_PI*theta[idx]);
+          */
+          double dx = eps*cos(2*M_PI*theta[idx]);
+          double dy = eps*sin(2*M_PI*theta[idx]);
+          int ix = i + 0*(N+1) + p*2*(N+1);
+          int iy = i + 1*(N+1) + p*2*(N+1);
+          X[ix] = X[ix-1] + dx;
+          X[iy] = X[iy-1] + dy;
 
-	  //
-	  // Reflect if walk leaves domain.
-	  //
-	  // Note: this requires a small step size to avoid
-	  // "double-reflections".
-	  //
-	  // (Could insert extra point at reflection location?)
-	  if (domain == SQUARE)
-	    {
-	      if (X[ix] > 1) X[ix] = 2-X[ix];
-	      if (X[ix] < 0) X[ix] = -X[ix];
-	      if (X[iy] > 1) X[iy] = 2-X[iy];
-	      if (X[iy] < 0) X[iy] = -X[iy];
-	    }
-	  else if (domain == DISK)
-	    {
-	      double r = hypot(X[ix],X[iy]);
-	      if (r > 1)
-		{
-		  double th = atan2(X[iy],X[ix]);
-		  r = 2-r; // Cheap reflection: just reflect radius.
-		  X[ix] = r*cos(th); X[iy] = r*sin(th);
-		}
-	    }
-	}
+          //
+          // Reflect if walk leaves domain.
+          //
+          // Note: this requires a small step size to avoid
+          // "double-reflections".
+          //
+          // (Could insert extra point at reflection location?)
+          if (domain == SQUARE)
+            {
+              if (X[ix] > 1) X[ix] = 2-X[ix];
+              if (X[ix] < 0) X[ix] = -X[ix];
+              if (X[iy] > 1) X[iy] = 2-X[iy];
+              if (X[iy] < 0) X[iy] = -X[iy];
+            }
+          else if (domain == DISK)
+            {
+              double r = hypot(X[ix],X[iy]);
+              if (r > 1)
+                {
+                  double th = atan2(X[iy],X[ix]);
+                  r = 2-r; // Cheap reflection: just reflect radius.
+                  X[ix] = r*cos(th); X[iy] = r*sin(th);
+                }
+            }
+        }
     }
 
   mxDestroyArray(thetaA);

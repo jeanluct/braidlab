@@ -47,7 +47,7 @@ end
 
 if rem(nargin,2) ~= 1
   error('BRAIDLAB:loop:plot:oddarg',...
-	'Number of inputs must be odd.');
+        'Number of inputs must be odd.');
 end
 
 %% Assigning input options
@@ -56,7 +56,7 @@ L = varargin{1};
 
 if ~isscalar(L)
   error('BRAIDLAB:loop:plot:onlyscalar',...
-	'Can only plot scalar loop, not array of loops.');
+        'Can only plot scalar loop, not array of loops.');
 end
 
 i = 2;
@@ -69,26 +69,26 @@ while i <= nargin
   if ~val
     if ~ischar(arg)
       error('BRAIDLAB:loop:plot:notaprop',...
-	    'Argument %d should be a string.',i);
+            'Argument %d should be a string.',i);
     end
 
     lowArg = lower(arg);
     j = strmatch(lowArg,names);
     if isempty(j)                       % if no matches
       error('BRAIDLAB:loop:plot:invalidpropname',...
-	    'Invalid property ''%s''.',arg);
+            'Invalid property ''%s''.',arg);
     elseif length(j) > 1                % if more than one match
       % Check for any exact matches (in case any names are subsets of others)
       k = strmatch(lowArg,names,'exact');
       if length(k) == 1
-	j = k;
+        j = k;
       else
-	matches = deblank(optionNames(j(1),:));
-	for k = j(2:length(j))'
-	  matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
-	end
-	error('BRAIDLAB:loop:plot:ambiguouspropname',...
-	      'Property %s is ambiguous; matches %s.',arg,matches);
+        matches = deblank(optionNames(j(1),:));
+        for k = j(2:length(j))'
+          matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
+        end
+        error('BRAIDLAB:loop:plot:ambiguouspropname',...
+              'Property %s is ambiguous; matches %s.',arg,matches);
       end
     end
     val = 1;                      % we expect a value next
@@ -166,8 +166,8 @@ prad = options.PunctureSize;
 
 if prad > min(gap)
   warning('BRAIDLAB:loop:plot:badrad', ...
-	  ['Puncture radius is too large.  For this loop the value ' ...
-	   'can''t exceed %f.'],min(gap))
+          ['Puncture radius is too large.  For this loop the value ' ...
+           'can''t exceed %f.'],min(gap))
   prad = .15*min(gap);
 end
 
@@ -188,7 +188,7 @@ for p = 1:n
   yy2 = -sqrt(prad^2 - xx(end:-1:1).^2);
   col = 'r-';
   patch(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
-	options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
+        options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
   hold on
 end
 
@@ -207,8 +207,8 @@ for p = 1:n
     yy1 = sqrt(rad^2 - xx.^2);
     yy2 = -sqrt(rad^2 - xx(end:-1:1).^2);
     plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
-	 options.LineColor,'LineWidth',options.LineWidth,...
-	 'LineStyle',options.LineStyle)
+         options.LineColor,'LineWidth',options.LineWidth,...
+         'LineStyle',options.LineStyle)
   end
 end
 
@@ -241,7 +241,7 @@ for p = 1:n-1
       y1 = pgap(p)*(nr+s)+Xs(p,2);
       y2 = -pgap(p+1)*(nl-s+tojoindown+1)+Xs(p+1,2);
       plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
-	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
@@ -249,7 +249,7 @@ for p = 1:n-1
       y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+Xs(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
       plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
-	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
 end
@@ -282,14 +282,14 @@ for p = 1:n-1
       y1 = -pgap(p)*(nr+s)+Xs(p,2);
       y2 = pgap(p+1)*(nl-s+tojoinup+1)+Xs(p+1,2);
       plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
-	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
       y1 = -pgap(p)*(nr+s)+Xs(p,2);
       y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+Xs(p+1,2);
       plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
-	   'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
 end

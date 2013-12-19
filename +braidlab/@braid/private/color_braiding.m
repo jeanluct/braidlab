@@ -41,7 +41,7 @@ for i = 1:size(XY,1)
   % invalidates the braid computation.
   if size(unique(XYi,'rows'),1) ~= size(XYi,1)
     error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
-	  'Coincident particles: braid not defined.')
+          'Coincident particles: braid not defined.')
   end
   % Check if some particles have one coordinate in common.  The braid is
   % still well-defined, but warn the user.
@@ -171,8 +171,8 @@ for i = 1:size(crossdat,1)
     % Find the location of the lower string.
     idx1 = find(Iperm == crossdat(i,3));
     if Iperm(idx1+1) == crossdat(i,4)  % If the higher string is in fact the
-				       % next string to the right, then
-				       % apply the crossing.
+                                       % next string to the right, then
+                                       % apply the crossing.
       Iperm(idx1:idx1+1) = [crossdat(i,4) crossdat(i,3)]; % update index vector
       gen(i) = idx1*crossdat(i,2); % save the generator
       tcr(i) = crossdat(i,1);      % save the time of crossing
@@ -185,16 +185,16 @@ for i = 1:size(crossdat,1)
       goodcross = [];
       for j = icm'  % Loop over these crossings, looking for one that
                     % involves adjacent particles.
-	idx1 = find(Iperm == crossdat(j,3));
-	idx2 = find(Iperm == crossdat(j,4));
-	if idx1+1 == idx2, goodcross = j; break; end  % adjacent: we're done
+        idx1 = find(Iperm == crossdat(j,3));
+        idx2 = find(Iperm == crossdat(j,4));
+        if idx1+1 == idx2, goodcross = j; break; end  % adjacent: we're done
       end
       if isempty(goodcross)
-	% Cannot find two strings crossing that are not next to each other.
-	fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
-	      ' with permutation [' num2str(Iperm) '].'];
-	msg = sprintf(fs,i,crossdat(i,1),idx1);
-	error('BRAIDLAB:color_braiding:badcrossing',msg)
+        % Cannot find two strings crossing that are not next to each other.
+        fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
+              ' with permutation [' num2str(Iperm) '].'];
+        msg = sprintf(fs,i,crossdat(i,1),idx1);
+        error('BRAIDLAB:color_braiding:badcrossing',msg)
       end
       % Swap the good crossing with the current one.
       debugmsg(sprintf('Swap crossings %d and %d',i,j))

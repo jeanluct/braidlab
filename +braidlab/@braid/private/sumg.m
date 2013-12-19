@@ -26,7 +26,7 @@ else % two arguments are added
     % For integers, we have an upper and a lower boundary.
     if ~( out > intmin(class(out)) && out < intmax(class(out)) )
       error('BRAIDLAB:braid:sumg:overflow',...
-	    'Summation of %d and %d has overflowed.', a1, a2)
+            'Summation of %d and %d has overflowed.', a1, a2)
     end
   end
 end
