@@ -21,7 +21,7 @@ function l = loopcoords(b,conv,typ)
 %   >> b=braid([1 -2 1 2 1 3 -1 -2 -1 -2 -1 2 2 -3 -2]);
 %   >> b.loopcoords('dehornoy')  % use Dehornoy's convention
 %
-%   ans = 
+%   ans =
 %
 %   (( 1 -6  1 -7  4 -1 ))
 %

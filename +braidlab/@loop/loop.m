@@ -69,7 +69,7 @@ classdef loop
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
-    
+
     % Default loop around first two of three punctures.
     if nargin == 0, return; end
     if isscalar(c) && ~isa(c,'braidlab.loop')
@@ -155,7 +155,7 @@ classdef loop
     % is called for each object.  Thus, what is returned is a
     % comma-separated of the same value n.  Better to define n as a
     % function, then.
-    
+
       % Length of coords is 2n-4, where n is the number of punctures.
       value = length(obj(1).coords)/2 + 2;
     end
@@ -248,5 +248,5 @@ classdef loop
     end
 
   end % methods block
-    
+
 end % loop classdef

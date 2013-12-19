@@ -66,7 +66,7 @@ end
 
 % Sort the initial conditions from left to right according to their initial
 % X coord; IDX contains the indices of the sort.
-[~,idx] = sortrows(squeeze(XY(1,:,:)).'); 
+[~,idx] = sortrows(squeeze(XY(1,:,:)).');
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
 
