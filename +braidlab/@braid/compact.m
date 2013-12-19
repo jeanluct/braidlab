@@ -24,9 +24,9 @@ function c = compact(b)
 %   This is a method for the BRAID class.
 %   See also BRAID.
 
-if istrivial(b),     
-    c = braidlab.braid([], b.n); 
-    return; 
+if istrivial(b),
+    c = braidlab.braid([], b.n);
+    return;
 end
 
 bc = compact_helper(b.word);

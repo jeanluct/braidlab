@@ -9,7 +9,7 @@ function c = complexity(b)
 %
 %   References:
 %
-%   I. A. Dynnikov and B. Wiest, "On the Complexity of Braids," 
+%   I. A. Dynnikov and B. Wiest, "On the Complexity of Braids,"
 %   Journal of the European Mathematical Society 9 (2007), 801-840.
 %
 %   This is a method for the BRAID class.

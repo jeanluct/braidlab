@@ -28,5 +28,5 @@ else % two arguments are added
       error('BRAIDLAB:braid:sumg:overflow',...
 	    'Summation of %d and %d has overflowed.', a1, a2)
     end
-  end    
+  end
 end
