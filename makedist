@@ -1,29 +1,24 @@
 #!/bin/sh
 
-# Quick script to tar up the braidlab distribution files.
-#   exclude version-control folders
+# Script to tar up the braidlab distribution files.
 #   exclude LCS toolbox for now
-#   the README needs work
 
-# set to a tar command that supports --exclude-vcs option, e.g., GNU tar
 TARCMD=tar
 
-VERSION=1.0.2
-
-# test for compatibility of the tar command
-if [[ -z $($TARCMD --help | grep -n exclude-vcs) ]]
-	then echo "Tar command '$TARCMD' does not support '--exclude-vcs' option. Use GNU tar instead."; exit
-fi
+# release version:
+VERSION=`hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g'`
 
 # test for compatibility of the mex command
 if [[ -z $(mex -help | grep -n MATLAB) ]]
-	then echo "Command 'mex' is not Matlab's MEX compiler. Instead it is, most likely, a latex related command. Please make MEX compiler available in your execution path"; exit
+	then echo "Command 'mex' is not Matlab's MEX compiler. Instead it is, most likely, a latex-related command. Please make MEX compiler available in your execution path"; exit
 fi
 
-
+# build the braidlab user's guide
 cd doc
 pdflatex braidlab_guide.tex
 bibtex braidlab_guide
+makeindex braidlab_guide
+pdflatex braidlab_guide.tex
 pdflatex braidlab_guide.tex
 pdflatex braidlab_guide.tex
 cd ..
@@ -35,7 +30,6 @@ make all
 rm -f braidlab-${VERSION}.tar.gz braidlab-${VERSION}.zip
 cd ..
 ${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
-    --exclude-vcs \
     --exclude='braidlab/+braidlab/+lcs' \
     braidlab/+braidlab \
     braidlab/README.md \
@@ -44,8 +38,7 @@ ${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
     braidlab/Makefile \
     braidlab/Makefile.cbraid-mex \
     braidlab/testsuite \
-    braidlab/extern/cbraid \
-    braidlab/extern/trains \
+    braidlab/extern/README \
     braidlab/extern/VariablePrecisionIntegers \
     braidlab/doc/braidlab_guide.pdf
 cd braidlab
