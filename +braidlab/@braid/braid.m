@@ -230,8 +230,16 @@ classdef braid
     function b12 = mtimes(b1,b2)
     %MTIMES   Multiply two braids together (if second argument is a braid)
     %         or act on a loop by a braid (if second argument is a loop).
+    %
+    %   C = B1*B2, where B1 and B2 are braid objects, return the product of
+    %   the two braids.  The product is the group operation in the braid
+    %   group (braid concatenation).
+    %
+    %   L2 = B*L, where B is a braid and L is a loop object, returns a
+    %   new loop L2 given by the action of B on L.
+    %
     %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MTIMES.
+    %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
       if isa(b2,'braidlab.braid')
         b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
@@ -254,8 +262,13 @@ classdef braid
     function bm = mpower(b,m)
     %MPOWER   Raise a braid to some positive or negative power.
     %
+    %   C = B^N, where B is a braid and N is a positive integer, returns the
+    %   Nth power of the braid B, C = B*B*...*B (N times).
+    %
+    %   For negative N, the inverse of B is multiplied |N| times.
+    %
     %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MPOWER.
+    %   See also BRAID, BRAID.INV, BRAID.MTIMES.
       bm = braidlab.braid([],b.n);
       if m > 0
         bm.word = repmat(b.word,[1 m]);
