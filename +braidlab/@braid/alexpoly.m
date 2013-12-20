@@ -1,6 +1,23 @@
 function p = alexpoly(b)
 %ALEXPOLY   Alexander polynomial of a braid.
-%   P = ALEXPOLY(B) returns the
+%   P = ALEXPOLY(B) returns the Alexander polynomial (or Alexander-Conway
+%   polynomial) of the closure of the braid B.
+%
+%   The Alexander polynomial is a Laurent polynomial (it has negative as
+%   well as positive powers), which is represented using the Matlab
+%   wavelet toolbox class 'laurpoly'.
+%
+%   Example: the trefoil knot is the closure of sigma_1^3.  Its Alexander
+%   polynomial is
+%
+%   >> alexpoly(braid([1 1 1]))
+%
+%   ans(z) = + z^(+1) - 1 + z^(-1)
+%
+%   Reference:
+%
+%   Weisstein, Eric W. "Alexander Polynomial." From MathWorld -- A Wolfram
+%   Web Resource. http://mathworld.wolfram.com/AlexanderPolynomial.html
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.ENTROPY, BRAID.BURAU, LAURPOLY.
@@ -12,9 +29,10 @@ n = b.n;
 
 for i = 1:n-1, bu{i,i} = bu{i,i} - 1; end
 
-num = (-1)^(n-1)*detcell(bu);
+num = (-1)^(n-1)*det(bu);
 denom = laurpoly(ones(1,n),n-1);
 
+% Long division of Laurent polynomials.  They always divide each other exactly.
 p = mldivide(num,denom);
 
 % Balance polynomial so p(z) = p(1/z).

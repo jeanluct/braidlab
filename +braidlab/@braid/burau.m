@@ -15,7 +15,7 @@ function m = burau(b,t)
 %   dilatation.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, BRAID.ENTROPY, BRAID.ALEXPOLY, LAURPOLY.
+%   See also BRAID, BRAID.ENTROPY, BRAID.ALEXPOLY, LAURPOLY, LAURMAT.
 
 if nargin < 2, t = -1; end
 
@@ -71,5 +71,8 @@ else
 	m{i,q} = -1/t*m{i,q};
       end
     end
+  end
+  if isa(t,'laurpoly')
+    m = laurmat(m);
   end
 end
