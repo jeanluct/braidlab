@@ -1,24 +1,47 @@
 #!/bin/sh
 
 # Count lines of code in braidlab as a function of revision, for funsies.
-# Run from the devel folder.
+#
+# Run from the root braidlab folder as devel/linecount.
+#
 # Plot results in Matlab with linecount_plot.m
-# This sometimes puts the repo in a funny state, so clone a fresh copy first.
+#
+# To avoid putting the repo in a funny state, clone a fresh local copy
+# first in tmp.  Delete when done.
 
-LINECOUNTFILE='linecount.dat'
+ROOTDIR=`pwd`
+DEVELDIR=$ROOTDIR/devel
+LINECOUNTFILE=$DEVELDIR/linecount.dat0
 rm -f $LINECOUNTFILE
 LASTREV=`hg id -r tip -n`
 REVSTEP=1
 
+cd /tmp
+rm -rf braidlab-tmp
+hg clone $ROOTDIR braidlab-tmp
+cd braidlab-tmp
+
 for i in `seq 0 $REVSTEP $LASTREV`; do
     hg up -c -r $i
-    LINES=`find ../+braidlab -name '*.[cm]' -o -name '*.cpp' | xargs wc -l | tail -1 | sed 's/ total$//g'`
-    ## assignmentoptimal.c was originally included in the main tree,
-    ## so subtract its linecount (441) if the file is present.
-    if [ -e '../+braidlab/private/assignmentoptimal.c' ]; then
+    CODEFOLDERS="+braidlab"
+    if [ -e 'testsuite' ]; then
+	CODEFOLDERS="$CODEFOLDERS testsuite"
+    fi
+    if [ -e 'doc' ]; then
+	CODEFOLDERS="$CODEFOLDERS doc"
+    fi
+    LINES=`find $CODEFOLDERS \
+	-name '*.[cm]' -o -name '*.cpp' -o -name '*.tex' -o -name '*.bib' \
+	| xargs wc -l | tail -1 | sed 's/ total$//g'`
+    # assignmentoptimal.c was originally included in the main tree, so
+    # subtract its linecount (441) if the file is present.
+    if [ -e '+braidlab/private/assignmentoptimal.c' ]; then
 	LINES=$(($LINES-441))
     fi
     # The date is in UTC seconds.
     DATE=`hg log -r $i --template '{date|hgdate}' | cut -d' ' -f1`
     echo $i '\t' $DATE '\t' $LINES >> $LINECOUNTFILE
 done
+
+cd /tmp
+rm -rf braidlab-tmp
