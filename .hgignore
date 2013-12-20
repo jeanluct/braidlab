@@ -13,3 +13,4 @@ syntax: glob
 *.ind
 *.toc
 .depends
+./doc/lcs_guide.pdf
