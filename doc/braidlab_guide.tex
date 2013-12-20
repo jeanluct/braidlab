@@ -382,11 +382,32 @@ of a braid is obtained with the method \lstinline{burau}:
 ans = 1    -1
      -1     2
 \end{lstlisting}
-where the last argument ($-1$) is the value of the parameter~$t$ in
-the Laurent polynomials that appear in the entries of the Burau
-matrices. %
+where the last argument ($-1$) is the value of the parameter~$t$ in the
+Laurent polynomials %
+\index{Laurent polynomials|(}%
+that appear in the entries of the Burau matrices.  With access to Matlab's
+wavelet toolbox, %
+\index{Matlab!wavelet toolbox}%
+\index{laurpoly@\lstinline{laurpoly}|(}%
+we can use actual Laurent polynomials as the entries:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> B = burau(braid([1 -2]),laurpoly(1,1))
+
+B = [1x1 laurpoly]    [1x1 laurpoly]
+    [1x1 laurpoly]    [1x1 laurpoly]
+\end{lstlisting}
+but the matrix is now given as a cell array, each entry containing a
+\lstinline{laurpoly} object:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> B{2,2}
+
+ans(z) = + 1 - z^(-1)
+\end{lstlisting}
+%
 \index{braid!Burau representation|)}%
 \index{braid class@\braid\ class!burau@\lstinline{burau}|)}%
+\index{laurpoly@\lstinline{laurpoly}|)}%
+\index{Laurent polynomials|)}%
 
 The method \lstinline{perm} %
 \index{braid class@\braid\ class!perm@\lstinline{perm}|(}%
