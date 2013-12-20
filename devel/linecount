@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Count lines of code in braidlab as a function of revision, for funsies.
+# Run from the devel folder.
+# Plot results in Matlab with linecount_plot.m
+# This sometimes puts the repo in a funny state, so clone a fresh copy first.
+
+LINECOUNTFILE='linecount.dat'
+rm -f $LINECOUNTFILE
+LASTREV=`hg id -r tip -n`
+REVSTEP=1
+
+for i in `seq 0 $REVSTEP $LASTREV`; do
+    hg up -c -r $i
+    LINES=`find ../+braidlab -name '*.[cm]' -o -name '*.cpp' | xargs wc -l | tail -1 | sed 's/ total$//g'`
+    ## assignmentoptimal.c was originally included in the main tree,
+    ## so subtract its linecount (441) if the file is present.
+    if [ -e '../+braidlab/private/assignmentoptimal.c' ]; then
+	LINES=$(($LINES-441))
+    fi
+    # The date is in UTC seconds.
+    DATE=`hg log -r $i --template '{date|hgdate}' | cut -d' ' -f1`
+    echo $i '\t' $DATE '\t' $LINES >> $LINECOUNTFILE
+done
