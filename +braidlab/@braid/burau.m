@@ -15,7 +15,7 @@ function m = burau(b,t)
 %   dilatation.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, BRAID.ENTROPY, LAURPOLY.
+%   See also BRAID, BRAID.ENTROPY, BRAID.ALEXPOLY, LAURPOLY.
 
 if nargin < 2, t = -1; end
 
@@ -54,19 +54,20 @@ if isnumeric(t)
 else
   % t is not numeric: use a cell array.
   % Multiplication of numeric type by t must be defined.
+  sc = -1;  % -1 is Birman's convention, +1 is Kassel-Turaev.
   m = num2cell(eye(n-1));
   for sig = b.word(end:-1:1)
     i = abs(sig);
     if sig > 0
       for q = 1:n-1
-	if i-1 > 0, m{i-1,q} = m{i-1,q} - t*m{i,q}; end
-	if i+1 < n, m{i+1,q} = -m{i,q} + m{i+1,q}; end
+	if i-1 > 0, m{i-1,q} = m{i-1,q} + sc*t*m{i,q}; end
+	if i+1 < n, m{i+1,q} = sc*m{i,q} + m{i+1,q}; end
 	m{i,q} = -t*m{i,q};
       end
     else
       for q = 1:n-1
-	if i-1 > 0, m{i-1,q} = m{i-1,q} - m{i,q}; end
-	if i+1 < n, m{i+1,q} = -1/t*m{i,q} + m{i+1,q}; end
+	if i-1 > 0, m{i-1,q} = m{i-1,q} + sc*m{i,q}; end
+	if i+1 < n, m{i+1,q} = sc*1/t*m{i,q} + m{i+1,q}; end
 	m{i,q} = -1/t*m{i,q};
       end
     end
