@@ -4,8 +4,9 @@ function m = burau(b,t)
 %   with Burau parameter T (default T=-1).
 %
 %   M = BURAU(B,'abs') returns the matrix of the "absolute value" monoid,
-%   where ever entry of the Burau matrices are taken in absolute value.  The
-%   spectrial radius of this matrix is an upper bound on the braid's
+%   where every entry of the Burau matrices of the standard braid generators
+%   are taken in absolute value, before multiplying them together.  The
+%   spectral radius of this matrix is an upper bound on the braid's
 %   dilatation.
 %
 %   This is a method for the BRAID class.
