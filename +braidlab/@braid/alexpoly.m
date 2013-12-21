@@ -22,6 +22,11 @@ function p = alexpoly(b)
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.ENTROPY, BRAID.BURAU, LAURPOLY.
 
+if exist('laurpoly') ~= 2
+  error('BRAIDLAB:braid:alexpoly:notoolbox',...
+	'Wavelet toolbox (laurpoly) doesn''t appear to be installed.')
+end
+
 % Compute reduced Burau representation of the braid.
 bu = burau(b,laurpoly(1,1));
 
@@ -38,7 +43,8 @@ p = mldivide(num,denom);
 % Balance polynomial so p(z) = p(1/z).
 pp = mldivide(reflect(p),p);
 if ~ismonomial(pp)
-  error('BRAIDLAD:braid:notmonomial','p(z) = p(1/z) cannot be enforced.')
+  error('BRAIDLAD:braid:alexpoly:notmonomial',...
+	'p(z) = p(1/z) cannot be enforced.')
 end
 deg = get(pp,'maxDEG');
 p = p * laurpoly(1,deg/2);
