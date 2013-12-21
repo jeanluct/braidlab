@@ -29,37 +29,6 @@ if proj ~= 0
   XY = rotate_data_clockwise(XY,proj);
 end
 
-% Check for coincident coordinate values.
-% This is too slow... need to vectorize somehow.
-needsnoise = false;
-for i = 1:size(XY,1)
-  XYi = squeeze(XY(i,:,:))';
-  % Check if some particles occupy the exact same location, which
-  % invalidates the braid computation.
-  if size(unique(XYi,'rows'),1) ~= size(XYi,1)
-    error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
-          'Coincident particles: braid not defined.')
-  end
-  % Check if some particles have one coordinate in common.  The braid is
-  % still well-defined, but warn the user.
-  if (length(XYi(:,1)) ~= length(unique(XYi(:,1))) | ...
-      length(XYi(:,2)) ~= length(unique(XYi(:,2))))
-    needsnoise = true; break;
-  end
-end
-if needsnoise
-  % There are coincident values for the coordinates.  This can happen when
-  % the data is discrete, such as when measured in pixels, or when the data
-  % arises from a dynamical system with symmetries.  Just add a tiny amount
-  % of noise to the projection line.
-  warning('BRAIDLAB:braid:color_braiding:coincidentproj',...
-          'Coincident projection coordinate... perturbing projection line.')
-  noise = 1e-8;
-  XY = XY.*(1 + noise*randn(size(XY)));
-  proj = proj + noise*rand(1,1);
-  XY = rotate_data_clockwise(XY,proj);
-end
-
 % Sort the initial conditions from left to right according to their initial
 % X coord; IDX contains the indices of the sort.
 [~,idx] = sortrows(squeeze(XY(1,:,:)).');
@@ -90,14 +59,31 @@ for I = 1:n
     Xtraj1 = XYtraj(:,1,I); Xtraj2 = XYtraj(:,1,J);
     Ytraj1 = XYtraj(:,2,I); Ytraj2 = XYtraj(:,2,J);
 
+    % Check for coincident particles (terminally bad) or coincident
+    % projection coordinates (usually fixed by a change in projection
+    % angle).
+    dXtraj = Xtraj1 - Xtraj2;
+    nearcoinc = find(abs(dXtraj) < 10*eps);
+    if ~isempty(nearcoinc)
+      dYtraj = Ytraj1(nearcoinc) - Ytraj2(nearcoinc);
+      if any(abs(dYtraj) < 10*eps)
+	error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
+	      'Coincident particles: braid not defined.')
+      else
+	error('BRAIDLAB:braid:color_braiding:coincidentproj',...
+	      [ 'Coincident projection coordinate; change ' ...
+		'projection angle (type help braid.braid).' ])
+      end
+    end
+
     % Determine the order of the x-coordinates, PERM.  Each crossing
     % corresponds to a change in sign of PERM.
-    perm = sign(Xtraj1-Xtraj2);
+    perm = sign(dXtraj);
 
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0))
-      error('BRAIDLAB:braid:color_braiding:coincident',...
-            'Somehow there are still coincident trajectories...')
+      error('BRAIDLAB:braid:color_braiding:coincidentproj',...
+            'Somehow there are still coincident projection coordinates...')
     end
 
     ii = 1:length(perm)-1;
