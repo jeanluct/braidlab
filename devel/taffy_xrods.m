@@ -111,8 +111,7 @@ XY = zeros(npts,2,n);
 XY(:,1,:) = real(z);
 XY(:,2,:) = imag(z);
 
-% Bug?  If I specify a projection angle here I sometimes get an error (pi/2).
-b = braid(XY,pi/2)
+b = braid(XY)
 
 tntype(b)
 
