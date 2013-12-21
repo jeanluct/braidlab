@@ -44,6 +44,7 @@
 %
 \renewcommand{\l}{\left}			% \left
 \renewcommand{\r}{\right}			% \right
+\mathnotation{\ee}{\mathrm{e}}                  % Base of natural log
 \mathnotation{\nn}{n}				% # of strings
 \mathnotation{\ac}{a}				% Dynnikov coord a
 \mathnotation{\bc}{b}				% Dynnikov coord b
@@ -989,6 +990,150 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \index{braid!loop coordinates|)}
 
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
+
+
+\section{An example: Taffy pullers}
+\label{sec:taffy}
+
+\index{taffy pullers|(}
+
+Taffy pullers are a class of devices designed to strech and fold soft candy
+repeatedly \citep{MattFinn2011_silver}.  The goal is to aerate the taffy.
+Since many folds are required, the process has been mechanized using fixed and
+moving rods.  The two most typical designs are shown in
+Figure~\ref{fig:taffy}: the one in
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.2\textheight]{taffy_3rods}
+  \label{fig:taffy_3rods}
+}\hspace{1em}
+\subfigure[]{
+  \includegraphics[height=.2\textheight]{taffy_4rods}
+  \label{fig:taffy_4rods}
+}
+\end{center}
+\caption{(a) Three-rod taffy puller.  (b) Four-rod taffy puller.}
+\label{fig:taffy}
+\end{figure}
+%
+Figure~\ref{fig:taffy_3rods} has a single fixed rod (gray) and two moving
+rods, each rotating on a different axis.  The design in
+Figure~\ref{fig:taffy_3rods} has four moving rods, sharing two axes of
+rotation.  (There are several videos of taffy pullers on
+\href{http://www.youtube.com/watch?v=6QkGp2qBbn4}{YouTube}.)
+
+Let's use \braidlab\ to analyze the rod motion.  From the folder
+\lstinline{doc/examples}, run the command %
+\index{taffy@\lstinline{taffy}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = taffy('3rods')
+
+b = < -2  1  1 -2 >
+\end{lstlisting}
+which also produces Figure~\ref{fig:taffy_3rods}.  The Thurston--Nielsen %
+\index{braid!Thurston--Nielsen type}%
+type and topological entropy %
+\index{braid!entropy}%
+of this braid are %
+\index{braid class@\braid\ class!tntype@\lstinline{tntype}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> [t,entr] = tntype(b)
+
+t = pseudo-Anosov
+
+entr = 1.7627
+\end{lstlisting}
+One would expect a competent taffy puller to be pseudo-Anosov, %
+\index{braid!pseudo-Anosov}%
+as this one is.  It implies that there is no `bad' initial condition where a
+piece of taffy never gets stretched, or stretches slowly.  A reducible or
+finite-order braid would indicate poor design.  The entropy is a measure of
+the taffy puller's effectiveness: it gives the rate of growth of curves
+anchored on the rods.  Thus, the length of the taffy is multiplied
+(asymptotically) by $\ee^{1.7627} \simeq 5.828$ for each full period of rod
+motion.  Needless to say, this leads to extremely rapid growth, since after
+$10$ periods the taffy length has been multiplied by roughly $10^7$.
+
+The design in Figure~\ref{fig:taffy_4rods} can be plotted and analyzed with
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = taffy('4rods')
+
+b = < 1  3  2  2  1  3 >
+\end{lstlisting}
+When we apply \lstinline{tntype} to this braid we find the braid is
+pseudo-Anosov with exactly the same entropy as the 3-rod taffy puller,
+$1.7627$.  There is thus no obvious advantage to using more rods in this case.
+
+A simple modification of the 4-rod design in Figure~\ref{fig:taffy_4rods} is
+shown in Figure~\ref{fig:taffy_6rods}.
+%
+\begin{figure}
+\begin{center}
+  \includegraphics[height=.2\textheight]{taffy_6rods}
+\end{center}
+\caption{A six-rod taffy puller based on Figure~\ref{fig:taffy_4rods}, with
+  two added fixed rods (gray).}
+\label{fig:taffy_6rods}
+\end{figure}
+%
+The only change is to extend the rotation axles into two extra fixed rods
+(shown in gray).  The resulting braid is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = taffy('6rods')
+
+b = < 3  2  1  2  4  5  4  3  3  2  1  2  5  4  5  3 >
+\end{lstlisting}
+with Thurston--Nielsen type and entropy
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> [t,entr] = tntype(b)
+
+t = pseudo-Anosov
+
+entr = 2.6339
+\end{lstlisting}
+\index{braid class@\braid\ class!tntype@\lstinline{tntype}|)}%
+The fixed rods have increased the entropy by~$50\%$!  This sounds like a
+fairly small change, but what it means is that this 6-rod design achieves
+growth of~$10^7$ in about~$6$ iterations rather than~$10$.  Alexander Flanagan
+constructed this six-rod device while an undergraduate student at the
+University of Wisconsin -- Madison, but as far as we know this new design has
+not yet been used in commercial applications.
+
+The symmetric design of the taffy pullers illustrates one pitfall when
+constructing braids.  If we give an optional projection angle %
+\index{projection line!bad choice of angle|(}%
+of~$\pi/2$ to \lstinline{taffy}:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> taffy('4rods',pi/2)
+Error using color_braiding (line 73)
+Coincident projection coordinate; change projection angle
+   (type help braid.braid).
+\end{lstlisting}
+This corresponds to using the $y$ (vertical) axis to compute the braid, but as
+we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
+the rods are initially perfectly aligned along that axis.  The braid obtained
+would depend sensitively on numerical roundoff when comparing the rod
+projections.  Instead of attempting to construct the braid, \braidlab\ returns
+an error and asks the user to modify the projection axis.  A tiny change in
+the projection line is sufficient to break the symmetry:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> taffy('4rods',pi/2 + .01)
+
+ans = < -2  2  1  3  2 -3 -1  3  1  2  1  3 >
+>> compact(ans)
+
+ans = < 3  1  2  2  3  1 >
+\end{lstlisting}
+\index{taffy@\lstinline{taffy}|)}%
+which is actually equal to the braid formed from projecting on the~$x$ axis,
+though it need only be conjugate %
+\index{braid!conjugate}%
+(see Section~\ref{sec:braidfromdata}). %
+\index{projection line!bad choice of angle|)}%
+
+\index{taffy pullers|)}
 
 
 \section{Side note: On filling-in punctures}

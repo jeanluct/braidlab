@@ -36,7 +36,8 @@ ${TARCMD} cvzf braidlab/braidlab-${VERSION}.tar.gz \
     braidlab/testsuite \
     braidlab/extern/README \
     braidlab/extern/VariablePrecisionIntegers \
-    braidlab/doc/braidlab_guide.pdf
+    braidlab/doc/braidlab_guide.pdf \
+    braidlab/doc/examples
 cd braidlab
 
 # Also make a zip.

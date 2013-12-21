@@ -1,20 +1,26 @@
-function taffy_xrods(ptype)
-%TAFFY_XRODS   Taffy puller with 3,4,5,6 rods.
-%   ptype = '3rods', '4rods', '4rods-alt', '5rods', '6rods'
+function b = taffy(ptype,projang)
+%TAFFY   Braid of taffy puller with 3,4,5,6 rods.
+%   B = TAFFY(PTYPE), where PTYPE is one of
+%
+%     '3rods', '4rods', '4rods-alt', '5rods', '6rods'
+%
+%   returns the braid B of the taffy puller PTYPE.
+%
+%   TAFFY(PTYPE,PROJANG) specifies the projection angle PROJANG for
+%   computing the braid (default 0).
+%
+%   See also BRAIDLAB.BRAID, BRAIDLAB.BRAID.BRAID.
 
-% Taffy puller with 3,4,5,6 rods.
-
-if ~ischar(ptype)
-  ptype = sprintf('%drods',ptype);
-end
-
-addpath ~/Projects/articles/braidlab
 import braidlab.*
 
-npts = 200;
-r = .75;
-rodr = .05;
-lw = 2;
+if nargin < 1, ptype = '3rods'; end
+if nargin < 2, projang = 0; end
+
+% If ptype is a number, use that as the number of rods.
+if ~ischar(ptype), ptype = sprintf('%drods',ptype); end
+
+% Parameters or rods and orbits.
+npts = 200; r = .75; rodr = .05;
 
 gray = [.8 .8 .8];
 th = linspace(0,2*pi,npts); th = th(end:-1:1);
@@ -30,19 +36,9 @@ switch lower(ptype)
   cl = {'r' gray 'b'};
  case {'4rods'}
   % For 4 rods, co-rotating.
-  n = 4;
-  z = zeros(npts,n);
-  z(:,1) = 0 + r*exp(i*(th-pi));
-  z(:,2) = 0;
-  z(:,3) = 1 + r*exp(i*th);
-  z(:,4) = 1;
-  cl = {'r' gray 'b' gray};
- case {'4rods-alt'}
-  % For 4 rods, co-rotating.
   % This is the 'real' 4-pronged taffy puller.
   %
-  % Makes it obvious that the rods on the small-radius trajctories behave
-  % as a fixed rod.
+  % The rods on the small-radius trajctories behave as a fixed rod.
   n = 4;
   z = zeros(npts,n);
   r0 = .5*r;
@@ -51,6 +47,17 @@ switch lower(ptype)
   z(:,3) = 1 + r*exp(i*th);
   z(:,4) = 1 + r0*exp(i*(th-pi));
   cl = {'r' 'r' 'b' 'b'};
+ case {'4rods-alt'}
+  % For 4 rods, co-rotating.
+  %
+  % Replace the moving rods by fixed rods.
+  n = 4;
+  z = zeros(npts,n);
+  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,2) = 0;
+  z(:,3) = 1 + r*exp(i*th);
+  z(:,4) = 1;
+  cl = {'r' gray 'b' gray};
  case {'5rods'}
   % For 5 rods, insert one in the middle.  Doesn't change the entropy.
   n = 5;
@@ -80,7 +87,7 @@ iq = ceil(npts/4)+1;
 for j = 1:n
   if z(1,j) ~= z(2,j)
     % moving rod
-    plot(real(z(:,j)),imag(z(:,j)),cl{j},'LineWidth',lw)
+    plot(real(z(:,j)),imag(z(:,j)),cl{j},'LineWidth',2)
     hold on
   end
 end
@@ -97,22 +104,13 @@ for j = 1:n
   % Plot rod at start.
   patch(real(z(1,j)) + rodr*cos(th),imag(z(1,j)) + rodr*sin(th),cl{j})
 end
-axis equal
-hold off
-ax = axis; axis(1.2*ax)
-axis off
+axis equal, hold off
+ax = axis; axis(1.2*ax); axis off
 set(gcf,'color','w')
 
-fname = sprintf('taffy_%s.pdf',ptype);
-export_fig('-nocrop',fname)
+if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end
 
 XY = zeros(npts,2,n);
+XY(:,1,:) = real(z); XY(:,2,:) = imag(z);
 
-XY(:,1,:) = real(z);
-XY(:,2,:) = imag(z);
-
-b = braid(XY)
-
-tntype(b)
-
-entropy(b)
+b = braid(XY,projang);
