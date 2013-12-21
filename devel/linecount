@@ -11,7 +11,7 @@
 
 ROOTDIR=`pwd`
 DEVELDIR=$ROOTDIR/devel
-LINECOUNTFILE=$DEVELDIR/linecount.dat0
+LINECOUNTFILE=$DEVELDIR/linecount.dat
 rm -f $LINECOUNTFILE
 LASTREV=`hg id -r tip -n`
 REVSTEP=1
