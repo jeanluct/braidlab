@@ -36,5 +36,9 @@ denom = laurpoly(ones(1,n),n-1);
 p = mldivide(num,denom);
 
 % Balance polynomial so p(z) = p(1/z).
-deg = get(mldivide(reflect(p),p),'maxDEG');
+pp = mldivide(reflect(p),p);
+if ~ismonomial(pp)
+  error('BRAIDLAD:braid:notmonomial','p(z) = p(1/z) cannot be enforced.')
+end
+deg = get(pp,'maxDEG');
 p = p * laurpoly(1,deg/2);
