@@ -1067,19 +1067,49 @@ pseudo-Anosov with exactly the same entropy as the 3-rod taffy puller,
 $1.7627$.  There is thus no obvious advantage to using more rods in this case.
 
 A simple modification of the 4-rod design in Figure~\ref{fig:taffy_4rods} is
-shown in Figure~\ref{fig:taffy_6rods}.
+shown in Figure~\ref{fig:taffy_6rods-bad}.
 %
 \begin{figure}
 \begin{center}
+\subfigure[]{
+  \includegraphics[height=.2\textheight]{taffy_6rods-bad}
+  \label{fig:taffy_6rods-bad}
+}\hspace{1em}
+\subfigure[]{
   \includegraphics[height=.2\textheight]{taffy_6rods}
+  \label{fig:taffy_6rods}
+}
 \end{center}
-\caption{A six-rod taffy puller based on Figure~\ref{fig:taffy_4rods}, with
-  two added fixed rods (gray).}
-\label{fig:taffy_6rods}
+\caption{(a) A six-rod taffy puller based on Figure~\ref{fig:taffy_4rods},
+  with two added fixed rods (gray).  This is a poor design, since it leads to
+  a reducible braid. %
+  \index{braid!reducible}%
+  (b) Same as (a), but with the same radius of motion for all the rods.  The
+  braid is in this case pseudo-Anosov, with larger entropy than the 4-rod
+  design.}
+\label{fig:taffy_6rods-improved}
 \end{figure}
 %
 The only change is to extend the rotation axles into two extra fixed rods
 (shown in gray).  The resulting braid is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = taffy('6rods-bad')
+
+b = < 2  1  2  4  5  4  3  3  2  1  2  4  5  4 >
+\end{lstlisting}
+with Thurston--Nielsen type
+\index{braid!reducible|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> tntype(b)
+
+ans = reducible
+\end{lstlisting}
+There are reducing curves in this design: simply wrap a loop around the left
+gray rod and the inner red rod, and it will rotate without stretching. %
+\index{braid!reducible|)}%
+To avoid this, we extend the radius of motion of the inner rods to equal that
+of the outer ones, and obtain the design shown in
+Figure~\ref{fig:taffy_4rods}.  The corresponding braid is
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = taffy('6rods')
 
