@@ -2,7 +2,7 @@ function b = taffy(ptype,projang)
 %TAFFY   Braid of taffy puller with 3,4,5,6 rods.
 %   B = TAFFY(PTYPE), where PTYPE is one of
 %
-%     '3rods', '4rods', '4rods-alt', '5rods', '6rods'
+%     '3rods', '4rods', '4rods-alt', '5rods', '6rods', '6rods-bad', '6rods-alt'
 %
 %   returns the braid B of the taffy puller PTYPE.
 %
@@ -50,7 +50,7 @@ switch lower(ptype)
  case {'4rods-alt'}
   % For 4 rods, co-rotating.
   %
-  % Replace the moving rods by fixed rods.
+  % Replace the moving rods by fixed rods (topologically equivalent).
   n = 4;
   z = zeros(npts,n);
   z(:,1) = 0 + r*exp(i*(th-pi));
@@ -69,7 +69,7 @@ switch lower(ptype)
   z(:,5) = .5*ones(size(z(:,1)));
   cl = {'r' gray 'b' gray 'm'};
  case {'6rods'}
-  % For 6 rods, make it a 'double-puller'.
+  % For 6 rods, insert fixed rods on axes of rotation.
   n = 6;
   z = zeros(npts,n);
   z(:,1) = 0 + r*exp(i*(th-pi));
@@ -78,6 +78,31 @@ switch lower(ptype)
   z(:,4) = 1;
   z(:,5) = 0 + r*exp(i*th);
   z(:,6) = 1 + r*exp(i*(th-pi));
+  cl = {'r' gray 'b' gray 'r' 'b'};
+ case {'6rods-bad'}
+  % Alternate (bad) design for 6 rods.
+  n = 6;
+  z = zeros(npts,n);
+  r0 = .5*r;
+  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,2) = 0;
+  z(:,3) = 0 + r0*exp(i*th);
+  z(:,4) = 1;
+  z(:,5) = 1 + r*exp(i*th);
+  z(:,6) = 1 + r0*exp(i*(th-pi));
+  cl = {'r' gray 'r' gray 'b' 'b'};
+ case {'6rods-alt'}
+  % Alternate design for 6 rods.
+  n = 6;
+  r = 1.2;
+  z = zeros(npts,n);
+  r0 = .3*r;
+  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,2) = 0;
+  z(:,3) = 0 + r0*exp(i*th);
+  z(:,4) = 1;
+  z(:,5) = 1 + r*exp(i*th);
+  z(:,6) = 1 + r0*exp(i*(th-pi));
   cl = {'r' gray 'b' gray 'r' 'b'};
 end
 
