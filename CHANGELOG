@@ -1,13 +1,16 @@
 ------------------------------------------------------------------------
 1.0.3 [2013-12-20]
 
+* The braidlab guide has been updated and expanded, and now has a
+  table of contents and a detailed index.
+
 * New methods in braid class: 'alexpoly' returns the Alexander
   polynomial.  'burau' can now construct a matrix of Laurent
   polynomials (wavelet toolbox required).  'tensor' is the tensor
   product of braids.
 
-* The braidlab guide has been updated and expanded, and now has a
-  table of contents and a detailed index.
+* Big speedup in creating braids from data, due to improved safety
+  checks on the particle trajectories.
 
 ------------------------------------------------------------------------
 1.0.2 [2013-12-13]
