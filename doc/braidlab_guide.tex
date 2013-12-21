@@ -372,7 +372,8 @@ on how the geometric complexity is computed. %
 \index{braid class@\braid\ class!complexity@\lstinline{complexity}|)}%
 
 There are a few remaining methods in the braid class, which we describe
-briefly.  The Burau matrix representation~\citep{Burau1936,Birman1975} %
+briefly.  The reduced Burau matrix
+representation~\citep{Burau1936,Birman1975} %
 \index{braid!Burau representation|(}%
 \index{braid class@\braid\ class!burau@\lstinline{burau}|(}%
 of a braid is obtained with the method \lstinline{burau}:
@@ -393,8 +394,11 @@ we can use actual Laurent polynomials as the entries:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> B = burau(braid([1 -2]),laurpoly(1,1))
 
-B = [1x1 laurpoly]    [1x1 laurpoly]
-    [1x1 laurpoly]    [1x1 laurpoly]
+     | - z^(+1)        z^(+1)     |
+     |                            |
+ B = |                            |
+     |                            |
+     |   - 1        + 1 - z^(-1)  |
 \end{lstlisting}
 but the matrix is now given as a cell array, each entry containing a
 \lstinline{laurpoly} object:
@@ -403,11 +407,33 @@ but the matrix is now given as a cell array, each entry containing a
 
 ans(z) = + 1 - z^(-1)
 \end{lstlisting}
-%
+The reduced Burau matrix of a braid can be used to compute the
+\emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
+\index{Alexander--Conway polynomial|(}%
+of its closure (see Section~\ref{sec:braidfromdata} for more on the closure of
+a braid).  For instance, the trefoil knot is given by the closure of the
+braid~$\sigma_1^3$ \citep{AlexanderPolynomial}, which gives a Laurent
+polynomial
+\index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> alexpoly(braid([1 1 1]))
+
+ans(z) = + z^(+1) - 1 + z^(-1)
+\end{lstlisting}
+The figure-eight know is the closure of~$(\sigma_1\sigma_2^{-1})^2$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> alexpoly(braid([1 -2 1 -2]))
+
+ans(z) = - z^(+1) + 3 - z^(-1)
+\end{lstlisting}
+The Alexander polynomial is a knot invariant, so it can be used to determine
+when two knots are not the same.
 \index{braid!Burau representation|)}%
 \index{braid class@\braid\ class!burau@\lstinline{burau}|)}%
 \index{laurpoly@\lstinline{laurpoly}|)}%
 \index{Laurent polynomials|)}%
+\index{Alexander--Conway polynomial|)}%
+\index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|)}%
 
 The method \lstinline{perm} %
 \index{braid class@\braid\ class!perm@\lstinline{perm}|(}%
