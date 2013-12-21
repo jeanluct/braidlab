@@ -22,14 +22,11 @@ if nargin < 3
   proj = 0;
 end
 
-% Rotate coordinates according to angle proj.
-% Note that since the projection line is supposed to be rotated by proj,
-% we rotate the data by -proj.
+% Rotate coordinates according to angle proj.  Note that since the
+% projection line is supposed to be rotated counterclockwise by proj, we
+% rotate the data clockwise by proj.
 if proj ~= 0
-  XYr = zeros(size(XY));
-  XYr(:,1,:) = cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
-  XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
-  XY = XYr; clear XYr;
+  XY = rotate_data_clockwise(XY,proj);
 end
 
 % Check for coincident coordinate values.
@@ -52,16 +49,15 @@ for i = 1:size(XY,1)
 end
 if needsnoise
   % There are coincident values for the coordinates.  This can happen when
-  % the data is discrete, such as when measured in pixels.  Just add a
-  % tiny amount of noise to the data.  Later maybe best to change
-  % projection line instead?
-  warning('BRAIDLAB:braid:color_braiding:coincident',...
-          'Coincident coordinates... adding a bit of noise.')
+  % the data is discrete, such as when measured in pixels, or when the data
+  % arises from a dynamical system with symmetries.  Just add a tiny amount
+  % of noise to the projection line.
+  warning('BRAIDLAB:braid:color_braiding:coincidentproj',...
+          'Coincident projection coordinate... perturbing projection line.')
   noise = 1e-8;
   XY = XY.*(1 + noise*randn(size(XY)));
-  % Maybe check if closed first, and re-close?
-else
-  needsnoise = false;
+  proj = proj + noise*rand(1,1);
+  XY = rotate_data_clockwise(XY,proj);
 end
 
 % Sort the initial conditions from left to right according to their initial
@@ -210,3 +206,10 @@ end
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
 if nargout > 2, varargout{3} = cross_cell; end
+
+% =========================================================================
+function XYr = rotate_data_clockwise(XY,proj)
+
+XYr = zeros(size(XY));
+XYr(:,1,:) = cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
