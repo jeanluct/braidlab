@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------
+1.0.3 [2013-12-20]
+
+* New methods in braid class: 'alexpoly' returns the Alexander
+  polynomial.  'burau' can now construct a matrix of Laurent
+  polynomials (wavelet toolbox required).  'tensor' is the tensor
+  product of braids.
+
+* The braidlab guide has been updated and expanded, and now has a
+  table of contents and a detailed index.
+
+------------------------------------------------------------------------
 1.0.2 [2013-12-13]
 
 * loopTest.m in testsuite.
