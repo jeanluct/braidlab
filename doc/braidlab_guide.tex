@@ -148,6 +148,8 @@ Note that running the testsuite requires Matlab version 2013a or later.
 
 \index{braid class@\braid\ class|(}
 
+\subsubsection{Constructor and elementary operations}
+
 \braidlab\ defines a number of classes, most importantly \braid\ and \loopc.
 The braid~$\sigma_1\sigma_2^{-1}$ is constructed with %
 \index{braid class@\braid\ class!constructor|(}
@@ -280,6 +282,23 @@ ans = < 1 -2 >
 \end{lstlisting}
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}|)}
 
+The opposite of subbraid is the \emph{tensor product}, the larger braid
+obtained by laying two braids side-by-side \citep{KasselTuraev}: %
+\index{braid class@\braid\ class!tensor@\lstinline{tensor}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> a = braid([1 2 -3]); b = braid([1 -2]);
+>> tensor(a,b)
+
+ans = < 1  2 -3  5 -6 >
+\end{lstlisting}
+Here, the tensor product of a 4-braid and a 3-braid has 7 strings.  The
+generators $\sigma_1\sigma_2^{-1}$ of \lstinline{b} became
+$\sigma_5\sigma_6^{-1}$ after re-indexing so they appear to the right of
+\lstinline{a}.
+
+
+\subsubsection{Topological entropy and complexity}
+
 There are a few methods that exploit the connection between braids and
 homeomorphisms \index{homeomorphism} of the punctured disk. %
 \index{disk, punctured}%
@@ -371,6 +390,9 @@ on how the geometric complexity is computed. %
 \index{braid!complexity|)}%
 \index{braid class@\braid\ class!complexity@\lstinline{complexity}|)}%
 
+
+\subsubsection{Representation and invariants}
+
 There are a few remaining methods in the braid class, which we describe
 briefly.  The reduced Burau matrix
 representation~\citep{Burau1936,Birman1975} %
@@ -448,20 +470,6 @@ If the strings are unpermuted, then the braid is \emph{pure}, %
 \index{braid!pure}%
 which can also be tested with the method \lstinline{ispure}. %
 \index{braid class@\braid\ class!ispure@\lstinline{ispure}}%
-
-The \emph{tensor product} of two braids is the braid obtained by laying them
-side-by-side \citep{KasselTuraev}: %
-\index{braid class@\braid\ class!tensor@\lstinline{tensor}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
->> a = braid([1 2 -3]); b = braid([1 -2]);
->> tensor(a,b)
-
-ans = < 1  2 -3  5 -6 >
-\end{lstlisting}
-Here, the tensor product of a 4-braid and a 3-braid has 7 strings.  The
-generators $\sigma_1\sigma_2^{-1}$ of \lstinline{b} became
-$\sigma_5\sigma_6^{-1}$ after re-indexing so they appear to the right of
-\lstinline{a}.
 
 Finally, the \emph{writhe} %
 \index{braid!writhe}%
@@ -669,6 +677,8 @@ large braids.
 
 \index{loop class@\loopc\ class|(}
 
+\subsubsection{Loop coordinates}
+
 A simple closed loop on a disk with~$5$ punctures %
 \index{disk, punctured}%
 \index{punctures}%
@@ -774,6 +784,9 @@ b =  0    -1     0
 \end{lstlisting}
 As for braids, \lstinline{l.n} returns the number of punctures (or strings). %
 \index{loop class@\loopc\ class!number of punctures (\lstinline{n})}
+
+
+\subsubsection{Acting on loops with braids}
 
 Now we can act on this loop with braids. %
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
