@@ -15,12 +15,7 @@ fi
 
 # build the braidlab user's guide
 cd doc
-pdflatex braidlab_guide.tex
-bibtex braidlab_guide
-makeindex braidlab_guide
-pdflatex braidlab_guide.tex
-pdflatex braidlab_guide.tex
-pdflatex braidlab_guide.tex
+make braidlab_guide.pdf
 cd ..
 
 # Make 32 and 64 bit, cross-compile for Mac, Windows (we wish).
