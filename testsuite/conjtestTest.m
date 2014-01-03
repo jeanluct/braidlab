@@ -16,14 +16,11 @@ classdef conjtestTest < matlab.unittest.TestCase
       % Close the braid.
       XY = braidlab.closure(XY);
 
-      % Because of the added noise, braid can vary by trivial gens, so
-      % set the seed.
-      rng(1);
-      testCase.gen1 = testCase.verifyWarningFree(@() braidlab.braid(XY), ...
-			'BRAIDLAB:braid:color_braiding:coincident');
+      testCase.gen1 = braidlab.braid(XY);
       testCase.gen1c = testCase.gen1.compact;
-      testCase.gen2 = testCase.verifyWarning(@() braidlab.braid(XY,-pi/4), ...
-			'BRAIDLAB:braid:color_braiding:coincident');
+      testCase.verifyError(@() braidlab.braid(XY,pi/4), ...
+			   'BRAIDLAB:braid:color_braiding:coincidentproj');
+      testCase.gen2 = braidlab.braid(XY,-pi/4);
       testCase.gen2c = testCase.gen2.compact;
     end
   end
@@ -32,9 +29,6 @@ classdef conjtestTest < matlab.unittest.TestCase
     function test_length(testCase)
       testCase.verifyEqual(testCase.gen1.length,894);
       testCase.verifyEqual(testCase.gen1c.length,14);
-      if testCase.gen2.length < 400
-	keyboard
-      end
       testCase.verifyEqual(testCase.gen2.length,400);
       testCase.verifyEqual(testCase.gen2c.length,12);
     end
