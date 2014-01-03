@@ -123,7 +123,7 @@ classdef braid
           secnd = 0;
         end
         % The input is an array of data.
-        br = color_braiding(b,1:size(b,1),secnd);
+        br = braidlab.braid.color_braiding(b,1:size(b,1),secnd);
       else
         % Store word as row vector.
         if size(b,1) > size(b,2)
@@ -211,7 +211,7 @@ classdef braid
     end
 
     function ee = istrivial(b)
-    %ISTRIVIAL   Returns true if braid is the trivial braid.
+    %ISTRIVIAL   Return true if braid is the trivial braid.
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.EQ.
@@ -220,7 +220,7 @@ classdef braid
     end
 
     function ee = ispure(obj)
-    %ISPURE   Returns true if braid is a pure braid.
+    %ISPURE   Return true if braid is a pure braid.
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.PERM.
@@ -344,10 +344,17 @@ classdef braid
 
   end % methods block
 
+  %
   % Static methods defined in separate files.
+  %
+  % These methods do not need a braid object as a first argument.
+  %
   % Need to execute 'clear classes' to register changes here.
-  methods (Static = true)
-    [b,tc] = crosstimes(XY,t,proj)
-  end % static methods
+  %
+
+  % The subclass databraid has access to color_braiding.
+  methods (Static = true, Access = {?braidlab.databraid})
+    [varargout] = color_braiding(XY,t,proj)
+  end % methods block
 
 end % braid classdef
