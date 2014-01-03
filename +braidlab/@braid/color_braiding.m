@@ -1,15 +1,25 @@
 function [varargout] = color_braiding(XY,t,proj)
 %COLOR_BRAIDING   Find braid generators from trajectories using colored braids.
-%   [GEN TCR CROSS_CELL] = COLOR_BRAIDING(XY,T) takes the inputs XY (the
-%   trajectory set) and T (time) and calculates the corresponding generator
-%   sequence via a color braiding method.  The color braiding method takes
-%   pairs of strings and finds the crossings that occur between the two.
-%   This is done for all pairs then the crossings for each pair are
-%   converted to generators.  The outputs are the generator sequence (GEN),
-%   the time of crossing (TCR), and the cell array containing times of
-%   crossings for each pair of strings (CROSS_CELL).
+%   B = COLOR_BRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
+%   (vector of times) and calculates the corresponding braid B via a color
+%   braiding method.
 %
-%   See also COLOR_BRAIDING_SUB.
+%   The color braiding method takes pairs of strings and finds the crossings
+%   that occur between the two.  This is done for all pairs, and then the
+%   crossings for each pair are converted to generators.
+%
+%   [B,TCR] = COLOR_BRAIDING(XY,T) also returns the time of crossing (TCR).
+%
+%   [B,TCR,CROSS_CELL] = COLOR_BRAIDING(XY,T) also returns the cell array
+%   containing times of crossings for each pair of strings (CROSS_CELL).
+%
+%   The projection line angle PROJANG can be specified as an optional
+%   third argument (default 0).
+%
+%   COLOR_BRAIDING is a protected static method of the BRAID class.  It
+%   is also used by the DATABRAID subclass.
+%
+%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
 import braidlab.debugmsg
 
