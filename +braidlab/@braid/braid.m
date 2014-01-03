@@ -344,6 +344,11 @@ classdef braid
 
   end % methods block
 
+  % Do not allow access to derived classes, such as databraid.
+  methods (Access = private)
+    c = compact(b)
+  end % methods block
+
   %
   % Static methods defined in separate files.
   %

@@ -7,6 +7,9 @@
 %
 %    'tcross'   vector of interpolated crossing times
 %
+%   A DATABRAID has access to all the methods of BRAID, except COMPACT,
+%   since compacting the generators makes the crossing times undefined.
+%
 %   METHODS('DATABRAID') shows a list of methods.
 %
 %   See also DATABRAID.DATABRAID (constructor).
