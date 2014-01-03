@@ -1,4 +1,13 @@
 ------------------------------------------------------------------------
+1.0.4 [2014-01-03]
+
+* The databraid class records crossing times of a dataset.
+
+* Added an example section on taffy pullers to braidlab guide.
+
+* bugfix in testsuite.
+
+------------------------------------------------------------------------
 1.0.3 [2013-12-20]
 
 * The braidlab guide has been updated and expanded, and now has a
