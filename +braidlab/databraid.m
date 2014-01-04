@@ -3,12 +3,13 @@
 %   class, a DATABRAID remembers the times at which particles crossed.
 %
 %   In addition to the data members of the BRAID class, the class DATABRAID
-%   has the following data members:
+%   has the following data member (property):
 %
 %    'tcross'   vector of interpolated crossing times
 %
-%   A DATABRAID has access to all the methods of BRAID, except COMPACT,
-%   since compacting the generators makes the crossing times undefined.
+%   A DATABRAID has access to most of the methods of BRAID, though some of
+%   them work a bit differently.  See in particular DATABRAID.EQ,
+%   DATABRAID.COMPACT, and DATABRAID.MTIMES.  MPOWER and MINV are undefined.
 %
 %   METHODS('DATABRAID') shows a list of methods.
 %
@@ -157,7 +158,7 @@ classdef databraid < braidlab.braid
     end
 
     function c = compact(b)
-    %COMPACT   Shorten a databraid as much as possible.
+    %COMPACT   Try to shorten a databraid by cancelling generators.
     %   C = COMPACT(B) attempts to shorten a databraid B by cancelling
     %   adjacent generators, and returns the shortened databraid C.  The
     %   crossing times corresponding to the cancelled generators are
@@ -199,7 +200,8 @@ classdef databraid < braidlab.braid
   end % methods block
 
   % Some operations are not appropriate for databraids, since they break
-  % chronology.
+  % chronology.  Hide these, though they can still be called and will
+  % return an error message.
   methods (Hidden)
     function bm = mpower(b,m)
       error('BRAIDLAD:databraid:mpower:undefined',...

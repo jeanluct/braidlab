@@ -1,5 +1,5 @@
 function c = compact(b)
-%COMPACT   Shorten a braid as much as possible.
+%COMPACT   Try to shorten a braid by cancelling generators.
 %   C = COMPACT(B) attempts to shorten a braid B by using group properties,
 %   and returns the shortened braid C.  The group relations are
 %

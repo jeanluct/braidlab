@@ -13,10 +13,10 @@
 %
 %   In addition, LOOP has the dependent properties
 %
-%    'a'        the 'a' vector of Dynnikov coordinates, of length N-2;
-%    'b'        the 'b' vector of Dynnikov coordinates, of length N-2.
+%    'a'        the 'a' vector of Dynnikov coordinates, of length N-2
+%    'b'        the 'b' vector of Dynnikov coordinates, of length N-2
 %
-%   METHODS(LOOP) shows a list of methods.
+%   METHODS('LOOP') shows a list of methods.
 %
 %   References:
 %
@@ -39,8 +39,8 @@ classdef loop
     coords = [0 -1]; % Dynnikov coordinates
   end
   properties (Dependent = true)
-    a                % "a" Dynnikov coord vector
-    b                % "b" Dynnikov coord vector
+    a                % 'a' Dynnikov coord vector
+    b                % 'b' Dynnikov coord vector
   end
 
   methods

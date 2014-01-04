@@ -3,10 +3,10 @@
 %
 %   The class BRAID has the following data members:
 %
-%    'word'     vector of signed integers (int32) giving the Artin generators.
-%    'n'        number of strings in the braid.
+%    'word'     vector of signed integers (int32) giving the Artin generators
+%    'n'        number of strings in the braid
 %
-%   METHODS(BRAID) shows a list of methods.
+%   METHODS('BRAID') shows a list of methods.
 %
 %   See also BRAID.BRAID (constructor), CFBRAID.
 
