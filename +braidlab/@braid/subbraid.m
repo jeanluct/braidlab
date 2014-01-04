@@ -1,4 +1,4 @@
-function bs = subbraid(b,s)
+function [varargout] = subbraid(b,s)
 %SUBBRAID   Extract a subset of strings from a braid.
 %   BS = SUBBRAID(B,S) returns the subbraid BS, obtained by discarding
 %   all strings in B but the ones specified in S.  S is a vector which
@@ -21,6 +21,7 @@ nn = length(s);
 
 p = 1:b.n;
 bs = [];
+is = [];
 
 for i = 1:length(b)
   gen = abs(b.word(i)); % unsigned generator
@@ -34,8 +35,12 @@ for i = 1:length(b)
     sgen = find(p(pos) == s(i1));
     % Restore sign and append to list.
     bs = [bs sign(b.word(i))*sgen];
+    % Optionally also keep track of which generators we kept.  This is
+    % used by the subclass databraid.
+    if nargout > 1, is = [is i]; end
   end
   p([gen gen+1]) = p([gen+1 gen]); % update permutation
 end
 
-bs = braidlab.braid(bs,nn);
+varargout{1} = braidlab.braid(bs,nn);
+if nargout > 1, varargout{2} = is; end
