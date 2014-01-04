@@ -36,7 +36,10 @@ classdef databraid < braidlab.braid
     %   crossings.  The default is to project onto the X axis (PROJANG = 0).
     %
     %   DATABRAID(BB,T) creates a databraid from a braid BB and crossing
-    %   times T.  T defaults to 1:length(BB).
+    %   times T.  T defaults to [1:length(BB)].
+    %
+    %   DATABRAID(W,T) creates a databraid from a list of generators W and
+    %   crossing times T.  T defaults to [1:length(BB)].
     %
     %   This is a method for the DATABRAID class.
     %   See also DATABRAID, BRAID, BRAID.BRAID.
@@ -45,6 +48,15 @@ classdef databraid < braidlab.braid
       elseif isa(XY,'braidlab.braid')
 	br.word = XY.word;
 	br.n = XY.n;
+	if nargin > 1
+	  br.tcross = secnd;
+	else
+	  br.tcross = 1:length(br.word);
+	end
+	return
+      elseif ndims(XY) < 3
+	br.n = max(size(XY));
+	br.word = reshape(XY,[1 br.n]);
 	if nargin > 1
 	  br.tcross = secnd;
 	else
@@ -137,12 +149,15 @@ classdef databraid < braidlab.braid
       end
     end
 
-    % TODO: this should return a databraid, retaining only the relevant
-    % crossing times.
     function bs = subbraid(b,s)
-      warning('BRAIDLAD:databraid:subbraid:notimplemented',...
-	      'This operation is not yet fully implemented for databraids.')
-      bs = subbraid@braidlab.braid(b,s);
+      ;
+      % Do not put comments above the first line of code, so the help
+      % message from braid.subbraid is displayed.
+
+      % Use the optional return argument ii for braid.subbraid, which gives
+      % a list of the generators that were kept.
+      [bb,ii] = subbraid@braidlab.braid(b,s);
+      bs = braidlab.databraid(bb,b.tcross(ii));
     end
 
     function c = tensor(a,b)
