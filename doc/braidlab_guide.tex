@@ -489,12 +489,15 @@ The writhe is a braid invariant.
 \subsection{Constructing a braid from data}
 \label{sec:braidfromdata}
 
+\subsubsection{An example}
+\label{sec:braidfromdataex}
+
 \index{braid class@\braid\ class!constructor!from data|(}%
 \index{braid!from data|(}%
 One of the main purposes of \braidlab\ is to analyze two-dimensional
 trajectory data using braids.  We can assign a braid to trajectory data by
 looking for \emph{crossings} %
-\index{crossings}%
+\index{crossing}%
 along a projection line~\citep{Thiffeault2005,Thiffeault2010}. %
 \index{projection line|(}%
 The \braid\ constructor allows us to do this easily.
@@ -560,7 +563,7 @@ ans = 894
 \end{lstlisting}
 This is a very long braid!  But Figure~\ref{fig:testdata_trajs} suggests that
 this is misleading: many of the crossings %
-\index{crossings}%
+\index{crossing}%
 are `wiggles' that cancel each other out.  Indeed, if we attempt to shorten
 the braid: %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
@@ -575,7 +578,7 @@ ans = 14
 we find the number of generators (the length) has dropped to~$14$!  We can
 then plot this shortened braid as a braid diagram using \lstinline{plot(b)} %
 \index{braid class@\braid\ class!plot@\lstinline{plot}} to produce
-Figure~\ref{fig:testdata_braid}.  The braid diagram allows us to see
+Figure~\ref{fig:testdata_braid}.  The braid diagram allows us to see some
 topological information clearly, such as the fact that the second and third
 particles undergo a large number of twists around each other; we can check
 this by creating a subbraid %
@@ -588,10 +591,14 @@ ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
 \end{lstlisting}
 which shows that the winding number between these two strings is~$-4$.
 
-The braid was constructed from the data by assuming a projection along
-the~$X$ axis (the default).  We can choose a different projection by
-specifying an optional angle for the projection line; for instance, to
-project along the~$Y$ axis we invoke
+
+\subsubsection{Changing the projection line and enforcing closure}
+\label{sec:projection}
+
+The braid in the previous section was constructed from the data by assuming a
+projection along the~$X$ axis (the default).  We can choose a different
+projection by specifying an optional angle for the projection line; for
+instance, to project along the~$Y$ axis we invoke
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid(XY,pi/2);   % project onto Y axis
 >> b.length
@@ -622,7 +629,7 @@ closure method: %
 \index{braid!closure|(}%
 \index{braid class@\braid\ class!closure@\lstinline{closure}|(}%
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
-\index{crossings!in braid closure|(}
+\index{crossing!in braid closure|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
@@ -634,7 +641,7 @@ bY = < -3 -3 -3 -3 -3 -3 -3  1 -3  1 >
 This default closure simply draws line segments from the final points to the
 initial points in such a way that no new crossings are created in the~$X$
 projection. %
-\index{crossings!in braid closure|)}%
+\index{crossing!in braid closure|)}%
 Hence, the $X$-projected braid \lstinline{bX} is unchanged by the closure, but
 here the $Y$-projected braid \lstinline{bY} is longer by one generator
 (\lstinline{bY} is plotted in Figure~\ref{fig:testdata_braidY}).  This is
@@ -668,10 +675,14 @@ large braids.
 \index{braid!conjugate|)}%
 \index{braid class@\braid\ class!conjtest@\lstinline{conjtest}|)}%
 
+
+\subsubsection{The \lstinline{databraid} subclass}
+\label{sec:databraid}
+
 In some instances when dealing with data it is important to know the
 \emph{crossing times}, %
-\index{crossings!times|(}%
-that is, the times at which two particles exchanged position aong the
+\index{crossing!times|(}%
+that is, the times at which two particles exchanged position along the
 projection line. %
 \index{projection line}%
 A braid object does not keep this information, but there is an object that
@@ -680,7 +691,8 @@ does: a \lstinline{databraid}. %
 Its constructor takes an optional vector of times as an argument, and it has a
 data member \lstinline{tcross} %
 \index{tcross@\lstinline{tcross}|(}%
-that retains the crossing times:
+that retains the crossing times.  Using the same data \lstinline{XY} from
+before, sampled at times \lstinline{ti}, we have
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = databraid(XY,ti);
 >> b.tcross(1:3)
@@ -690,13 +702,31 @@ ans = 870.9010
       887.0089
 \end{lstlisting}
 \index{tcross@\lstinline{tcross}|)}%
-There are exactly as many crossing times as generators in the braid.  Almost
-all operations that can be done to \braid\ also work on a
-\lstinline{databraid}, except \lstinline{compact}: %
+There are always exactly as many crossing times as generators in the braid.
+Many operations that can be done to a \lstinline{braid} also work on a
+\lstinline{databraid}, with a few differences:
+\begin{itemize}
+\item\lstinline{compact} %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
-that method re-arranges the braid and so invalidates the crossing times.
-\jlt{Rewrite a compact function for databraids that doesn't do that.}
-\index{crossings!times|)}%
+works a bit differently.  It is less effective than \lstinline{braid.compact}
+since it must preserve the order of generators in order to maintain the
+ordering of the crossing times.
+\item Equality testing checks if two \hbox{\lstinline{databraid}s} are
+  lexicographically equal (i.e., generator-by-generator) and that their
+  crossing times all agree.  This is very restrictive.  To check if the
+  underlying braids are equal, first convert the \hbox{\lstinline{databraid}s}
+  to \hbox{\lstinline{braid}s} by using the method
+  \lstinline{databraid.braid}.
+\item Multiplication of two \hbox{\lstinline{databraid}s} is only defined if
+  the crossing times of the first braid are all earlier than the second.
+\item Powers and inverses of \hbox{\lstinline{databraid}s} are not defined.
+\item Currently the method \lstinline{subbraid} returns a \lstinline{braid}
+  object, not a \lstinline{databraid}.  A future implementation will return a
+  \lstinline{databraid} with the correct crossing times, so do not rely on
+  this behavior.
+\end{itemize} %
+\index{crossing!times|)}%
+
 \index{databraid class@\lstinline{databraid} class|)}%
 
 \index{braid class@\braid\ class!constructor!from data|)}
@@ -1369,8 +1399,8 @@ test data from their granular medium experiments~\citep{Puckett2012}.
 
 % \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
 
-\index{crossings|seealso{projection line}}%
-\index{projection line|seealso{crossings}}
+\index{crossing|seealso{projection line}}%
+\index{projection line|seealso{crossing}}
 
 \clearpage
 \addcontentsline{toc}{section}{Index}
