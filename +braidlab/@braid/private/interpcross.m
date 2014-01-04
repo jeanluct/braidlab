@@ -9,6 +9,25 @@ function [tc,dY] = interpcross(t,X,Y,itc,p1,p2)
 %   coordinates) which determines the sign of the generator.  ITC can also
 %   be passed as a vector, in which case TC and DY will also be vectors.
 
+% <LICENSE
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%
+%   This file is part of Braidlab.
+%
+%   Braidlab is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   Braidlab is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+% LICENSE>
+
 if size(t,1) < size(t,2), t = t.'; end % Make sure t is a column vector.
 
 % Refine crossing time and position (linear interpolation).
