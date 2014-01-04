@@ -5,11 +5,11 @@
 %
 %   The class CFBRAID has the following data members:
 %
-%    'delta'    the power of positive-half twists Delta;
-%    'factors'  cell array of positive factors F;
-%    'n'        number of strings in the braid.
+%    'delta'    the power of positive-half twists Delta
+%    'factors'  cell array of positive factors
+%    'n'        number of strings in the braid
 %
-%   METHODS(CFBRAID) shows a list of methods.
+%   METHODS('CFBRAID') shows a list of methods.
 %
 %   Reference: J. S. Birman and T. E. Brendle, "Braids: A Survey," in
 %   Handbook of Knot Theory (2005), pp. 78-82.
@@ -18,9 +18,9 @@
 
 classdef cfbraid
   properties
-    delta = 0
-    factors = cell(0)
-    n = 1
+    delta = 0             % the power of positive-half twists Delta
+    factors = cell(0)     % cell array of positive factors
+    n = 1                 % number of strings in the braid
   end
 
   methods
@@ -89,7 +89,7 @@ classdef cfbraid
     end
 
     function ee = istrivial(b)
-    %ISTRIVIAL   Returns true if braid is the trivial braid.
+    %ISTRIVIAL   Return true if braid is the trivial braid.
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID.
@@ -97,7 +97,7 @@ classdef cfbraid
     end
 
     function ee = ispositive(obj)
-    %ISPOSITIVE   Returns true if braid is positive.
+    %ISPOSITIVE   Return true if braid is positive.
     %   ISPOSITIVE(B) returns true if the braid B can be written with only
     %   positive crossings.
     %
