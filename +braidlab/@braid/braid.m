@@ -329,13 +329,13 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.DISP.
-    if isempty(b.word)
+      if isempty(b.word)
         str = 'e';
-    else
+      else
         str = num2str(b.word);
-    end
-    
-    str = ['< ' str ' >'];
+      end
+
+      str = ['< ' str ' >'];
     end
 
     function disp(b)
@@ -343,23 +343,22 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.CHAR.
-    if isscalar(b)
-       c = char(b);
-       if iscell(c)
+      if isscalar(b)
+        c = char(b);
+        if iscell(c)
          disp(['     ' c{:}])
-       else
+        else
          disp(c)
-       end
-    else
+        end
+      else
         % format dimensions as NxMxK...
         dimstr = strjoin(strsplit(num2str(size(b))),'x');
-        
+
         disp([dimstr ' braid array with properties:'])
         for f = fields(b).'
-            disp(f{:});
+          disp(f{:});
         end
-    end
-    
+      end
     end
     
     function l = length(b)
