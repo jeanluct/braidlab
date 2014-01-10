@@ -12,19 +12,23 @@
 ROOTDIR=$1
 export BPFILE=COPYING
 
-function checkboiler() {
-    return $(grep --quiet LICENSE $1)
+function checktag() {
+    if [ -z "$1" ]; then return 1; fi
+
+    if !(grep --quiet LICENSE $1); then
+	echo "Warning: file" $1 "is missing LICENSE tag."
+	return 1
+    fi
+
+    return 0
 }
-export -f checkboiler
+export -f checktag
 
 function insertboiler_matlab() {
     export OPENTAG='% <LICENSE'
     export CLOSETAG='% LICENSE>'
 
-    if !(checkboiler $1); then
-	echo "Warning: file" $1 "is missing LICENSE tag."
-	exit 1
-    fi
+    if !(checktag $1); then exit 1; fi
 
     sed 's/^/%   /' ${BPFILE} >| ${BPFILE}.m
     sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.m" $1
@@ -36,10 +40,7 @@ function insertboiler_cpp() {
     export OPENTAG='\/\/ <LICENSE'
     export CLOSETAG='\/\/ LICENSE>'
 
-    if !(checkboiler $1); then
-	echo "Warning: file" $1 "is missing LICENSE tag."
-	exit 1
-    fi
+    if !(checktag $1); then exit 1; fi
 
     sed 's,^,//   ,' ${BPFILE} >| ${BPFILE}.cpp
     sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.cpp" $1
@@ -51,10 +52,7 @@ function insertboiler_c() {
     export OPENTAG='<LICENSE'
     export CLOSETAG='LICENSE>'
 
-    if !(checkboiler $1); then
-	echo "Warning: file" $1 "is missing LICENSE tag."
-	exit 1
-    fi
+    if !(checktag $1); then exit 1; fi
 
     sed 's,^,   ,' ${BPFILE} >| ${BPFILE}.c
     sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.c" $1
@@ -66,10 +64,7 @@ function insertboiler_bash() {
     export OPENTAG='# <LICENSE'
     export CLOSETAG='# LICENSE>'
 
-    if !(checkboiler $1); then
-	echo "Warning: file" $1 "is missing LICENSE tag."
-	exit 1
-    fi
+    if !(checktag $1); then exit 1; fi
 
     sed 's,^,#   ,' ${BPFILE} >| ${BPFILE}.sh
     sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.sh" $1
@@ -95,7 +90,7 @@ find $ROOTDIR -name "*.bib" -print0 | \
 find $ROOTDIR -name "Makefile" -print0 | \
     xargs -0 -n 1 bash -c 'insertboiler_bash "$@"' _
 
-unset -f checkboiler
+unset -f checktag
 unset -f insertboiler_matlab
 unset -f insertboiler_cpp
 unset -f insertboiler_c
