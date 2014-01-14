@@ -22,6 +22,7 @@
 # Extract architecture, compiler, etc. from MEX configuration.
 MEX         = mex
 MEXENV      = $(MEX) -v 2> /dev/null
+MEXVOUT     := $(shell $(MEXENV))
 MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2))
 MEXSUFFIX   = $(strip $(shell $(MEXENV) | \
 		grep "^ *LDEXTENSION *=" | cut -d = -f 2 | cut -d . -f 2))
@@ -36,9 +37,15 @@ CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 MEXFLAGS  = -compatibleArrayDims  # For now build for arrays of size 2^32-1.
 
 %.$(MEXSUFFIX): %.c
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
 %.$(MEXSUFFIX): %.cpp
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
 	$(MEX) $(MEXFLAGS) $^
 
 all: randomwalk_helper.$(MEXSUFFIX)
