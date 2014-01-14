@@ -22,6 +22,7 @@
 # Extract architecture, compiler, etc. from MEX configuration.
 MEX         = mex
 MEXENV      = $(MEX) -v 2> /dev/null
+MEXVOUT     := $(shell $(MEXENV))
 MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2))
 MEXSUFFIX   = $(strip $(shell $(MEXENV) | \
 		grep "^ *LDEXTENSION *=" | cut -d = -f 2 | cut -d . -f 2))
@@ -40,9 +41,15 @@ CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
 CBRAID_LD         = -lcbraid-mex
 
 %.$(MEXSUFFIX): %.c
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
 	$(MEX) $(MEXFLAGS) $(LIBS) $^
 
 %.$(MEXSUFFIX): %.cpp
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
 	# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
 	cd $(CBRAID_LIBDIR); \
 		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
