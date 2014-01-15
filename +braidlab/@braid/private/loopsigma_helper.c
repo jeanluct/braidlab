@@ -5,7 +5,7 @@
 /* Helper function for loopsigma */
 
 /*
-<LICENSE
+ <LICENSE
    Copyright (c) 2013, 2014 Jean-Luc Thiffeault
 
    This file is part of Braidlab.
@@ -22,7 +22,7 @@
 
    You should have received a copy of the GNU General Public License
    along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE>
+ LICENSE>
 */
 
 #define pos(x) (x > 0 ? x : 0)

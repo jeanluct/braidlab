@@ -360,7 +360,7 @@ classdef braid
         end
       end
     end
-    
+
     function l = length(b)
     %LENGTH   Length of a braid.
     %   L = LENGTH(B) returns the number of generators in the current
