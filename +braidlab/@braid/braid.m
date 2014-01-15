@@ -234,8 +234,10 @@ classdef braid
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.EQ.
+      usetype = 'double';
       if isempty(b.word), ee = true; return; end
-      ee = all(loopcoords(b) == loopcoords(braidlab.braid([],b.n)));
+      ee = all(loopcoords(b,'right',usetype) == ...
+               loopcoords(braidlab.braid([],b.n), 'right', usetype));
     end
 
     function ee = ispure(obj)
