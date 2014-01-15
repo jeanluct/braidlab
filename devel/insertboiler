@@ -24,77 +24,41 @@ function checktag() {
 }
 export -f checktag
 
-function insertboiler_matlab() {
-    export OPENTAG='% <LICENSE'
-    export CLOSETAG='% LICENSE>'
+function ibtag() {
+    export OPENTAG=${1}' <LICENSE'
+    export CLOSETAG=${1}' LICENSE>'
 
-    if !(checktag $1); then exit 1; fi
+    if !(checktag ${2}); then exit 1; fi
 
-    sed 's/^/%   /' ${BPFILE} >| ${BPFILE}.m
-    sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.m" $1
-    rm -f ${BPFILE}.m
+    # Add comment character to start of boilerplate text.
+    sed "s,^,${1}   ," ${BPFILE} >| ${BPFILE}.comment
+    # Insert boilerplate text.
+    sed -i \
+	"/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.comment" $2
+    rm -f ${BPFILE}.comment
+    # Remove trailing whitespace, if rtw command is available.
+    if hash rtw 2> /dev/null; then
+	rtw ${2}; rm -f ${2}.rtw
+    fi
 }
-export -f insertboiler_matlab
+export -f ibtag
 
-function insertboiler_cpp() {
-    export OPENTAG='\/\/ <LICENSE'
-    export CLOSETAG='\/\/ LICENSE>'
-
-    if !(checktag $1); then exit 1; fi
-
-    sed 's,^,//   ,' ${BPFILE} >| ${BPFILE}.cpp
-    sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.cpp" $1
-    rm -f ${BPFILE}.cpp
-}
-export -f insertboiler_cpp
-
-function insertboiler_c() {
-    export OPENTAG='<LICENSE'
-    export CLOSETAG='LICENSE>'
-
-    if !(checktag $1); then exit 1; fi
-
-    sed 's,^,   ,' ${BPFILE} >| ${BPFILE}.c
-    sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.c" $1
-    rm -f ${BPFILE}.c
-}
-export -f insertboiler_c
-
-function insertboiler_bash() {
-    export OPENTAG='# <LICENSE'
-    export CLOSETAG='# LICENSE>'
-
-    if !(checktag $1); then exit 1; fi
-
-    sed 's,^,#   ,' ${BPFILE} >| ${BPFILE}.sh
-    sed -i "/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.sh" $1
-    rm -f ${BPFILE}.sh
-}
-export -f insertboiler_bash
-
+# Insert boilerplate for various file extensions.
 find $ROOTDIR -name "*.m" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_matlab "$@"' _
-
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
 find $ROOTDIR -name "*.cpp" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_cpp "$@"' _
-
+    xargs -0 -n 1 bash -c 'ibtag "\/\/" "$@"' _
 find $ROOTDIR -name "*.c" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_c "$@"' _
-
-# Use Matlab tags for latex and bibtex files.
+    xargs -0 -n 1 bash -c 'ibtag "" "$@"' _
 find $ROOTDIR -name "*.tex" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_matlab "$@"' _
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
 find $ROOTDIR -name "*.bib" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_matlab "$@"' _
-
-find $ROOTDIR -name "Makefile" -print0 | \
-    xargs -0 -n 1 bash -c 'insertboiler_bash "$@"' _
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
+find $ROOTDIR -name "Makefile*" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "#" "$@"' _
 
 unset -f checktag
-unset -f insertboiler_matlab
-unset -f insertboiler_cpp
-unset -f insertboiler_c
-unset -f insertboiler_bash
+unset -f ibtag
 unset BPFILE
 unset OPENTAG
 unset CLOSETAG
