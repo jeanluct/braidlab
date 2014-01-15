@@ -143,12 +143,18 @@ classdef loop
 
     function value = get.a(obj)
       value = obj.coords(1:length(obj.coords)/2);
-      assert(~isoverflowed(value), 'Dynnikov "a" coordinate has overflowed.');
+      if isoverflowed(value)
+        error('BRAIDLAB:loop:loop:overflow', ...
+              'Dynnikov "a" coordinate has overflowed.')        
+      end
     end
 
     function value = get.b(obj)
       value = obj.coords(length(obj.coords)/2+1:end);
-      assert(~isoverflowed(value), 'Dynnikov "b" coordinate has overflowed.');
+      if isoverflowed(value)
+        error('BRAIDLAB:loop:loop:overflow', ...
+              'Dynnikov "b" coordinate has overflowed.')        
+      end
     end
 
     function [a,b] = ab(obj)
