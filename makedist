@@ -42,13 +42,12 @@ else
 fi
 ${TARCMD} cvzf ${BLNAME}.tar.gz "${TARFLAGS[@]}" \
     --exclude='+braidlab/+lcs' \
+    --exclude='*.c' --exclude='*.cpp' --exclude='Makefile' \
     +braidlab \
     README.md \
     CHANGELOG \
     COPYING \
     LICENSE \
-    Makefile \
-    Makefile.cbraid-mex \
     testsuite \
     extern/README \
     extern/VariablePrecisionIntegers \
