@@ -1,7 +1,7 @@
 function tight
 
 import braidlab.*
-warning('off','BRAIDLAD:braid:entropy:noconv');
+warning('off','BRAIDLAB:braid:entropy:noconv');
 
 % Number of strands.
 n = 5;

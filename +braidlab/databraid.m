@@ -63,7 +63,7 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also DATABRAID, BRAID, BRAID.BRAID.
       if nargin < 1
-	error('BRAIDLAD:databraid:badarg','Not enough input arguments.')
+	error('BRAIDLAB:databraid:badarg','Not enough input arguments.')
       elseif isa(XY,'braidlab.braid')
 	br.word = XY.word;
 	br.n = XY.n;
@@ -101,7 +101,7 @@ classdef databraid < braidlab.braid
 	proj = third;
       end
       if nargin > 3
-	error('BRAIDLAD:databraid:badarg','Too many input arguments.')
+	error('BRAIDLAB:databraid:badarg','Too many input arguments.')
       end
       [b,br.tcross] = braidlab.braid.color_braiding(XY,t,proj);
       br.word = b.word;
@@ -156,7 +156,7 @@ classdef databraid < braidlab.braid
     %   See also BRAID.MTIMES, DATABRAID, LOOP.
       if isa(b2,'braidlab.databraid')
 	if b1.tcross(end) > b2.tcross(1)
-	  error('BRAIDLAD:databraid:mtimes:notchrono',...
+	  error('BRAIDLAB:databraid:mtimes:notchrono',...
 		'First braid must have earlier times than second.')
 	end
         b12 = braidlab.databraid(...
@@ -238,12 +238,12 @@ classdef databraid < braidlab.braid
   % return an error message.
   methods (Hidden)
     function bm = mpower(b,m)
-      error('BRAIDLAD:databraid:mpower:undefined',...
+      error('BRAIDLAB:databraid:mpower:undefined',...
 	    'This operation is not defined for databraids.')
     end
 
     function bi = inv(b)
-      error('BRAIDLAD:databraid:inv:undefined',...
+      error('BRAIDLAB:databraid:inv:undefined',...
 	    'This operation is not defined for databraids.')
     end
   end % methods block

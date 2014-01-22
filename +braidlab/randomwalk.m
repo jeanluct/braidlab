@@ -42,18 +42,18 @@ function X = randomwalk(n,N,eps,opts)
 
 if isscalar(n)
   if n < 1
-    error('BRAIDLAD:randomwalk:badarg','Need at least one particle.')
+    error('BRAIDLAB:randomwalk:badarg','Need at least one particle.')
   end
 elseif size(n,1) ~= 2
-  error('BRAIDLAD:randomwalk:badarg','Vector X0 should have two rows.')
+  error('BRAIDLAB:randomwalk:badarg','Vector X0 should have two rows.')
 end
 
 if N < 1
-  error('BRAIDLAD:randomwalk:badarg','Need at least one step.')
+  error('BRAIDLAB:randomwalk:badarg','Need at least one step.')
 end
 
 if eps <= 0
-  error('BRAIDLAD:randomwalk:badarg','Need EPS > 0.')
+  error('BRAIDLAB:randomwalk:badarg','Need EPS > 0.')
 end
 
 if nargin < 4
@@ -86,5 +86,5 @@ switch lower(opts)
   end
   X = randomwalk_helper(X0,N,eps,2);
  otherwise
-  error('BRAIDLAD:randomwalk:badarg','Unknown option %s.',opts)
+  error('BRAIDLAB:randomwalk:badarg','Unknown option %s.',opts)
 end

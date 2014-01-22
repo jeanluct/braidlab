@@ -23,8 +23,8 @@ entr_iter = zeros(nmax,kmax);
 entr_trains = zeros(nmax,kmax);
 entr_diff = zeros(nmax,kmax);
 
-warning('off','BRAIDLAD:braid:entropy:noconv')
-warning('off','BRAIDLAD:braid:entropy:reducible')
+warning('off','BRAIDLAB:braid:entropy:noconv')
+warning('off','BRAIDLAB:braid:entropy:reducible')
 
 for n = 3:nmax
   disp(n)

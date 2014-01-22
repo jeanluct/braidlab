@@ -112,7 +112,7 @@ classdef braid
           m = secnd;
           if nargin < 3
             if m < 5
-              error('BRAIDLAD:braid:badarg','Need at least five strings.')
+              error('BRAIDLAB:braid:badarg','Need at least five strings.')
             end
             if mod(m,2) == 1
               n = (m+1)/2;
@@ -132,11 +132,11 @@ classdef braid
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
         else
-          error('BRAIDLAD:braid:badarg','Unrecognized string argument.')
+          error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
         end
       elseif max(size(size(b))) == 3
         if nargin > 2
-          error('BRAIDLAD:braid:badarg','Too many input arguments.')
+          error('BRAIDLAB:braid:badarg','Too many input arguments.')
         elseif nargin < 2
           % Use a zero projection angle.
           secnd = 0;

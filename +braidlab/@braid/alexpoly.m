@@ -62,7 +62,7 @@ p = mldivide(num,denom);
 % Balance polynomial so p(z) = p(1/z).
 pp = mldivide(reflect(p),p);
 if ~ismonomial(pp)
-  error('BRAIDLAD:braid:alexpoly:notmonomial',...
+  error('BRAIDLAB:braid:alexpoly:notmonomial',...
 	'p(z) = p(1/z) cannot be enforced.')
 end
 deg = get(pp,'maxDEG');

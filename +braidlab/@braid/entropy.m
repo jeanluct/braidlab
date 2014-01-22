@@ -58,12 +58,12 @@ if nargin < 2, tol = toldef; end
 if ischar(tol)
   if any(strcmpi(tol,{'trains','train','train-tracks','bh'}))
     if nargout > 1
-      error('BRAIDLAD:braid:entropy:nargout',...
+      error('BRAIDLAB:braid:entropy:nargout',...
             'Too many output arguments for ''trains'' option.')
     end
     [TN,varargout{1}] = tntype_helper(b.word,b.n);
     if strcmpi(TN,'reducible1')
-      warning('BRAIDLAD:braid:entropy:reducible',...
+      warning('BRAIDLAB:braid:entropy:reducible',...
               'Reducible braid... falling back on iterative method.')
       tol = toldef;
     else
@@ -71,7 +71,7 @@ if ischar(tol)
     end
   elseif any(strcmpi(tol,{'iterative','iter','dynn','dynnikov'}))
   else
-    error('BRAIDLAD:braid:entropy:badarg','Unknown input option ''%s''.',tol)
+    error('BRAIDLAB:braid:entropy:badarg','Unknown input option ''%s''.',tol)
   end
 end
 
@@ -99,7 +99,7 @@ for i = 1:maxit
   if abs(entr-entr0) < tol
     nconv = nconv + 1;
     if i > 10 && entr < .15 && consecutiveconv
-      warning('BRAIDLAD:braid:entropy:smallentr', ...
+      warning('BRAIDLAB:braid:entropy:smallentr', ...
               'Braid has small entropy; result may be inaccurate.')
       consecutiveconv = false;
     end
@@ -115,7 +115,7 @@ for i = 1:maxit
 end
 
 if i == maxit
-  warning('BRAIDLAD:braid:entropy:noconv', ...
+  warning('BRAIDLAB:braid:entropy:noconv', ...
           ['Failed to converge to requested tolerance; braid is likely' ...
            ' finite-order or has low entropy.'])
   entr = 0;

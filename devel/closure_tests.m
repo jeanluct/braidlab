@@ -23,10 +23,10 @@ end
 
 if paralyze
   pctRunOnAll warning('off','BRAIDLAB:braid:color_braiding:coincident')
-  pctRunOnAll warning('off','BRAIDLAD:braid:entropy:noconv')
+  pctRunOnAll warning('off','BRAIDLAB:braid:entropy:noconv')
 else
   warning('off','BRAIDLAB:braid:color_braiding:coincident')
-  warning('off','BRAIDLAD:braid:entropy:noconv')
+  warning('off','BRAIDLAB:braid:entropy:noconv')
 end
 
 cl = {'r' 'g' 'b' 'm' 'c' 'y' 'k'};
