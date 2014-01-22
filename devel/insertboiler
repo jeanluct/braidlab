@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Insert the 'GNU boilerplate language' between two tags.
+#
+# Run this as
+#
+#  ./devel/insertboiler <base_directory>
+#
+# It will recurse down the directory.  The file COPYING needs to be in
+# the folder where the command is executed.
+
+ROOTDIR=$1
+export BPFILE=COPYING
+
+function checktag() {
+    if [ -z "$1" ]; then return 1; fi
+
+    if !(grep --quiet LICENSE $1); then
+	echo "Warning: file" $1 "is missing LICENSE tag."
+	return 1
+    fi
+
+    return 0
+}
+export -f checktag
+
+function ibtag() {
+    export OPENTAG=${1}' <LICENSE'
+    export CLOSETAG=${1}' LICENSE>'
+
+    if !(checktag ${2}); then exit 1; fi
+
+    # Add comment character to start of boilerplate text.
+    sed "s,^,${1}   ," ${BPFILE} >| ${BPFILE}.comment
+    # Insert boilerplate text.
+    sed -i \
+	"/${OPENTAG}/,/${CLOSETAG}/ {//!d}; /${OPENTAG}/r ${BPFILE}.comment" $2
+    rm -f ${BPFILE}.comment
+    # Remove trailing whitespace, if rtw command is available.
+    if hash rtw 2> /dev/null; then
+	rtw ${2}; rm -f ${2}.rtw
+    fi
+}
+export -f ibtag
+
+# Insert boilerplate for various file extensions.
+find $ROOTDIR -name "*.m" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
+find $ROOTDIR -name "*.cpp" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "\/\/" "$@"' _
+find $ROOTDIR -name "*.c" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "" "$@"' _
+find $ROOTDIR -name "*.tex" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
+find $ROOTDIR -name "*.bib" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
+find $ROOTDIR -name "Makefile*" -print0 | \
+    xargs -0 -n 1 bash -c 'ibtag "#" "$@"' _
+
+unset -f checktag
+unset -f ibtag
+unset BPFILE
+unset OPENTAG
+unset CLOSETAG

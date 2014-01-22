@@ -1,0 +1,45 @@
+------------------------------------------------------------------------
+1.0.4 [2014-01-03]
+
+* The databraid class records crossing times of a dataset.
+
+* Added an example section on taffy pullers to braidlab guide.
+
+* bugfix in testsuite.
+
+------------------------------------------------------------------------
+1.0.3 [2013-12-20]
+
+* The braidlab guide has been updated and expanded, and now has a
+  table of contents and a detailed index.
+
+* New methods in braid class: 'alexpoly' returns the Alexander
+  polynomial.  'burau' can now construct a matrix of Laurent
+  polynomials (wavelet toolbox required).  'tensor' is the tensor
+  product of braids.
+
+* Big speedup in creating braids from data, due to improved safety
+  checks on the particle trajectories.
+
+------------------------------------------------------------------------
+1.0.2 [2013-12-13]
+
+* loopTest.m in testsuite.
+
+* Clean up files.  Eliminate subrepos.
+
+* First public release.
+
+------------------------------------------------------------------------
+1.0.1 [2013-12-12]
+
+* Check for overflow of loop coordinates.
+
+* Several bugfixes.
+
+* Improved support for VPI (Variable Precision Integers).
+
+------------------------------------------------------------------------
+1.0 [2013-10-02]
+
+First release of braidlab.
