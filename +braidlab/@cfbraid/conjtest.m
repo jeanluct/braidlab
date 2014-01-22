@@ -39,17 +39,27 @@ if ~isa(b1,'braidlab.cfbraid') | ~isa(b2,'braidlab.cfbraid')
         'Function takes two CFBRAIDS as arguments.');
 end
 
-if istrivial(b1) | istrivial(b2)
-  error('BRAIDLAB:cfbraid:conjtest:empty','Empty braid word.');
-end
-
 if b1.n ~= b2.n
   varargout{1} = false;
   if nargout > 1, varargout{2} = []; end
   return
 end
 
-% TODO: The braids are aleady in canonical form, but that's recomputed in
+if istrivial(b1)
+  if istrivial(b2)
+    varargout{1} = true;
+    if nargout > 1
+      varargout{2} = braidlab.cfbraid;
+      varargout{2}.n = b1.n;
+    end
+  else
+    varargout{1} = false;
+    if nargout > 1, varargout{2} = []; end
+  end
+  return
+end
+
+% TODO: The braids are already in canonical form, but that's recomputed in
 % the helper. Rewrite so the helper function accepts a struct.
 
 [isconj,C] = conjtest_helper(b1.braid.word,b2.braid.word,b1.n);

@@ -43,10 +43,15 @@ function c = compact(b)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if istrivial(b),
-    c = braidlab.braid([], b.n);
-    return;
-end
+% Removed this check: it can easily overflow for long braids, but we should
+% still be able to compact those.  This does mean that we will miss some
+% trivial braids, but the user should really call istrivial separately if
+% they suspect a trivial braid.  As a side effect, this can speed up
+% compact a fair bit.
+%if istrivial(b),
+%  c = braidlab.braid([], b.n);
+%  return;
+%end
 
 bc = compact_helper(b.word);
 
