@@ -57,8 +57,26 @@ classdef braidTest < matlab.unittest.TestCase
       b = braidlab.braid('random',5,7);
       testCase.verifyEqual(b,braidlab.braid([-2 2 -3 -2 -3 -1 -4]));
 
+      testCase.verifyError(@() braidlab.braid('garbage'), ...
+			   'BRAIDLAB:braid:badarg');
+
       b = braidlab.braid('HironakaKin',3,1);
       testCase.verifyEqual(b,braidlab.braid([1 2 3 3 2 1 1 2 3 4]));
+
+      testCase.verifyError(@() braidlab.braid('HironakaKin',4), ...
+			   'BRAIDLAB:braid:badarg');
+
+      testCase.verifyError(@() braidlab.braid('VenzkePsi',4), ...
+			   'BRAIDLAB:braid:badarg');
+
+      b = braidlab.braid('VenzkePsi',5);
+      testCase.verifyEqual(b,braidlab.braid([4 3 2 1 4 3 2 1 -1 -2]));
+      b = braidlab.braid('VenzkePsi',6);
+      testCase.verifyEqual(b,braidlab.braid([5 4 3 2 1 5 4 3 5 4]));
+
+      % Too many input arguments for creating a braid from data.
+      testCase.verifyError(@() braidlab.braid(zeros(3,2,4),1,1), ...
+			   'BRAIDLAB:braid:badarg');
     end
 
     function test_braid_from_randomwalk(testCase)
