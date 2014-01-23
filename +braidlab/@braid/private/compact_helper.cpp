@@ -150,7 +150,7 @@ bool commute_and_cancel(T& b, const int dir)
               incrpos = true;
               continue;
             }
-          if (i+2*dir >= 0 && i+2*dir <= b.size()-1)
+          if ((int)i+2*dir >= 0 && (int)i+2*dir <= (int)b.size()-1)
             {
               // Try the second type of relation.
               if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
@@ -179,7 +179,7 @@ bool commute_and_cancel(T& b, const int dir)
 #endif
           incrpos = true;
           break;
-        } while (i+dir >= 0 && i+dir <= b.size()-1);
+        } while ((int)i+dir >= 0 && (int)i+dir <= (int)b.size()-1);
       // remove 0's from the vector.
       b.erase(remove(b.begin(),b.end(),0),b.end());
       if (b.size() < 2) break;
