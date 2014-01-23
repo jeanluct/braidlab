@@ -78,9 +78,12 @@ classdef braid
     %   computing a positive entropy.  For large N, the entropy of this
     %   braid is bounded from above by log(2+sqrt(3))/((N-1)/2).
     %
-    %   B = BRAID('HironakaKin',N) for N even returns
+    %   B = BRAID('HironakaKin',N) for N even (N>4) returns
     %   BRAID('HironakaKin',(N+2)/2,(N-4)/2), which is pseudo-Anosov but
     %   does not minimize entropy for even N.
+    %
+    %   B = BRAID('VenzkePsi',N) or BRAID('PSI',N) returns a member of
+    %   the Venzke family of psi-braids on N strings (N>4).
     %
     %   References:
     %
@@ -89,6 +92,9 @@ classdef braid
     %
     %   E. Lanneau and J.-L. Thiffeault, "On the minimum dilatation of
     %   braids on punctured discs," Geometriae Dedicata 152 (2011), 165-182.
+    %
+    %   R. Venzke, "Braid forcing, hyperbolic geometry, and pseudo-Anosov
+    %   sequences of low entropy," PhD Thesis (2008).
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, CFBRAID.
@@ -127,6 +133,30 @@ classdef braid
           N = m+n+1;
           br.n = N;
           br.word = [1:m m:-1:1 1:N-1];
+        elseif any(strcmpi(b,{'venzkepsi','psi'}))
+	  % See page 1 of Venzke's thesis.
+          n = secnd;
+          if n < 5
+            error('BRAIDLAB:braid:badarg','Need at least five strings.')
+          end
+	  br.n = n;
+	  if n == 6
+	    br.word = [5:-1:1 5 4 3 5 4];
+	    return
+	  end
+	  L = (n-1):-1:1;
+	  if mod(n,2) == 1
+	    br.word = [L L -1 -2];
+	  elseif mod(n,4) == 0
+	    k = n/4;
+	    br.word = [repmat(L,1,2*k+1) -1 -2];
+	  elseif mod(n,8) == 2
+	    k = (n-2)/8;
+	    br.word = [repmat(L,1,2*k+1) -1 -2];
+	  elseif mod(n,8) == 6
+	    k = (n-6)/8;
+	    br.word = [repmat(L,1,6*k+5) -1 -2];
+	  end
         elseif any(strcmpi(b,{'rand','random'}))
           br.n = secnd;
           k = third;
