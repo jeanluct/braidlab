@@ -118,7 +118,7 @@ if i == maxit
   warning('BRAIDLAB:braid:entropy:noconv', ...
           ['Failed to converge to requested tolerance; braid is likely' ...
            ' finite-order or has low entropy.'])
-  entr = 0;
+  %entr = 0;
 end
 
 varargout{1} = entr;
