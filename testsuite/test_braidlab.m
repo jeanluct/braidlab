@@ -31,5 +31,6 @@ suite = TestSuite.fromFolder(pwd);
 %suite = TestSuite.fromClass(?loopTest);
 %suite = TestSuite.fromClass(?conjtestTest);
 %suite = TestSuite.fromClass(?compactTest);
+%suite = TestSuite.fromClass(?entropyTest);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite)
