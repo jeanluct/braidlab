@@ -1,4 +1,22 @@
 ------------------------------------------------------------------------
+1.0.5 [2014-01-31]
+
+* Constructors for Rupert Venzke's psi-family of low-entropy braids.
+
+* Fix bug involving single-trajectory dataset.
+
+* Plot empty braids (why not...).
+
+* braid.compact no longer checks for trivial braid, since this can
+  take a lot of time (more than the compact itself).
+
+* Unit test for entropy added to testsuite.
+
+* Lighter distribution (just compiled files).
+
+* A few more small bugfixes.
+
+------------------------------------------------------------------------
 1.0.4 [2014-01-03]
 
 * The databraid class records crossing times of a dataset.
