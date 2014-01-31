@@ -21,7 +21,7 @@
 minver =  '8.1.0'; minrel = '2013a';
 if verLessThan('matlab', minver)
   error('BRAIDLAB:test_braidlab:minver',...
-	'Testsuite requires Matlab version >= %s (%s).',minver,minrel)
+        'Testsuite requires Matlab version >= %s (%s).',minver,minrel)
 end
 
 import matlab.unittest.*

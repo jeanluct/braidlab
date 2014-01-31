@@ -48,6 +48,20 @@ else
   hold on
 end
 
+% Plot an empty braid word (exciting!).
+if isempty(b.word)
+  for k = 1:b.n
+    posX = baseX + (k-1)*gapX; posY = baseY;
+    line([posX posX],[posY posY+gapY],lat{:})
+  end
+  if ~holdstate
+    hold off
+    axis equal
+    axis off
+  end
+  return
+end
+
 if ~uselines
   f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
   xx = linspace(0,gapX,npts);
