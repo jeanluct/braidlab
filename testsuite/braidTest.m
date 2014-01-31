@@ -58,16 +58,16 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(b,braidlab.braid([-2 2 -3 -2 -3 -1 -4]));
 
       testCase.verifyError(@() braidlab.braid('garbage'), ...
-			   'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:badarg');
 
       b = braidlab.braid('HironakaKin',3,1);
       testCase.verifyEqual(b,braidlab.braid([1 2 3 3 2 1 1 2 3 4]));
 
       testCase.verifyError(@() braidlab.braid('HironakaKin',4), ...
-			   'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:badarg');
 
       testCase.verifyError(@() braidlab.braid('VenzkePsi',4), ...
-			   'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:badarg');
 
       b = braidlab.braid('VenzkePsi',5);
       testCase.verifyEqual(b,braidlab.braid([4 3 2 1 4 3 2 1 -1 -2]));
@@ -76,7 +76,12 @@ classdef braidTest < matlab.unittest.TestCase
 
       % Too many input arguments for creating a braid from data.
       testCase.verifyError(@() braidlab.braid(zeros(3,2,4),1,1), ...
-			   'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:badarg');
+
+      % Creating a braid from a two-dimensional array is assumed to be a
+      % single-particle dataset.  Print a warning, though.
+      testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
+                             'BRAIDLAB:braid:onetraj');
     end
 
     function test_braid_from_randomwalk(testCase)

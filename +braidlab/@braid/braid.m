@@ -134,29 +134,29 @@ classdef braid
           br.n = N;
           br.word = [1:m m:-1:1 1:N-1];
         elseif any(strcmpi(b,{'venzkepsi','psi'}))
-	  % See page 1 of Venzke's thesis.
+          % See page 1 of Venzke's thesis.
           n = secnd;
           if n < 5
             error('BRAIDLAB:braid:badarg','Need at least five strings.')
           end
-	  br.n = n;
-	  if n == 6
-	    br.word = [5:-1:1 5 4 3 5 4];
-	    return
-	  end
-	  L = (n-1):-1:1;
-	  if mod(n,2) == 1
-	    br.word = [L L -1 -2];
-	  elseif mod(n,4) == 0
-	    k = n/4;
-	    br.word = [repmat(L,1,2*k+1) -1 -2];
-	  elseif mod(n,8) == 2
-	    k = (n-2)/8;
-	    br.word = [repmat(L,1,2*k+1) -1 -2];
-	  elseif mod(n,8) == 6
-	    k = (n-6)/8;
-	    br.word = [repmat(L,1,6*k+5) -1 -2];
-	  end
+          br.n = n;
+          if n == 6
+            br.word = [5:-1:1 5 4 3 5 4];
+            return
+          end
+          L = (n-1):-1:1;
+          if mod(n,2) == 1
+            br.word = [L L -1 -2];
+          elseif mod(n,4) == 0
+            k = n/4;
+            br.word = [repmat(L,1,2*k+1) -1 -2];
+          elseif mod(n,8) == 2
+            k = (n-2)/8;
+            br.word = [repmat(L,1,2*k+1) -1 -2];
+          elseif mod(n,8) == 6
+            k = (n-6)/8;
+            br.word = [repmat(L,1,6*k+5) -1 -2];
+          end
         elseif any(strcmpi(b,{'rand','random'}))
           br.n = secnd;
           k = third;
@@ -174,15 +174,31 @@ classdef braid
         % The input is an array of data.
         br = braidlab.braid.color_braiding(b,1:size(b,1),secnd);
       else
-        % Store word as row vector.
-        if size(b,1) > size(b,2)
-          b = b.';
-        end
-        br.word = b;
-        if nargin < 2
-          br.n = max(abs(b))+1;
+        if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
+          % b is neither a row vector or a column vector.  Hopefully the
+          % user means a one-particle dataset.  Perhaps he/she is trying to
+          % create several braids at once (which is not currently
+          % allowed).  By default, print a warning.
+          if size(b,2) == 2
+            warning('BRAIDLAB:braid:onetraj', ...
+                    [ 'Creating trivial braid from single ' ...
+                      'trajectory (did you mean that?).' ])
+            br.word = [];
+            br.n = 1;
+          else
+            error('BRAIDLAB:braid:badarg','Bad array size.')
+          end
         else
-          br.n = secnd;
+          % Store word as row vector.
+          if size(b,1) > size(b,2)
+            b = b.';
+          end
+          br.word = b;
+          if nargin < 2
+            br.n = max(abs(b))+1;
+          else
+            br.n = secnd;
+          end
         end
       end
     end
