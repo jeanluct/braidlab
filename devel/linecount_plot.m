@@ -3,10 +3,11 @@ function linecount_plot(ptype)
 if nargin < 1, ptype = 'rev'; end
 
 d = load('linecount.dat');
+ii = [1 ; find(diff(d(:,3)))+1];
 
-rev = d(:,1);
-utc = d(:,2);
-lc = d(:,3);
+rev = d(ii,1);
+utc = d(ii,2);
+lc = d(ii,3);
 
 % Convert Unix time to datenum.
 dnum = utc/86400 + datenum(1970,1,1);
