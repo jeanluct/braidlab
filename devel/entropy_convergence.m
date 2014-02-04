@@ -33,6 +33,7 @@ catch err
   if strcmp(err.identifier,'BRAIDLAB:braid:tntype_helper:notdecr')
     warning('Growth not decreasing... giving up on train tracks.')
   end
+  etr = 0;
 end
 toc
 
