@@ -12,7 +12,7 @@ function [varargout] = entropy(b,tol,maxit)
 %
 %   [ENTR,PLOOP] = ENTROPY(B) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
-%   are normalized such that INTAXIS(PLOOP)=1.
+%   are normalized such that NORM(PLOOP.COORDS)=1.
 %
 %   ENTR = ENTROPY(B,'trains') uses the Bestvina-Handel train-track
 %   algorithm instead of the Moussafir iterative technique.  (The flags 'BH'
@@ -42,8 +42,6 @@ function [varargout] = entropy(b,tol,maxit)
 % LICENSE>
 
 import braidlab.debugmsg
-
-lenfun = @intaxis; % length function: minlength or intaxis
 
 if istrivial(b)
   varargout{1} = 0;
@@ -90,9 +88,9 @@ entr0 = -1;
 
 nconv = 0;
 for i = 1:maxit
-   u.coords = u.coords/lenfun(u);  % normalize to avoid overflow
+   u.coords = u.coords/norm(u.coords);  % normalize to avoid overflow
    u = b*u;
-  entr = log(lenfun(u));
+  entr = log(norm(u.coords));
   debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
   % Check if we've converged to requested tolerance.
   if abs(entr-entr0) < tol
@@ -122,6 +120,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  u.coords = u.coords/lenfun(u);
+  u.coords = u.coords/norm(u.coords);
   varargout{2} = u;
 end
