@@ -66,7 +66,7 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
 
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 ifndef MEXVOUT
@@ -78,6 +78,8 @@ endif
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.c update_rules.o
+
+entropy_helper.$(MEXSUFFIX): entropy_helper.c update_rules.o
 
 showvars:
 	@echo "$(MEXSUFFIX)"
