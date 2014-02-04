@@ -94,14 +94,9 @@ for i = 1:maxit
    u = b*u;
   entr = log(lenfun(u));
   debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
-  % Check if we've congerved to requested tolerance.
+  % Check if we've converged to requested tolerance.
   if abs(entr-entr0) < tol
     nconv = nconv + 1;
-    if i > 10 && entr < .15 && consecutiveconv
-      warning('BRAIDLAB:braid:entropy:smallentr', ...
-              'Braid has small entropy; result may be inaccurate.')
-      consecutiveconv = false;
-    end
     % Only break if we converged nconvreq times, to prevent accidental
     % convergence.
     if nconv >= nconvreq
