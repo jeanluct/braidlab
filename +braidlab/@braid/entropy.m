@@ -10,8 +10,9 @@ function [varargout] = entropy(b,tol,maxit)
 %   1e-6) and the maximum number of iterations MAXIT to try before giving up
 %   (default 100).
 %
-%   [ENTR,LOGL] = ENTROPY(B) also returns a list LOGL of logarithmic lengths
-%   for each iteration of the algorithm.
+%   [ENTR,PLOOP] = ENTROPY(B) also returns the projective loop PLOOP
+%   corresponding to the generalized eigenvector.  The Dynnikov coordinates
+%   are normalized such that INTAXIS(PLOOP)=1.
 %
 %   ENTR = ENTROPY(B,'trains') uses the Bestvina-Handel train-track
 %   algorithm instead of the Moussafir iterative technique.  (The flags 'BH'
@@ -40,15 +41,13 @@ function [varargout] = entropy(b,tol,maxit)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+import braidlab.debugmsg
+
 lenfun = @intaxis; % length function: minlength or intaxis
 
 if istrivial(b)
   varargout{1} = 0;
-  if nargout > 1
-    % Only one entry for the loop lengths (initial one).
-    u = braidlab.loop(b.n);
-    varargout{2} = log(lenfun(u));
-  end
+  if nargout > 1, varargout{2} = []; end
   return
 end
 
@@ -88,13 +87,13 @@ nconvreq = 3; consecutiveconv = true;
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n);
 entr0 = -1;
-logL0 = log(lenfun(u));
-if nargout > 1, logLlist = logL0; end
+
 nconv = 0;
 for i = 1:maxit
-  u = b*u;
-  logL = log(lenfun(u));
-  entr = logL-logL0;
+   u.coords = u.coords/lenfun(u);  % normalize to avoid overflow
+   u = b*u;
+  entr = log(lenfun(u));
+  debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
   % Check if we've congerved to requested tolerance.
   if abs(entr-entr0) < tol
     nconv = nconv + 1;
@@ -105,13 +104,17 @@ for i = 1:maxit
     end
     % Only break if we converged nconvreq times, to prevent accidental
     % convergence.
-    if nconv >= nconvreq, break; end
+    if nconv >= nconvreq
+      debugmsg(sprintf(['Converged %d time(s) in a row after ' ...
+                        '%d iterations'],nconv,i))
+      break;
+    end
   elseif nconv > 0 && consecutiveconv
     % We failed to converge nconvreq times in a row: reset nconv.
+    debugmsg(sprintf('Converged %d time(s) in a row (< %d)',nconv,nconvreq))
     nconv = 0;
   end
-  if nargout > 1, logLlist = [logLlist logL]; end
-  entr0 = entr; logL0 = logL;
+  entr0 = entr;
 end
 
 if i == maxit
@@ -124,5 +127,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  varargout{2} = logLlist;
+  u.coords = u.coords/lenfun(u);
+  varargout{2} = u;
 end
