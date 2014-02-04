@@ -45,21 +45,28 @@ double l2norm(const int N, double *a, double *b)
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  int it, Niter, nconv, nconvreq;
+  int it, maxit, nconv, nconvreq, dbglvl;
   int n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
   mwIndex k, l;
   mwSize N, Ngen;
-  const mxArray *iiA, *uA;
+  const mxArray *iiA, *uA, *dbglvl_ptr;
   const int *ii;
   const double *u;
   double entr, entr0, tol, l2, *a, *b, *uo;
+
+  /* Get debug level global variable */
+  dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (dbglvl_ptr != NULL)
+    dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
+  else
+    dbglvl = 0;
 
   iiA = prhs[0];
   ii = (int *)mxGetData(iiA); /* iiA contains int32's. */
   uA = prhs[1];
   u = mxGetPr(uA);
 
-  Niter = (int)mxGetScalar(prhs[2]);
+  maxit = (int)mxGetScalar(prhs[2]);
   nconvreq = (int)mxGetScalar(prhs[3]);
   tol = mxGetScalar(prhs[4]);
 
@@ -85,7 +92,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (k = 1; k <= N/2; ++k) { a[k] = u[k-1]; b[k] = u[k-1+N/2]; }
 
   nconv = 0; entr0 = -1;
-  for (it = 1; it <= Niter; ++it)
+  for (it = 1; it <= maxit; ++it)
     {
       /* Normalize coordinates */
       l2 = l2norm(N,a,b);
@@ -95,6 +102,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       update_rules(Ngen, n, ii, a, b);
 
       entr = log(l2norm(N,a,b));
+
+      if (dbglvl >= 2)
+	mexPrintf("  iteration %d  entr=%.10e\n",it,entr);
 
       if (fabs(entr - entr0) < tol)
 	{
@@ -109,6 +119,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       else if (nconv > 0)
 	{
 	  /* Reset consecutive convergence counter. */
+	  if (dbglvl >= 1)
+	    mexPrintf("Converged %d time(s) in a row (< %d)\n",nconv,nconvreq);
 	  nconv = 0;
 	}
 
