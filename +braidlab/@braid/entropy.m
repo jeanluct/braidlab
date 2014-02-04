@@ -80,41 +80,47 @@ end
 % Number of convergence criteria required to be satisfied.
 % Consecutive convergence is more desirable, but becomes hard to achieve
 % for low-entropy braids.
-nconvreq = 3; consecutiveconv = true;
+nconvreq = 3;
 
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n);
-entr0 = -1;
 
-nconv = 0;
-for i = 1:maxit
-   u.coords = u.coords/norm(u.coords);  % normalize to avoid overflow
-   u = b*u;
-  entr = log(norm(u.coords));
-  debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
-  % Check if we've converged to requested tolerance.
-  if abs(entr-entr0) < tol
-    nconv = nconv + 1;
-    % Only break if we converged nconvreq times, to prevent accidental
-    % convergence.
-    if nconv >= nconvreq
-      debugmsg(sprintf(['Converged %d time(s) in a row after ' ...
-                        '%d iterations'],nconv,i))
-      break;
+if exist('entropy_helper') == 3
+  % If MEX file is available, use that.
+  % Only works on double precision numbers.
+  [entr,i,u.coords] = entropy_helper(b.word,u.coords,maxit,nconvreq,tol);
+else
+  nconv = 0; entr0 = -1;
+  for i = 1:maxit
+    u.coords = u.coords/norm(u.coords);  % normalize to avoid overflow
+    u = b*u;
+    entr = log(norm(u.coords));
+    debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
+    % Check if we've converged to requested tolerance.
+    if abs(entr-entr0) < tol
+      nconv = nconv + 1;
+      % Only break if we converged nconvreq times, to prevent accidental
+      % convergence.
+      if nconv >= nconvreq
+	break;
+      end
+    elseif nconv > 0
+      % We failed to converge nconvreq times in a row: reset nconv.
+      debugmsg(sprintf('Converged %d time(s) in a row (< %d)',nconv,nconvreq))
+      nconv = 0;
     end
-  elseif nconv > 0 && consecutiveconv
-    % We failed to converge nconvreq times in a row: reset nconv.
-    debugmsg(sprintf('Converged %d time(s) in a row (< %d)',nconv,nconvreq))
-    nconv = 0;
+    entr0 = entr;
   end
-  entr0 = entr;
 end
 
-if i == maxit
+if i >= maxit
   warning('BRAIDLAB:braid:entropy:noconv', ...
           ['Failed to converge to requested tolerance; braid is likely' ...
            ' finite-order or has low entropy.'])
   %entr = 0;
+else
+  debugmsg(sprintf(['Converged %d time(s) in a row after ' ...
+		    '%d iterations'],nconvreq,i))
 end
 
 varargout{1} = entr;
