@@ -59,43 +59,42 @@ classdef entropyTest < matlab.unittest.TestCase
       testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
 
       testCase.verifyWarning(@() entropy(testCase.b4,'trains'), ...
-			     'BRAIDLAB:braid:entropy:reducible');
+                             'BRAIDLAB:braid:entropy:reducible');
 
       testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
-			   'BRAIDLAB:braid:entropy:badarg');
+                           'BRAIDLAB:braid:entropy:badarg');
     end
 
     function test_entropy_iter(testCase)
       for tol = [1e-6 1e-10 1e-12 1e-14]
-	e = entropy(testCase.b1,tol);
-	testCase.verifyTrue(abs(e - testCase.e1ex) < tol);
+        e = entropy(testCase.b1,tol);
+        testCase.verifyTrue(abs(e - testCase.e1ex) < tol);
 
-	e = entropy(testCase.b2,tol);
-	testCase.verifyTrue(abs(e - testCase.e2ex) < tol);
+        e = entropy(testCase.b2,tol);
+        testCase.verifyTrue(abs(e - testCase.e2ex) < tol);
 
-	e = entropy(testCase.b4,tol);
-	testCase.verifyTrue(abs(e - testCase.e4ex) < tol);
+        e = entropy(testCase.b4,tol);
+        testCase.verifyTrue(abs(e - testCase.e4ex) < tol);
       end
 
       tol = 1e-6;
       testCase.verifyWarning(@() entropy(testCase.b5,tol), ...
-			     'BRAIDLAB:braid:entropy:noconv');
+                             'BRAIDLAB:braid:entropy:noconv');
       testCase.verifyWarning(@() entropy(testCase.b3,tol), ...
-			     'BRAIDLAB:braid:entropy:noconv');
+                             'BRAIDLAB:braid:entropy:noconv');
       % Increase the maximum number of iterations.
       e = entropy(testCase.b3,tol,1000);
       testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
     end
 
     function test_low_entropy(testCase)
-      % Test entropy on Venzke's low-entropy braids.  Note that with the
-      % iterative method we cannot achieve tolerance of 1e-6 for n>16,
-      % even by increasing the maximum number of iterations.
-      tol = 1e-6;
+      % Test entropy on Venzke's low-entropy braids.
+      % Stricter tolerance requires more maximum iterations.
+      tol = 1e-8;
       for n = 7:16
         b = braidlab.braid('psi',n);
         etr = entropy(b,'trains');
-        e = entropy(b,tol,1000);
+        e = entropy(b,tol,2000);
 
         % Polynomials from Venzke's thesis, page 53.
         c = zeros(1,n+1);
@@ -113,14 +112,15 @@ classdef entropyTest < matlab.unittest.TestCase
           k = (n-6)/8;
           c(n+1-(4*k+5)) = -2; c(n+1-(4*k+1)) = -2;
         end
-	% Could also solve for the Perron root this way:
-	%p = @(x) c*x.^(n+1:-1:1).';
-	%opts = optimoptions(@fsolve,'Display','off',...
-	%                    'TolX',1e-20,'TolFun',1e-20);
-	%ee = log(fsolve(p,2,opts));
+        % Could also solve for the Perron root this way:
+        %p = @(x) c*x.^(n+1:-1:1).';
+        %opts = optimoptions(@fsolve,'Display','off',...
+        %                    'TolX',1e-20,'TolFun',1e-20);
+        %ee = log(fsolve(p,2,opts));
         ee = log(max(abs(roots(c))));
-	testCase.verifyTrue(abs(e - ee) < tol);
-	testCase.verifyTrue(abs(etr - ee) < 1e-9);
+        testCase.verifyTrue(abs(e - ee) < tol);
+        % The train track method is very precise.
+        testCase.verifyTrue(abs(etr - ee) < 1e-14);
       end
     end
   end
