@@ -44,6 +44,12 @@ TRAINS_LIBDIR     = ../../../extern/trains
 TRAINS_INCLUDEDIR = ../../../extern
 TRAINS_LD         = -ltrains
 
+%.o: %.c
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
+	$(MEX) -c $(MEXFLAGS) $^
+
 %.$(MEXSUFFIX): %.c
 ifndef MEXVOUT
 	$(error Matlab "mex" command is not in your path)
@@ -60,6 +66,8 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
+
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 ifndef MEXVOUT
 	$(error Matlab "mex" command is not in your path)
@@ -69,7 +77,7 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX)
+loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.c update_rules.o
 
 showvars:
 	@echo "$(MEXSUFFIX)"

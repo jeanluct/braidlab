@@ -25,19 +25,22 @@
  LICENSE>
 */
 
-#define pos(x) (x > 0 ? x : 0)
-#define neg(x) (x < 0 ? x : 0)
 #define MAX(a,b)  (a > b ? a : b)
+
+__inline__
+void update_rules(const int Ngen, const int n, const int *ii,
+                  double *a, double *b);
+
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   int i, n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
-  mwIndex j, k, l;
+  mwIndex k, l;
   mwSize N, Nr, Ngen;
   const mxArray *iiA, *uA;
   const int *ii;
   const double *u;
-  double *a, *b, *ap, *bp, *uo, c, d;
+  double *a, *b, *uo;
 
   if (nrhs < 2)
     {
@@ -64,8 +67,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   /* Make 1-indexed arrays */
   a = (double *) malloc(N/2 * sizeof(double)) - 1;
   b = (double *) malloc(N/2 * sizeof(double)) - 1;
-  ap = (double *) malloc(N/2 * sizeof(double)) - 1;
-  bp = (double *) malloc(N/2 * sizeof(double)) - 1;
 
   /* Create an mxArray for the output data */
   plhs[0] = mxCreateDoubleMatrix(Nr, N, mxREAL);
@@ -78,57 +79,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         {
           a[k] = u[(k-1    )*Nr+l];
           b[k] = u[(k-1+N/2)*Nr+l];
-          ap[k] = a[k];
-          bp[k] = b[k];
         }
 
-      for (j = 0; j < Ngen; ++j) /* Loop over generators */
-        {
-          i = abs(ii[j]);
-          if (ii[j] > 0)
-            {
-              if (i == 1)
-                {
-                  bp[1] = a[1] + pos(b[1]);
-                  ap[1] = -b[1] + pos(bp[1]);
-                }
-              else if (i == n-1)
-                {
-                  bp[n-2] = a[n-2] + neg(b[n-2]);
-                  ap[n-2] = -b[n-2] + neg(bp[n-2]);
-                }
-              else
-                {
-                  c = a[i-1] - a[i] - pos(b[i]) + neg(b[i-1]);
-                  ap[i-1] = a[i-1] - pos(b[i-1]) - pos(pos(b[i]) + c);
-                  bp[i-1] = b[i] + neg(c);
-                  ap[i] = a[i] - neg(b[i]) - neg(neg(b[i-1]) - c);
-                  bp[i] = b[i-1] - neg(c);
-                }
-            }
-          else if (ii[j] < 0)
-            {
-              if (i == 1)
-                {
-                  bp[1] = -a[1] + pos(b[1]);
-                  ap[1] = b[1] - pos(bp[1]);
-                }
-              else if (i == n-1)
-                {
-                  bp[n-2] = -a[n-2] + neg(b[n-2]);
-                  ap[n-2] = b[n-2] - neg(bp[n-2]);
-                }
-              else
-                {
-                  d = a[i-1] - a[i] + pos(b[i]) - neg(b[i-1]);
-                  ap[i-1] = a[i-1] + pos(b[i-1]) + pos(pos(b[i]) - d);
-                  bp[i-1] = b[i] - pos(d);
-                  ap[i] = a[i] + neg(b[i]) + neg(neg(b[i-1]) + d);
-                  bp[i] = b[i-1] + pos(d);
-                }
-            }
-          for (k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
-        }
+      /* Act with the braid sequence in ii onto the coordinates a,b. */
+      update_rules(Ngen, n, ii, a, b);
+
       for (k = 1; k <= N/2; ++k)
         {
           /* Copy final a and b to row of output array */
@@ -139,8 +94,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   free(a+1);
   free(b+1);
-  free(ap+1);
-  free(bp+1);
 
   return;
 }
