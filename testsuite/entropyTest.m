@@ -119,8 +119,7 @@ classdef entropyTest < matlab.unittest.TestCase
         %ee = log(fsolve(p,2,opts));
         ee = log(max(abs(roots(c))));
         testCase.verifyTrue(abs(e - ee) < tol);
-        % The train track method is very precise.
-        testCase.verifyTrue(abs(etr - ee) < 1e-14);
+        testCase.verifyTrue(abs(etr - ee) < 1e-9);
       end
     end
   end
