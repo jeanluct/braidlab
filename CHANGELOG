@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+1.x.x [2014-xx-xx]
+
+* braid.entropy's convergence has been greatly improved (see next item
+  for more details).  With enough iterations, machine precision can
+  usually be achieved.
+
+* braid.entropy's optional second return argument has changed from a
+  list of iterates to the final generalized eigenvector.  The reason
+  is that the internal algorithm has changed: the Dynnikov coordinates
+  get renormalized at every step, much like the power iteration method
+  for finding the largest eigenvalue of a matrix.  A consequence of
+  this is that it is no longer natural to store the iterates.  This
+  shouldn't affect things very much, since this optional argument was
+  not used widely.
+
+------------------------------------------------------------------------
 1.0.5 [2014-01-31]
 
 * Constructors for Rupert Venzke's psi-family of low-entropy braids.
