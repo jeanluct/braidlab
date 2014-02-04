@@ -34,7 +34,7 @@ void update_rules(const int Ngen, const int n, const int *ii,
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  int i, n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
+  int n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
   mwIndex k, l;
   mwSize N, Nr, Ngen;
   const mxArray *iiA, *uA;
