@@ -105,25 +105,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       entr = log(l2norm(N,a,b));
 
       if (dbglvl >= 2)
-	mexPrintf("  iteration %d  entr=%.10e\n",it,entr);
+        mexPrintf("  iteration %d  entr=%.10e\n",it,entr);
 
       if (fabs(entr - entr0) < tol)
-	{
-	  /* We've converged! */
-	  ++nconv;
-	  if (nconv >= nconvreq)
-	    {
-	      /* Only break if we converged enough times in a row. */
-	      break;
-	    }
-	}
+        {
+          /* We've converged! */
+          ++nconv;
+          if (nconv >= nconvreq)
+            {
+              /* Only break if we converged enough times in a row. */
+              break;
+            }
+        }
       else if (nconv > 0)
-	{
-	  /* Reset consecutive convergence counter. */
-	  if (dbglvl >= 1)
-	    mexPrintf("Converged %d time(s) in a row (< %d)\n",nconv,nconvreq);
-	  nconv = 0;
-	}
+        {
+          /* Reset consecutive convergence counter. */
+          if (dbglvl >= 1)
+            mexPrintf("Converged %d time(s) in a row (< %d)\n",nconv,nconvreq);
+          nconv = 0;
+        }
 
       entr0 = entr;
     }
