@@ -88,6 +88,25 @@ classdef entropyTest < matlab.unittest.TestCase
       testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
     end
 
+    function test_entropy_iter_conv(testCase)
+      % Verify that the iterative method always converges to the required
+      % tolerance, using the default number of steps, unless the braid is
+      % parabolic, finite-order, or reducible with no finite-order
+      % component.
+      %
+      % This particular random set has been checked to contain no
+      % finite-order or parabolic braids, which are rare for long random
+      % braids.
+      rng('default')
+      len = 50; tol = 1e-8; Nreal = 30;
+      for r = 1:Nreal
+        for n = 4:10
+          b = braidlab.braid('random',n,len);
+          testCase.verifyWarningFree(@() b.entropy(tol));
+        end
+      end
+    end
+
     function test_low_entropy(testCase)
       % Test entropy on Venzke's low-entropy braids.
       % Stricter tolerance requires more maximum iterations.
