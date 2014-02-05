@@ -43,7 +43,7 @@ function [varargout] = entropy(b,tol,maxit)
 
 import braidlab.debugmsg
 
-if istrivial(b)
+if istrivial(b) || b.n < 3
   varargout{1} = 0;
   if nargout > 1, varargout{2} = []; end
   return
@@ -73,8 +73,117 @@ if ischar(tol)
 end
 
 if nargin < 3
-  % Empirical formula (see find_maxit).
-  maxit = max(min(90*b.n-500,4100),100);
+  % Use the spectral gap of the lowest-entropy braid to compute the
+  % maximum number of iterations.
+  if b.n <= 100
+    % Pre-computed spectral gap for 3 <= n <= 100.
+    gaps = [
+      4.1179753e-01
+      3.6109108e-01
+      2.3605428e-01
+      3.1827604e-01
+      8.3003466e-02
+      5.6109015e-02
+      3.2443313e-02
+      3.3357112e-02
+      1.6610611e-02
+      1.3132736e-02
+      9.7237407e-03
+      9.1009771e-03
+      6.2032130e-03
+      5.2000119e-03
+      4.2062893e-03
+      3.8839500e-03
+      2.9862353e-03
+      2.5907556e-03
+      2.1976739e-03
+      2.0310987e-03
+      1.6649014e-03
+      1.4779248e-03
+      1.2917820e-03
+      1.1991711e-03
+      1.0225819e-03
+      9.2282755e-04
+      8.2342598e-04
+      7.6830919e-04
+      6.7289595e-04
+      6.1485705e-04
+      5.5698874e-04
+      5.2227822e-04
+      4.6628160e-04
+      4.3023188e-04
+      3.9427302e-04
+      3.7137575e-04
+      3.3637717e-04
+      3.1281038e-04
+      2.8929568e-04
+      2.7360071e-04
+      2.5061457e-04
+      2.3456107e-04
+      2.1853921e-04
+      2.0743034e-04
+      1.9171645e-04
+      1.8040458e-04
+      1.6911285e-04
+      1.6103347e-04
+      1.4992983e-04
+      1.4173009e-04
+      1.3354367e-04
+      1.2752926e-04
+      1.1946235e-04
+      1.1337376e-04
+      1.0729426e-04
+      1.0272597e-04
+      9.6725019e-05
+      9.2109457e-05
+      8.7500285e-05
+      8.3968815e-05
+      7.9412792e-05
+      7.5850337e-05
+      7.2292478e-05
+      6.9519891e-05
+      6.5998921e-05
+      6.3205512e-05
+      6.0415478e-05
+      5.8208572e-05
+      5.5444718e-05
+      5.3223511e-05
+      5.1004828e-05
+      4.9226495e-05
+      4.7026765e-05
+      4.5238419e-05
+      4.3451991e-05
+      4.2003115e-05
+      4.0230652e-05
+      3.8774644e-05
+      3.7320115e-05
+      3.6127846e-05
+      3.4683773e-05
+      3.3486345e-05
+      3.2290072e-05
+      3.1300055e-05
+      3.0111723e-05
+      2.9117923e-05
+      2.8125036e-05
+      2.7296159e-05
+      2.6309381e-05
+      2.5477696e-05
+      2.4646740e-05
+      2.3947523e-05
+      2.3121324e-05
+      2.2419997e-05
+      2.1719259e-05
+      2.1125318e-05
+      2.0428324e-05
+      1.9832782e-05];
+    gap = gaps(b.n-2);
+  else
+    % Recompute the roots of the psi braid.
+    r = psiroots(n);
+    gap = log10(abs(r(1)/r(2)));
+  end
+  maxit = ceil(-log10(tol) / gap) + 10;
+  debugmsg(sprintf('maxit = %d',maxit))
 end
 
 % Number of convergence criteria required to be satisfied.
@@ -102,7 +211,7 @@ else
       % Only break if we converged nconvreq times, to prevent accidental
       % convergence.
       if nconv >= nconvreq
-	break;
+        break;
       end
     elseif nconv > 0
       % We failed to converge nconvreq times in a row: reset nconv.
@@ -120,7 +229,7 @@ if i >= maxit
   %entr = 0;
 else
   debugmsg(sprintf(['Converged %d time(s) in a row after ' ...
-		    '%d iterations'],nconvreq,i))
+                    '%d iterations'],nconvreq,i))
 end
 
 varargout{1} = entr;
