@@ -4,7 +4,7 @@ function e = psiroots(n)
 %   low-entropy braid psi, created with braid('psi',N) for N > 4.  The
 %   roots are sorted in descending order of magnitude.
 %
-%   For N <= 4 the roots are those of the lowest-entropy braids.
+%   For 3 <= N <= 4 the roots are those of the lowest-entropy braids.
 %
 %   Reference:
 %
@@ -31,6 +31,10 @@ function e = psiroots(n)
 %   You should have received a copy of the GNU General Public License
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
+
+if n < 3
+  error('BRAIDLAB:psiroots:badarg','Need at least three strings.')
+end
 
 % Polynomials from Venzke's thesis, page 53.
 c = zeros(1,n+1);
