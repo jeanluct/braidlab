@@ -1,18 +1,30 @@
 ------------------------------------------------------------------------
 1.x.x [2014-xx-xx]
 
-* braid.entropy's convergence has been greatly improved (see next item
-  for more details).  With enough iterations, machine precision can
-  usually be achieved.
+Several improvements to the method braid.entropy:
 
-* braid.entropy's optional second return argument has changed from a
-  list of iterates to the final generalized eigenvector.  The reason
-  is that the internal algorithm has changed: the Dynnikov coordinates
-  get renormalized at every step, much like the power iteration method
-  for finding the largest eigenvalue of a matrix.  A consequence of
-  this is that it is no longer natural to store the iterates.  This
+* It has a C MEX helper function and is much faster.
+
+* Its convergence has been greatly improved (see next item for more
+  details).  With enough iterations, machine precision can usually be
+  achieved.
+
+* Its optional second return argument has changed from a list of
+  iterates to the final generalized eigenvector.  The reason is that
+  the internal algorithm has changed: the Dynnikov coordinates get
+  renormalized at every step, much like the power iteration method for
+  finding the largest eigenvalue of a matrix.  A consequence of this
+  is that it is no longer natural to store the iterates.  This
   shouldn't affect things very much, since this optional argument was
   not used widely.
+
+* The maximum number of iterations to try is now determined by using
+  the low-entropy psi braids.  The spectral gap of those braids is
+  computed using the new function psiroots.  Two caveats: (i) Those
+  braids are only known to have lowest entropy for 8 strands or fewer.
+  (ii) Even if they have the lowest entropy, they might not have the
+  lowest spectral gap.  In practice this shouldn't matter, but this
+  method shouldn't be used to prove theorems!
 
 ------------------------------------------------------------------------
 1.0.5 [2014-01-31]
