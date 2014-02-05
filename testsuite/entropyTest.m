@@ -80,10 +80,11 @@ classdef entropyTest < matlab.unittest.TestCase
       tol = 1e-6;
       testCase.verifyWarning(@() entropy(testCase.b5,tol), ...
                              'BRAIDLAB:braid:entropy:noconv');
-      testCase.verifyWarning(@() entropy(testCase.b3,tol), ...
+      % Low-entropy braid with too few iterations.
+      testCase.verifyWarning(@() entropy(testCase.b3,tol,100), ...
                              'BRAIDLAB:braid:entropy:noconv');
-      % Increase the maximum number of iterations.
-      e = entropy(testCase.b3,tol,1000);
+      % The default gives enough iterations.
+      e = entropy(testCase.b3,tol);
       testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
     end
 
@@ -94,30 +95,9 @@ classdef entropyTest < matlab.unittest.TestCase
       for n = 7:16
         b = braidlab.braid('psi',n);
         etr = entropy(b,'trains');
-        e = entropy(b,tol,2000);
+        e = entropy(b,tol);
 
-        % Polynomials from Venzke's thesis, page 53.
-        c = zeros(1,n+1);
-        c(1) = 1; c(n+1) = 1;
-        if mod(n,2) == 1
-          k = (n-1)/2;
-          c(n+1-(k+1)) = -2; c(n+1-(k)) = -2;
-        elseif mod(n,4) == 0
-          k = n/4;
-          c(n+1-(2*k+1)) = -2; c(n+1-(2*k-1)) = -2;
-        elseif mod(n,8) == 2
-          k = (n-2)/8;
-          c(n+1-(4*k+3)) = -2; c(n+1-(4*k-1)) = -2;
-        elseif mod(n,8) == 6
-          k = (n-6)/8;
-          c(n+1-(4*k+5)) = -2; c(n+1-(4*k+1)) = -2;
-        end
-        % Could also solve for the Perron root this way:
-        %p = @(x) c*x.^(n+1:-1:1).';
-        %opts = optimoptions(@fsolve,'Display','off',...
-        %                    'TolX',1e-20,'TolFun',1e-20);
-        %ee = log(fsolve(p,2,opts));
-        ee = log(max(abs(roots(c))));
+        ee = log(max(abs(braidlab.psiroots(n))));
         testCase.verifyTrue(abs(e - ee) < tol);
         testCase.verifyTrue(abs(etr - ee) < 1e-9);
       end

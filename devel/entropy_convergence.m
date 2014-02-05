@@ -13,19 +13,18 @@ tol = 1e-15;
 
 % Predict the number of iterations from the spectral gap between the
 % first two roots.
-r = roots_psi(n);
+r = psiroots(n);
 Niter = ceil(-log10(tol) / log10(abs(r(1)/r(2))));
 ee = log(abs(r(1)));
 fprintf('Predict %d iterations needed\n',Niter)
 
 b = braidlab.braid('psi',n);  % low entropy braid
 
-% Train-track is much faster (and often more accurate) for such
-% low-entropy braids.  The low entropy actually helps the method.  But it
-% is the other way around for high entropy.
+% For train tracks, the low entropy actually helps the method.  But the
+% iterative method is better for high entropy.
 %
-% However, the method fails for n>77, with the message 'Growth not
-% decreasing in fold and minimum tolerance of 1.00e-14 reached.'
+% However, the train track method fails for n>77, with the message 'Growth
+% not decreasing in fold and minimum tolerance of 1.00e-14 reached.'
 tic
 try
   etr = entropy(b,'trains');
@@ -46,4 +45,4 @@ fprintf('Predicted %d iterations\n',Niter)
 
 fprintf('Error: iter=%e  train=%e\n',abs(e-ee),abs(etr-ee))
 
-BRAIDLAB_debuglvl = 0;
+clear -global BRAIDLAB_debuglvl
