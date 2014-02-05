@@ -32,7 +32,7 @@ void update_rules(const int Ngen, const int n, const int *ii,
                   double *a, double *b);
 
 __inline__
-double l2norm(const int N, double *a, double *b)
+double l2norm(const int N, const double *a, const double *b)
 {
   int k;
   double l2;
@@ -49,17 +49,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int n; /* Refer to generators, so don't need to be mwIndex/mwSize. */
   mwIndex k, l;
   mwSize N, Ngen;
-  const mxArray *iiA, *uA, *dbglvl_ptr;
+  const mxArray *iiA, *uA;
+  mxArray *dbglvl_ptr;
   const int *ii;
   const double *u;
   double entr, entr0, tol, l2, *a, *b, *uo;
 
   /* Get debug level global variable */
   dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  dbglvl = 0;
   if (dbglvl_ptr != NULL)
-    dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
-  else
-    dbglvl = 0;
+    if (mxGetM(dbglvl_ptr) != 0)
+      dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
 
   iiA = prhs[0];
   ii = (int *)mxGetData(iiA); /* iiA contains int32's. */
@@ -138,6 +139,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   free(a+1);
   free(b+1);
+  if (dbglvl_ptr != NULL)
+    if (mxGetM(dbglvl_ptr) != 0)
+      mxDestroyArray(dbglvl_ptr);
 
   return;
 }
