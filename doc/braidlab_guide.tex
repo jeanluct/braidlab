@@ -343,7 +343,6 @@ or has very low entropy:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(braid([1 2]))
 Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.
-> In braid.entropy at 89
 
 ans = 0
 \end{lstlisting}
@@ -1213,7 +1212,7 @@ constructing braids.  If we give an optional projection angle %
 of~$\pi/2$ to \lstinline{taffy}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2)
-Error using color_braiding (line 73)
+Error using color_braiding
 Coincident projection coordinate; change projection angle
    (type help braid.braid).
 \end{lstlisting}
@@ -1364,7 +1363,6 @@ However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
 ans = 3.3258
 
 Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.
-> In braid.entropy at 89
 
 ans = 0
 \end{lstlisting}
