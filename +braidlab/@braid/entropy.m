@@ -6,9 +6,13 @@ function [varargout] = entropy(b,tol,maxit)
 %   on the punctured disk, then ENTR is the topological entropy of the
 %   pseudo-Anosov representative.
 %
-%   ENTR = ENTROPY(B,TOL,MAXIT) also specifies the tolerance TOL (default
-%   1e-6) and the maximum number of iterations MAXIT to try before giving up
-%   (default 100).
+%   ENTR = ENTROPY(B,TOL) also specifies the absolute tolerance TOL (default
+%   1e-6) that should be aimed for.  TOL is only approximate: if the
+%   iteration converges slowly it can be off by a small amount.
+%
+%   ENTR = ENTROPY(B,TOL,MAXIT) also specifies the maximum number of
+%   iterations MAXIT to try before giving up.  The default is computed based
+%   on TOL and the extreme case given by the small-dilatation psi braids.
 %
 %   [ENTR,PLOOP] = ENTROPY(B) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -20,7 +24,7 @@ function [varargout] = entropy(b,tol,maxit)
 %   for long braids this algorithm becomes very inefficient.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE.
+%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
