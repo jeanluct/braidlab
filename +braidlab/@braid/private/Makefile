@@ -31,10 +31,11 @@ CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2))
 MATLABHOME  = $(strip $(shell $(MEXENV) | \
 		grep "\-> *MATLAB *=" | cut -d = -f 2))
 
-CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
+CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
+
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
-MEXFLAGS  = -largeArrayDims
+MEXFLAGS  = -largeArrayDims CFLAGS="${CFLAGS}"
 
 CBRAID_LIBDIR     = ../../../extern/cbraid/lib
 CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
@@ -87,6 +88,6 @@ showvars:
 	@echo "$(CC)"
 	@echo "$(CXX)"
 	@echo "$(MATLABHOME)"
-
+	@echo "$(CFLAGS)"
 clean:
 	rm -f *.$(MEXSUFFIX) *.o
