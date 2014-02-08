@@ -1,4 +1,4 @@
-function [varargout] = entropy(b,tol,maxit)
+function [varargout] = entropy(b,tol,maxit,nconvreq)
 %ENTROPY   Topological entropy of a braid.
 %   ENTR = ENTROPY(B) returns the topological entropy of the braid B.  More
 %   precisely, ENTR is the maximum growth rate of a loop under iteration of
@@ -21,7 +21,12 @@ function [varargout] = entropy(b,tol,maxit)
 %   convergence is not checked for.  The final value of the entropy at
 %   the end of iteration is returned.
 %
-%   [ENTR,PLOOP] = ENTROPY(B) also returns the projective loop PLOOP
+%   ENTR = ENTROPY(B,TOL,MAXIT,NCONV) or ENTROPY(B,TOL,[],NCONV) demands
+%   that the tolerance TOL be achieved NCONV consecutive times (default 3).
+%   For low-entropy braids, achieving TOL a few times does not guarantee TOL
+%   digits, so increasing NCONV is required for extreme accuracy.
+%
+%   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
 %   are normalized such that NORM(PLOOP.COORDS)=1.
 %
@@ -85,7 +90,7 @@ end
 
 if isempty(tol), tol = 0; end
 
-if nargin < 3
+if nargin < 3 || isempty(maxit)
   if tol == 0
     error('BRAIDLAB:braid:entropy:badarg', ...
           'Must specify tolerance>0 or maximum iterations.')
@@ -211,7 +216,7 @@ end
 % Number of convergence criteria required to be satisfied.
 % Consecutive convergence is more desirable, but becomes hard to achieve
 % for low-entropy braids.
-nconvreq = 3;
+if nargin < 4, nconvreq = 3; end
 
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n);
