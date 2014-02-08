@@ -54,7 +54,7 @@ function [varargout] = entropy(b,tol,maxit)
 
 import braidlab.debugmsg
 
-if istrivial(b) || b.n < 3
+if isempty(b.word) || b.n < 3
   varargout{1} = 0;
   if nargout > 1, varargout{2} = []; end
   return
