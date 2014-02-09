@@ -25,10 +25,12 @@ classdef entropyTest < matlab.unittest.TestCase
     b3
     b4
     b5
+    b6
     e1ex
     e2ex
     e3ex
     e4ex
+    e6ex
   end
 
   methods (TestMethodSetup)
@@ -39,10 +41,12 @@ classdef entropyTest < matlab.unittest.TestCase
       testCase.b3 = braid('VenzkePsi',16);
       testCase.b4 = braid([1 2 -3],5);
       testCase.b5 = braid([1 2]);  % finite-order (zero entropy)
+      testCase.b6 = braid('VenzkePsi',101);
       testCase.e1ex = 2*log((1+sqrt(5))/2);
       testCase.e2ex = 2*log(1+sqrt(2));
       testCase.e3ex = 0.166609316967714;
       testCase.e4ex = 0.831442945529311;
+      testCase.e6ex = 0.026080318192290;
     end
   end
 
@@ -86,6 +90,12 @@ classdef entropyTest < matlab.unittest.TestCase
       % The default gives enough iterations.
       e = entropy(testCase.b3,tol);
       testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
+
+      % Try a braid with more than 100 strings, so the maximum number of
+      % iterations is determined by asymptotic spectral gap.  Have to use
+      % higher tolerance, since the entropy converges slowly.
+      e = entropy(testCase.b6,.01*tol);
+      testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
 
       % Specify 0 tolerance: should not issue a warning about lack of
       % convergence.

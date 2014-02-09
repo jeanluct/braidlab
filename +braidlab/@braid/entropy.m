@@ -102,7 +102,7 @@ if nargin < 3 || isempty(maxit)
     %
     % This is log10(abs(r(1)/r(2))), where r(1) and r(2) are the two
     % largest roots of the braid's polynomial.
-    gaps = [
+    spgaps = [
       4.1179753e-01
       3.6109108e-01
       2.3605428e-01
@@ -201,15 +201,14 @@ if nargin < 3 || isempty(maxit)
       2.1125318e-05
       2.0428324e-05
       1.9832782e-05];
-    gap = gaps(b.n-2);
+    spgap = spgaps(b.n-2);
   else
-    % For n>100, recompute the roots of the psi braid.
-    r = psiroots(n);
-    gap = log10(abs(r(1)/r(2)));
+    % For n>100, use asymptotic formula.
+    spgap = 19.79769 * b.n^-3;
   end
   % The maximum number of iterations is chosen based on the tolerance and
-  % spectral gap.  Roughly, each iteration yields gap decimal digits.
-  maxit = ceil(-log10(tol) / gap) + 10;
+  % spectral gap.  Roughly, each iteration yields spgap decimal digits.
+  maxit = ceil(-log10(tol) / spgap) + 10;
   debugmsg(sprintf('maxit = %d',maxit))
 end
 
@@ -217,6 +216,12 @@ end
 % Consecutive convergence is more desirable, but becomes hard to achieve
 % for low-entropy braids.
 if nargin < 4, nconvreq = 3; end
+
+% Use the lines below to help guarantee TOL.  We set the number of required
+% consecutive convergences to one digit.  Not yet fully tested.
+%if nargin < 4
+%  if exist('spgap'), nconvreq = ceil(1/spgap); maxit = maxit + nconvreq; end
+%end
 
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n);
