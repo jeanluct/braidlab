@@ -204,7 +204,7 @@ if nargin < 3 || isempty(maxit)
     spgap = spgaps(b.n-2);
   else
     % For n>100, use asymptotic formula.
-    spgap = 19.79769 * b.n^-3;
+    spgap = 8*pi^2/sqrt(3)/log(10) * b.n^-3;
   end
   % The maximum number of iterations is chosen based on the tolerance and
   % spectral gap.  Roughly, each iteration yields spgap decimal digits.
