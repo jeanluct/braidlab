@@ -3,7 +3,9 @@
 
 Several improvements to the method braid.entropy:
 
-* It has a C MEX helper function and is much faster.
+* It has a C MEX helper function and is much faster.  It no longer
+  checks if the braid is trivial, which avoids overflow and speeds up
+  the function.
 
 * Its convergence has been greatly improved (see next item for more
   details).  With enough iterations, machine precision can usually be
