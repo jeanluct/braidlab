@@ -196,7 +196,7 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
-  clf reset
+  %clf reset
 end
 
 %%  Draw punctures.
