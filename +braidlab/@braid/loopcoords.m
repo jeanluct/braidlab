@@ -81,9 +81,15 @@ switch lower(typ)
  case 'vpi'
   % Use variable precision integers if available.
   if ~(exist('vpi') == 2)
-    error('BRAIDLAB:braid:loopcoords:novpi',...
-          ['vpi type not on path.  Try ''addpath ' ...
-           'extern/VariablePrecisionIntegers'' from braidlab folder.'])
+    % No VPI... try to add the path.
+    blbase = fileparts(fileparts(which('braidlab.debugmsg')));
+    addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
+    if ~(exist('vpi') == 2)
+      % For some reason this didn't work.
+      error('BRAIDLAB:braid:loopcoords:novpi',...
+            ['vpi type not on path.  Try ''addpath ' ...
+             'extern/VariablePrecisionIntegers'' from braidlab folder.'])
+    end
   end
   htyp = @vpi;
 end
