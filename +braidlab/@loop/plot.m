@@ -196,7 +196,9 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
+  % Do we need either of these?
   %clf reset
+  %cla
 end
 
 %%  Draw punctures.
