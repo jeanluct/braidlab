@@ -196,7 +196,7 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
-  % Do we need either of these?
+  % Do we need either of the next two lines?
   %clf reset
   %cla
 end
