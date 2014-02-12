@@ -62,15 +62,35 @@ classdef loopTest < matlab.unittest.TestCase
 
       % Trying to create from odd number of columns should error.
       testCase.verifyError(@()braidlab.loop([1 2 3]), ...
-			   'BRAIDLAB:loop:loop:oddlength');
+                           'BRAIDLAB:loop:loop:oddlength');
       testCase.verifyError(@()braidlab.loop([1 2 3; 4 5 6]), ...
-			   'BRAIDLAB:loop:loop:oddlength');
+                           'BRAIDLAB:loop:loop:oddlength');
       % Trying to create from different sizes of a,b should error.
       testCase.verifyError(@()braidlab.loop([1 2 3],[4 5]), ...
-			   'BRAIDLAB:loop:loop:badsize')
+                           'BRAIDLAB:loop:loop:badsize')
       % Trying to create from different sizes of a,b should error.
       testCase.verifyError(@()braidlab.loop([1 2 3; 1 2 3],[4 5; 4 5]), ...
-			   'BRAIDLAB:loop:loop:badsize')
+                           'BRAIDLAB:loop:loop:badsize')
+    end
+
+    function test_loopcoords(testCase)
+      % Test loop coordinates using various types.
+      % This is a method for braid, but essentially uses loops.
+      b = braidlab.braid([1 -2 3]);
+
+      l = loopcoords(b);
+      testCase.verifyEqual(l.coords,int64([1 -2 1 -2 -2 2]));
+      l = loopcoords(b,[],'double');
+      testCase.verifyEqual(l.coords,[1 -2 1 -2 -2 2]);
+      l = loopcoords(b,[],'int32');
+      testCase.verifyEqual(l.coords,int32([1 -2 1 -2 -2 2]));
+      l = loopcoords(b,[],'vpi');
+      testCase.verifyEqual(l.coords,vpi([1 -2 1 -2 -2 2]));
+
+      l = loopcoords(b,'left');
+      testCase.verifyEqual(l.coords,int64([-1 2 -3 0 0 0]));
+      l = loopcoords(b,'dehornoy');
+      testCase.verifyEqual(l.coords,int64([1 -2 3 0 0 0]));
     end
 
     function test_loop_length_overflow(testCase)
@@ -90,14 +110,14 @@ classdef loopTest < matlab.unittest.TestCase
       % reasonable.
       Niter = 5;
       err = ['Manual and built-in computations of entropy do not match' ...
-	     ' at (small) Niter=%d.'];
+             ' at (small) Niter=%d.'];
       testCase.verifyEqual(loopEntropy(Niter), expEntropy, 'AbsTol', tol, ...
-			   sprintf(err, Niter));
+                           sprintf(err, Niter));
 
       % This is the actual overflow test.
       Niter = 100;
       testCase.verifyError(@()loopEntropy(Niter),...
-			   'BRAIDLAB:braid:sumg:overflow')
+                           'BRAIDLAB:braid:sumg:overflow')
     end
   end
 end
