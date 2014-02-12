@@ -59,16 +59,15 @@ function l = loopcoords(b,conv,typ)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2
-  conv = 'right';
-end
+if nargin < 2, conv = 'right'; end
 
-if isempty(conv)
-  conv = 'right';
-end
+if isempty(conv), conv = 'right'; end
 
 if nargin < 3
   typ = 'int64';
+  notypespec = true;
+else
+  notypespec = false;
 end
 
 switch lower(typ)
@@ -79,18 +78,7 @@ switch lower(typ)
  case 'double'
   htyp = @double;
  case 'vpi'
-  % Use variable precision integers if available.
-  if ~(exist('vpi') == 2)
-    % No VPI... try to add the path.
-    blbase = fileparts(fileparts(which('braidlab.debugmsg')));
-    addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
-    if ~(exist('vpi') == 2)
-      % For some reason this didn't work.
-      error('BRAIDLAB:braid:loopcoords:novpi',...
-            ['vpi type not on path.  Try ''addpath ' ...
-             'extern/VariablePrecisionIntegers'' from braidlab folder.'])
-    end
-  end
+  checkvpi
   htyp = @vpi;
 end
 
@@ -111,4 +99,33 @@ switch lower(conv)
   w = b.word;
 end
 
-l = braidlab.loop(loopsigma(w,htyp(l.coords)));
+try
+  l = braidlab.loop(loopsigma(w,htyp(l.coords)));
+catch err
+  if notypespec  % Only try VPI if type wasn't explicitly specified.
+    if strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
+      warning('BRAIDLAB:braid:loopcoords:overflow',...
+              'loopcoords overflowed... using VPI.')
+      checkvpi
+      l = braidlab.loop(loopsigma(w,vpi(l.coords)));
+    end
+  else
+    rethrow(err)
+  end
+end
+
+%=====================================================================
+function checkvpi
+
+% Use variable precision integers if available.
+if ~(exist('vpi') == 2)
+  % No VPI... try to add the path.
+  blbase = fileparts(fileparts(which('braidlab.debugmsg')));
+  addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
+  if ~(exist('vpi') == 2)
+    % For some reason this didn't work.
+    error('BRAIDLAB:braid:loopcoords:novpi',...
+          ['vpi type not on path.  Try ''addpath ' ...
+           'extern/VariablePrecisionIntegers'' from braidlab folder.'])
+  end
+end
