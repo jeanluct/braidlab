@@ -342,7 +342,7 @@ This can fail if the braid is finite-order %
 or has very low entropy:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(braid([1 2]))
-Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.
+Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.  Returning zero entropy.
 
 ans = 0
 \end{lstlisting}
@@ -956,7 +956,7 @@ or even act on all the loops with the same braid:
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
 \index{braid class@\braid\ class!multiplication (\lstinline{*})|(}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2);
+>> b = braid([1 -2]);
 >> b*ll
 
 ans = (( 2  1 -2  1 ))
@@ -1362,7 +1362,7 @@ However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
 
 ans = 3.3258
 
-Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.
+Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.  Returning zero entropy.
 
 ans = 0
 \end{lstlisting}
