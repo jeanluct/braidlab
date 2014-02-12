@@ -44,7 +44,9 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
-  clf reset
+  % Do we need either of the next two lines?
+  %clf reset
+  cla
   hold on
 end
 
