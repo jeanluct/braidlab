@@ -220,7 +220,17 @@ classdef loop
     %   See also LOOP, LOOP.DISP.
       for i = 1:size(obj,2)
         if ~isa(obj(i).coords,'vpi')
-          disp(char(obj(i)))
+          sz = get(0, 'CommandWindowSize');
+          wc = textwrap({char(obj(i))},sz(1)-4);
+          for i = 1:length(wc)
+            % Indent rows.
+            wc{i} = ['   ' wc{i}];
+            % If the format is loose rather than compact, add a line break.
+            if strcmp(get(0,'FormatSpacing'),'loose')
+              wc{i} = sprintf('%s\n',wc{i});
+            end
+          end
+          disp(strvcat(wc))
         else
           % VPI objects are hard to display.  Is there even a
           % conversion to string?

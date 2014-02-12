@@ -392,11 +392,24 @@ classdef braid
       if isscalar(b)
         c = char(b);
         if iscell(c)
-         disp(['     ' c{:}])
+          % Is this part ever reached?
+          disp(['     ' c{:}])
         else
-         disp(c)
+          sz = get(0, 'CommandWindowSize');
+          wc = textwrap({c},sz(1)-4);
+          for i = 1:length(wc)
+            % Indent rows.
+            wc{i} = ['   ' wc{i}];
+            % If the format is loose rather than compact, add a line break.
+            if strcmp(get(0,'FormatSpacing'),'loose')
+              wc{i} = sprintf('%s\n',wc{i});
+            end
+          end
+          disp(strvcat(wc))
         end
       else
+        % Not sure this is how we want to display.
+
         % format dimensions as NxMxK...
         dimstr = strjoin(strsplit(num2str(size(b))),'x');
 
