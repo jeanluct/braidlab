@@ -64,7 +64,7 @@ while sum(P_connected) ~= length(P_connected) && kill == 0;
         
         % List the indicies of the pair trying to be connected
         
-        P_pair = [P_in(P_ind) P_in(P_next)] % these will be called the structure punctures.
+        P_pair = sort([P_in(P_ind) P_in(P_next)]); % these will be called the structure punctures.
         
         % Create a list of the punctures including the pair and all
         % punctures outside the structure.  

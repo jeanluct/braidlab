@@ -72,7 +72,17 @@ showstringspaces=false}
 \date{}
 \maketitle
 
-\section{A section}
+This tutorial will walk through the algorithm discussed in Allshouse and Thiffeault (2012).  The focus will be on implementation, and fundamental discussion on the code will be discussed.  Execution of the coherent structure detection algorithm relies on a successfully installed version of braidlab.
+
+\section{Step 1: Braid generation and pair-loop creation}
+
+The first step of the algorithm is to create the braid based on a set of trajectories, create the test set of pair-loops, and act on the pair-loops with the generator sequence.  These operations are executed by the code Step1_PairLoopModification.  The only required input for this step is either the set of trajectories, $\bm{X}_{traj}$ or a previously generated braid, $b$.  The outputs of this step are the braid, the advected pair-loops, and an index array used to identify the initial state of the pair-loops.
+
+There are two options for the initial input.  If the braid for the system has already been calculated, this can be used as the input for the function.  Alternatively, properly formatted trajectory sets can be input directly into the function, and the braid will be calculated.  For more information on creating braids from data reference section 2.2 in the braidlab tutorial.
+
+
+
+
 
 
 \begin{lstlisting}[frame=single,framerule=0pt]

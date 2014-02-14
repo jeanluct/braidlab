@@ -39,6 +39,7 @@ function plot_mod(varargin)
 % LICENSE>
 
 %% List of option names that can be used
+
 optionNames = [
     'LineColor        '
     'LineStyle        '
@@ -78,17 +79,18 @@ if ~isscalar(L)
         'Can only plot scalar loop, not array of loops.');
 end
 
-i = 2;
+argin_index = 2; % The first argument needs to be the loop, so the 
+                   % second index will be the first property name
+                   
+val = 0; % We do not expect the next argument to be a value
 
-val = 0;
-
-while i <= nargin
-  arg = varargin{i};
+while argin_index <= nargin
+  arg = varargin{argin_index};
 
   if ~val
     if ~ischar(arg)
       error('BRAIDLAB:loop:plot:notaprop',...
-            'Argument %d should be a string.',i);
+            'Argument %d should be a string.',argin_index);
     end
 
     lowArg = lower(arg);
@@ -117,7 +119,7 @@ while i <= nargin
     val = 0;
 
   end
-  i = i + 1;
+  argin_index = argin_index + 1;
 end
 
 if isempty(options.LineColor);  options.LineColor = 'b'; end
@@ -129,68 +131,80 @@ if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 
 %% Set the coordinates of the loop
 
-[a,b] = L.ab;
+[~,b_coord] = L.ab;
 n = L.n;
 
 % Convert Dynnikov coding to intersection numbers.
 [mu,nu] = L.intersec;
 
-% Extend the coordinates.
-B = [-nu(1)/2 b nu(end)/2];
-% A = [0 a 0];
+% Extend the coordinates to include the punctures at either end
+b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
 % Convert to older P,M,N notation.
-M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
-N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
-b = B;
+M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
+N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 %% Set the position of the punctures
+% The default position of the punctures are the integers along the x-axis
 
 if isempty(options.PuncturePositions);
   options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 
-X = options.PuncturePositions;
+% sort the punctures based on the x coordinate
+puncture_position = sortrows(options.PuncturePositions);
 
-if n ~= length(X)
+% Check to make sure the number of coordinate pairs matches the number of
+% punctures in the loop coordinate
+if n ~= length(puncture_position)
   error('BRAIDLAB:loop:plot:badlen','Bad number of puncture positions.')
 end
 
-Xs = sortrows(X);
+if 2 ~= size(puncture_position,2)
+  error('BRAIDLAB:loop:plot:badposformat','The input position format is incorrect.')
+end
 
-d =  hypot(diff(Xs(:,1)),diff(Xs(:,2)));
+% Calculate the distance between punctures
+d =  hypot(diff(puncture_position(:,1)),diff(puncture_position(:,2)));
 
-%%
+%% Set the distance between the puncture and the lines forming the loop
 
-% The gap between lines.
-% (clarify: gap vs pgap?)
-% TODO: Keep punctures same size (need special gap near x-axis).
-gap = zeros(size(d));
+% Calculate the distance between the lines making up the loop.  This is
+% based on the number of times the loop passes above or below a given
+% puncture and the distance to the two nearest punctures.
+
+space_between_loop_lines = zeros(size(d));
 for i = 1:n-1
-  gap(i) = min(d(i)/M(i),d(i)/N(i))*.7;
+  space_between_loop_lines(i) = min(d(i)/M_coord(i),d(i)/N_coord(i))*.7;
 end
-pgap = zeros(n,1);
-pgap(1) = gap(1);
-pgap(end) = gap(end);
-for i = 2:n-1
-  pgap(i) = min(gap(i),gap(i-1));
-end
-pgap = min(pgap)/2+zeros(n,1);
+
+% Set the gap size to half the minimum distance between lines
+
+pgap = min(space_between_loop_lines)/2+zeros(n,1);
+
+%% Set the radius of the puncture
+
+% TODO: Keep punctures same size (need special gap near x-axis).
+
+% set the default puncture radius if no property value was input
 
 if isempty(options.PunctureSize);
-  options.PunctureSize = .15*min(gap);
+  options.PunctureSize = .15*min(space_between_loop_lines);
 end
 
 prad = options.PunctureSize;
 
-if prad > min(gap)
+% check to make sure puncture radius is not so large that it hits the loop
+
+if prad > min(space_between_loop_lines)
   warning('BRAIDLAB:loop:plot:badrad', ...
           ['Puncture radius is too large.  For this loop the value ' ...
-           'can''t exceed %f.'],min(gap))
-  prad = .15*min(gap);
+           'can''t exceed %f.'],min(space_between_loop_lines))
+  prad = .15*min(space_between_loop_lines);
 end
 
 %% Identify hold state of the current figure
+% this state will be reestablished after loop is plotted
 
 if ishold
   holdstate = true;
@@ -201,33 +215,39 @@ else
   %cla
 end
 
+hold on
+
 %%  Draw punctures.
 
+puncture_boundary_x = linspace(-prad,prad,100);
+puncture_boundary_y_top = sqrt(prad^2 - puncture_boundary_x.^2);
+puncture_boundary_y_bottom = -sqrt(prad^2 - puncture_boundary_x(end:-1:1).^2);
+  
 for p = 1:n
-  xx = linspace(-prad,prad,100);
-  yy1 = sqrt(prad^2 - xx.^2);
-  yy2 = -sqrt(prad^2 - xx(end:-1:1).^2);
-  col = 'r-';
-  patch(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
+  patch(puncture_position(p,1)+[puncture_boundary_x puncture_boundary_x(end:-1:1)],puncture_position(p,2)+[puncture_boundary_y_top puncture_boundary_y_bottom],...
         options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
-  hold on
 end
 
 %% Draw semicircles.
+% Cycle through each puncture.  
 
 for p = 1:n
+    
+  % Determine number of semicircles are at the present loop  
   if p == n
-    nl = M(n);
+    nl = M_coord(n);
   else
-    nl = b(p);
+    nl = b_coord(p);
   end
-  x = p;
+  
+  % Draw this number of semicircles taking into account the direction
+  % (left/right) of the puncture.  
   for sc = 1:abs(nl)
-    rad = sc*pgap(p);
-    xx = sign(nl)*linspace(0,rad,50);
-    yy1 = sqrt(rad^2 - xx.^2);
-    yy2 = -sqrt(rad^2 - xx(end:-1:1).^2);
-    plot(Xs(p,1)+[xx xx(end:-1:1)],Xs(p,2)+[yy1 yy2],...
+    rad = sc*pgap(p); % semi circle radius
+    loop_curve_x = sign(nl)*linspace(0,rad,50);
+    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
+    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
+    plot(puncture_position(p,1)+[loop_curve_x loop_curve_x(end:-1:1)],puncture_position(p,2)+[loop_curve_y_top loop_curve_y_bottom],...
          options.LineColor,'LineWidth',options.LineWidth,...
          'LineStyle',options.LineStyle)
   end
@@ -242,34 +262,34 @@ for p = 1:n-1
   if p == 1
     nr = 0;
   else
-    nr = max(b(p),0);
+    nr = max(b_coord(p),0);
   end
-  tojoin = M(p)-nr;
+  tojoin = M_coord(p)-nr;
 
   if tojoin > 0
     % How many left-semicircles (b<0) around the next puncture?
     if p < n-1
-      nl = -min(b(p+1),0);
+      nl = -min(b_coord(p+1),0);
     else
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoinup = M(p+1)-nl;
+    tojoinup = M_coord(p+1)-nl;
     tojoindown = max(tojoin-tojoinup,0);
     %keyboard
     % The lines that join downwards.
     for s = 1:tojoindown
-      y1 = pgap(p)*(nr+s)+Xs(p,2);
-      y2 = -pgap(p+1)*(nl-s+tojoindown+1)+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+      y1 = pgap(p)*(nr+s)+puncture_position(p,2);
+      y2 = -pgap(p+1)*(nl-s+tojoindown+1)+puncture_position(p+1,2);
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
-      y1 = pgap(p)*(nr+s)+Xs(p,2);
-      y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+Xs(p+1,2);
+      y1 = pgap(p)*(nr+s)+puncture_position(p,2);
+      y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+puncture_position(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
@@ -284,32 +304,32 @@ for p = 1:n-1
   if p == 1
     nr = 0;
   else
-    nr = max(b(p),0);
+    nr = max(b_coord(p),0);
   end
-  tojoin = N(p)-nr;
+  tojoin = N_coord(p)-nr;
 
   if tojoin > 0
     % How many left-semicircles (b<0) around the next puncture?
     if p < n-1
-      nl = -min(b(p+1),0);
+      nl = -min(b_coord(p+1),0);
     else
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoindown = N(p+1)-nl;
+    tojoindown = N_coord(p+1)-nl;
     tojoinup = max(tojoin-tojoindown,0);
     % The lines that join upwards.
     for s = 1:tojoinup
-      y1 = -pgap(p)*(nr+s)+Xs(p,2);
-      y2 = pgap(p+1)*(nl-s+tojoinup+1)+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+      y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
+      y2 = pgap(p+1)*(nl-s+tojoinup+1)+puncture_position(p+1,2);
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
-      y1 = -pgap(p)*(nr+s)+Xs(p,2);
-      y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+Xs(p+1,2);
-      plot([Xs(p,1) Xs(p+1,1)],[y1 y2],options.LineColor,...
+      y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
+      y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+puncture_position(p+1,2);
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
