@@ -105,7 +105,7 @@ catch err
     if strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
       warning('BRAIDLAB:braid:loopcoords:overflow',...
               'loopcoords overflowed... using VPI.')
-      checkvpi
+      braidlab.checkvpi
       l = braidlab.loop(loopsigma(w,vpi(l.coords)));
     end
   else
