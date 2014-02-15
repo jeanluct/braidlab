@@ -110,7 +110,7 @@ end
 if nargin < 4, nconvreq = 3; end
 
 % Use a fundamental group generating set as the initial multiloop.
-u = braidlab.loop(b.n);
+u = braidlab.loop(b.n,@double);
 
 if exist('entropy_helper') == 3
   % If MEX file is available, use that.
