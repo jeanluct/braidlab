@@ -35,7 +35,7 @@
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-classdef cfbraid
+classdef cfbraid < matlab.mixin.CustomDisplay
   properties
     delta = 0             % the power of positive-half twists Delta
     factors = cell(0)     % cell array of positive factors
@@ -140,7 +140,7 @@ classdef cfbraid
     %CHAR   Convert braid to string.
     %
     %   This is a method for the CFBRAID class.
-    %   See also CFBRAID, CFBRAID.DISP.
+    %   See also CFBRAID.
       if b.delta == 0 && isempty(b.factors)
         str = '< e >';
         return
@@ -161,29 +161,6 @@ classdef cfbraid
       str = ['< ' str ' >'];
     end
 
-    function disp(b)
-    %DISP   Display a braid.
-    %
-    %   This is a method for the CFBRAID class.
-    %   See also CFBRAID, CFBRAID.CHAR.
-       c = char(b);
-       if iscell(c)
-         disp(['     ' c{:}])
-       else
-         sz = get(0, 'CommandWindowSize');
-         wc = textwrap({c},sz(1)-4);
-         for i = 1:length(wc)
-           % Indent rows.
-           wc{i} = ['   ' wc{i}];
-           % If the format is loose rather than compact, add a line break.
-           if strcmp(get(0,'FormatSpacing'),'loose')
-             wc{i} = sprintf('%s\n',wc{i});
-           end
-         end
-         disp(strvcat(wc))
-       end
-    end
-
     function l = length(b)
     %LENGTH   Word length of left canonical form of a braid word.
     %   L = LENGTH(B) returns the word length of a braid B expressed in
@@ -194,6 +171,26 @@ classdef cfbraid
       if b.delta == 0 && isempty(b.factors), l = 0; return; end
       Dl = b.n*(b.n-1)/2;  % The lengh of the half-twist Delta.
       l = abs(b.delta)*Dl + length(cell2mat(b.factors));
+    end
+
+  end % methods block
+
+
+  methods (Access = protected)
+
+    function displayScalarObject(b)
+       c = char(b);
+       sz = get(0, 'CommandWindowSize');
+       wc = textwrap({c},sz(1)-4);
+       for i = 1:length(wc)
+	 % Indent rows.
+	 if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
+	 % If the format is loose rather than compact, add a line break.
+	 if strcmp(get(0,'FormatSpacing'),'loose')
+	   wc{i} = sprintf('%s\n',wc{i});
+	 end
+       end
+       disp(strvcat(wc))
     end
 
   end % methods block

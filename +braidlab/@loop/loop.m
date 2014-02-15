@@ -53,7 +53,7 @@
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-classdef loop
+classdef loop < matlab.mixin.CustomDisplay
   properties
     coords = [0 -1]; % Dynnikov coordinates
   end
@@ -245,26 +245,6 @@ classdef loop
       end
     end
 
-    function disp(obj)
-    %DISP   Display a loop.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.CHAR.
-      for i = 1:size(obj,2)
-        sz = get(0, 'CommandWindowSize');
-        wc = textwrap({char(obj(i))},sz(1)-4);
-        for i = 1:length(wc)
-          % Indent rows.
-          wc{i} = ['   ' wc{i}];
-          % If the format is loose rather than compact, add a line break.
-          if strcmp(get(0,'FormatSpacing'),'loose')
-            wc{i} = sprintf('%s\n',wc{i});
-          end
-        end
-        disp(strvcat(wc))
-      end
-    end
-
     function l = minlength(obj)
     %MINLENGTH   The minimum length of a loop.
     %   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
@@ -301,6 +281,31 @@ classdef loop
         % The number of intersections with the real axis.
         l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
             + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+      end
+    end
+
+  end % methods block
+
+
+  methods (Access = protected)
+
+    function displayScalarObject(obj)
+      displayNonScalarObject(obj)
+    end
+
+    function displayNonScalarObject(obj)
+      for j = 1:size(obj,2)
+        sz = get(0, 'CommandWindowSize');
+        wc = textwrap({char(obj(j))},sz(1)-6);
+        for i = 1:length(wc)
+          % Indent rows.
+          if i > 1, wc{i} = ['      ' wc{i}]; else, wc{i} = ['   ' wc{i}]; end
+          % If the format is loose rather than compact, add a line break.
+          if strcmp(get(0,'FormatSpacing'),'loose')
+            wc{i} = sprintf('%s\n',wc{i});
+          end
+        end
+        disp(strvcat(wc))
       end
     end
 

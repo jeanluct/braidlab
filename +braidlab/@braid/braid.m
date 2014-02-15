@@ -29,7 +29,7 @@
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-classdef braid
+classdef braid < matlab.mixin.CustomDisplay
   properties
     n = 1            % number of strings
     word = int32([]) % braid word in Artin generators
@@ -374,42 +374,6 @@ classdef braid
       str = ['< ' str ' >'];
     end
 
-    function disp(b)
-    %DISP   Display a braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.CHAR.
-      if isscalar(b)
-        c = char(b);
-        if iscell(c)
-          % Is this part ever reached?
-          disp(['     ' c{:}])
-        else
-          sz = get(0, 'CommandWindowSize');
-          wc = textwrap({c},sz(1)-4);
-          for i = 1:length(wc)
-            % Indent rows.
-            wc{i} = ['   ' wc{i}];
-            % If the format is loose rather than compact, add a line break.
-            if strcmp(get(0,'FormatSpacing'),'loose')
-              wc{i} = sprintf('%s\n',wc{i});
-            end
-          end
-          disp(strvcat(wc))
-        end
-      else
-        % Not sure this is how we want to display.
-
-        % format dimensions as NxMxK...
-        dimstr = strjoin(strsplit(num2str(size(b))),'x');
-
-        disp([dimstr ' braid array with properties:'])
-        for f = fields(b).'
-          disp(f{:});
-        end
-      end
-    end
-
     function l = length(b)
     %LENGTH   Length of a braid.
     %   L = LENGTH(B) returns the number of generators in the current
@@ -419,6 +383,26 @@ classdef braid
     %   This is a method for the BRAID class.
     %   See also BRAID, COMPACT.
       l = length(b.word);
+    end
+
+  end % methods block
+
+
+  methods (Access = protected)
+
+    function displayScalarObject(b)
+      c = char(b);
+      sz = get(0, 'CommandWindowSize');
+      wc = textwrap({c},sz(1)-4);
+      for i = 1:length(wc)
+        % Indent rows.
+        if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
+        % If the format is loose rather than compact, add a line break.
+        if strcmp(get(0,'FormatSpacing'),'loose')
+          wc{i} = sprintf('%s\n',wc{i});
+        end
+      end
+      disp(strvcat(wc))
     end
 
   end % methods block
