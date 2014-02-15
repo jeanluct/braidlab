@@ -205,11 +205,22 @@ classdef loop
     %   See also LOOP, LOOP.DISP.
       if isscalar(obj)
         if ~isa(obj(1).coords,'vpi')
-          str = ['(( ' num2str(obj.coords) ' ))'];
+          objstr = num2str(obj.coords);
+        else
+          % The VPI num2str command is buggy on arrays.
+          objstr = num2str(obj.coords(1));
+          if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
+          for i = 2:length(obj.coords)
+            oo = num2str(obj.coords(i)); oo(1:2) = '';
+            objstr = [objstr oo];
+          end
         end
+        str = ['(( ' objstr ' ))'];
       else
-        error('BRAIDLAB:loop:char:notscalar', ...
-              'Cannot convert nonscalar loop to string.');
+        str = '';
+        for i = 1:length(obj)
+          str = [str ; char(obj(i))];
+        end
       end
     end
 
@@ -217,25 +228,19 @@ classdef loop
     %DISP   Display a loop.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.DISP.
+    %   See also LOOP, LOOP.CHAR.
       for i = 1:size(obj,2)
-        if ~isa(obj(i).coords,'vpi')
-          sz = get(0, 'CommandWindowSize');
-          wc = textwrap({char(obj(i))},sz(1)-4);
-          for i = 1:length(wc)
-            % Indent rows.
-            wc{i} = ['   ' wc{i}];
-            % If the format is loose rather than compact, add a line break.
-            if strcmp(get(0,'FormatSpacing'),'loose')
-              wc{i} = sprintf('%s\n',wc{i});
-            end
+        sz = get(0, 'CommandWindowSize');
+        wc = textwrap({char(obj(i))},sz(1)-4);
+        for i = 1:length(wc)
+          % Indent rows.
+          wc{i} = ['   ' wc{i}];
+          % If the format is loose rather than compact, add a line break.
+          if strcmp(get(0,'FormatSpacing'),'loose')
+            wc{i} = sprintf('%s\n',wc{i});
           end
-          disp(strvcat(wc))
-        else
-          % VPI objects are hard to display.  Is there even a
-          % conversion to string?
-          disp(obj(i).coords)
         end
+        disp(strvcat(wc))
       end
     end
 
