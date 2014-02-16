@@ -1,4 +1,9 @@
+#include <string>
 #include "mex.h"
+
+// Guarded sum: check for overflow.
+
+// http://stackoverflow.com/questions/3944505/detecting-signed-overflow-in-c-c?rq=1
 
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
@@ -19,10 +24,12 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-inline void mexerr()
+
+template <class T>
+inline void mexerr(T a, T b, std::string p)
 {
-  mexErrMsgIdAndTxt("BRAIDLAB:braid:sumg:overflow",
-		    "Summation has overflowed.");
+  std::string err = "Summation of " + p + " and " + p + " has overflowed.";
+  mexErrMsgIdAndTxt("BRAIDLAB:braid:sumg:overflow",err.c_str(),a,b);
 }
 
 
@@ -30,11 +37,11 @@ inline long long sumg(long long a, long long b)
 {
   if (a >= 0)
     {
-      if (LLONG_MAX - a < b) mexerr();
+      if (LLONG_MAX - a < b) mexerr(a,b,"%lld");
     }
   else
     {
-      if (b < LLONG_MIN - a) mexerr();
+      if (b < LLONG_MIN - a) mexerr(a,b,"%lld");
     }
 
   return a+b;
@@ -45,11 +52,11 @@ inline int sumg(int a, int b)
 {
   if (a >= 0)
     {
-      if (INT_MAX - a < b) mexerr();
+      if (INT_MAX - a < b) mexerr(a,b,"%d");
     }
   else
     {
-      if (b < INT_MIN - a) mexerr();
+      if (b < INT_MIN - a) mexerr(a,b,"%d");
     }
 
   return a+b;
