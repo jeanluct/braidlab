@@ -35,7 +35,7 @@ end
 
 % If MEX file is available, use that.
 if exist('loopsigma_helper') == 3
-  if isa(u,'double') || isa(u,'int32') || isa(u,'int64')
+  if isa(u,'double') || isa(u,'single') || isa(u,'int32') || isa(u,'int64')
     up = loopsigma_helper(ii,u);
     return
   end

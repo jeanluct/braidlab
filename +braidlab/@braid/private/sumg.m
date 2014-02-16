@@ -34,7 +34,7 @@ elseif length(varargin) > 2
   % More than two arguments recurse binomially;
   % consider sorting to improve results,
   % e.g., ( 1 - 1 ) + maxint    will not overflow
-  %       ( 1 + maxing) - 1     will overflow
+  %       ( 1 + maxint) - 1     will overflow
   out = sumg( varargin{1:floor(end/2)}, sumg(varargin{floor(end/2)+1:end}) );
 else % two arguments are added
   a1 = varargin{1}; a2 = varargin{2};

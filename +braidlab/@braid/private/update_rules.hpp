@@ -1,4 +1,5 @@
 #include "mex.h"
+#include "sumg.hpp"
 
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
@@ -34,49 +35,49 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
   // Copy initial row data
   for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
 
-  for (int j = 0; j < Ngen; ++j) /* Loop over generators */
+  for (int j = 0; j < Ngen; ++j) // Loop over generators.
     {
       int i = abs(ii[j]);
       if (ii[j] > 0)
         {
           if (i == 1)
             {
-              bp[1] = a[1] + pos(b[1]);
-              ap[1] = -b[1] + pos(bp[1]);
+              bp[1] = sumg( a[1] , pos(b[1]) );
+              ap[1] = sumg( -b[1] , pos(bp[1]) );
             }
           else if (i == n-1)
             {
-              bp[n-2] = a[n-2] + neg(b[n-2]);
-              ap[n-2] = -b[n-2] + neg(bp[n-2]);
+              bp[n-2] = sumg( a[n-2] , neg(b[n-2]) );
+              ap[n-2] = sumg( -b[n-2] , neg(bp[n-2]) );
             }
           else
             {
-              T c = a[i-1] - a[i] - pos(b[i]) + neg(b[i-1]);
-              ap[i-1] = a[i-1] - pos(b[i-1]) - pos(pos(b[i]) + c);
-              bp[i-1] = b[i] + neg(c);
-              ap[i] = a[i] - neg(b[i]) - neg(neg(b[i-1]) - c);
-              bp[i] = b[i-1] - neg(c);
+              T c = sumg(sumg(a[i-1],-a[i]) , sumg(-pos(b[i]),neg(b[i-1])));
+              ap[i-1] = sumg(sumg(a[i-1],-pos(b[i-1])),-pos(sumg(pos(b[i]),c)));
+              bp[i-1] = sumg( b[i] , neg(c) );
+              ap[i] = sumg(sumg(a[i],-neg(b[i])),-neg(sumg(neg(b[i-1]),-c)));
+              bp[i] = sumg( b[i-1] , -neg(c) );
             }
         }
       else if (ii[j] < 0)
         {
           if (i == 1)
             {
-              bp[1] = -a[1] + pos(b[1]);
-              ap[1] = b[1] - pos(bp[1]);
+              bp[1] = sumg( -a[1] , pos(b[1]) );
+              ap[1] = sumg( b[1] , -pos(bp[1]) );
             }
           else if (i == n-1)
             {
-              bp[n-2] = -a[n-2] + neg(b[n-2]);
-              ap[n-2] = b[n-2] - neg(bp[n-2]);
+              bp[n-2] = sumg( -a[n-2] , neg(b[n-2]) );
+              ap[n-2] = sumg( b[n-2] , -neg(bp[n-2]) );
             }
           else
             {
-              T d = a[i-1] - a[i] + pos(b[i]) - neg(b[i-1]);
-              ap[i-1] = a[i-1] + pos(b[i-1]) + pos(pos(b[i]) - d);
-              bp[i-1] = b[i] - pos(d);
-              ap[i] = a[i] + neg(b[i]) + neg(neg(b[i-1]) + d);
-              bp[i] = b[i-1] + pos(d);
+              T d = sumg(sumg(a[i-1], -a[i]) , sumg(pos(b[i]), -neg(b[i-1])));
+              ap[i-1] = sumg(sumg(a[i-1],pos(b[i-1])),pos(sumg(pos(b[i]),-d)));
+              bp[i-1] = sumg( b[i] , -pos(d) );
+              ap[i] = sumg(sumg(a[i] , neg(b[i])) , neg(sumg(neg(b[i-1]) , d)));
+              bp[i] = sumg( b[i-1] , pos(d) );
             }
         }
       for (mwIndex k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
