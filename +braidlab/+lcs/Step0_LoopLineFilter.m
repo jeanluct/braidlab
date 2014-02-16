@@ -1,4 +1,4 @@
-function punctureAssignment = Step0_LoopLineFilter(xTraj)
+function punctureAssignment = Step0_LoopLineFilter(xTraj,ratioTolerance)
 
 %% Create braid from trajectories
 
@@ -37,7 +37,7 @@ loopListModified = system_braid*loopList;
 %% Calculate the ratio of the lengths before and after advection
 
 lengthRatio = loopListModified.intaxis./loopList.intaxis;
-loopIndexShort = loopIndex(lengthRatio<1,:);
+loopIndexShort = loopIndex(lengthRatio<ratioTolerance,:);
 
 %% Label the puncture groups
 
@@ -59,6 +59,5 @@ for i = 1:size(loopIndexShort,1)
     end
     
 end
-
 
 end
