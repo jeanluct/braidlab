@@ -85,6 +85,10 @@ classdef braid < matlab.mixin.CustomDisplay
     %   B = BRAID('VenzkePsi',N) or BRAID('PSI',N) returns a member of
     %   the Venzke family of psi-braids on N strings (N>4).
     %
+    %   B = BRAID(K) returns a braid representative B for the knot K.  The
+    %   knot is denoted in standard coding as '0_1', '3_1', '5_2', etc.
+    %   Currently knots up to 8 crossings are represented.
+    %
     %   References:
     %
     %   E. Hironaka and E. Kin, "A family of pseudo-Anosov braids with small
@@ -109,12 +113,13 @@ classdef braid < matlab.mixin.CustomDisplay
         br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
       elseif ischar(b)
         % First argument is a string.
-        if any(strcmpi(b,{'halftwist','delta'}))
+	switch lower(b)
+	 case {'halftwist','delta'}
           br.n = secnd;
           D = [];
           for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
           br.word = D;
-        elseif any(strcmpi(b,{'hironakakin','hironaka-kin','hk'}))
+         case {'hironakakin','hironaka-kin','hk'}
           m = secnd;
           if nargin < 3
             if m < 5
@@ -133,7 +138,7 @@ classdef braid < matlab.mixin.CustomDisplay
           N = m+n+1;
           br.n = N;
           br.word = [1:m m:-1:1 1:N-1];
-        elseif any(strcmpi(b,{'venzkepsi','psi'}))
+	 case {'venzkepsi','psi'}
           % See page 1 of Venzke's thesis.
           n = secnd;
           if n < 5
@@ -157,13 +162,18 @@ classdef braid < matlab.mixin.CustomDisplay
             k = (n-6)/8;
             br.word = [repmat(L,1,6*k+5) -1 -2];
           end
-        elseif any(strcmpi(b,{'rand','random'}))
+	 case {'rand','random'}
           br.n = secnd;
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
-        else
-          error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
-        end
+	 otherwise
+	  % Maybe the string specifies a knot.
+	  try
+	    br = knot2braid(b);
+	  catch err
+	    error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
+	  end
+	end
       elseif max(size(size(b))) == 3
         if nargin > 2
           error('BRAIDLAB:braid:badarg','Too many input arguments.')
