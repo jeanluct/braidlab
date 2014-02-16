@@ -18,7 +18,6 @@ end
 %% Create the list of loops connecting pairs of trajectories and 
 
 loopIndex = zeros(size(xInitial,1)*(size(xInitial,1)-1),2);
-loopList = [];
 k = 1;
 
 for i = 1:size(xInitial,1)
