@@ -6,7 +6,8 @@ function m = burau(b,t)
 %
 %   M = BURAU(B,T), where T is a Laurent polynomial class object, returns
 %   the Burau representation as a cell array with Laurent polynomial
-%   entries.  With the wavelet toolbox, use BURAU(B,laurpoly(1,1)).
+%   entries.  With the wavelet toolbox, use BURAU(B,laurpoly(1,1)).  With
+%   the symbolic toolbox, use BURAU(B,sym('t')).
 %
 %   M = BURAU(B,'abs') returns the matrix of the "absolute value" monoid,
 %   where every nonzero entry of the Burau matrices of the standard braid
@@ -71,27 +72,30 @@ if isnumeric(t)
     end
   end
 else
-  % t is not numeric: use a cell array.
+  % t is not numeric.
   % Multiplication of numeric type by t must be defined.
   sc = -1;  % -1 is Birman's convention, +1 is Kassel-Turaev.
-  m = num2cell(eye(n-1));
+  typ = str2func(class(t));
+  m(1:n-1,1:n-1) = typ(0);
+  for i = 1:n-1, m(i,i) = typ(1); end
   for sig = b.word(end:-1:1)
     i = abs(sig);
     if sig > 0
       for q = 1:n-1
-	if i-1 > 0, m{i-1,q} = m{i-1,q} + sc*t*m{i,q}; end
-	if i+1 < n, m{i+1,q} = sc*m{i,q} + m{i+1,q}; end
-	m{i,q} = -t*m{i,q};
+	if i-1 > 0, m(i-1,q) = m(i-1,q) + sc*t*m(i,q); end
+	if i+1 < n, m(i+1,q) = sc*m(i,q) + m(i+1,q); end
+	m(i,q) = -t*m(i,q);
       end
     else
       for q = 1:n-1
-	if i-1 > 0, m{i-1,q} = m{i-1,q} + sc*m{i,q}; end
-	if i+1 < n, m{i+1,q} = sc*1/t*m{i,q} + m{i+1,q}; end
-	m{i,q} = -1/t*m{i,q};
+	if i-1 > 0, m(i-1,q) = m(i-1,q) + sc*m(i,q); end
+	if i+1 < n, m(i+1,q) = sc*1/t*m(i,q) + m(i+1,q); end
+	m(i,q) = -1/t*m(i,q);
       end
     end
+    if isa(t,'sym'), m = simplify(m); end
   end
   if isa(t,'laurpoly')
-    m = laurmat(m);
+    m = laurmat(num2cell(m));
   end
 end
