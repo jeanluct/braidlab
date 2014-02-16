@@ -36,7 +36,7 @@ loopListModified = system_braid*loopList;
 
 %% Calculate the ratio of the lengths before and after advection
 
-lengthRatio = loopListModified.length./loopList.length;
+lengthRatio = loopListModified.intaxis./loopList.intaxis;
 loopIndexShort = loopIndex(lengthRatio<1,1);
 
 %% Label the puncture groups
