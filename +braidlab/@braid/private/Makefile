@@ -45,18 +45,6 @@ TRAINS_LIBDIR     = ../../../extern/trains
 TRAINS_INCLUDEDIR = ../../../extern
 TRAINS_LD         = -ltrains
 
-%.o: %.c
-ifndef MEXVOUT
-	$(error Matlab "mex" command is not in your path)
-endif
-	$(MEX) -c $(MEXFLAGS) $^
-
-%.$(MEXSUFFIX): %.c
-ifndef MEXVOUT
-	$(error Matlab "mex" command is not in your path)
-endif
-	$(MEX) $(MEXFLAGS) $(LIBS) $^
-
 %.$(MEXSUFFIX): %.cpp
 ifndef MEXVOUT
 	$(error Matlab "mex" command is not in your path)
@@ -77,10 +65,6 @@ endif
 		make CXX="$(CXX) -fPIC" CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
-
-loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.c update_rules.o
-
-entropy_helper.$(MEXSUFFIX): entropy_helper.c update_rules.o
 
 showvars:
 	@echo "$(MEXSUFFIX)"
