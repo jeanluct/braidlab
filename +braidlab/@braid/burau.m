@@ -53,49 +53,31 @@ end
 
 n = b.n;
 
-if isnumeric(t)
-  m = eye(n-1);
-  for sig = b.word(end:-1:1)
-    i = abs(sig);
-    if sig > 0
-      for q = 1:n-1
-	if i-1 > 0, m(i-1,q) = m(i-1,q) - t*m(i,q); end
-	if i+1 < n, m(i+1,q) = afun(-1)*m(i,q) + m(i+1,q); end
-	m(i,q) = -t*m(i,q);
-      end
-    else
-      for q = 1:n-1
-	if i-1 > 0, m(i-1,q) = m(i-1,q) + afun(-1)*m(i,q); end
-	if i+1 < n, m(i+1,q) = -1/t*m(i,q) + m(i+1,q); end
-	m(i,q) = -1/t*m(i,q);
-      end
+% Multiplication of numeric type by t must be defined.
+sc = -1;  % -1 is Birman's convention, +1 is Kassel-Turaev.
+typ = str2func(class(t));
+
+% Make diagonal matrix.
+m(1:n-1,1:n-1) = typ(0);
+for i = 1:n-1, m(i,i) = typ(1); end
+
+for sig = b.word(end:-1:1)
+  i = abs(sig);
+  if sig > 0
+    for q = 1:n-1
+      if i-1 > 0, m(i-1,q) = m(i-1,q) + afun(sc*t)*m(i,q); end
+      if i+1 < n, m(i+1,q) = afun(sc)*m(i,q) + m(i+1,q); end
+      m(i,q) = afun(-t)*m(i,q);
+    end
+  else
+    for q = 1:n-1
+      if i-1 > 0, m(i-1,q) = m(i-1,q) + afun(sc)*m(i,q); end
+      if i+1 < n, m(i+1,q) = afun(sc/t)*m(i,q) + m(i+1,q); end
+      m(i,q) = afun(-1/t)*m(i,q);
     end
   end
-else
-  % t is not numeric.
-  % Multiplication of numeric type by t must be defined.
-  sc = -1;  % -1 is Birman's convention, +1 is Kassel-Turaev.
-  typ = str2func(class(t));
-  m(1:n-1,1:n-1) = typ(0);
-  for i = 1:n-1, m(i,i) = typ(1); end
-  for sig = b.word(end:-1:1)
-    i = abs(sig);
-    if sig > 0
-      for q = 1:n-1
-	if i-1 > 0, m(i-1,q) = m(i-1,q) + sc*t*m(i,q); end
-	if i+1 < n, m(i+1,q) = sc*m(i,q) + m(i+1,q); end
-	m(i,q) = -t*m(i,q);
-      end
-    else
-      for q = 1:n-1
-	if i-1 > 0, m(i-1,q) = m(i-1,q) + sc*m(i,q); end
-	if i+1 < n, m(i+1,q) = sc*1/t*m(i,q) + m(i+1,q); end
-	m(i,q) = -1/t*m(i,q);
-      end
-    end
-    if isa(t,'sym'), m = simplify(m); end
-  end
-  if isa(t,'laurpoly')
-    m = laurmat(num2cell(m));
-  end
+  if isa(t,'sym'), m = simplify(m); end
+end
+if isa(t,'laurpoly')
+  m = laurmat(num2cell(m));
 end
