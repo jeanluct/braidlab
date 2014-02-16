@@ -7,7 +7,8 @@ function m = burau(b,t)
 %   M = BURAU(B,T), where T is a Laurent polynomial class object, returns
 %   the Burau representation as a cell array with Laurent polynomial
 %   entries.  With the wavelet toolbox, use BURAU(B,laurpoly(1,1)).  With
-%   the symbolic toolbox, use BURAU(B,sym('t')).
+%   the symbolic toolbox, use BURAU(B,sym('t')).  Note that the symbolic
+%   toolbox is much slower.
 %
 %   M = BURAU(B,'abs') returns the matrix of the "absolute value" monoid,
 %   where every nonzero entry of the Burau matrices of the standard braid
