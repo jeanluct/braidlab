@@ -10,7 +10,7 @@ function out = sumg( varargin )
 %   maxint + (2 - 3) = maxint - 1
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Marko Budisic
 %
 %   This file is part of Braidlab.
 %
