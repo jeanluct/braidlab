@@ -31,7 +31,7 @@ for i in `seq 0 $REVSTEP $LASTREV`; do
 	CODEFOLDERS="$CODEFOLDERS doc"
     fi
     LINES=`find $CODEFOLDERS \
-	-name '*.[cm]' -o -name '*.cpp' -o -name '*.tex' -o -name '*.bib' \
+	-name '*.[cm]' -o -name '*.?pp' -o -name '*.tex' -o -name '*.bib' \
 	| xargs wc -l | tail -1 | sed 's/ total$//g'`
     # assignmentoptimal.c was originally included in the main tree, so
     # subtract its linecount (441) if the file is present.
