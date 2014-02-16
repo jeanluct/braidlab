@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <string>
 #include "mex.h"
-#include "update_rules.hpp"
+#include "loopsigma_helper_common.hpp"
 
 // Helper function for loopsigma
 
@@ -41,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   std::string typ = mxArrayToString(lhs[0]);
 
   // Dimensions of uA.
-  const int N = mxGetN(uA); const int Nr = mxGetM(uA);
+  const mwSize N = mxGetN(uA), Nr = mxGetM(uA);
 
   const mxArray *iiA = prhs[0];
   const int *ii = (int *)mxGetData(iiA); // iiA contains int32's.
@@ -65,6 +65,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   else
     {
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badtype",
-			"Unknown variable type.");
+                        "Unknown variable type.");
     }
 }

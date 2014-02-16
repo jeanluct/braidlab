@@ -34,9 +34,9 @@ if isempty(ii)
 end
 
 % If MEX file is available, use that.
-if exist('loopsigma_helper_general') == 3
+if exist('loopsigma_helper') == 3
   if isa(u,'double') || isa(u,'int32') || isa(u,'int64')
-    up = loopsigma_helper_general(ii,u);
+    up = loopsigma_helper(ii,u);
     return
   end
 end
