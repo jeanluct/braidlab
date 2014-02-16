@@ -1,9 +1,5 @@
-#include <math.h>
-#include <stdio.h>
 #include "mex.h"
 #include "update_rules.hpp"
-
-// Helper function for loopsigma
 
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
@@ -24,53 +20,34 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-#define MAX(a,b)  (a > b ? a : b)
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+template <class T>
+inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
+                                    const mxArray *uA, mxArray *uoA)
 {
-  typedef long long int loop_type;
-  int n; // Refers to generators, so don't need to be mwIndex/mwSize.
-  mwIndex k, l;
-  mwSize N, Nr, Ngen;
-  const mxArray *iiA, *uA;
-  const int *ii;
-  const loop_type *u;
-  loop_type *a, *b, *uo;
+  const T *u = (T *)mxGetPr(uA);
 
-  if (nrhs < 2)
-    {
-      mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
-                        "2 input arguments required.");
-    }
-
-  iiA = prhs[0];
-  ii = (int *)mxGetData(iiA); // iiA contains int32's.
-  uA = prhs[1];
-  u = (loop_type *)mxGetPr(uA);
-
-  Ngen = MAX(mxGetM(iiA),mxGetN(iiA));
-
-  N = mxGetN(uA);
-  Nr = mxGetM(uA);
+  const mwSize N = mxGetN(uA);
+  const mwSize Nr = mxGetM(uA);
   if (N % 2 != 0)
     {
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badarg",
                         "u argument should have even number of columns.");
     }
-  n = (int)(N/2 + 2);
+  // Refers to generators, so don't need to be mwIndex/mwSize.
+  const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
-  a = (loop_type *) malloc(N/2 * sizeof(loop_type)) - 1;
-  b = (loop_type *) malloc(N/2 * sizeof(loop_type)) - 1;
+  T *a = (T *) malloc(N/2 * sizeof(T)) - 1;
+  T *b = (T *) malloc(N/2 * sizeof(T)) - 1;
 
   // Create an mxArray for the output data.
-  plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT64_CLASS, mxREAL);
-  uo = (loop_type *)mxGetPr(plhs[0]);
+  T *uo = (T *)mxGetPr(uoA);
 
-  for (l = 0; l < Nr; ++l) // Loop over rows of u.
+  for (mwIndex l = 0; l < Nr; ++l) // Loop over rows of u.
     {
       // Copy initial row data.
-      for (k = 1; k <= N/2; ++k)
+      for (mwIndex k = 1; k <= N/2; ++k)
         {
           a[k] = u[(k-1    )*Nr+l];
           b[k] = u[(k-1+N/2)*Nr+l];
@@ -79,7 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       // Act with the braid sequence in ii onto the coordinates a,b.
       update_rules(Ngen, n, ii, a, b);
 
-      for (k = 1; k <= N/2; ++k)
+      for (mwIndex k = 1; k <= N/2; ++k)
         {
           // Copy final a and b to row of output array.
           uo[(k-1    )*Nr+l] = a[k];
