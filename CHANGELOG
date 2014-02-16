@@ -1,0 +1,93 @@
+------------------------------------------------------------------------
+1.x.x [2014-xx-xx]
+
+Several improvements to the method braid.entropy:
+
+* It has a C MEX helper function and is much faster.  It no longer
+  checks if the braid is trivial, which avoids overflow and speeds up
+  the function.
+
+* Its convergence has been greatly improved (see next item for more
+  details).  With enough iterations, machine precision can usually be
+  achieved.
+
+* Its optional second return argument has changed from a list of
+  iterates to the final generalized eigenvector.  The reason is that
+  the internal algorithm has changed: the Dynnikov coordinates get
+  renormalized at every step, much like the power iteration method for
+  finding the largest eigenvalue of a matrix.  A consequence of this
+  is that it is no longer natural to store the iterates.  This
+  shouldn't affect things very much, since this optional argument was
+  not used widely.
+
+* The maximum number of iterations to try is now determined by using
+  the low-entropy psi braids.  The spectral gap of those braids is
+  computed using the new function psiroots.  Two caveats: (i) Those
+  braids are only known to have lowest entropy for 8 strands or fewer.
+  (ii) Even if they have the lowest entropy, they might not have the
+  lowest spectral gap.  In practice this shouldn't matter, but this
+  method shouldn't be used to prove theorems!
+
+------------------------------------------------------------------------
+1.0.5 [2014-01-31]
+
+* Constructors for Rupert Venzke's psi-family of low-entropy braids.
+
+* Fix bug involving single-trajectory dataset.
+
+* Plot empty braids (why not...).
+
+* braid.compact no longer checks for trivial braid, since this can
+  take a lot of time (more than the compact itself).
+
+* Unit test for entropy added to testsuite.
+
+* Lighter distribution (just compiled files).
+
+* A few more small bugfixes.
+
+------------------------------------------------------------------------
+1.0.4 [2014-01-03]
+
+* The databraid class records crossing times of a dataset.
+
+* Added an example section on taffy pullers to braidlab guide.
+
+* bugfix in testsuite.
+
+------------------------------------------------------------------------
+1.0.3 [2013-12-20]
+
+* The braidlab guide has been updated and expanded, and now has a
+  table of contents and a detailed index.
+
+* New methods in braid class: 'alexpoly' returns the Alexander
+  polynomial.  'burau' can now construct a matrix of Laurent
+  polynomials (wavelet toolbox required).  'tensor' is the tensor
+  product of braids.
+
+* Big speedup in creating braids from data, due to improved safety
+  checks on the particle trajectories.
+
+------------------------------------------------------------------------
+1.0.2 [2013-12-13]
+
+* loopTest.m in testsuite.
+
+* Clean up files.  Eliminate subrepos.
+
+* First public release.
+
+------------------------------------------------------------------------
+1.0.1 [2013-12-12]
+
+* Check for overflow of loop coordinates.
+
+* Several bugfixes.
+
+* Improved support for VPI (Variable Precision Integers).
+
+------------------------------------------------------------------------
+1.0 [2013-10-02]
+
+First release of braidlab.
