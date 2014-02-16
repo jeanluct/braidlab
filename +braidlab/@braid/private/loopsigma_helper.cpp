@@ -52,6 +52,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxDOUBLE_CLASS, mxREAL);
       loopsigma_helper_common<double>(Ngen,ii,uA,plhs[0]);
     }
+  else if (typ == "single")
+    {
+      plhs[0] = mxCreateNumericMatrix(Nr, N, mxSINGLE_CLASS, mxREAL);
+      loopsigma_helper_common<float>(Ngen,ii,uA,plhs[0]);
+    }
   else if (typ == "int32")
     {
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT32_CLASS, mxREAL);
