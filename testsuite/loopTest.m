@@ -91,6 +91,13 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l.coords,int64([-1 2 -3 0 0 0]));
       l = loopcoords(b,'dehornoy');
       testCase.verifyEqual(l.coords,int64([1 -2 3 0 0 0]));
+
+      % Make a braid that will overflow int64.
+      b = braidlab.braid(repmat([1 -2],[1 50]));
+      testCase.verifyWarning(@() b.istrivial, ...
+                           'BRAIDLAB:braid:loopcoords:overflow')
+      testCase.verifyWarning(@() b == b, ...
+                           'BRAIDLAB:braid:loopcoords:overflow')
     end
 
     function test_loop_length_overflow(testCase)

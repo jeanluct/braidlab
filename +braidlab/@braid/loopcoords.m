@@ -29,10 +29,11 @@ function l = loopcoords(b,conv,typ)
 %   numbers can be dropped, and his notation is (a1,b1,a2,b2,a3,b3) compared
 %   to our (a1,a2,a3,b1,b2,b3).
 %
-%   L = LOOPCOORDS(B,CONV,TYPE) creates a loop with entries of type TYPE,
-%   which can be 'int32', 'int64' (default), 'double', or 'vpi' (variable
-%   precision integers).  Use CONV=[] for the default convention.  Note
-%   that fixed-precision integer types can overflow for long braids.
+%   L = LOOPCOORDS(B,CONV,'TYPE') or LOOPCOORDS(B,CONV,@TYPE) creates a loop
+%   with coordinates of type TYPE.  The default is TYPE=int64.  Other useful
+%   values are double, int32, and vpi (variable precision integers).  Use
+%   CONV=[] for the default convention.  Note that fixed-precision integer
+%   types can overflow for long braids.
 %
 %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
 %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
@@ -63,24 +64,22 @@ if nargin < 2, conv = 'right'; end
 
 if isempty(conv), conv = 'right'; end
 
-if nargin < 3
-  typ = 'int64';
-  notypespec = true;
-else
+if nargin > 2
   notypespec = false;
+  if ischar(typ)
+    htyp = str2func(typ);
+  elseif isa(typ,'function_handle')
+    htyp = typ;
+  else
+    error('BRAIDLAB:braid:loopcoords:badarg', ...
+	  'Third argument should be a type string or function handle.');
+  end
+else
+  htyp = @int64;
+  notypespec = true;
 end
 
-switch lower(typ)
- case 'int32'
-  htyp = @int32;
- case 'int64'
-  htyp = @int64;
- case 'double'
-  htyp = @double;
- case 'vpi'
-  checkvpi
-  htyp = @vpi;
-end
+if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
 
 switch lower(conv)
  case {'left','dehornoy'}
@@ -106,26 +105,10 @@ catch err
     if strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
       warning('BRAIDLAB:braid:loopcoords:overflow',...
               'loopcoords overflowed... using VPI.')
-      checkvpi
+      braidlab.checkvpi
       l = braidlab.loop(loopsigma(w,vpi(l.coords)));
     end
   else
     rethrow(err)
-  end
-end
-
-%=====================================================================
-function checkvpi
-
-% Use variable precision integers if available.
-if ~(exist('vpi') == 2)
-  % No VPI... try to add the path.
-  blbase = fileparts(fileparts(which('braidlab.debugmsg')));
-  addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
-  if ~(exist('vpi') == 2)
-    % For some reason this didn't work.
-    error('BRAIDLAB:braid:loopcoords:novpi',...
-          ['vpi type not on path.  Try ''addpath ' ...
-           'extern/VariablePrecisionIntegers'' from braidlab folder.'])
   end
 end

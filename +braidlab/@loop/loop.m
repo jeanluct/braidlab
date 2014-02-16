@@ -53,7 +53,7 @@
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-classdef loop
+classdef loop < matlab.mixin.CustomDisplay
   properties
     coords = [0 -1]; % Dynnikov coordinates
   end
@@ -79,12 +79,20 @@ classdef loop
     %   If A and B are arrays of equal dimension and with N-2 columns, then
     %   an array of several loop objects is created, one for each row.
     %
+    %   Note that the coordinates of the loop are of the same type as the
+    %   vectors used in its construction (usually double by default).  For
+    %   example, to construct a loop of 64-bit integers, use LOOP(int64(D)).
+    %
     %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
     %   N+1 punctures.  The loop L is a (nonoriented) generating set for the
     %   fundamental group of the sphere with N punctures, with the extra
     %   puncture serving as the basepoint.  This sort of object is
     %   convenient when looking for growth of loops under braid action, or
     %   for testing for braid equality.
+    %
+    %   L = LOOP(N,'TYPE') or LOOP(N,@TYPE) creates a loop with coordinates
+    %   of type TYPE.  The default is TYPE=double.  Other useful values are
+    %   int32, int64, and vpi (variable precision integers).
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
@@ -99,8 +107,21 @@ classdef loop
               'Need at least two punctures.');
       end
       n1 = c-1;
-      l.coords = zeros(1,2*n1);
-      l.coords(n1+1:end) = -1;
+      if nargin > 1
+        if ischar(b)
+          htyp = str2func(b);
+        elseif isa(b,'function_handle')
+          htyp = b;
+        else
+          error('BRAIDLAB:loop:loop:badarg', ...
+                'Second argument should be a type string or function handle.');
+        end
+      else
+        htyp = @double;
+      end
+      if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
+      l.coords = htyp(zeros(1,2*n1));
+      l.coords(n1+1:end) = htyp(-1);
       return
     end
     if isa(c,'braidlab.loop')
@@ -205,36 +226,21 @@ classdef loop
     %   See also LOOP, LOOP.DISP.
       if isscalar(obj)
         if ~isa(obj(1).coords,'vpi')
-          str = ['(( ' num2str(obj.coords) ' ))'];
-        end
-      else
-        error('BRAIDLAB:loop:char:notscalar', ...
-              'Cannot convert nonscalar loop to string.');
-      end
-    end
-
-    function disp(obj)
-    %DISP   Display a loop.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.DISP.
-      for i = 1:size(obj,2)
-        if ~isa(obj(i).coords,'vpi')
-          sz = get(0, 'CommandWindowSize');
-          wc = textwrap({char(obj(i))},sz(1)-4);
-          for i = 1:length(wc)
-            % Indent rows.
-            wc{i} = ['   ' wc{i}];
-            % If the format is loose rather than compact, add a line break.
-            if strcmp(get(0,'FormatSpacing'),'loose')
-              wc{i} = sprintf('%s\n',wc{i});
-            end
-          end
-          disp(strvcat(wc))
+          objstr = num2str(obj.coords);
         else
-          % VPI objects are hard to display.  Is there even a
-          % conversion to string?
-          disp(obj(i).coords)
+          % The VPI num2str command is buggy on arrays.
+          objstr = num2str(obj.coords(1));
+          if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
+          for i = 2:length(obj.coords)
+            oo = num2str(obj.coords(i)); oo(1:2) = '';
+            objstr = [objstr oo];
+          end
+        end
+        str = ['(( ' objstr ' ))'];
+      else
+        str = '';
+        for i = 1:length(obj)
+          str = [str ; char(obj(i))];
         end
       end
     end
@@ -275,6 +281,31 @@ classdef loop
         % The number of intersections with the real axis.
         l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
             + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+      end
+    end
+
+  end % methods block
+
+
+  methods (Access = protected)
+
+    function displayScalarObject(obj)
+      displayNonScalarObject(obj)
+    end
+
+    function displayNonScalarObject(obj)
+      for j = 1:size(obj,2)
+        sz = get(0, 'CommandWindowSize');
+        wc = textwrap({char(obj(j))},sz(1)-6);
+        for i = 1:length(wc)
+          % Indent rows.
+          if i > 1, wc{i} = ['      ' wc{i}]; else, wc{i} = ['   ' wc{i}]; end
+          % If the format is loose rather than compact, add a line break.
+          if strcmp(get(0,'FormatSpacing'),'loose')
+            wc{i} = sprintf('%s\n',wc{i});
+          end
+        end
+        disp(strvcat(wc))
       end
     end
 
