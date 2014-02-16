@@ -33,14 +33,12 @@ if isempty(ii)
   return
 end
 
-if isa(u,'double') && exist('loopsigma_helper_double') == 3
-  % If MEX file is available, use that.
-  % Only works on double precision numbers.
-  up = loopsigma_helper_double(ii,u);
-  return
-elseif isa(u,'int64') && exist('loopsigma_helper_int64') == 3
-  up = loopsigma_helper_int64(ii,u);
-  return
+% If MEX file is available, use that.
+if exist('loopsigma_helper_general') == 3
+  if isa(u,'double') || isa(u,'int32') || isa(u,'int64')
+    up = loopsigma_helper_general(ii,u);
+    return
+  end
 end
 
 n = size(u,2)/2 + 2;

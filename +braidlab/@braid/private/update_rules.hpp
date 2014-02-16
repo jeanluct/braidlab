@@ -88,3 +88,58 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
   free(ap+1);
   free(bp+1);
 }
+
+
+template <class T>
+inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
+				    const mxArray *uA, mxArray *uoA)
+{
+  int n; // Refers to generators, so don't need to be mwIndex/mwSize.
+  mwIndex k, l;
+  const T *u;
+  T *a, *b, *uo;
+  mwSize N, Nr;
+
+  u = (T *)mxGetPr(uA);
+
+  N = mxGetN(uA);
+  Nr = mxGetM(uA);
+  if (N % 2 != 0)
+    {
+      mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badarg",
+                        "u argument should have even number of columns.");
+    }
+  n = (int)(N/2 + 2);
+
+  // Make 1-indexed arrays.
+  a = (T *) malloc(N/2 * sizeof(T)) - 1;
+  b = (T *) malloc(N/2 * sizeof(T)) - 1;
+
+  // Create an mxArray for the output data.
+  uo = (T *)mxGetPr(uoA);
+
+  for (l = 0; l < Nr; ++l) // Loop over rows of u.
+    {
+      // Copy initial row data.
+      for (k = 1; k <= N/2; ++k)
+        {
+          a[k] = u[(k-1    )*Nr+l];
+          b[k] = u[(k-1+N/2)*Nr+l];
+        }
+
+      // Act with the braid sequence in ii onto the coordinates a,b.
+      update_rules(Ngen, n, ii, a, b);
+
+      for (k = 1; k <= N/2; ++k)
+        {
+          // Copy final a and b to row of output array.
+          uo[(k-1    )*Nr+l] = a[k];
+          uo[(k-1+N/2)*Nr+l] = b[k];
+        }
+    }
+
+  free(a+1);
+  free(b+1);
+
+  return;
+}
