@@ -12,9 +12,10 @@ function p = alexpoly(b,x,opt)
 %   Supported objects are X=laurpoly(1,1) (from the Matlab wavelet toolbox,
 %   the default) and X=sym('x') (from the Matlab symbolic toolbox).
 %
-%   P = ALEXPOLY(B,X,'uncentered') or ALEXPOLY(B,[],'uncentered') does not
+%   P = ALEXPOLY(B,X,'uncentered') or ALEXPOLY(B,'uncentered') does not
 %   attempt to center the polynomial so that P(X) = P(1/X).  This is
-%   sometimes necessary for braids that cannot be centered (see below).
+%   necessary for polynomials with fractional powers when using the
+%   laurpoly class, since that class cannot represent those.
 %
 %   Example: the trefoil knot 3_1 is the closure of sigma_1^3.  Its
 %   Alexander polynomial is
@@ -30,16 +31,21 @@ function p = alexpoly(b,x,opt)
 %
 %   ans = x + 1/x - 1
 %
-%   The braid [1 1] cannot be centered, since its polynomial cannot be
-%   put in palindromic form:
+%   The braid [1 1], which corresponds to the Hopf link, cannot be centered
+%   using the laurpoly class, since this requires fractional exponents.
 %
 %   >> ALEXPOLY(braid([1 1]))
 %   Error using braidlab.braid/alexpoly
-%   Monomial with odd degree.  Try the 'uncentered' option.
+%   Polynomial with fractional powers.  Try the 'uncentered' option or use
+%   the symbolic toolbox.
 %
-%   >> ALEXPOLY(braid([1 1]),[],'uncentered')
+%   >> ALEXPOLY(braid([1 1]),'uncentered')
 %
 %   ans(z) = - z^(+1) + 1
+%
+%   >> ALEXPOLY(braid([1 1]),sym('x'))
+%
+%   ans = 1/x^(1/2) - x^(1/2)
 %
 %   Reference:
 %
@@ -68,14 +74,29 @@ function p = alexpoly(b,x,opt)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 3 || any(strcmpi(opt,{'center','centre','centered','centred'}))
-  center = true;
-elseif any(strcmpi(opt, ...
-           {'nocenter','uncentered','uncentred','uncenter','uncentre'}))
-  center = false;
-else
-  error('BRAIDLAB:braid:alexpoly:badarg', ...
-        'Unknown option %s.')
+center = true;
+stringopt = false;
+
+if nargin == 2 && ischar(x)
+  opt = x;
+  x = [];
+  stringopt = true;
+end
+
+if nargin == 3, stringopt = true; end
+
+if stringopt
+  if any(strcmpi(opt,{'center','centre','centered','centred'}))
+    center = true;
+  elseif any(strcmpi(opt,{'center','centre','centered','centred'}))
+    center = true;
+  elseif any(strcmpi(opt, ...
+             {'nocenter','uncentered','uncentred','uncenter','uncentre'}))
+    center = false;
+  else
+    error('BRAIDLAB:braid:alexpoly:badarg', ...
+	  'Unknown option %s.')
+  end
 end
 
 if nargin < 2 || isempty(x)
@@ -92,8 +113,9 @@ end
 
 errnotmono = {'BRAIDLAB:braid:alexpoly:notmonomial', ...
               'p(z) = p(1/z) cannot be enforced.'};
-errodddegree = {'BRAIDLAB:braid:alexpoly:baddegree', ...
-                'Monomial with odd degree.  Try the ''uncentered'' option.'};
+errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
+              ['Polynomial with fractional powers.  Try the ' ...
+               '''uncentered'' option or use the symbolic toolbox.']};
 
 % Compute reduced Burau representation of the braid.
 bu = burau(b,x);
@@ -117,7 +139,7 @@ switch class(x)
     end
     deg = get(pp,'maxDEG');
     if mod(deg,2)
-      error(errodddegree{:})
+      error(errfracpow{:})
     end
     p = p * laurpoly(1,deg/2);
   end
@@ -148,9 +170,6 @@ switch class(x)
       error(errnotmono{:})
     end
     deg = m*(length(p2)-1);
-    if mod(deg,2)
-      error(errodddegree{:})
-    end
     p = expand(simplify(p * x^(-deg/2)));
   end
 
