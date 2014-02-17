@@ -75,7 +75,7 @@ void printvec(const std::vector<int>& b)
 
 template<class T>
 inline
-bool commute_and_cancel(T& b, const int dir)
+bool commute_and_cancel(T& b, const int dir, const bool secndrel)
 {
 #ifdef BRAIDLAB_COMPACT_DEBUG
   using std::cerr;
@@ -88,7 +88,7 @@ bool commute_and_cancel(T& b, const int dir)
   do
     {
       bool incrpos = false;
-      // dir=1 means start from the begining, dir=-1 from the end.
+      // dir=1 means start from the beginning, dir=-1 from the end.
       mwIndex i = (dir == 1 ? pos0 : b.size()-1-pos0);
 #ifdef BRAIDLAB_COMPACT_DEBUG
       cerr << "Position i = " << i << endl;
@@ -150,7 +150,7 @@ bool commute_and_cancel(T& b, const int dir)
               incrpos = true;
               continue;
             }
-          if ((int)i+2*dir >= 0 && (int)i+2*dir <= (int)b.size()-1)
+          if ((int)i+2*dir >= 0 && (int)i+2*dir <= (int)b.size()-1 && secndrel)
             {
               // Try the second type of relation.
               if ((b[i]+1 == b[i+dir] || b[i]-1 == b[i+dir])
@@ -218,7 +218,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   // Try to commute_and_cancel from the left/right until nothing changes.
-  while (commute_and_cancel(bw,1) || commute_and_cancel(bw,-1)) {}
+  while (commute_and_cancel(bw,1,false) || commute_and_cancel(bw,-1,false)) {}
+
+  // Try to commute_and_cancel from the left/right until nothing changes.
+  while (commute_and_cancel(bw,1,true) || commute_and_cancel(bw,-1,true)) {}
 
   // Now copy vector bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);
