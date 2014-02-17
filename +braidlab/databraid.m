@@ -63,45 +63,45 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also DATABRAID, BRAID, BRAID.BRAID.
       if nargin < 1
-	error('BRAIDLAB:databraid:badarg','Not enough input arguments.')
+        error('BRAIDLAB:databraid:badarg','Not enough input arguments.')
       elseif isa(XY,'braidlab.braid')
-	br.word = XY.word;
-	br.n = XY.n;
-	if nargin > 1
-	  br.tcross = secnd;
-	else
-	  br.tcross = 1:length(br.word);
-	end
-	return
+        br.word = XY.word;
+        br.n = XY.n;
+        if nargin > 1
+          br.tcross = secnd;
+        else
+          br.tcross = 1:length(br.word);
+        end
+        return
       elseif ndims(XY) < 3
-	br.n = max(size(XY));
-	br.word = reshape(XY,[1 br.n]);
-	if nargin > 1
-	  br.tcross = secnd;
-	else
-	  br.tcross = 1:length(br.word);
-	end
-	return
+        br.n = max(size(XY));
+        br.word = reshape(XY,[1 br.n]);
+        if nargin > 1
+          br.tcross = secnd;
+        else
+          br.tcross = 1:length(br.word);
+        end
+        return
       elseif nargin < 2
-	t = 1:size(XY,1);
-	proj = 0;
+        t = 1:size(XY,1);
+        proj = 0;
       elseif nargin < 3
-	if isscalar(secnd)
-	  % The argument secnd is interpreted as a projection line angle.
-	  proj = secnd;
-	  t = 1:size(XY,1);
-	else
-	  % The argument secnd is interpreted as a list of times.
-	  t = secnd;
-	  proj = 0;
-	end
+        if isscalar(secnd)
+          % The argument secnd is interpreted as a projection line angle.
+          proj = secnd;
+          t = 1:size(XY,1);
+        else
+          % The argument secnd is interpreted as a list of times.
+          t = secnd;
+          proj = 0;
+        end
       end
       if nargin == 3
-	t = secnd;
-	proj = third;
+        t = secnd;
+        proj = third;
       end
       if nargin > 3
-	error('BRAIDLAB:databraid:badarg','Too many input arguments.')
+        error('BRAIDLAB:databraid:badarg','Too many input arguments.')
       end
       [b,br.tcross] = braidlab.braid.color_braiding(XY,t,proj);
       br.word = b.word;
@@ -155,16 +155,16 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also BRAID.MTIMES, DATABRAID, LOOP.
       if isa(b2,'braidlab.databraid')
-	if b1.tcross(end) > b2.tcross(1)
-	  error('BRAIDLAB:databraid:mtimes:notchrono',...
-		'First braid must have earlier times than second.')
-	end
+        if b1.tcross(end) > b2.tcross(1)
+          error('BRAIDLAB:databraid:mtimes:notchrono',...
+                'First braid must have earlier times than second.')
+        end
         b12 = braidlab.databraid(...
-	    braidlab.braid([b1.word b2.word],max(b1.n,b2.n)),...
-	    [b1.tcross b2.tcross]);
+            braidlab.braid([b1.word b2.word],max(b1.n,b2.n)),...
+            [b1.tcross b2.tcross]);
       elseif isa(b2,'braidlab.loop')
         % Action of databraid on a loop.
-	b12 = mtimes@braidlab.braid(b1,b2);
+        b12 = mtimes@braidlab.braid(b1,b2);
       end
     end
 
@@ -239,12 +239,12 @@ classdef databraid < braidlab.braid
   methods (Hidden)
     function bm = mpower(b,m)
       error('BRAIDLAB:databraid:mpower:undefined',...
-	    'This operation is not defined for databraids.')
+            'This operation is not defined for databraids.')
     end
 
     function bi = inv(b)
       error('BRAIDLAB:databraid:inv:undefined',...
-	    'This operation is not defined for databraids.')
+            'This operation is not defined for databraids.')
     end
   end % methods block
 

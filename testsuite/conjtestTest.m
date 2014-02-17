@@ -39,7 +39,7 @@ classdef conjtestTest < matlab.unittest.TestCase
       testCase.b1 = braidlab.braid(XY);
       testCase.b1c = testCase.b1.compact;
       testCase.verifyError(@() braidlab.braid(XY,pi/4), ...
-			   'BRAIDLAB:braid:color_braiding:coincidentproj');
+                           'BRAIDLAB:braid:color_braiding:coincidentproj');
       testCase.b2 = braidlab.braid(XY,-pi/4);
       testCase.b2c = testCase.b2.compact;
     end
@@ -55,9 +55,9 @@ classdef conjtestTest < matlab.unittest.TestCase
 
     function test_compact(testCase)
       testCase.verifyTrue(testCase.b1 == testCase.b1c,...
-			  'Something went wrong when compacting b1.');
+                          'Something went wrong when compacting b1.');
       testCase.verifyTrue(testCase.b2 == testCase.b2c,...
-			  'Something went wrong when compacting b2.');
+                          'Something went wrong when compacting b2.');
     end
 
     function test_conj(testCase)
