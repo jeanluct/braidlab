@@ -39,9 +39,9 @@ classdef compactTest < matlab.unittest.TestCase
       n = 10; % how many strings
       k = 30; % how many generators
       for i = 1:100
-	b = braidlab.braid('random',n,k); bc = compact(b);
-	testCase.verifyTrue(b == bc,...
-			    'Braids not equal after compacting.');
+        b = braidlab.braid('random',n,k); bc = compact(b);
+        testCase.verifyTrue(b == bc,...
+                            'Braids not equal after compacting.');
       end
     end
   end

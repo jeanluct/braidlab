@@ -113,8 +113,8 @@ classdef braid < matlab.mixin.CustomDisplay
         br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
       elseif ischar(b)
         % First argument is a string.
-	switch lower(b)
-	 case {'halftwist','delta'}
+        switch lower(b)
+         case {'halftwist','delta'}
           br.n = secnd;
           D = [];
           for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
@@ -138,7 +138,7 @@ classdef braid < matlab.mixin.CustomDisplay
           N = m+n+1;
           br.n = N;
           br.word = [1:m m:-1:1 1:N-1];
-	 case {'venzkepsi','psi'}
+         case {'venzkepsi','psi'}
           % See page 1 of Venzke's thesis.
           n = secnd;
           if n < 5
@@ -162,18 +162,18 @@ classdef braid < matlab.mixin.CustomDisplay
             k = (n-6)/8;
             br.word = [repmat(L,1,6*k+5) -1 -2];
           end
-	 case {'rand','random'}
+         case {'rand','random'}
           br.n = secnd;
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
-	 otherwise
-	  % Maybe the string specifies a knot.
-	  try
-	    br = knot2braid(b);
-	  catch err
-	    error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
-	  end
-	end
+         otherwise
+          % Maybe the string specifies a knot.
+          try
+            br = knot2braid(b);
+          catch err
+            error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
+          end
+        end
       elseif max(size(size(b))) == 3
         if nargin > 2
           error('BRAIDLAB:braid:badarg','Too many input arguments.')

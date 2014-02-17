@@ -103,7 +103,7 @@ switch class(x)
       break
     catch err
       if ~strcmpi(err.identifier,'symbolic:sym:sym2poly:errmsg2')
-	rethrow
+        rethrow
       end
     end
   end
@@ -120,5 +120,5 @@ switch class(x)
 
  otherwise
   error('BRAIDLAB:braid:alexpoly:unknowntype', ...
-	'Unknown type.')
+        'Unknown type.')
 end

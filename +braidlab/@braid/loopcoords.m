@@ -72,7 +72,7 @@ if nargin > 2
     htyp = typ;
   else
     error('BRAIDLAB:braid:loopcoords:badarg', ...
-	  'Third argument should be a type string or function handle.');
+          'Third argument should be a type string or function handle.');
   end
 else
   htyp = @int64;
