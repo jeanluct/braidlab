@@ -261,17 +261,22 @@ ans = < 1  4 -4  2  4 -1 -2  4  4  4 >
 \end{lstlisting}
 The constructor can also build some standard braids: %
 \index{braid class@\braid\ class!constructor!half-twist}
+\index{braid class@\braid\ class!constructor!knots}
+\index{knot!braid representative}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> braid('halftwist',5)
 
 ans = < 4  3  2  1  4  3  2  4  3  4 >
+
+>> braid('8_21')  % braid for 8-crossing knot #21
+
+ans = < 4  3  2  1  4  3  2  4  3  4 >
 \end{lstlisting}
-In Section~\ref{sec:braidfromdata} we will also show how to construct
-a braid from a trajectory data set.
-\index{braid class@\braid\ class!constructor|)}
+In Section~\ref{sec:braidfromdata} we will show how to construct a braid from
+a trajectory data set.  \index{braid class@\braid\ class!constructor|)}
 
 \index{braid class@\braid\ class!equality (\lstinline{==})}%
-The \braid\ class also handles equality of braids:
+The \braid\ class handles equality of braids:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> a = braid([1 -2]); b = braid([1 -2 2 1 2 -1 -2 -1]);
 >> a == b
@@ -451,28 +456,50 @@ ans(z) = + 1 - z^(-1)
 The reduced Burau matrix of a braid can be used to compute the
 \emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
 \index{Alexander--Conway polynomial|(}%
-of its closure (see Section~\ref{sec:braidfromdata} for more on the closure of
-a braid).  For instance, the trefoil knot is given by the closure of the
+of its closure.  For instance, the trefoil knot is given by the closure of the
+\index{knot!trefoil}%
+\index{knot!Alexander polynomial}
 braid~$\sigma_1^3$ \citep{AlexanderPolynomial}, which gives a Laurent
 polynomial
 \index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1 1]))
+>> alexpoly(braid([1 1 1]))  % can also use braid('trefoil')
 
 ans(z) = + z^(+1) - 1 + z^(-1)
 \end{lstlisting}
 The figure-eight knot is the closure of~$(\sigma_1\sigma_2^{-1})^2$:
+\index{knot!figure-eight}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 -2 1 -2]))
+>> alexpoly(braid([1 -2 1 -2]))  % or braid('figure-8')
 
 ans(z) = - z^(+1) + 3 - z^(-1)
 \end{lstlisting}
-The Alexander polynomial is a knot invariant, so it can be used to determine
-when two knots are not the same.
-\index{braid!Burau representation|)}%
-\index{braid class@\braid\ class!burau@\lstinline{burau}|)}%
+The Alexander polynomial is a knot invariant, \index{knot!invariant} so it can
+be used to determine when two knots are not the same.  For knots, it is
+guaranteed to have integral powers.  For links, it might not:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> alexpoly(braid([1 1]))  % braid for the Hopf link
+
+Error using braidlab.braid/alexpoly
+Polynomial with fractional powers.  Try the 'uncentered' option or use the symbolic toolbox.
+\end{lstlisting}
+\index{Matlab!symbolic toolbox}%
+Fractional powers cannot be represented with a \lstinline{laurpoly} object. %
 \index{laurpoly@\lstinline{laurpoly}|)}%
 \index{Laurent polynomials|)}%
+In that case we can use the `uncentered' option, which yields the uncentered
+polynomial $1-z$.  Alternatively, we can switch to using a variable from the
+symbolic toolbox:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> alexpoly(braid([1 1]),sym('x'))
+
+ans = 1/x^(1/2) - x^(1/2)
+\end{lstlisting}
+\index{sym@\lstinline{sym}}%
+which can represent fractional powers.
+
+\index{braid!Burau representation|)}%
+\index{braid class@\braid\ class!burau@\lstinline{burau}|)}%
 \index{Alexander--Conway polynomial|)}%
 \index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|)}%
 
