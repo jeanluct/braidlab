@@ -179,8 +179,10 @@ elseif strcmp(class(x),'sym') || isnumeric(x)
       error(errnotmono{:})
     end
     deg = m*(length(p2)-1);
-    p = expand(simplify(p * x^(-deg/2)));
+    p = p * x^(-deg/2);
   end
+  % simplify/expand help put it in polynomial form.  Sometimes fails.
+  if ~isnumeric(x), p = expand(simplify(expand(simplify(p)))); end
 
 else
   error('BRAIDLAB:braid:alexpoly:unknowntype', ...
