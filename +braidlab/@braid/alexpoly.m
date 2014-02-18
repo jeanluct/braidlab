@@ -12,48 +12,58 @@ function p = alexpoly(b,x,opt)
 %   Supported objects are X=laurpoly(1,1) (from the Matlab wavelet toolbox,
 %   the default) and X=sym('x') (from the Matlab symbolic toolbox). X can
 %   also be a numeric type (a real or complex number), but in that case the
-%   'uncentered' option below is the default.
+%   'centered' option below is unavailable.
 %
-%   P = ALEXPOLY(B,X,'uncentered') or ALEXPOLY(B,'uncentered') does not
-%   attempt to center the polynomial so that P(X) = P(1/X).  When using the
-%   laurpoly class, this is necessary for polynomials with fractional powers
-%   since they cannot be represented by a laurpoly object.  If X is a
-%   numeric type, 'uncentered' is the default.
+%   P = ALEXPOLY(B,X,'centered') or ALEXPOLY(B,'centered') centers the
+%   polynomial so that P(X) = (+/-)P(1/X).  (The + sign always applies if
+%   the closure of the braid is a knot, rather than a link.)  This may fail
+%   when using the laurpoly class, since polynomials with fractional powers
+%   cannot be represented by a laurpoly object.  This option is unavailable
+%   when X is a numeric type,
 %
 %   Example: the trefoil knot 3_1 is the closure of sigma_1^3.  Its
 %   Alexander polynomial is
 %
 %   >> ALEXPOLY(braid('3_1'))
 %
+%   ans = + z^(+2) - z^(+1) + 1
+%
+%   This can be centered to make the Laurent polynomial palindromic:
+%
+%   >> ALEXPOLY(braid('3_1'),'centered')
+%
 %   ans(z) = + z^(+1) - 1 + z^(-1)
 %
 %   To use the symbolic toolbox instead (much slower), specify the
 %   polynomial variable as a second argument:
 %
-%   >> ALEXPOLY(braid('3_1')),sym('x'))
+%   >> ALEXPOLY(braid('3_1'),sym('x'))
 %
-%   ans = x + 1/x - 1
+%   ans = x^2 - x + 1
 %
 %   The braid [1 1], which corresponds to the Hopf link, cannot be centered
-%   using the laurpoly class, since this requires fractional exponents.
+%   using the laurpoly class, since this requires fractional exponents:
 %
-%   >> ALEXPOLY(braid([1 1]))
+%   >> ALEXPOLY(braid([1 1]),'centered')
+%
 %   Error using braidlab.braid/alexpoly
-%   Polynomial with fractional powers.  Try the 'uncentered' option or use
+%   Polynomial with fractional powers.  Remove 'centered' option or use
 %   the symbolic toolbox.
 %
-%   >> ALEXPOLY(braid([1 1]),'uncentered')
+%   >> ALEXPOLY(braid([1 1]))
 %
 %   ans(z) = - z^(+1) + 1
 %
-%   >> ALEXPOLY(braid([1 1]),sym('x'))
+%   >> ALEXPOLY(braid([1 1]),sym('x'),'centered')
 %
 %   ans = 1/x^(1/2) - x^(1/2)
 %
-%   Reference:
+%   References:
 %
-%   Weisstein, Eric W. "Alexander Polynomial." From MathWorld -- A Wolfram
-%   Web Resource. http://mathworld.wolfram.com/AlexanderPolynomial.html
+%   E. Weisstein, "Alexander Polynomial." From MathWorld -- A Wolfram Web
+%   Resource. http://mathworld.wolfram.com/AlexanderPolynomial.html
+%
+%   D. Rolfsen, "Knots and Links," AMS Chelsea (2003).
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.ENTROPY, BRAID.BURAU, LAURPOLY.
@@ -77,10 +87,7 @@ function p = alexpoly(b,x,opt)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-center = true;
-
-if nargin > 1, if isnumeric(x), center = false; end, end
-
+center = false;
 stringopt = false;
 
 if nargin == 2 && ischar(x)
@@ -90,6 +97,18 @@ if nargin == 2 && ischar(x)
 end
 
 if nargin == 3, stringopt = true; end
+
+if nargin < 2 || isempty(x)
+  if exist('laurpoly') == 2
+    x = laurpoly(1,1);
+  elseif exist('sym') == 2
+    x = sym('x');
+  else
+    error('BRAIDLAB:braid:alexpoly:notoolbox',...
+          ['Neither the wavelet toolbox (laurpoly) nor the symbolic toolbox' ...
+           ' (sym) appear to be installed.'])
+  end
+end
 
 if stringopt
   if any(strcmpi(opt,{'center','centre','centered','centred'}))
@@ -110,23 +129,11 @@ if stringopt
   end
 end
 
-if nargin < 2 || isempty(x)
-  if exist('laurpoly') == 2
-    x = laurpoly(1,1);
-  elseif exist('sym') == 2
-    x = sym('x');
-  else
-    error('BRAIDLAB:braid:alexpoly:notoolbox',...
-          ['Neither the wavelet toolbox (laurpoly) nor the symbolic toolbox' ...
-           ' (sym) appear to be installed.'])
-  end
-end
-
 errnotmono = {'BRAIDLAB:braid:alexpoly:notmonomial', ...
               'p(z) = p(1/z) cannot be enforced.'};
 errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
-              ['Polynomial with fractional powers.  Try the ' ...
-               '''uncentered'' option or use the symbolic toolbox.']};
+              ['Polynomial with fractional powers.  Remove ' ...
+               '''centered'' option or use the symbolic toolbox.']};
 
 % Compute reduced Burau representation of the braid.
 bu = burau(b,x);
