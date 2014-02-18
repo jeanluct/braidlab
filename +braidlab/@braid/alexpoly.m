@@ -77,7 +77,9 @@ function p = alexpoly(b,x,opt)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if ~isnumeric(x), center = true; else center = false; end
+center = true;
+
+if nargin > 1, if isnumeric(x), center = false; end, end
 
 stringopt = false;
 
