@@ -10,12 +10,15 @@ function p = alexpoly(b,x,opt)
 %
 %   P = ALEXPOLY(B,X) uses the object X for the polynomial variable.
 %   Supported objects are X=laurpoly(1,1) (from the Matlab wavelet toolbox,
-%   the default) and X=sym('x') (from the Matlab symbolic toolbox).
+%   the default) and X=sym('x') (from the Matlab symbolic toolbox). X can
+%   also be a numeric type (a real or complex number), but in that case the
+%   'uncentered' option below is the default.
 %
 %   P = ALEXPOLY(B,X,'uncentered') or ALEXPOLY(B,'uncentered') does not
-%   attempt to center the polynomial so that P(X) = P(1/X).  This is
-%   necessary for polynomials with fractional powers when using the
-%   laurpoly class, since that class cannot represent those.
+%   attempt to center the polynomial so that P(X) = P(1/X).  When using the
+%   laurpoly class, this is necessary for polynomials with fractional powers
+%   since they cannot be represented by a laurpoly object.  If X is a
+%   numeric type, 'uncentered' is the default.
 %
 %   Example: the trefoil knot 3_1 is the closure of sigma_1^3.  Its
 %   Alexander polynomial is
@@ -74,7 +77,8 @@ function p = alexpoly(b,x,opt)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-center = true;
+if ~isnumeric(x), center = true; else center = false; end
+
 stringopt = false;
 
 if nargin == 2 && ischar(x)
@@ -87,7 +91,12 @@ if nargin == 3, stringopt = true; end
 
 if stringopt
   if any(strcmpi(opt,{'center','centre','centered','centred'}))
-    center = true;
+    if ~isnumeric(x)
+      center = true;
+    else
+      error('BRAIDLAB:braid:alexpoly:cantcenter', ...
+            'Can''t center polynomial for numeric types.')
+    end
   elseif any(strcmpi(opt,{'center','centre','centered','centred'}))
     center = true;
   elseif any(strcmpi(opt, ...
@@ -95,7 +104,7 @@ if stringopt
     center = false;
   else
     error('BRAIDLAB:braid:alexpoly:badarg', ...
-	  'Unknown option %s.')
+          'Unknown option %s.')
   end
 end
 
@@ -121,8 +130,7 @@ errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
 bu = burau(b,x);
 n = b.n;
 
-switch class(x)
- case 'laurpoly'
+if strcmp(class(x),'laurpoly')
   for i = 1:n-1, bu{i,i} = bu{i,i} - 1; end
 
   num = (-1)^(n-1)*det(bu);
@@ -144,14 +152,15 @@ switch class(x)
     p = p * laurpoly(1,deg/2);
   end
 
- case 'sym'
+elseif strcmp(class(x),'sym') || isnumeric(x)
   for i = 1:n-1, bu(i,i) = bu(i,i) - 1; end
 
   num = (-1)^(n-1)*det(bu);
   denom = sum(x.^[0:n-1]);
 
-  % Long division of Laurent polynomials. They always divide each other exactly.
-  p = simplify(num / denom);
+  % The polynomials always divide each other exactly.
+  p = num / denom;
+  if ~isnumeric(x), p = simplify(p); end
 
   if center
     mono = simplify(p / subs(p,x,1/x));
@@ -173,7 +182,7 @@ switch class(x)
     p = expand(simplify(p * x^(-deg/2)));
   end
 
- otherwise
+else
   error('BRAIDLAB:braid:alexpoly:unknowntype', ...
         'Unknown type.')
 end
