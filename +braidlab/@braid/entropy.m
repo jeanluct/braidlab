@@ -122,7 +122,8 @@ else
     u.coords = u.coords/norm(u.coords);  % normalize to avoid overflow
     u = b*u;
     entr = log(norm(u.coords));
-    debugmsg(sprintf('  iteration %d  entr=%.10e',i,entr),2)
+    debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
+		     i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;

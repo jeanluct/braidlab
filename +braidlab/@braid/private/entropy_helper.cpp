@@ -90,7 +90,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       entr = log(l2norm(N,a,b));
 
       if (dbglvl >= 2)
-        mexPrintf("  iteration %d  entr=%.10e\n",it,entr);
+        mexPrintf("  iteration %d  entr=%.10e  diff=%.4e\n",it,entr,entr-entr0);
 
       if (fabs(entr - entr0) < tol)
         {
