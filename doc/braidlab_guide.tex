@@ -453,50 +453,74 @@ but the matrix is now given as a cell array, each entry containing a
 
 ans(z) = + 1 - z^(-1)
 \end{lstlisting}
+Another option is to use Matlab's symbolic toolbox:
+\index{Matlab!symbolic toolbox}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> B = burau(braid([1 -2]),sym('t'))
+
+B = [ -t,       t]
+    [ -1, 1 - 1/t]
+\end{lstlisting}
+where now \lstinline{B} is a matrix of \lstinline{sym} objects:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> B(2,2)
+
+ans = 1 - 1/t
+\end{lstlisting}
+
 The reduced Burau matrix of a braid can be used to compute the
 \emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
 \index{Alexander--Conway polynomial|(}%
-of its closure.  For instance, the trefoil knot is given by the closure of the
+of its closure.  For instance, the trefoil knot is given by the closure of
+the %
 \index{knot!trefoil}%
-\index{knot!Alexander polynomial}
+\index{knot!Alexander polynomial}%
 braid~$\sigma_1^3$ \citep{AlexanderPolynomial}, which gives a Laurent
 polynomial
 \index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> alexpoly(braid([1 1 1]))  % can also use braid('trefoil')
 
-ans(z) = + z^(+1) - 1 + z^(-1)
+ans(z) = + z^(+2) - z^(+1) + 1
 \end{lstlisting}
 The figure-eight knot is the closure of~$(\sigma_1\sigma_2^{-1})^2$:
 \index{knot!figure-eight}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> alexpoly(braid([1 -2 1 -2]))  % or braid('figure-8')
 
+ans(z) = - 1 + 3*z^(-1) - z^(-2)
+\end{lstlisting}
+This can be `centered' so that it satisfies~$p(z)=\pm p(1/z)$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> alexpoly(braid([1 -2 1 -2]),'centered')
+
 ans(z) = - z^(+1) + 3 - z^(-1)
 \end{lstlisting}
-The Alexander polynomial is a knot invariant, \index{knot!invariant} so it can
-be used to determine when two knots are not the same.  For knots, it is
-guaranteed to have integral powers.  For links, it might not:
+The centered Alexander polynomial is a knot invariant, \index{knot!invariant}
+so it can be used to determine when two knots are not the same.  For knots,
+the centered polynomial is guaranteed to have integral powers.  For links,
+such as the Hopf link consisting of two singly-linked loops, it might not:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1]))  % braid for the Hopf link
+>> alexpoly(braid([1 1],'centered'))  % the Hopf link
 
 Error using braidlab.braid/alexpoly
-Polynomial with fractional powers.  Try the 'uncentered' option or use the symbolic toolbox.
+Polynomial with fractional powers.  Remove 'centered' option or use the symbolic toolbox.
 \end{lstlisting}
 \index{Matlab!symbolic toolbox}%
 Fractional powers cannot be represented with a \lstinline{laurpoly} object. %
 \index{laurpoly@\lstinline{laurpoly}|)}%
 \index{Laurent polynomials|)}%
-In that case we can use the `uncentered' option, which yields the uncentered
+In that case we can drop the `centered' option, which yields the uncentered
 polynomial $1-z$.  Alternatively, we can switch to using a variable from the
 symbolic toolbox:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1]),sym('x'))
+>> alexpoly(braid([1 1]),sym('x'),'centered')
 
 ans = 1/x^(1/2) - x^(1/2)
 \end{lstlisting}
 \index{sym@\lstinline{sym}}%
-which can represent fractional powers.
+which can represent fractional powers.  This polynomial
+satisfies~$p(x)=-p(1/x)$.
 
 \index{braid!Burau representation|)}%
 \index{braid class@\braid\ class!burau@\lstinline{burau}|)}%
