@@ -1,6 +1,6 @@
 % Check if pos/neg operators in loopsigma eventually stabilize.
 
-b = braid('psi',9);
+b = compact(braid('psi',9));
 
 l = loop(b.n);
 
