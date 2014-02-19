@@ -48,11 +48,8 @@ ap = a; bp = b;
 pos = @(x)max(x,0); neg = @(x)min(x,0);
 
 % If nargout > 1, record the state of pos/neg operators.
-recposneg = false;
-if nargout > 1, recposneg = true; end
-if recposneg
-  pn = zeros(size(u,1),length(ii),4);
-end
+% There are at most 4 such choices for each generator.
+if nargout > 1, pn = zeros(size(u,1),length(ii),4); end
 
 for j = 1:length(ii)
   i = abs(ii(j));
@@ -61,14 +58,14 @@ for j = 1:length(ii)
      case 1
       bp(:,1) = sumg( a(:,1) , pos(b(:,1)) );
       ap(:,1) = sumg( -b(:,1) , pos(bp(:,1)) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,1));
         pn(:,j,2) = sign(bp(:,1));
       end
      case n-1
       bp(:,n-2) = sumg( a(:,n-2) , neg(b(:,n-2)) );
       ap(:,n-2) = sumg( -b(:,n-2) , neg(bp(:,n-2)) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,n-2));
         pn(:,j,2) = sign(bp(:,n-2));
       end
@@ -78,7 +75,7 @@ for j = 1:length(ii)
       bp(:,i-1) = sumg( b(:,i), neg(c) );
       ap(:,i) = sumg( a(:,i), -neg(b(:,i)), -neg(sumg(neg(b(:,i-1)), -c)) );
       bp(:,i) = sumg( b(:,i-1), -neg(c) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,i));
         pn(:,j,2) = sign(b(:,i-1));
         pn(:,j,3) = sign(c);
@@ -90,14 +87,14 @@ for j = 1:length(ii)
      case 1
       bp(:,1) = sumg(-a(:,1), pos(b(:,1)) );
       ap(:,1) = sumg(b(:,1), -pos(bp(:,1)) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,1));
         pn(:,j,2) = sign(bp(:,1));
       end
      case n-1
       bp(:,n-2) = sumg(-a(:,n-2), neg(b(:,n-2)) );
       ap(:,n-2) = sumg(b(:,n-2), - neg(bp(:,n-2)) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,n-2));
         pn(:,j,2) = sign(bp(:,n-2));
       end
@@ -107,7 +104,7 @@ for j = 1:length(ii)
       bp(:,i-1) = sumg(b(:,i), -pos(d));
       ap(:,i) = sumg(a(:,i), neg(b(:,i)), neg(sumg(neg(b(:,i-1)), d)) );
       bp(:,i) = sumg(b(:,i-1), pos(d) );
-      if recposneg
+      if nargout > 1
         pn(:,j,1) = sign(b(:,i));
         pn(:,j,2) = sign(b(:,i-1));
         pn(:,j,3) = sign(pos(b(:,i)) - d);
