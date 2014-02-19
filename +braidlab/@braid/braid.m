@@ -292,6 +292,16 @@ classdef braid < matlab.mixin.CustomDisplay
       ee = all(obj.perm == 1:obj.n);
     end
 
+    function [lp,pn] = recsigns(b,l)
+    %RECSIGNS   Act on a loop, recording signs of pos/neg operators.
+
+    % This is experimental.  See devel/pnstabilize.m.
+
+      [w,pn] = loopsigma(b.word,vertcat(l.coords));
+
+      lp = braidlab.loop(w);
+    end
+
     function b12 = mtimes(b1,b2)
     %MTIMES   Multiply two braids together (if second argument is a braid)
     %         or act on a loop by a braid (if second argument is a loop).
