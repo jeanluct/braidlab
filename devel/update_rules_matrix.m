@@ -1,7 +1,8 @@
 function M = update_rules_matrix(b,pn,N)
 
-n = b.n;
 if nargin < 3, N = 2*b.n-2; end
+
+maxgen = N/2 + 1; % Maximum generator index for this loop size.
 
 M = speye(N,N);
 
@@ -26,7 +27,7 @@ for j = 1:length(b)
       %bp(:,1) = a(:,1) + pos(b(:,1));
       T(b0+1,a0+1) = 1;
       T(b0+1,b0+1) = pos(pn(j,1));
-     case n-1
+     case maxgen
       % pn(:,j,1) = sign(b(:,n-2));
       % pn(:,j,2) = sign(bp(:,n-2));
       %ap(:,n-2) = -b(:,n-2) + neg(a(:,n-2) + neg(b(:,n-2)));
@@ -74,7 +75,7 @@ for j = 1:length(b)
       %bp(:,1) = -a(:,1) + pos(b(:,1));
       T(b0+1,a0+1) = -1;
       T(b0+1,b0+1) = pos(pn(j,1));
-     case n-1
+     case maxgen
       % pn(:,j,1) = sign(b(:,n-2));
       % pn(:,j,2) = sign(bp(:,n-2));
       %ap(:,n-2) = b(:,n-2) - neg(-a(:,n-2) + neg(b(:,n-2)));
