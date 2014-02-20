@@ -48,8 +48,9 @@ ap = a; bp = b;
 pos = @(x)max(x,0); neg = @(x)min(x,0);
 
 % If nargout > 1, record the state of pos/neg operators.
-% There are at most 4 such choices for each generator.
-if nargout > 1, pn = zeros(size(u,1),length(ii),4); end
+% There are at most maxpn such choices for each generator.
+maxpn = 5;
+if nargout > 1, pn = zeros(size(u,1),length(ii),maxpn); end
 
 for j = 1:length(ii)
   i = abs(ii(j));
@@ -79,7 +80,8 @@ for j = 1:length(ii)
         pn(:,j,1) = sign(b(:,i));
         pn(:,j,2) = sign(b(:,i-1));
         pn(:,j,3) = sign(c);
-        pn(:,j,4) = sign( neg(b(:,i-1)) - c );
+        pn(:,j,4) = sign(pos(b(:,i)) + c);
+        pn(:,j,5) = sign(neg(b(:,i-1)) - c);
       end
     end
   elseif ii(j) < 0
@@ -109,6 +111,7 @@ for j = 1:length(ii)
         pn(:,j,2) = sign(b(:,i-1));
         pn(:,j,3) = sign(pos(b(:,i)) - d);
         pn(:,j,4) = sign(d);
+        pn(:,j,5) = sign(neg(b(:,i-1)) + d);
       end
     end
   end
@@ -117,6 +120,6 @@ end
 varargout{1} = [ap bp];
 
 if nargout > 1
-  pn = reshape(pn,[size(u,1) 4*length(ii)]);
+  pn = reshape(pn,[size(u,1) maxpn*length(ii)]);
   varargout{2} = pn;
 end
