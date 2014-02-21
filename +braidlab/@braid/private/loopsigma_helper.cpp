@@ -76,12 +76,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       // Cell array of strings, to be converted to multiprecision objects.
 
+      // Array for Matlab mxArray subscripts.
       mwSize nsubs = 2;
       mwIndex *subs = (mwIndex *)mxCalloc(nsubs,sizeof(mwIndex));
+
+      // Pointer to input data.
       const mxArray *uA = prhs[1];
 
+      // Allocate input and output GMP multiprecision array.
       mpz_class *u = new mpz_class[N*Nr];
+      mpz_class *uo = new mpz_class[N*Nr];
 
+      // Convert cell of mxArray strings to mpz_class objects.
       for (mwIndex l = 0; l < Nr; ++l)
         {
           for (mwIndex k = 0; k < N; ++k)
@@ -93,13 +99,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             }
         }
 
-      mpz_class *uo = new mpz_class[N*Nr];
-
+      // Act on coordinates with braid.
       loopsigma_helper_gmp(Ngen,ii,Nr,N,u,uo);
 
+      // Vector of array dimensions.
       mwSize *dims = (mwSize *)mxCalloc(nsubs,sizeof(mwSize));
       dims[0] = Nr; dims[1] = N;
+      // Allocate output cell array.
       plhs[0] = mxCreateCellArray(nsubs,dims);
+
+      // Convert mpz_class objects back to strings, store in cell array.
       for (mwIndex l = 0; l < Nr; ++l)
         {
           for (mwIndex k = 0; k < N; ++k)
