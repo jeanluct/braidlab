@@ -1,3 +1,6 @@
+#ifndef BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
+#define BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
+
 #include "mex.h"
 #include "update_rules.hpp"
 
@@ -38,8 +41,8 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
   const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
-  T *a = (T *) malloc(N/2 * sizeof(T)) - 1;
-  T *b = (T *) malloc(N/2 * sizeof(T)) - 1;
+  T *a = new T[N/2] - 1;
+  T *b = new T[N/2] - 1;
 
   // Create an mxArray for the output data.
   T *uo = (T *)mxGetPr(uoA);
@@ -64,8 +67,10 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
         }
     }
 
-  free(a+1);
-  free(b+1);
+  delete[] (a+1);
+  delete[] (b+1);
 
   return;
 }
+
+#endif // BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP

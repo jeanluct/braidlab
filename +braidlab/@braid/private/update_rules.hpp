@@ -1,3 +1,6 @@
+#ifndef BRAIDLAB_UPDATE_RULES_HPP
+#define BRAIDLAB_UPDATE_RULES_HPP
+
 #include "mex.h"
 #include "sumg.hpp"
 
@@ -29,8 +32,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
   const int N = 2*(n-2);
 
   // Make 1-indexed arrays.
-  T *ap = (T *) malloc(N/2 * sizeof(T)) - 1;
-  T *bp = (T *) malloc(N/2 * sizeof(T)) - 1;
+  T *ap = new T[N/2] - 1;
+  T *bp = new T[N/2] - 1;
 
   // Copy initial row data
   for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
@@ -83,6 +86,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
       for (mwIndex k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
     }
 
-  free(ap+1);
-  free(bp+1);
+  delete[] (ap+1);
+  delete[] (bp+1);
 }
+
+#endif // BRAIDLAB_UPDATE_RULES_HPP
