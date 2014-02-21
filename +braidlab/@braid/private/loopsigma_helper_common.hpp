@@ -26,7 +26,8 @@
 
 template <class T>
 inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
-                                    const mxArray *uA, mxArray *uoA)
+                                    const mxArray *uA,
+				    mxArray *uoA, mxArray *pnA = 0)
 {
   const T *u = (T *)mxGetPr(uA);
 
@@ -44,6 +45,15 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
   T *a = new T[N/2] - 1;
   T *b = new T[N/2] - 1;
 
+  int *pn1 = 0;
+  double *pn = 0;
+  const int maxpn = 5;
+  if (pnA != 0)
+    {
+      pn1 = new int[maxpn*Ngen]();
+      pn = (double *)mxGetPr(pnA);
+    }
+
   // Create an mxArray for the output data.
   T *uo = (T *)mxGetPr(uoA);
 
@@ -57,7 +67,7 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
         }
 
       // Act with the braid sequence in ii onto the coordinates a,b.
-      update_rules(Ngen, n, ii, a, b);
+      update_rules(Ngen, n, ii, a, b, pn1);
 
       for (mwIndex k = 1; k <= N/2; ++k)
         {
@@ -65,10 +75,25 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
           uo[(k-1    )*Nr+l] = a[k];
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
+
+	  if (pnA != 0)
+	    {
+	      for (mwIndex k = 0; k < maxpn; ++k)
+		{
+		  for (mwIndex j = 0; j < Ngen; ++j)
+		    {
+		      mexPrintf("%d %d",j*maxpn*Nr + k*Nr + l,j*maxpn + k);
+		      mexPrintf("  %d\n",pn1[j*maxpn + k]);
+		      pn[j*maxpn*Nr + k*Nr + l] = pn1[j*maxpn + k];
+		    }
+		}
+	    }
     }
 
   delete[] (a+1);
   delete[] (b+1);
+
+  if (pnA != 0) delete[] pn1;
 
   return;
 }

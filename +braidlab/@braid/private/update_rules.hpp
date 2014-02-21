@@ -23,11 +23,18 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-template <class T> inline T pos(T x) { return (x > 0 ? x : 0); }
-template <class T> inline T neg(T x) { return (x < 0 ? x : 0); }
+template <typename T> inline T pos(T x) { return (x > 0 ? x : 0); }
+template <typename T> inline T neg(T x) { return (x < 0 ? x : 0); }
 
-template <class T>
-inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
+template <typename T> inline int sign(T x)
+{
+  return ( x > 0 ? 1 : (x < 0 ? -1 : 0) );
+}
+
+
+template <typename T>
+inline void update_rules(const int Ngen, const int n, const int *ii,
+                         T *a, T *b, int* pn = 0)
 {
   const int N = 2*(n-2);
 
@@ -38,6 +45,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
   // Copy initial row data
   for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
 
+  const int maxpn = 5;
+
   for (int j = 0; j < Ngen; ++j) // Loop over generators.
     {
       int i = abs(ii[j]);
@@ -47,11 +56,23 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
             {
               bp[1] = sumg( a[1] , pos(b[1]) );
               ap[1] = sumg( -b[1] , pos(bp[1]) );
+
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[1]);
+                  pn[j*maxpn + 1] = sign(bp[1]);
+                }
             }
           else if (i == n-1)
             {
               bp[n-2] = sumg( a[n-2] , neg(b[n-2]) );
               ap[n-2] = sumg( -b[n-2] , neg(bp[n-2]) );
+
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[n-2]);
+                  pn[j*maxpn + 1] = sign(bp[n-2]);
+                }
             }
           else
             {
@@ -60,6 +81,15 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
               bp[i-1] = sumg( b[i] , neg(c) );
               ap[i] = sumg(sumg(a[i],-neg(b[i])),-neg(sumg(neg(b[i-1]),-c)));
               bp[i] = sumg( b[i-1] , -neg(c) );
+
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[i]);
+                  pn[j*maxpn + 1] = sign(b[i-1]);
+                  pn[j*maxpn + 2] = sign(c);
+                  pn[j*maxpn + 3] = sign(pos(b[i]) + c);
+                  pn[j*maxpn + 4] = sign(neg(b[i-1]) - c);
+                }
             }
         }
       else if (ii[j] < 0)
@@ -68,11 +98,22 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
             {
               bp[1] = sumg( -a[1] , pos(b[1]) );
               ap[1] = sumg( b[1] , -pos(bp[1]) );
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[1]);
+                  pn[j*maxpn + 1] = sign(bp[1]);
+                }
             }
           else if (i == n-1)
             {
               bp[n-2] = sumg( -a[n-2] , neg(b[n-2]) );
               ap[n-2] = sumg( b[n-2] , -neg(bp[n-2]) );
+
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[n-2]);
+                  pn[j*maxpn + 1] = sign(bp[n-2]);
+                }
             }
           else
             {
@@ -81,6 +122,15 @@ inline void update_rules(const int Ngen, const int n, const int *ii, T *a, T *b)
               bp[i-1] = sumg( b[i] , -pos(d) );
               ap[i] = sumg(sumg(a[i] , neg(b[i])) , neg(sumg(neg(b[i-1]) , d)));
               bp[i] = sumg( b[i-1] , pos(d) );
+
+              if (pn != 0)
+                {
+                  pn[j*maxpn + 0] = sign(b[i]);
+                  pn[j*maxpn + 1] = sign(b[i-1]);
+                  pn[j*maxpn + 2] = sign(pos(b[i]) - d);
+                  pn[j*maxpn + 3] = sign(d);
+                  pn[j*maxpn + 4] = sign(neg(b[i-1]) + d);
+                }
             }
         }
       for (mwIndex k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
