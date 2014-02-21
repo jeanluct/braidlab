@@ -1,4 +1,4 @@
-function plot_mod(varargin)
+function plot(varargin)
 %PLOT   Plot a loop.
 %   PLOT(L) plots a representative of the equivalence class
 %   defined by the loop L.
@@ -20,7 +20,7 @@ function plot_mod(varargin)
 %   See also LOOP.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
 %
 %   This file is part of Braidlab.
 %
@@ -66,7 +66,7 @@ end
 % Must be of the form L then option name then option value
 
 if rem(nargin,2) ~= 1
-  error('BRAIDLAB:loop:plot:oddarg',...
+  error('BRAIDLAB:loop:plot:oddarg', ...
         'Number of inputs must be odd.');
 end
 
@@ -75,7 +75,7 @@ end
 L = varargin{1};
 
 if ~isscalar(L)
-  error('BRAIDLAB:loop:plot:onlyscalar',...
+  error('BRAIDLAB:loop:plot:onlyscalar', ...
         'Can only plot scalar loop, not array of loops.');
 end
 
@@ -89,14 +89,14 @@ while argin_index <= nargin
 
   if ~val
     if ~ischar(arg)
-      error('BRAIDLAB:loop:plot:notaprop',...
+      error('BRAIDLAB:loop:plot:notaprop', ...
             'Argument %d should be a string.',argin_index);
     end
 
     lowArg = lower(arg);
     j = strmatch(lowArg,names);
     if isempty(j)                       % if no matches
-      error('BRAIDLAB:loop:plot:invalidpropname',...
+      error('BRAIDLAB:loop:plot:invalidpropname', ...
             'Invalid property ''%s''.',arg);
     elseif length(j) > 1                % if more than one match
       % Check for any exact matches (in case any names are subsets of others)
@@ -108,7 +108,7 @@ while argin_index <= nargin
         for k = j(2:length(j))'
           matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
         end
-        error('BRAIDLAB:loop:plot:ambiguouspropname',...
+        error('BRAIDLAB:loop:plot:ambiguouspropname', ...
               'Property %s is ambiguous; matches %s.',arg,matches);
       end
     end
@@ -161,7 +161,8 @@ if n ~= length(puncture_position)
 end
 
 if 2 ~= size(puncture_position,2)
-  error('BRAIDLAB:loop:plot:badposformat','The input position format is incorrect.')
+  error('BRAIDLAB:loop:plot:badposformat', ...
+        'The input position format is incorrect.')
 end
 
 % Calculate the distance between punctures
@@ -225,7 +226,10 @@ puncture_boundary_y_top = sqrt(prad^2 - puncture_boundary_x.^2);
 puncture_boundary_y_bottom = -sqrt(prad^2 - puncture_boundary_x(end:-1:1).^2);
   
 for p = 1:n
-  patch(puncture_position(p,1)+[puncture_boundary_x puncture_boundary_x(end:-1:1)],puncture_position(p,2)+[puncture_boundary_y_top puncture_boundary_y_bottom],...
+  patch(puncture_position(p,1) + ...
+        [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
+        puncture_position(p,2) + ...
+        [puncture_boundary_y_top puncture_boundary_y_bottom], ...
         options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
 end
 
@@ -248,8 +252,9 @@ for p = 1:n
     loop_curve_x = sign(nl)*linspace(0,rad,50);
     loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
     loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    plot(puncture_position(p,1)+[loop_curve_x loop_curve_x(end:-1:1)],puncture_position(p,2)+[loop_curve_y_top loop_curve_y_bottom],...
-         options.LineColor,'LineWidth',options.LineWidth,...
+    plot(puncture_position(p,1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         puncture_position(p,2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         options.LineColor,'LineWidth',options.LineWidth, ...
          'LineStyle',options.LineStyle)
   end
 end
@@ -282,7 +287,8 @@ for p = 1:n-1
     for s = 1:tojoindown
       y1 = pgap(p)*(nr+s)+puncture_position(p,2);
       y2 = -pgap(p+1)*(nl-s+tojoindown+1)+puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
+           options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join upwards (on the same side).
@@ -290,7 +296,8 @@ for p = 1:n-1
       y1 = pgap(p)*(nr+s)+puncture_position(p,2);
       y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+puncture_position(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
+           options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
@@ -323,14 +330,16 @@ for p = 1:n-1
     for s = 1:tojoinup
       y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
       y2 = pgap(p+1)*(nl-s+tojoinup+1)+puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
+           options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
       y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
       y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2],options.LineColor,...
+      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
+           options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
   end
@@ -340,7 +349,7 @@ if ~holdstate
   hold off
   axis equal
   axis off
-  % Add a gap on the left and right, to avoid clipping the figure.
+  % Add a gap around the edges, to avoid clipping the figure.
   axis tight
   ax = axis;
   sc = .1*max(abs(ax(1)),abs(ax(2)));
