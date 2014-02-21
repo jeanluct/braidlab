@@ -22,7 +22,7 @@ function [varargout] = color_braiding(XY,t,proj)
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
 %
 %   This file is part of Braidlab.
 %
