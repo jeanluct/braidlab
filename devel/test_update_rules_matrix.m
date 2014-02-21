@@ -6,7 +6,7 @@ for i = 1:Ntest
   b = braid('random',5,10);
   l = loop(randi(100,1,2*b.n-2)-50);
 
-  [l2,pn] = recsigns(b,l);
+  [l2,pn] = b*l;
 
   M = update_rules_matrix(b,pn,size(l.coords,2));
 
