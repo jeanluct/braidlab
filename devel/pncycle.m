@@ -6,7 +6,7 @@ import braidlab.*
 
 if nargin < 1, b = compact(braid('psi',9)); end
 
-if nargin < 2, maxit = 200; end
+if nargin < 2, maxit = 1000; end
 
 l = loop(b.n,'vpi');
 

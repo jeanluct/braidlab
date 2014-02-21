@@ -108,7 +108,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
 
       // Act on coordinates with braid.
-      loopsigma_helper_gmp(Ngen,ii,Nr,N,u,uo);
+      loopsigma_helper_gmp(Ngen,ii,Nr,N,u,uo,pnA);
 
       // Vector of array dimensions.
       mwSize *dims = (mwSize *)mxCalloc(nsubs,sizeof(mwSize));

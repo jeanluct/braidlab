@@ -36,7 +36,6 @@ end
 % If MEX file is available, use that.
 if exist('loopsigma_helper') == 3
   if isa(u,'double') || isa(u,'single') || isa(u,'int32') || isa(u,'int64')
-    'here'
     [varargout{1:nargout}] = loopsigma_helper(ii,u);
     return
 
@@ -54,7 +53,7 @@ if exist('loopsigma_helper') == 3
     % (multiprecision).  It will return an error if it wasn't.
     compiled_with_gmp = true;
     try
-      ustr = loopsigma_helper(ii,ustr);
+      [varargout{1:nargout}] = loopsigma_helper(ii,ustr);
     catch err
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;
@@ -68,7 +67,7 @@ if exist('loopsigma_helper') == 3
       uvpi = vpi(zeros(size(u)));
       for i = 1:size(u,1)
         for j = 1:size(u,2)
-          uvpi(i,j) = vpi(ustr{i,j});
+          uvpi(i,j) = vpi(varargout{1}{i,j});
         end
       end
 

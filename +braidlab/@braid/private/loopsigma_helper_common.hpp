@@ -76,16 +76,16 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
 
-          if (pnA != 0)
+      if (pnA != 0)
+        {
+          for (mwIndex k = 0; k < maxpn; ++k)
             {
-              for (mwIndex k = 0; k < maxpn; ++k)
+              for (mwIndex j = 0; j < Ngen; ++j)
                 {
-                  for (mwIndex j = 0; j < Ngen; ++j)
-                    {
-                      pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
-                    }
+                  pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
                 }
             }
+        }
     }
 
   delete[] (a+1);
@@ -100,7 +100,8 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
 #ifdef BRAIDLAB_USE_GMP
 inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
                                  const mwSize Nr, const mwSize N,
-                                 const mpz_class *u, mpz_class *uo)
+                                 const mpz_class *u,
+                                 mpz_class *uo, mxArray *pnA = 0)
 {
   // Refers to generators, so don't need to be mwIndex/mwSize.
   const int n = (int)(N/2 + 2);
@@ -108,6 +109,15 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
   // Make 1-indexed arrays.
   mpz_class *a = new mpz_class[N/2] - 1;
   mpz_class *b = new mpz_class[N/2] - 1;
+
+  int *pn1 = 0;
+  double *pn = 0;
+  const int maxpn = 5;
+  if (pnA != 0)
+    {
+      pn1 = new int[maxpn*Ngen]();
+      pn = (double *)mxGetPr(pnA);
+    }
 
   for (mwIndex l = 0; l < Nr; ++l) // Loop over rows of u.
     {
@@ -119,7 +129,7 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
         }
 
       // Act with the braid sequence in ii onto the coordinates a,b.
-      update_rules(Ngen, n, ii, a, b);
+      update_rules(Ngen, n, ii, a, b, pn1);
 
       for (mwIndex k = 1; k <= N/2; ++k)
         {
@@ -127,10 +137,23 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
           uo[(k-1    )*Nr+l] = a[k];
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
+
+      if (pnA != 0)
+        {
+          for (mwIndex k = 0; k < maxpn; ++k)
+            {
+              for (mwIndex j = 0; j < Ngen; ++j)
+                {
+                  pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
+                }
+            }
+        }
     }
 
   delete[] (a+1);
   delete[] (b+1);
+
+  if (pnA != 0) delete[] pn1;
 
   return;
 }
