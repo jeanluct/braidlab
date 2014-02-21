@@ -45,6 +45,11 @@ TRAINS_LIBDIR     = ../../../extern/trains
 TRAINS_INCLUDEDIR = ../../../extern
 TRAINS_LD         = -ltrains
 
+ifdef BRAIDLAB_USE_GMP
+GMP_LD = -lgmpxx -lgmp
+MEXFLAGS += -DBRAIDLAB_USE_GMP
+endif
+
 %.$(MEXSUFFIX): %.cpp
 ifndef MEXVOUT
 	$(error Matlab "mex" command is not in your path)
@@ -65,6 +70,15 @@ endif
 		make CXX="$(CXX) -fPIC" CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
+
+loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
+	loopsigma_helper_common.hpp update_rules.hpp \
+	loopsigma_helper_gmp.hpp sumg.hpp
+ifndef MEXVOUT
+	$(error Matlab "mex" command is not in your path)
+endif
+	# $< is the first dependency (the .cpp file).
+	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 showvars:
 	@echo "$(MEXSUFFIX)"

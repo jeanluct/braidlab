@@ -38,6 +38,42 @@ if exist('loopsigma_helper') == 3 && nargout < 2
   if isa(u,'double') || isa(u,'single') || isa(u,'int32') || isa(u,'int64')
     varargout{1} = loopsigma_helper(ii,u);
     return
+
+  elseif isa(u,'vpi')
+
+    % Convert u to cell of strings to pass to C++ file.
+    ustr = cell(size(u));
+    for i = 1:size(u,1)
+      for j = 1:size(u,2)
+        ustr{i,j} = strtrim(num2str(u(i,j)));
+      end
+    end
+
+    % Call MEX function, but make sure to check if it was compiled with GMP
+    % (multiprecision).  It will return an error if it wasn't.
+    compiled_with_gmp = true;
+    try
+      ustr = loopsigma_helper(ii,ustr);
+    catch err
+      if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
+        compiled_with_gmp = false;
+      else
+        rethrow
+      end
+    end
+
+    if compiled_with_gmp
+      % Convert cell of strings back to vpi.
+      uvpi = vpi(zeros(size(u)));
+      for i = 1:size(u,1)
+        for j = 1:size(u,2)
+          uvpi(i,j) = vpi(ustr{i,j});
+        end
+      end
+
+      varargout{1} = uvpi;
+      return
+    end
   end
 end
 
