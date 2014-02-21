@@ -34,9 +34,10 @@ if isempty(ii)
 end
 
 % If MEX file is available, use that.
-if exist('loopsigma_helper') == 3 && nargout < 2
+if exist('loopsigma_helper') == 3
   if isa(u,'double') || isa(u,'single') || isa(u,'int32') || isa(u,'int64')
-    varargout{1} = loopsigma_helper(ii,u);
+    'here'
+    [varargout{1:nargout}] = loopsigma_helper(ii,u);
     return
 
   elseif isa(u,'vpi')

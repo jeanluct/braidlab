@@ -51,25 +51,33 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int *ii = (int *)mxGetData(iiA); // iiA contains int32's.
   const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
 
+  mxArray *pnA = 0;
+  if (nlhs > 1)
+    {
+      const int maxpn = 5;
+      plhs[1] = mxCreateDoubleMatrix(Nr,maxpn*Ngen,mxREAL);
+      pnA = plhs[1];
+    }
+
   if (typ == "double")
     {
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxDOUBLE_CLASS, mxREAL);
-      loopsigma_helper_common<double>(Ngen,ii,uA,plhs[0]);
+      loopsigma_helper_common<double>(Ngen,ii,uA,plhs[0],pnA);
     }
   else if (typ == "single")
     {
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxSINGLE_CLASS, mxREAL);
-      loopsigma_helper_common<float>(Ngen,ii,uA,plhs[0]);
+      loopsigma_helper_common<float>(Ngen,ii,uA,plhs[0],pnA);
     }
   else if (typ == "int32")
     {
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT32_CLASS, mxREAL);
-      loopsigma_helper_common<int>(Ngen,ii,uA,plhs[0]);
+      loopsigma_helper_common<int>(Ngen,ii,uA,plhs[0],pnA);
     }
   else if (typ == "int64")
     {
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT64_CLASS, mxREAL);
-      loopsigma_helper_common<long long int>(Ngen,ii,uA,plhs[0]);
+      loopsigma_helper_common<long long int>(Ngen,ii,uA,plhs[0],pnA);
     }
 #ifdef BRAIDLAB_USE_GMP
   else if (typ == "cell")
