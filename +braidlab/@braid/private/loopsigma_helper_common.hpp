@@ -27,7 +27,7 @@
 template <class T>
 inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
                                     const mxArray *uA,
-				    mxArray *uoA, mxArray *pnA = 0)
+                                    mxArray *uoA, mxArray *pnA = 0)
 {
   const T *u = (T *)mxGetPr(uA);
 
@@ -76,18 +76,16 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
 
-	  if (pnA != 0)
-	    {
-	      for (mwIndex k = 0; k < maxpn; ++k)
-		{
-		  for (mwIndex j = 0; j < Ngen; ++j)
-		    {
-		      mexPrintf("%d %d",j*maxpn*Nr + k*Nr + l,j*maxpn + k);
-		      mexPrintf("  %d\n",pn1[j*maxpn + k]);
-		      pn[j*maxpn*Nr + k*Nr + l] = pn1[j*maxpn + k];
-		    }
-		}
-	    }
+          if (pnA != 0)
+            {
+              for (mwIndex k = 0; k < maxpn; ++k)
+                {
+                  for (mwIndex j = 0; j < Ngen; ++j)
+                    {
+                      pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
+                    }
+                }
+            }
     }
 
   delete[] (a+1);
