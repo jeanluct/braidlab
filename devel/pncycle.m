@@ -17,7 +17,7 @@ nconv = 0;
 pnl = [];
 
 for i = 1:maxit
-  [l,pn] = recsigns(b,l);
+  [l,pn] = b*l;
   pnl = [pnl ; pn];
   if nconv == 0
     % Check if we appear to have reached a limit cycle.

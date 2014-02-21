@@ -292,17 +292,7 @@ classdef braid < matlab.mixin.CustomDisplay
       ee = all(obj.perm == 1:obj.n);
     end
 
-    function [lp,pn] = recsigns(b,l)
-    %RECSIGNS   Act on a loop, recording signs of pos/neg operators.
-
-    % This is experimental.  See devel/pnstabilize.m.
-
-      [w,pn] = loopsigma(b.word,vertcat(l.coords));
-
-      lp = braidlab.loop(w);
-    end
-
-    function b12 = mtimes(b1,b2)
+    function [varargout] = mtimes(b1,b2)
     %MTIMES   Multiply two braids together (if second argument is a braid)
     %         or act on a loop by a braid (if second argument is a loop).
     %
@@ -316,7 +306,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
       if isa(b2,'braidlab.braid')
-        b12 = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
+        varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
         % Action of braid on a loop.
         %
@@ -327,7 +317,8 @@ classdef braid < matlab.mixin.CustomDisplay
           error('BRAIDLAB:braid:mtimes', ...
                 'Generator values too large for the loop.')
         end
-        b12 = braidlab.loop(loopsigma(b1.word,vertcat(b2.coords)));
+        [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
+        varargout{1} = braidlab.loop(varargout{1});
       else
         error('BRAIDLAB:braid:mtimes', ...
               'Cannot act with a braid on this object.')
