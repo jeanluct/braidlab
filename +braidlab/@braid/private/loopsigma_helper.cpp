@@ -3,6 +3,11 @@
 #include <string>
 #include "mex.h"
 #include "loopsigma_helper_common.hpp"
+#ifdef BRAIDLAB_USE_GMP
+#include <iostream>
+#include <gmpxx.h>
+#include "loopsigma_helper_gmp.hpp"
+#endif
 
 // Helper function for loopsigma
 
@@ -67,9 +72,55 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT64_CLASS, mxREAL);
       loopsigma_helper_common<long long int>(Ngen,ii,uA,plhs[0]);
     }
+#ifdef BRAIDLAB_USE_GMP
+  else if (typ == "cell")
+    {
+      // Cell array of strings, to be converted to multiprecision objects.
+
+      mwSize nsubs = 2;
+      mwIndex *subs = (mwIndex *)mxCalloc(nsubs,sizeof(mwIndex));
+      const mxArray *uA = prhs[1];
+
+      mpz_class *u = new mpz_class[N*Nr];
+
+      for (mwIndex l = 0; l < Nr; ++l)
+        {
+          for (mwIndex k = 0; k < N; ++k)
+            {
+              subs[0] = l; subs[1] = k;
+              mwIndex idx = mxCalcSingleSubscript(uA,nsubs,subs);
+              mxArray *cA = mxGetCell(uA,idx);
+              u[k*Nr+l] = mpz_class(mxArrayToString(cA));
+            }
+        }
+
+      mpz_class *uo = new mpz_class[N*Nr];
+
+      loopsigma_helper_gmp(Ngen,ii,Nr,N,u,uo);
+
+      mwSize *dims = (mwSize *)mxCalloc(nsubs,sizeof(mwSize));
+      dims[0] = Nr; dims[1] = N;
+      plhs[0] = mxCreateCellArray(nsubs,dims);
+      for (mwIndex l = 0; l < Nr; ++l)
+        {
+          for (mwIndex k = 0; k < N; ++k)
+            {
+              subs[0] = l; subs[1] = k;
+              mwIndex idx = mxCalcSingleSubscript(plhs[0],nsubs,subs);
+              mxArray *s = mxCreateString(uo[k*Nr+l].get_str().c_str());
+              mxSetCell(plhs[0],idx,s);
+            }
+        }
+
+      mxFree(dims);
+      mxFree(subs);
+      delete[] u;
+      delete[] uo;
+    }
+#endif
   else
     {
       mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badtype",
-                        "Unknown variable type.");
+                        "Unknown variable type '%s'.",typ.c_str());
     }
 }

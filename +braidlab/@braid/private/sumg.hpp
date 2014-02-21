@@ -1,5 +1,11 @@
+#ifndef BRAIDLAB_SUMG_HPP
+#define BRAIDLAB_SUMG_HPP
+
 #include <string>
 #include "mex.h"
+#ifdef BRAIDLAB_USE_GMP
+#include <gmpxx.h>
+#endif
 
 // Guarded sum: check for overflow.
 
@@ -75,3 +81,14 @@ inline float sumg(float a, float b)
   // TODO: check for overflow of floats.
   return a+b;
 }
+
+
+#ifdef BRAIDLAB_USE_GMP
+inline mpz_class sumg(mpz_class a, mpz_class b)
+{
+  // mpz_class never overflows.
+  return a+b;
+}
+#endif
+
+#endif // BRAIDLAB_SUMG_HPP
