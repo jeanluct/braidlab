@@ -210,9 +210,10 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
-  % Do we need either of the next two lines?
-  %clf reset
-  %cla
+  % This makes sure to start the axes afresh.
+  % Try "imagesc([1 1]), plot(loop)" without the cla to see the problem.
+  % See also issue #43.
+  cla
 end
 
 hold on
@@ -340,7 +341,8 @@ if ~holdstate
   axis equal
   axis off
   % Add a gap on the left and right, to avoid clipping the figure.
+  axis tight
   ax = axis;
   sc = .1*max(abs(ax(1)),abs(ax(2)));
-  axis([ax(1)-sc ax(2)+sc ax(3) ax(4)])
+  axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
