@@ -6,7 +6,6 @@
 #ifdef BRAIDLAB_USE_GMP
 #include <iostream>
 #include <gmpxx.h>
-#include "loopsigma_helper_gmp.hpp"
 #endif
 
 // Helper function for loopsigma
