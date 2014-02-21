@@ -59,8 +59,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[1]);
-                  pn[j*maxpn + 1] = sign(bp[1]);
+                  pn[0*Ngen + j] = sign(b[1]);
+                  pn[1*Ngen + j] = sign(bp[1]);
                 }
             }
           else if (i == n-1)
@@ -70,8 +70,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[n-2]);
-                  pn[j*maxpn + 1] = sign(bp[n-2]);
+                  pn[0*Ngen + j] = sign(b[n-2]);
+                  pn[1*Ngen + j] = sign(bp[n-2]);
                 }
             }
           else
@@ -84,11 +84,11 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[i]);
-                  pn[j*maxpn + 1] = sign(b[i-1]);
-                  pn[j*maxpn + 2] = sign(c);
-                  pn[j*maxpn + 3] = sign(pos(b[i]) + c);
-                  pn[j*maxpn + 4] = sign(neg(b[i-1]) - c);
+                  pn[0*Ngen + j] = sign(b[i]);
+                  pn[1*Ngen + j] = sign(b[i-1]);
+                  pn[2*Ngen + j] = sign(c);
+                  pn[3*Ngen + j] = sign(pos(b[i]) + c);
+                  pn[4*Ngen + j] = sign(neg(b[i-1]) - c);
                 }
             }
         }
@@ -100,8 +100,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
               ap[1] = sumg( b[1] , -pos(bp[1]) );
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[1]);
-                  pn[j*maxpn + 1] = sign(bp[1]);
+                  pn[0*Ngen + j] = sign(b[1]);
+                  pn[1*Ngen + j] = sign(bp[1]);
                 }
             }
           else if (i == n-1)
@@ -111,8 +111,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[n-2]);
-                  pn[j*maxpn + 1] = sign(bp[n-2]);
+                  pn[0*Ngen + j] = sign(b[n-2]);
+                  pn[1*Ngen + j] = sign(bp[n-2]);
                 }
             }
           else
@@ -125,11 +125,11 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
               if (pn != 0)
                 {
-                  pn[j*maxpn + 0] = sign(b[i]);
-                  pn[j*maxpn + 1] = sign(b[i-1]);
-                  pn[j*maxpn + 2] = sign(pos(b[i]) - d);
-                  pn[j*maxpn + 3] = sign(d);
-                  pn[j*maxpn + 4] = sign(neg(b[i-1]) + d);
+                  pn[0*Ngen + j] = sign(b[i]);
+                  pn[1*Ngen + j] = sign(b[i-1]);
+                  pn[2*Ngen + j] = sign(pos(b[i]) - d);
+                  pn[3*Ngen + j] = sign(d);
+                  pn[4*Ngen + j] = sign(neg(b[i-1]) + d);
                 }
             }
         }
