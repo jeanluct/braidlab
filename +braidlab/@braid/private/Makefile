@@ -72,8 +72,7 @@ endif
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
-	loopsigma_helper_common.hpp update_rules.hpp \
-	loopsigma_helper_gmp.hpp sumg.hpp
+	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp
 ifndef MEXVOUT
 	$(error Matlab "mex" command is not in your path)
 endif
