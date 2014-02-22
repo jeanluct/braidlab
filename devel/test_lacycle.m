@@ -20,6 +20,6 @@ for r = 1:Nreal
   maxperiod = max(size(pn,1),maxperiod);
 end
 
-fprintf('Maximum iterations: %d\n',maxit)
+fprintf('Max iterations: %d     Max period: %d\n',maxit,maxperiod)
 
 BRAIDLAB_debuglvl = 0;

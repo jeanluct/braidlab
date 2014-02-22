@@ -5,13 +5,13 @@ function [varargout] = linact(b,l,N)
 %   piecewise-linear action B*L is equal to the matrix-vector multiplication
 %   M*L.coords' for this particular loop L.
 %
+%   M = LINACT(B) uses L = LOOP(B.n).
+%
 %   [M,L2] = LINACT(B,L) also returns the loop L2 = B*L.
 %
-%   M = LINACT(B,PN) uses instead a vector PN of pos/neg operations in the
-%   piecewise-linear action, as given by [~,PN] = B*L for some loop L.
-%
-%   M = LINACT(B,PN,N) also specifies the loop dimension N, which
-%   otherwise defaults to 2*B.n-2.
+%   M = LINACT(B,PN,N) uses instead a vector PN of pos/neg operations in the
+%   piecewise-linear action, as given by [~,PN] = B*L for some loop L.  The
+%   loop dimension N defaults to 2*B.n-2.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LACYCLE.

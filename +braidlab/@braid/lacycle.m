@@ -67,9 +67,9 @@ if ~strcmpi(w.state,'on')
 end
 
 % Maximum number of iterations.
-if nargin < 2, maxit = 1000; end
+if nargin < 2 || isempty(maxit), maxit = 1000; end
 % Number of consecutive full periods we require to declare convergence.
-if nargin < 3, nconvreq = 5; end
+if nargin < 3 || isempty(nconvreq), nconvreq = 5; end
 
 l = loop(b.n,'vpi');
 
