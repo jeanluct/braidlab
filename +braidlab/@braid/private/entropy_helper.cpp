@@ -72,8 +72,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
-  double *a = (double *) malloc(N/2 * sizeof(double)) - 1;
-  double *b = (double *) malloc(N/2 * sizeof(double)) - 1;
+  double *a = new double[N/2] - 1;
+  double *b = new double[N/2] - 1;
 
   for (mwIndex k = 1; k <= N/2; ++k) { a[k] = u[k-1]; b[k] = u[k-1+N/2]; }
 
@@ -122,8 +122,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // Copy final a and b to row of output array.
   for (mwIndex k = 1; k <= N/2; ++k) { uo[k-1] = a[k]; uo[k-1+N/2] = b[k]; }
 
-  free(a+1);
-  free(b+1);
+  delete[] (a+1);
+  delete[] (b+1);
+
   if (dbglvl_ptr != NULL)
     if (mxGetM(dbglvl_ptr) != 0)
       mxDestroyArray(dbglvl_ptr);
