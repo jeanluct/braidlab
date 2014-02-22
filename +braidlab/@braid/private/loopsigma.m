@@ -95,23 +95,28 @@ for j = 1:length(ii)
      case 1
       bp(:,1) = sumg( a(:,1) , pos(b(:,1)) );
       ap(:,1) = sumg( -b(:,1) , pos(bp(:,1)) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,1));
         pn(:,j,2) = sign(bp(:,1));
       end
+
      case n-1
       bp(:,n-2) = sumg( a(:,n-2) , neg(b(:,n-2)) );
       ap(:,n-2) = sumg( -b(:,n-2) , neg(bp(:,n-2)) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,n-2));
         pn(:,j,2) = sign(bp(:,n-2));
       end
+
      otherwise
       c = sumg( a(:,i-1), -a(:,i), -pos(b(:,i)), neg(b(:,i-1)) );
       ap(:,i-1) = sumg( a(:,i-1), -pos(b(:,i-1)), -pos(sumg(pos(b(:,i)), c)) );
       bp(:,i-1) = sumg( b(:,i), neg(c) );
       ap(:,i) = sumg( a(:,i), -neg(b(:,i)), -neg(sumg(neg(b(:,i-1)), -c)) );
       bp(:,i) = sumg( b(:,i-1), -neg(c) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,i));
         pn(:,j,2) = sign(b(:,i-1));
@@ -125,23 +130,28 @@ for j = 1:length(ii)
      case 1
       bp(:,1) = sumg(-a(:,1), pos(b(:,1)) );
       ap(:,1) = sumg(b(:,1), -pos(bp(:,1)) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,1));
         pn(:,j,2) = sign(bp(:,1));
       end
+
      case n-1
       bp(:,n-2) = sumg(-a(:,n-2), neg(b(:,n-2)) );
       ap(:,n-2) = sumg(b(:,n-2), - neg(bp(:,n-2)) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,n-2));
         pn(:,j,2) = sign(bp(:,n-2));
       end
+
      otherwise
       d = sumg(a(:,i-1), -a(:,i), pos(b(:,i)), -neg(b(:,i-1)));
       ap(:,i-1) = sumg(a(:,i-1), pos(b(:,i-1)), pos(sumg(pos(b(:,i)),- d)) );
       bp(:,i-1) = sumg(b(:,i), -pos(d));
       ap(:,i) = sumg(a(:,i), neg(b(:,i)), neg(sumg(neg(b(:,i-1)), d)) );
       bp(:,i) = sumg(b(:,i-1), pos(d) );
+
       if nargout > 1
         pn(:,j,1) = sign(b(:,i));
         pn(:,j,2) = sign(b(:,i-1));
