@@ -45,12 +45,13 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
   T *a = new T[N/2] - 1;
   T *b = new T[N/2] - 1;
 
+  // If pnA has been allocated, we'll record the pos/neg operations.
   int *pn1 = 0;
   double *pn = 0;
   const int maxpn = 5;
   if (pnA != 0)
     {
-      pn1 = new int[maxpn*Ngen]();
+      pn1 = new int[maxpn*Ngen](); // Allocate and set to zero.
       pn = (double *)mxGetPr(pnA);
     }
 
@@ -76,6 +77,7 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
 
+      // Copy the pos/neg results to output array.
       if (pnA != 0)
         {
           for (mwIndex k = 0; k < maxpn; ++k)
@@ -110,12 +112,13 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
   mpz_class *a = new mpz_class[N/2] - 1;
   mpz_class *b = new mpz_class[N/2] - 1;
 
+  // If pnA has been allocated, we'll record the pos/neg operations.
   int *pn1 = 0;
   double *pn = 0;
   const int maxpn = 5;
   if (pnA != 0)
     {
-      pn1 = new int[maxpn*Ngen]();
+      pn1 = new int[maxpn*Ngen](); // Allocate and set to zero.
       pn = (double *)mxGetPr(pnA);
     }
 
@@ -138,6 +141,7 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
           uo[(k-1+N/2)*Nr+l] = b[k];
         }
 
+      // Copy the pos/neg results to output array.
       if (pnA != 0)
         {
           for (mwIndex k = 0; k < maxpn; ++k)
