@@ -306,11 +306,11 @@ classdef braid < matlab.mixin.CustomDisplay
     %   [L2,PN] = B*L records in PN the choices of the pos/neg operators in
     %   the piecewise linear action on a loop L.  PN has dimension
     %   [size(L,1) 5*length(B)], since there are at most 5 choices of
-    %   pos/neg for each generator.  This allows reconstruction
-    %   of the matrix induced by the braid B acting on L.
+    %   pos/neg for each generator.  This allows reconstruction of the
+    %   matrix induced by the braid B acting on L.  See BRAID.LINACT.
     %
     %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
+    %   See also BRAID, BRAID.INV, BRAID.MPOWER, BRAID.LINACT, LOOP.
       if isa(b2,'braidlab.braid')
         varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
