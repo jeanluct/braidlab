@@ -1,16 +1,27 @@
 ------------------------------------------------------------------------
 1.1 [2014-xx-xx]
 
-* loopsigma's helper function can now handle int32, int64, single, in
-  addition to double.  This makes checking braid equality and
-  triviality much faster, unless overflow occurs and VPI has to be
+* loopsigma's C++ helper functions can now handle int32, int64,
+  single, in addition to double.  This makes checking braid equality
+  and triviality much faster, unless overflow occurs and VPI has to be
   used.
+
+* loopsigma's C++ helper functions can also handle VPI (Variable
+  Precision Integers) if braidlab is compiled with "make
+  BRAIDLAB_USE_GMP=1".  This requires the GNU MultiPrecision library
+  (GMP) to be installed.  This gives a massive speedup when working
+  with VPI types.
 
 * The braid constructor can make knot representatives, i.e.,
   b=braid('8_3') for a braid representative for the third 8-crossing
   knot.
 
 * braid.burau and braid.alexpoly can use the symbolic toolbox.
+  alexpoly no longer centers the polynomial by default, since
+  centering cannot always be used with a laurpoly object, and can
+  never be used for integral types.  Use option 'centered'.
+
+* Many other small bugfixes and improvements.
 
 Several improvements to the method braid.entropy:
 
@@ -30,7 +41,6 @@ Several improvements to the method braid.entropy:
   is that it is no longer natural to store the iterates.  This
   shouldn't affect things very much, since this optional argument was
   not used widely.
-
 
 ------------------------------------------------------------------------
 1.0.5 [2014-01-31]
