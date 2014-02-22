@@ -211,7 +211,7 @@ classdef braid < matlab.mixin.CustomDisplay
           end
         end
       end
-    end
+    end % function braid
 
     function obj = set.n(obj,value)
       if value < 1
@@ -293,15 +293,21 @@ classdef braid < matlab.mixin.CustomDisplay
     end
 
     function [varargout] = mtimes(b1,b2)
-    %MTIMES   Multiply two braids together (if second argument is a braid)
-    %         or act on a loop by a braid (if second argument is a loop).
+    %MTIMES   Multiply two braids together or act on a loop with a braid.
     %
     %   C = B1*B2, where B1 and B2 are braid objects, return the product of
     %   the two braids.  The product is the group operation in the braid
     %   group (braid concatenation).
     %
-    %   L2 = B*L, where B is a braid and L is a loop object, returns a
-    %   new loop L2 given by the action of B on L.
+    %   L2 = B*L, where B is a braid and L is a loop object, returns a new
+    %   loop L2 given by the action of B on L.  L can also be a column
+    %   vector of loops.
+    %
+    %   [L2,PN] = B*L records in PN the choices of the pos/neg operators in
+    %   the piecewise linear action on a loop L.  PN has dimension
+    %   [size(L,1) 5*length(B)], since there are at most 5 choices of
+    %   pos/neg for each generator.  This allows reconstruction
+    %   of the matrix induced by the braid B acting on L.
     %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
@@ -313,8 +319,12 @@ classdef braid < matlab.mixin.CustomDisplay
         % Have to define this here, rather than in the loop class, since the
         % braid goes on the left, and Matlab determines which overloaded
         % function to call by looking at the first argument.
+        if (size(b2,2) > 1)
+          error('BRAIDLAB:braid:mtimes:notcolumn', ...
+                'Need column vector of loops.')
+        end
         if b1.n > b2(1).n
-          error('BRAIDLAB:braid:mtimes', ...
+          error('BRAIDLAB:braid:mtimes:badgen', ...
                 'Generator values too large for the loop.')
         end
         [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
