@@ -97,70 +97,71 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
-    % Default loop around first two of three punctures.
-    if nargin == 0, return; end
-    if isscalar(c) && ~isa(c,'braidlab.loop')
-      % Nested generators of the fundamental group of a sphere with c
-      % punctures with an extra basepoint puncture on the right.
-      if c < 2
-        error('BRAIDLAB:loop:loop:toofewpunc', ...
-              'Need at least two punctures.');
-      end
-      n1 = c-1;
-      if nargin > 1
-        if ischar(b)
-          htyp = str2func(b);
-        elseif isa(b,'function_handle')
-          htyp = b;
+      % Default loop around first two of three punctures.
+      if nargin == 0, return; end
+      if isscalar(c) && ~isa(c,'braidlab.loop')
+        % Nested generators of the fundamental group of a sphere with c
+        % punctures with an extra basepoint puncture on the right.
+        if c < 2
+          error('BRAIDLAB:loop:loop:toofewpunc', ...
+                'Need at least two punctures.');
+        end
+        n1 = c-1;
+        if nargin > 1
+          if ischar(b)
+            htyp = str2func(b);
+          elseif isa(b,'function_handle')
+            htyp = b;
+          else
+            error('BRAIDLAB:loop:loop:badarg', ...
+                  ['Second argument should be a type ' ...
+                   'string or function handle.']);
+          end
         else
-          error('BRAIDLAB:loop:loop:badarg', ...
-                'Second argument should be a type string or function handle.');
+          htyp = @double;
         end
-      else
-        htyp = @double;
+        if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
+        l.coords = htyp(zeros(1,2*n1));
+        l.coords(n1+1:end) = htyp(-1);
+        return
       end
-      if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
-      l.coords = htyp(zeros(1,2*n1));
-      l.coords(n1+1:end) = htyp(-1);
-      return
-    end
-    if isa(c,'braidlab.loop')
-      l.coords = c.coords;
-      return
-    end
-    if nargin == 1
-      if isvector(c)
-        % Create from a single vector of even length.
-        if mod(length(c),2)
-          error('BRAIDLAB:loop:loop:oddlength', ...
-                'Loop coordinate vector must have even length.')
+      if isa(c,'braidlab.loop')
+        l.coords = c.coords;
+        return
+      end
+      if nargin == 1
+        if isvector(c)
+          % Create from a single vector of even length.
+          if mod(length(c),2)
+            error('BRAIDLAB:loop:loop:oddlength', ...
+                  'Loop coordinate vector must have even length.')
+          end
+          % Store coordinates as row vector.
+          if size(c,1) > size(c,2), c = c.'; end
+          l.coords = c;
+        else
+          % Create from an array with an even number of columns.
+          if mod(size(c,2),2)
+            error('BRAIDLAB:loop:loop:oddlength', ...
+                  'Loop coordinate array must have even number of columns.')
+          end
+          l(size(c,1),1) = braidlab.loop;  % pre-allocate
+          for k = 1:size(c,1)
+            l(k,1).coords = c(k,:);
+          end
         end
-        % Store coordinates as row vector.
-        if size(c,1) > size(c,2), c = c.'; end
-        l.coords = c;
       else
-        % Create from an array with an even number of columns.
-        if mod(size(c,2),2)
-          error('BRAIDLAB:loop:loop:oddlength', ...
-                'Loop coordinate array must have even number of columns.')
+        % Create a,b separately from two vectors of the same length.
+        if any(size(c) ~= size(b))
+          error('BRAIDLAB:loop:loop:badsize', ...
+                'Loop coordinate vectors must have the same size.')
         end
         l(size(c,1)) = braidlab.loop;  % pre-allocate
         for k = 1:size(c,1)
-          l(k).coords = c(k,:);
+          l(k).coords = [c(k,:) b(k,:)];
         end
       end
-    else
-      % Create a,b separately from two vectors of the same length.
-      if any(size(c) ~= size(b))
-        error('BRAIDLAB:loop:loop:badsize', ...
-              'Loop coordinate vectors must have the same size.')
-      end
-      l(size(c,1)) = braidlab.loop;  % pre-allocate
-      for k = 1:size(c,1)
-        l(k).coords = [c(k,:) b(k,:)];
-      end
-    end
-    end
+    end % function loop
 
     function value = get.a(obj)
       value = obj.coords(1:length(obj.coords)/2);
@@ -239,8 +240,14 @@ classdef loop < matlab.mixin.CustomDisplay
         str = ['(( ' objstr ' ))'];
       else
         str = '';
-        for i = 1:length(obj)
-          str = [str ; char(obj(i))];
+        if size(obj,1) > size(obj,2)
+          for i = 1:size(obj,1)
+            str = [str ; char(obj(i,:))];
+          end
+        else
+          for i = 1:size(obj,2)
+            str = [str '  ' char(obj(:,i))];
+          end
         end
       end
     end
@@ -294,9 +301,9 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     function displayNonScalarObject(obj)
-      for j = 1:size(obj,2)
+      for j = 1:size(obj,1)
         sz = get(0, 'CommandWindowSize');
-        wc = textwrap({char(obj(j))},sz(1)-6);
+        wc = textwrap({char(obj(j,:))},sz(1)-6);
         for i = 1:length(wc)
           % Indent rows.
           if i > 1, wc{i} = ['      ' wc{i}]; else, wc{i} = ['   ' wc{i}]; end
