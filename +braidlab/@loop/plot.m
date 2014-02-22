@@ -215,9 +215,8 @@ else
   % Try "imagesc([1 1]), plot(loop)" without the cla to see the problem.
   % See also issue #43.
   cla
+  hold on
 end
-
-hold on
 
 %%  Draw punctures.
 
@@ -282,7 +281,6 @@ for p = 1:n-1
     % We can't joint to these left-facing loops from the left.
     tojoinup = M_coord(p+1)-nl;
     tojoindown = max(tojoin-tojoinup,0);
-    %keyboard
     % The lines that join downwards.
     for s = 1:tojoindown
       y1 = pgap(p)*(nr+s)+puncture_position(p,2);
