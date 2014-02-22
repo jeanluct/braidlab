@@ -31,7 +31,7 @@ function plot(b)
 baseX = 0; baseY = 0;
 gapX = 100; gapY = 150;
 cutf = .35;
-uselines = false;
+uselines = false; % If true, use straight line segments.
 npts = 40;
 lat = {'LineWidth',2};
 
@@ -89,26 +89,27 @@ for k = 1:b.length
     hold on
     % Draw the 'under' line with a gap.
     plot(posX+gapX-xx,posY+bline{sgn},lat{:})
-  else % use the 'line' graphics command.
+  else % use straight line segments graphics command.
     if sign(b.word(k)) == 1
       % Draw the 'over' line.
-      line([posX posX+gapX],[posY posY+gapY],lat{:})
+      plot([posX posX+gapX],[posY posY+gapY],lat{:})
+      hold on
       % Draw the 'under' line with a gap.
-      line([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      line([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plot([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],lat{:})
+      plot([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
     else
       % Draw the 'over' line.
-      line([posX+gapX posX],[posY posY+gapY],lat{:})
+      plot([posX+gapX posX],[posY posY+gapY],lat{:})
       % Draw the 'under' line with a gap.
-      line([posX posX+cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      line([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plot([posX posX+cutf*gapX],[posY posY+cutf*gapY],lat{:})
+      plot([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
     end
   end
   % Plot the remaining vertical lines.
   for l = 1:b.n
     if l ~= gen & l ~= gen+1
       posX = baseX + gapX*(l-1);
-      line([posX posX],[posY posY+gapY],lat{:})
+      plot([posX posX],[posY posY+gapY],lat{:})
     end
   end
 end
@@ -117,4 +118,9 @@ if ~holdstate
   hold off
   axis equal
   axis off
+  % Add a gap around the edges, to avoid clipping the figure.
+  axis tight
+  ax = axis;
+  sc = .1*max(abs(ax(1)),abs(ax(2)));
+  axis([ax(1)-sc ax(2)+sc ax(3) ax(4)])
 end
