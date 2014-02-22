@@ -1,9 +1,9 @@
 function [varargout] = linact(b,l,N)
 %LINACT   Effective linear action of a braid on a loop.
-%   M = LINACT(B,L) returns the matrix M giving the effective linear action
-%   of the braid B on the loop L.  This means that the piecewise-linear
-%   action B*L is equal to the matrix-vector multiplication M*L.coords' for
-%   this particular loop L.
+%   M = LINACT(B,L) returns the sparse matrix M giving the effective linear
+%   action of the braid B on the loop L.  This means that the
+%   piecewise-linear action B*L is equal to the matrix-vector multiplication
+%   M*L.coords' for this particular loop L.
 %
 %   [M,L2] = LINACT(B,L) also returns the loop L2 = B*L.
 %
@@ -14,7 +14,7 @@ function [varargout] = linact(b,l,N)
 %   otherwise defaults to 2*B.n-2.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.MTIMES.
+%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LACYCLE.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault

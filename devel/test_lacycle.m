@@ -6,10 +6,13 @@ Nreal = 100;
 maxit = 0;
 maxperiod = 0;
 
+global BRAIDLAB_debuglvl
+BRAIDLAB_debuglvl = 1;
+
 for r = 1:Nreal
   b = braid('random',n,k);
-  fprintf('b = %s: ',char(b))
-  [pn,it] = pncycle(b);
+  fprintf('b = %s:\t',char(b))
+  [pn,it] = lacycle(b);
   if isempty(pn)
     error('Failed to converge after %d iterations: %s\n',char(b),it);
   end
@@ -18,3 +21,5 @@ for r = 1:Nreal
 end
 
 fprintf('Maximum iterations: %d\n',maxit)
+
+BRAIDLAB_debuglvl = 0;
