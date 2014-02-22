@@ -44,17 +44,15 @@ if ishold
   holdstate = true;
 else
   holdstate = false;
-  % Do we need either of the next two lines?
-  %clf reset
   cla
-  hold on
 end
 
 % Plot an empty braid word (exciting!).
 if isempty(b.word)
   for k = 1:b.n
     posX = baseX + (k-1)*gapX; posY = baseY;
-    line([posX posX],[posY posY+gapY],lat{:})
+    plot([posX posX],[posY posY+gapY],lat{:})
+    hold on
   end
   if ~holdstate
     hold off
@@ -88,6 +86,7 @@ for k = 1:b.length
     sgn = (sign(b.word(k))+1)/2 + 1;
     % Draw the 'over' line.
     plot(posX+xx,posY+bline{3-sgn},lat{:})
+    hold on
     % Draw the 'under' line with a gap.
     plot(posX+gapX-xx,posY+bline{sgn},lat{:})
   else % use the 'line' graphics command.
