@@ -4,10 +4,10 @@ function test_entropy(n,tol)
 
 import braidlab.*
 
-if nargin < 1, n = 15; end  % Even n is terrible.  Try n=22
+if nargin < 1, n = 15; end
 if nargin < 2, tol = 1e-8; end
 
-b = braid('psi',n);
+b = compact(braid('psi',n));
 
 r = psiroots(n);
 eex = log(max(abs(r)));
@@ -38,15 +38,24 @@ if nargin < 2, tol = 1e-6; end
 if nargin < 3, maxit = []; end
 if nargin < 4, nconvreq = []; end
 
-M = lamat(b,maxit,nconvreq);
+[M,period] = lamat(b,maxit,nconvreq);
 
-if false
+method = 'eigs';
+
+switch method
+ case 'charpoly'
   % Use characteristic polynomial: very slow
   varargout{1} = log(sort(abs(roots(charpoly(M))),'descend'));
-  varargout{1} = varargout{1}(1);
-else
+  varargout{1} = varargout{1}(1) / period;
+
+ case 'eigs'
   opts.isreal = true;
   opts.tol = tol;
 
-  varargout{1} = log(abs(eigs(M,1,'LM',opts)));
+  varargout{1} = log(abs(eigs(M,1,'LM',opts))) / period;
+
+ case 'eig'
+  varargout{1} = log(sort(abs(eig(full(M))),'descend'));
+  varargout{1} = varargout{1}(1) / period;
+
 end
