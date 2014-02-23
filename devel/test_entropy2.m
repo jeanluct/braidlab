@@ -34,11 +34,11 @@ function [varargout] = entropy2(b,tol,maxit,nconvreq)
 
 if nargin < 2, tol = 1e-6; end
 
-% Get defaults for maxit and nconvreq from lacycle.
+% Get defaults for maxit and nconvreq from cycle.
 if nargin < 3, maxit = []; end
 if nargin < 4, nconvreq = []; end
 
-[M,period] = lamat(b,maxit,nconvreq);
+[M,period] = cyclemat(b,maxit,nconvreq);
 
 method = 'eigs';
 
