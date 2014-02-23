@@ -59,6 +59,7 @@ function [varargout] = cycle(b,varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+global BRAIDLAB_debuglvl
 
 import braidlab.*
 
@@ -76,10 +77,13 @@ for i = 1:nargin-1
   end
 end
 
-% Turn false convergence warning off, unless explicitly set to on.
-w = warning('query','BRAIDLAB:braid:cycle:falseconv');
-if ~strcmpi(w.state,'on')
-  warning('off','BRAIDLAB:braid:cycle:falseconv');
+% Turn false convergence warning off by default.
+if exist('BRAIDLAB_debuglvl') == 1
+  if BRAIDLAB_debuglvl >= 1
+    warning('on','BRAIDLAB:braid:cycle:falseconv');
+  else
+    warning('off','BRAIDLAB:braid:cycle:falseconv');
+  end
 end
 
 % Maximum number of iterations.
