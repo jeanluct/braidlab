@@ -1,5 +1,5 @@
 b = braid('psi',15);
-pn = pncycle(b);
+pn = cycle(b);
 
 pl = polynomialcycle(b,pn);
 
