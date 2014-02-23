@@ -12,7 +12,7 @@ function [varargout] = lamat(b,varargin)
 %   LAMAT(B,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.LACYCLE.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.LACYCLE, BRAID.LAPOLY.
+%   See also BRAID, LOOP, BRAID.LACYCLE, BRAID.LINACT.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
