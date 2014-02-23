@@ -14,7 +14,7 @@ function [varargout] = linact(b,l,N)
 %   loop dimension N defaults to 2*B.n-2.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LACYCLE.
+%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.CYCLE.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault

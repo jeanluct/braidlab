@@ -8,11 +8,11 @@
   action.
 
 * New methods in the braid class: braid.linact converts the optional
-  output from braid.mtimes (see above) to a matrix.  braid.lacycle
-  looks for a limit cycle in the braid action on on loops.
-  braid.lamat uses braid.lacycle to return a matrix corresponding to
-  this limit cycle.  The largest eigenvalue of this matrix, normalized
-  by the period, gives the Perron root of the largest pseudo-Anosov
+  output from braid.mtimes (see above) to a matrix.  braid.cycle looks
+  for a limit cycle in the braid action on on loops.  braid.cyclemat
+  uses braid.cycle to return a matrix corresponding to this limit
+  cycle.  The largest eigenvalue of this matrix, normalized by the
+  period, gives the Perron root of the largest pseudo-Anosov
   components.
 
 * loopsigma's C++ helper functions can now handle int32, int64,

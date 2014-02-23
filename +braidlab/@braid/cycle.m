@@ -1,25 +1,25 @@
-function [varargout] = lacycle(b,varargin)
-%LACYCLE   Find limit cycle of effective linear action of a braid.
-%   PN = LACYCLE(B) finds a limit cycle for the effective linear action
+function [varargout] = cycle(b,varargin)
+%CYCLE   Find limit cycle of effective linear action of a braid.
+%   PN = CYCLE(B) finds a limit cycle for the effective linear action
 %   of B on the starting loop loop(B.n).  The output matrix PN has
 %   dimension [PERIOD 5*B.n].  It contains the signs of the pos/neg
 %   operators in the piecewise-linear action given by BRAID.MTIMES.
 %
-%   LACYCLE(B,MAXIT,NCONVREQ) also specifies the maximum number of
+%   CYCLE(B,MAXIT,NCONVREQ) also specifies the maximum number of
 %   iterations MAXIT (default 1000) and the number of required consecutive
 %   convergences for the cycle NCONVREQ (default 5).
 %
-%   [PN,IT] = LACYCLE(B,...) also returns the number of iterations IT that
+%   [PN,IT] = CYCLE(B,...) also returns the number of iterations IT that
 %   were required to achieve convergence.
 %
-%   LACYCLE(B,'plot',...) makes a plot of the convergence of the signs.
+%   CYCLE(B,'plot',...) makes a plot of the convergence of the signs.
 %
 %   To reconstruct the matrix for iterate J of the limit cycle, use
 %   BRAID.LINACT:
 %
 %   Example: the braid [1 2] leads to a period-3 cycle:
 %
-%   >> b = braid([1 2]); pn = lacycle(b)
+%   >> b = braid([1 2]); pn = cycle(b)
 %
 %   pn =
 %       -1     1     1     1     0    -1     0     0     0     1
@@ -70,16 +70,16 @@ for i = 1:nargin-1
       varargin(i) = [];
       break
     else
-      error('BRAIDLAB:braid:lacycle:badarg', ...
+      error('BRAIDLAB:braid:cycle:badarg', ...
             'Unknown option ''%s''',varargin{i})
     end
   end
 end
 
 % Turn false convergence warning off, unless explicitly set to on.
-w = warning('query','BRAIDLAB:braid:lacycle:falseconv');
+w = warning('query','BRAIDLAB:braid:cycle:falseconv');
 if ~strcmpi(w.state,'on')
-  warning('off','BRAIDLAB:braid:lacycle:falseconv');
+  warning('off','BRAIDLAB:braid:cycle:falseconv');
 end
 
 % Maximum number of iterations.
@@ -125,7 +125,7 @@ for it = 1:maxit
         break
       end
     else
-      warning('BRAIDLAB:braid:lacycle:falseconv', ...
+      warning('BRAIDLAB:braid:cycle:falseconv', ...
               'False convergence after %d time(s)!\n',nconv)
       nconv = 0;
     end
@@ -134,7 +134,7 @@ end
 
 if it == maxit
   varargout{1} = [];
-  warning('BRAIDLAB:braid:lacycle:noconv', ...
+  warning('BRAIDLAB:braid:cycle:noconv', ...
           ['Failed to achieve convergence after %d iterations.' ...
            '  Try to increase MAXIT.'],it)
 else

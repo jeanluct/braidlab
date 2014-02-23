@@ -12,7 +12,7 @@ BRAIDLAB_debuglvl = 1;
 for r = 1:Nreal
   b = braid('random',n,k);
   fprintf('b = %s:\t',char(b))
-  [pn,it] = lacycle(b);
+  [pn,it] = cycle(b);
   if isempty(pn)
     error('Failed to converge after %d iterations: %s\n',char(b),it);
   end
