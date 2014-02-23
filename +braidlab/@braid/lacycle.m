@@ -1,4 +1,4 @@
-function [varargout] = lacycle(b,maxit,nconvreq)
+function [varargout] = lacycle(b,varargin)
 %LACYCLE   Find limit cycle of effective linear action of a braid.
 %   PN = LACYCLE(B) finds a limit cycle for the effective linear action
 %   of B on the starting loop loop(B.n).  The output matrix PN has
@@ -9,8 +9,10 @@ function [varargout] = lacycle(b,maxit,nconvreq)
 %   iterations MAXIT (default 1000) and the number of required consecutive
 %   convergences for the cycle NCONVREQ (default 5).
 %
-%   [PN,IT] = LACYCLE(...) also returns the number of iterations IT that
+%   [PN,IT] = LACYCLE(B,...) also returns the number of iterations IT that
 %   were required to achieve convergence.
+%
+%   LACYCLE(B,'plot',...) makes a plot of the convergence of the signs.
 %
 %   To reconstruct the matrix for iterate J of the limit cycle, use
 %   BRAID.LINACT:
@@ -60,6 +62,20 @@ function [varargout] = lacycle(b,maxit,nconvreq)
 
 import braidlab.*
 
+doplot = false;
+for i = 1:nargin-1
+  if ischar(varargin{i})
+    if strcmpi(varargin{i},'plot')
+      doplot = true;
+      varargin(i) = [];
+      break
+    else
+      error('BRAIDLAB:braid:lacycle:badarg', ...
+            'Unknown option ''%s''',varargin{i})
+    end
+  end
+end
+
 % Turn false convergence warning off, unless explicitly set to on.
 w = warning('query','BRAIDLAB:braid:lacycle:falseconv');
 if ~strcmpi(w.state,'on')
@@ -67,9 +83,17 @@ if ~strcmpi(w.state,'on')
 end
 
 % Maximum number of iterations.
-if nargin < 2 || isempty(maxit), maxit = 1000; end
+if nargin < 2 || isempty(varargin{1})
+  maxit = 1000;
+else
+  maxit = varargin{1};
+end
 % Number of consecutive full periods we require to declare convergence.
-if nargin < 3 || isempty(nconvreq), nconvreq = 5; end
+if nargin < 3 || isempty(varargin{2})
+  nconvreq = 5;
+else
+  nconvreq = varargin{2};
+end
 
 l = loop(b.n,'vpi');
 
@@ -114,9 +138,11 @@ if it == maxit
           ['Failed to achieve convergence after %d iterations.' ...
            '  Try to increase MAXIT.'],it)
 else
-  % Plot pn signs.
-  %imagesc(pnl.'), colormap bone
-  %xlabel('iteration'), ylabel('pos / neg')
+  if doplot
+    % Plot pn signs.
+    imagesc(pnl.'), colormap bone
+    xlabel('iteration'), ylabel('pos / neg')
+  end
 
   % Save the cycle.
   varargout{1} = pnl(end-period+1:end,:);
