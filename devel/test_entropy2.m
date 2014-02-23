@@ -40,7 +40,13 @@ if nargin < 4, nconvreq = []; end
 
 M = lamat(b,maxit,nconvreq);
 
-opts.isreal = true;
-opts.tol = tol;
+if false
+  % Use characteristic polynomial: very slow
+  varargout{1} = log(sort(abs(roots(charpoly(M))),'descend'));
+  varargout{1} = varargout{1}(1);
+else
+  opts.isreal = true;
+  opts.tol = tol;
 
-varargout{1} = log(abs(eigs(M,1,'LM',opts)));
+  varargout{1} = log(abs(eigs(M,1,'LM',opts)));
+end
