@@ -83,13 +83,13 @@ if ~strcmpi(w.state,'on')
 end
 
 % Maximum number of iterations.
-if nargin < 2 || isempty(varargin{1})
+if length(varargin) < 1 || isempty(varargin{1})
   maxit = 1000;
 else
   maxit = varargin{1};
 end
 % Number of consecutive full periods we require to declare convergence.
-if nargin < 3 || isempty(varargin{2})
+if length(varargin) < 2 || isempty(varargin{2})
   nconvreq = 5;
 else
   nconvreq = varargin{2};

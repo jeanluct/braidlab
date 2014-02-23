@@ -1,16 +1,18 @@
-function M = lamat(b,maxit,nconvreq)
-%LAMAT   Final matrix of cyclic effective linear action of a braid.
-%   P = LAMAT(B) returns the last sparse matrix M in the limit cycle
-%   obtained from LACYCLE(B).
+function [varargout] = lamat(b,varargin)
+%LAMAT   Matrix of cyclic effective linear action of a braid.
+%   M = LAMAT(B) returns the sparse matrix M, which is the product of the
+%   matrices in the limit cycle obtained from LACYCLE(B).
 %
-%   This matrix is representative of the asymptotic behavior of the braid
-%   action on loops.  In particular, its largest eigenvalue corresponds to
-%   the dilatation of braid.
+%   [M,PERIOD] = LAMAT(B) also returns the period.
 %
-%   P = LAMAT(B,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.LACYCLE.
+%   The matrix M is representative of the asymptotic behavior of the braid
+%   action on loops.  In particular, its largest eigenvalue, to the power
+%   1/PERIOD, corresponds to the dilatation of braid.
+%
+%   LAMAT(B,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.LACYCLE.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.LACYCLE, BRAID.LAMAT.
+%   See also BRAID, LOOP, BRAID.LACYCLE, BRAID.LAPOLY.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
@@ -33,10 +35,19 @@ function M = lamat(b,maxit,nconvreq)
 
 
 % Get defaults for maxit and nconvreq from lacycle.
-if nargin < 2, maxit = []; end
-if nargin < 3, nconvreq = []; end
+if nargin < 2, varargin = {[]}; end
 
-pn = lacycle(b,maxit,nconvreq);
+% Find the limit cycle.
+[pn,it] = lacycle(b,varargin{:});
+period = size(pn,1);
 
-% Get matrix from the last iterate.
-M = linact(b,pn(end,:));
+% Reconstruct matrices of the linear action, take their product.
+M = linact(b,pn(1,:));
+for i = 2:period
+  M = linact(b,pn(i,:)) * M;
+end
+
+varargout{1} = M;
+
+if nargout > 1, varargout{2} = size(pn,1); end
+if nargout > 2, varargout{3} = it; end
