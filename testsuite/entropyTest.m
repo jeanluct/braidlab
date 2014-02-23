@@ -126,7 +126,7 @@ classdef entropyTest < matlab.unittest.TestCase
       % Test entropy on Venzke's low-entropy braids.
       % Stricter tolerance requires more maximum iterations.
       tol = 1e-8;
-      for n = 7:16
+      for n = 5:16
         b = braidlab.braid('psi',n);
         etr = entropy(b,'trains');
         e = entropy(b,tol);
