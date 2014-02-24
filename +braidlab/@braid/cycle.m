@@ -138,10 +138,9 @@ for it = 1:maxit
 end
 
 if it == maxit
-  varargout{1} = [];
-  warning('BRAIDLAB:braid:cycle:noconv', ...
-          ['Failed to achieve convergence after %d iterations.' ...
-           '  Try to increase MAXIT.'],it)
+  error('BRAIDLAB:braid:cycle:noconv', ...
+        ['Failed to achieve convergence after %d iterations.' ...
+         '  Try to increase MAXIT.'],it)
 else
   if doplot
     % Plot pn signs.
