@@ -7,9 +7,10 @@ rng(1)
 forcepA = false;
 testred = false;
 warndiscr = true;
-nmax = 10;%20;
-kmax = nmax+10;%+30;
+nmax = 12;%20;
+kmax = nmax+14;%+30;
 nrep = 10;
+tol = 1e-12;
 
 if forcepA
   kmin = n+1;
@@ -42,7 +43,7 @@ for n = 3:nmax
       end
 
       tic
-      entr_iter(n,k) = entropy(b);
+      entr_iter(n,k) = entropy(b,tol);
       t_iter(n,k) = t_iter(n,k) + toc;
 
       tic
@@ -74,24 +75,26 @@ for n = 3:nmax
   end
 end
 
-t_diff = t_iter - t_trains;
+% Relative time difference.
+t_rdiff = .5*(t_iter - t_trains)./(t_iter + t_trains);
 
 figure(1)
-imagesc(t_diff)
+imagesc(t_rdiff)
 axis xy
 colorbar
 xlabel('k')
 ylabel('n')
 r = [1 0 0]; w = [.9 .9 .9]; b = [0 0 1];
 % colormap of size 64-by-3, ranging from red -> white -> blue
-mid = round(-64*min(min(t_diff))/(max(max(t_diff)) - min(min(t_diff))));
+mid = round(-64*min(min(t_rdiff))/(max(max(t_rdiff)) - min(min(t_rdiff))));
 c1 = zeros(mid,3); c2 = zeros(64-mid,3);
 for i = 1:3
   c1(:,i) = linspace(r(i), w(i), mid);
   c2(:,i) = linspace(w(i), b(i), 64-mid);
 end
 c = [c1(1:end-1,:);c2];
-caxis([min(min(t_diff)) max(max(t_diff))]), colormap(c), colorbar
+caxis([min(min(t_rdiff)) max(max(t_rdiff))]), colormap(c), colorbar
+title('time difference: t_iter - t_trains')
 
 figure(2)
 imagesc(log10(abs(entr_diff)))
@@ -99,7 +102,7 @@ axis xy
 title('log_{10} |entr_{diff}|')
 xlabel('k')
 ylabel('n')
-caxis([-8 max(max(log10(abs(entr_diff))))]), colorbar
+caxis([-15 max(max(log10(abs(entr_diff))))]), colorbar
 
 figure(3)
 subplot(2,1,1)
