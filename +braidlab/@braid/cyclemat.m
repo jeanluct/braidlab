@@ -6,10 +6,15 @@ function [varargout] = cyclemat(b,varargin)
 %   [M,PERIOD] = CYCLEMAT(B) also returns the period.
 %
 %   The matrix M is representative of the asymptotic behavior of the braid
-%   action on loops.  In particular, its largest eigenvalue, to the power
-%   1/PERIOD, corresponds to the dilatation of braid.
+%   action on loops.  In particular, its largest eigenvalue (in absolute
+%   value), to the power 1/PERIOD, corresponds to the dilatation of braid if
+%   it contains at least one pseudo-Anosov component.
 %
 %   CYCLEMAT(B,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.CYCLE.
+%
+%   MI = CYCLEMAT(B,'iterates') or CYCLEMAT(B,'iter') returns a cell arrary
+%   MI with PERIOD elements, each containing the matrix of an iterate from
+%   the limit cycle.  The matrix M above is MI{PERIOD}*...*MI{1}.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP, BRAID.CYCLE, BRAID.LINACT.
@@ -33,18 +38,35 @@ function [varargout] = cyclemat(b,varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+doiter = false;
+for i = 1:length(varargin)
+  if ischar(varargin{i})
+    if any(strcmpi(varargin{i},{'iterates','iter'}))
+      doiter = true;
+      varargin(i) = []; % delete string element from cell.
+      break
+    end
+  end
+end
 
 % Get defaults for maxit and nconvreq from cycle.
-if nargin < 2, varargin = {[]}; end
+%if nargin < 2 || length(varargin) < 1, varargin = {}; end
 
 % Find the limit cycle.
 [pn,it] = cycle(b,varargin{:});
 period = size(pn,1);
 
 % Reconstruct matrices of the linear action, take their product.
-M = linact(b,pn(1,:));
-for i = 2:period
-  M = linact(b,pn(i,:)) * M;
+if doiter
+  M = cell(1,period);
+  for i = 1:period
+    M{i} = linact(b,pn(i,:));
+  end
+else
+  M = linact(b,pn(1,:));
+  for i = 2:period
+    M = linact(b,pn(i,:)) * M;
+  end
 end
 
 varargout{1} = M;
