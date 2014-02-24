@@ -65,11 +65,11 @@ global BRAIDLAB_debuglvl
 import braidlab.*
 
 doplot = false;
-for i = 1:nargin-1
+for i = 1:length(varargin)
   if ischar(varargin{i})
     if strcmpi(varargin{i},'plot')
       doplot = true;
-      varargin(i) = [];
+      varargin(i) = []; % delete string element from cell.
       break
     else
       error('BRAIDLAB:braid:cycle:badarg', ...
@@ -114,7 +114,7 @@ for it = 1:maxit
       if all(pnl(end,:) == pnl(end-p,:))
         period = p;
         nconv = 1;
-        break;
+        break
       end
     end
   else
