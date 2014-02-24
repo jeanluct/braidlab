@@ -14,8 +14,9 @@ function [varargout] = cycle(b,varargin)
 %
 %   CYCLE(B,'plot',...) makes a plot of the convergence of the signs.
 %
-%   To reconstruct the matrix for iterate J of the limit cycle, use
-%   BRAID.LINACT:
+%   To reconstruct the matrix for one iterate of the limit cycle, use
+%   BRAID.LINACT.  To reconstruct the matrix of the product of iterates (the
+%   full cycle), use BRAID.CYCLEMAT.
 %
 %   Example: the braid [1 2] leads to a period-3 cycle:
 %
@@ -38,7 +39,7 @@ function [varargout] = cycle(b,varargin)
 %        0     1     1     1
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LINACT.
+%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LINACT, BRAID.CYCLEMAT.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
