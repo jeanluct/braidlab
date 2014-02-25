@@ -1,4 +1,4 @@
-function [linv,Q] = test_reducible_cycle2(b,m)
+function [linv,Q] = find_reducing_curves(b,m)
 
 import braidlab.*
 
