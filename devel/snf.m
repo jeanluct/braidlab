@@ -34,7 +34,7 @@ V = eye(n);
 for j = 1:min(m,n)
   % Zero column j below the diagonal.
   for i = j+1:m
-    if S(i,j)
+    if S(i,j) ~= 0
       % Construct an elementary Hermite transformation E
       % to zero S(i,j) by combining rows i and j.
       E = ehermite(S(j,j),S(i,j));
@@ -45,7 +45,7 @@ for j = 1:min(m,n)
   end
   % Zero row j after the superdiagonal.
   for i = j+2:n
-    if S(j,i)
+    if S(j,i) ~= 0
       % Construct an elementary Hermite transformation E
       % to zero S(j,i) by combining columns j+1 and i.
       E = ehermite(S(j,j+1),S(j,i));
@@ -79,7 +79,7 @@ while any(D)
     V(:,[b b+1]) = V(:,[b b+1]) / E;
   end
 
-  if S(b,b+1)
+  if S(b,b+1) ~= 0
 
     % Zero the first nonzero superdiagonal element
     % using columns b and b+1, to start the bulge at S(b+1,b).
