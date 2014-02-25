@@ -1,16 +1,16 @@
 function [U,S,V] = snf(A);
-
-% Smith normal form of an integer matrix.
+%SNF   Smith normal form of an integer matrix.
+%   [U,S,V] = SNF(A) for an integer matrix A returns integer matrices U, S,
+%   and V with the properties that
 %
-% [U,S,V] = smith(A) returns integer matrices U, S, and V such that
-% A = U*S*V',
-% S is diagonal and nonnegative, S(i,i) divides S(i+1,i+1) for all i,
-% det U =+-1, and det V =+-1.
-% s = smith(A) just returns diag(S).
-% Uses function ehermite.
-% [U,S,V] = smith(A);
+%    - A = U*S*V';
+%    - S is diagonal and nonnegative;
+%    - S(i,i) divides S(i+1,i+1) for all i (here 0 divides 0 by convention);
+%    - det U = +-1, and det V = +-1.
 %
-% This function is in some ways analogous to SVD.
+%   S = SNF(A) just returns diag(S).
+%
+%   This function is in some ways analogous to SVD.
 
 % John Gilbert, 415-812-4487, December 1993
 % gilbert@parc.xerox.com
@@ -70,10 +70,14 @@ while any(D)
     S(b,:) = -S(b,:);
     U(:,b) = -U(:,b);
   end
-  q = floor(S(b,b+1)/S(b,b));
-  E = [1 0 ; -q 1];
-  S(:,[b b+1]) = S(:,[b b+1]) * E';
-  V(:,[b b+1]) = V(:,[b b+1]) / E;
+
+  if S(b,b) ~= 0
+    q = floor(S(b,b+1)/S(b,b));
+    E = [1 0 ; -q 1];
+
+    S(:,[b b+1]) = S(:,[b b+1]) * E';
+    V(:,[b b+1]) = V(:,[b b+1]) / E;
+  end
 
   if S(b,b+1)
 
@@ -84,16 +88,16 @@ while any(D)
     V(:,[b b+1]) = V(:,[b b+1]) / E;
     for j = 1:min(m,n)
       if j+1 <= m
-	% Zero S(j+1,j) using rows j and j+1.
-	E = ehermite(S(j,j),S(j+1,j));
-	S([j j+1],:) = E * S([j j+1],:);
-	U(:,[j j+1]) = U(:,[j j+1]) / E;
+        % Zero S(j+1,j) using rows j and j+1.
+        E = ehermite(S(j,j),S(j+1,j));
+        S([j j+1],:) = E * S([j j+1],:);
+        U(:,[j j+1]) = U(:,[j j+1]) / E;
       end
       if j+2 <= n
-	% Zero S(j,j+2) using columns j+1 and j+2.
-	E = ehermite(S(j,j+1),S(j,j+2));
-	S(:,[j+1 j+2]) = S(:,[j+1 j+2]) * E';
-	V(:,[j+1 j+2]) = V(:,[j+1 j+2]) / E;
+        % Zero S(j,j+2) using columns j+1 and j+2.
+        E = ehermite(S(j,j+1),S(j,j+2));
+        S(:,[j+1 j+2]) = S(:,[j+1 j+2]) * E';
+        V(:,[j+1 j+2]) = V(:,[j+1 j+2]) / E;
       end
     end
   end
@@ -111,28 +115,30 @@ end
 
 % Squeeze factors to lower right to enforce divisibility condition.
 
-if false % This is creating problems.
 for i = 1 : min(m,n)
   for j = i+1 : min(m,n)
     % Replace S(i,i), S(j,j) by their gcd and lcm respectively.
     a = S(i,i);
     b = S(j,j);
     [g,c,d] = gcd(a,b);
-    E = [ 1 d ; -b/g a*c/g];
-    F = [ c 1 ; -b*d/g a/g];
-    S([i j],[i j]) = E * S([i j],[i j]) * F';
-    U(:,[i j]) = U(:,[i j]) / E;
-    V(:,[i j]) = V(:,[i j]) / F;
+    if g ~= 0
+      E = [ 1 d ; -b/g a*c/g];
+      F = [ c 1 ; -b*d/g a/g];
+      S([i j],[i j]) = E * S([i j],[i j]) * F';
+      U(:,[i j]) = U(:,[i j]) / E;
+      V(:,[i j]) = V(:,[i j]) / F;
+    end
   end
-end
 end
 
 U = round(U);
 V = round(V);
+
 if nargout <= 1
   U = diag(S);
 end
 
+%=========================================================================
 function E = ehermite(a,b);
 
 % Elementary Hermite tranformation.
