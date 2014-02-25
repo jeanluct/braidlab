@@ -48,6 +48,9 @@ end
 A = M - eye(size(M));
 [U,D,V] = snf(A);  % Smith form of A.
 
+% Check that everything is ok.
+checksnf(A,U,D,V);
+
 D = diag(D);
 
 Q = round(inv(V))';
