@@ -41,8 +41,8 @@ for j = 1:min(m,n)
       % Apply the transform to S and U.
       S([j i],:) = E * S([j i],:);
       U(:,[j i]) = U(:,[j i]) / E;
-    end;
-  end;
+    end
+  end
   % Zero row j after the superdiagonal.
   for i = j+2:n
     if S(j,i)
@@ -52,9 +52,9 @@ for j = 1:min(m,n)
       % Apply the transform to S and V.
       S(:,[j+1 i]) = S(:,[j+1 i]) * E';
       V(:,[j+1 i]) = V(:,[j+1 i]) / E;
-    end;
-  end;
-end;
+    end
+  end
+end
 
 % Now S is upper bidiagonal.
 % Chase the superdiagonal nonzeros away.
@@ -69,7 +69,7 @@ while any(D)
   if S(b,b) < 0
     S(b,:) = -S(b,:);
     U(:,b) = -U(:,b);
-  end;
+  end
   q = floor(S(b,b+1)/S(b,b));
   E = [1 0 ; -q 1];
   S(:,[b b+1]) = S(:,[b b+1]) * E';
@@ -94,11 +94,11 @@ while any(D)
 	E = ehermite(S(j,j+1),S(j,j+2));
 	S(:,[j+1 j+2]) = S(:,[j+1 j+2]) * E';
 	V(:,[j+1 j+2]) = V(:,[j+1 j+2]) / E;
-      end;
-    end;
-  end;
+      end
+    end
+  end
   D = diag(S,1);
-end;
+end
 
 % Now S is diagonal. Make it nonnegative.
 
@@ -106,11 +106,12 @@ for j = 1:min(m,n)
   if S(j,j) < 0
     S(j,:) = -S(j,:);
     U(:,j) = -U(:,j);
-  end;
-end;
+  end
+end
 
 % Squeeze factors to lower right to enforce divisibility condition.
 
+if false % This is creating problems.
 for i = 1 : min(m,n)
   for j = i+1 : min(m,n)
     % Replace S(i,i), S(j,j) by their gcd and lcm respectively.
@@ -122,14 +123,15 @@ for i = 1 : min(m,n)
     S([i j],[i j]) = E * S([i j],[i j]) * F';
     U(:,[i j]) = U(:,[i j]) / E;
     V(:,[i j]) = V(:,[i j]) / F;
-  end;
-end;
+  end
+end
+end
 
 U = round(U);
 V = round(V);
 if nargout <= 1
   U = diag(S);
-end;
+end
 
 function E = ehermite(a,b);
 
