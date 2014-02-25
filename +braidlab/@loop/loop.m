@@ -291,6 +291,25 @@ classdef loop < matlab.mixin.CustomDisplay
       end
     end
 
+    function lvl = nested(obj)
+    %NESTED   Nesting level of loop.
+    %   LVL = NESTED(L) returns the nesting level of a loop.  This is the
+    %   GCD of all the loop coordinate entries, minus one.  If the loop is
+    %   not nested, then LVL=0.  If the loop is doubled, LVL=1, etc.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+
+      lvl = zeros(size(obj,1),1);
+      for j = 1:size(obj,1)
+        lvl(j) = gcd(obj(j).coords(1),obj(j).coords(2));
+        for i = 3:length(obj(j).coords)
+          lvl(j) = gcd(lvl(j),obj(j).coords(i));
+        end
+        lvl(j) = lvl(j)-1;
+      end
+    end
+
   end % methods block
 
 
