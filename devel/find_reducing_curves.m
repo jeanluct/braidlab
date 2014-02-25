@@ -19,7 +19,7 @@ if ischar(b)
     aa(1:m) = (1:m)+1; aa(m+1:n-2) = 2*m+1-(m+1:n-2);
     lred = loop(-aa,ones(1,n-2));
     if b*lred ~= lred, error('Wrong reducing curve.'); end
-    figure, plot(lred)
+    %figure, plot(lred)
 
    otherwise
     error('Unknown flag.')
@@ -48,13 +48,17 @@ end
 A = M - eye(size(M));
 [U,D,V] = snf(A);  % Smith form of A.
 
-if any(any(A - U*D*V')), error('Bad Smith form.'); end
-
 D = diag(D);
-r = length(find(D ~= 0));
 
 Q = round(inv(V))';
-Q = Q(:,r+1:end);
+Q = Q(:,find(D == 0));
+linv = 0;
+
+if rank(Q) < size(Q,2)
+  error('Q doesn''t have full rank.')
+end
+
+return
 
 % Now cycle over linear combinations of the columns of Q.
 
