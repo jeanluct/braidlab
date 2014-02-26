@@ -1,4 +1,4 @@
-function D = gcd(varargin)
+function [D,c,d] = gcd(varargin)
 % vpi/gcd: Greatest Common Divisor of two (or more) vpi objects
 % usage: D = gcd(INT1,INT2)
 % usage: D = gcd(INT1,INT2,INT3,...)
@@ -41,6 +41,61 @@ function D = gcd(varargin)
 %  e-mail: woodchips@rochester.rr.com
 %  Release: 1.0
 %  Release date: 1/19/09
+
+if false
+  % JLT - first attempt to compute GCD.
+  a = varargin{1};
+  b = varargin{2};
+  if length(a) == 1 && length(b) > 1
+    a = a*vpi(ones(size(b)));
+  end
+  if length(a) > 1 && length(b) == 1
+    b = b*vpi(ones(size(a)));
+  end
+  if length(a) ~= length(b)
+    error('Inputs must of have same size, or one must have size 1.')
+  end
+
+  for i = 1:length(a)
+    while b(i) ~= 0
+      t = b(i);
+      b(i) = mod(a(i),b(i));
+      a(i) = t;
+    end
+    D(i) = a(i);
+  end
+  return
+end
+
+if nargout > 1
+  % JLT - second attempt to compute GCD, with extra output if desired..
+  a = varargin{1};
+  b = varargin{2};
+  if length(a) == 1 && length(b) > 1
+    a = a*vpi(ones(size(b)));
+  end
+  if length(a) > 1 && length(b) == 1
+    b = b*vpi(ones(size(a)));
+  end
+  if length(a) ~= length(b)
+    error('Inputs must of have same size, or one must have size 1.')
+  end
+
+  for i = 1:length(a)
+    s = 0; os = 1;
+    t = 1; ot = 0;
+    r = b(i); or = a(i);
+    while ~iszero(r)
+      q = or / r;
+      or0 = or; or = r; r = or0 - q*r;
+      os0 = os; os = s; s = os0 - q*s;
+      ot0 = ot; ot = t; t = ot0 - q*t;
+    end
+    c(i) = os; d(i) = ot;
+    D(i) = or;
+  end
+  return
+end
 
 switch nargin
   case 0
