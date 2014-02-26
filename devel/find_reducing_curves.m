@@ -1,72 +1,94 @@
-function [linv,Q] = find_reducing_curves(b,m)
+function [linv,Q] = find_reducing_curves(b)
 
 import braidlab.*
-
-if nargin < 1, b = 'hy'; end
-
-hally = false;
-
-if ischar(b)
-  switch lower(b)
-   case {'hy','hallyurttas','hall-yurttas','hally'}
-    hally = true;
-    if nargin < 2, m = 3; end
-    b = braid('hk',m,m+1);
-    n = b.n;
-
-    % System of reducing curves from Hall and Yurttas (2009), p. 1563.
-    aa = zeros(1,n-2);
-    aa(1:m) = (1:m)+1; aa(m+1:n-2) = 2*m+1-(m+1:n-2);
-    lred = loop(-aa,ones(1,n-2));
-    if b*lred ~= lred, error('Wrong reducing curve.'); end
-    %figure, plot(lred)
-
-   otherwise
-    error('Unknown flag.')
-  end
-end
 
 n = b.n;
 
 tn = tntype(b);
+fprintf('braid is %s.\n',tn)
 
-[M,period] = b.cyclemat;
-M = full(M);
+[M,period] = b.cyclemat('iter');
 
-% Get rid of "boundary" Dynnikov coordinates, a_(n-1) and b_(n-1).
-% If we don't do this there is a second curve around the others.
-ii = [(1:n-2) (1:n-2)+n-2+1];
-M = M(ii,ii);
+Q = [];
 
-if hally
-  % Check that reducing curve is invariant.
-  if any(M*lred.coords' - lred.coords')
-    error('Reducing curve not invatiant under linear action.')
+for i = 1:period
+  M{i} = full(M{i});
+
+  % Get rid of "boundary" Dynnikov coordinates, a_(n-1) and b_(n-1).
+  % If we don't do this there is a second curve around the others.
+  ii = [(1:n-2) (1:n-2)+n-2+1];
+  M{i} = M{i}(ii,ii);
+
+  A = M{i} - eye(size(M{i}));
+  [U,D,V] = snf(A);  % Smith form of A.
+
+  % Check that everything is ok.
+  checksnf(A,U,D,V);
+
+  D = diag(D);
+
+  Qit{i} = round(inv(V))';
+  Qit{i} = Qit{i}(:,find(D == 0));
+
+  if rank(Qit{i}) < size(Qit{i},2)
+    error('Qit{%d} doesn''t have full rank.',i)
+  end
+
+  % Make sure first nonzero component is positive.
+  for j = 1:size(Qit{i},2)
+    inz = find(Qit{i}(:,j) ~= 0);
+    if Qit{i}(inz(1),j) < 0
+      Qit{i}(:,j) = -Qit{i}(:,j);
+    end
+  end
+
+  % Take the intersection of the coordinates, since a loop must be
+  % invariant for each iterate.
+  if isempty(Q)
+    Q = Qit{i};
+  else
+    Q = intersect(Q',Qit{i}','rows')';
   end
 end
 
-A = M - eye(size(M));
-[U,D,V] = snf(A);  % Smith form of A.
-
-% Check that everything is ok.
-checksnf(A,U,D,V);
-
-D = diag(D);
-
-Q = round(inv(V))';
-Q = Q(:,find(D == 0));
-linv = 0;
-
-if rank(Q) < size(Q,2)
-  error('Q doesn''t have full rank.')
+% If Q is empty, there is no reducing curve.
+if isempty(Q)
+  Q = [];
+  linv = [];
+  return
 end
 
-return
+% If Q has rank one, easy to check if it's an invariant loop.
+if size(Q,2) == 1
+
+  linv = loop(Q);
+  if b*linv == linv
+    return
+  end
+
+  linv = loop(-Q);
+  if b*linv == linv
+    return
+  end
+
+  Q = [];
+  linv = [];
+  return
+end
 
 % Now cycle over linear combinations of the columns of Q.
 
 mm = size(Q,2);
-if mm == 0, linv = []; return; end
+
+doplot = false;
+if doplot
+  close all
+  figure
+  for i = 1:mm
+    subplot(mm,1,i)
+    plot(loop(Q(:,i)))
+  end
+end
 
 N = 3;  % Go from -N to N in each component.
 %nwords = (2*N+1)^mm;
@@ -93,8 +115,6 @@ while 1
 
   % If nothing was changed, we're done.
   if ~incr, break; end
-
-  %(A*Q*Z)'  % This is zero
 
   l = loop(Q*Z);
   if b*l == l
