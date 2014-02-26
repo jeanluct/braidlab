@@ -132,5 +132,6 @@ if ~strcmp(tn,'reducible') && ~isempty(linv)
 end
 
 if strcmp(tn,'reducible') && isempty(linv)
+  % Example: < -3  1 -4  2 -3 -1 -2  3 -2  4  3  4 >  Why?
   warning('Braid is reducible, but we didn''t find a reducing curve.')
 end
