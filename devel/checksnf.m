@@ -1,23 +1,25 @@
 function checksnf(A,U,S,V)
 
-if any(any(A - U*S*V'))
+if any(any(A - U*S*V' ~= 0))
   error('Bad Smith form: not equal to A.')
 end
 
-if any(any(eye(size(U)) - U*round(inv(U))))
-  error('Bad Smith form: inv(U) not integer.')
-end
+if ~strcmp(class(A),'vpi')
+  if any(any(eye(size(U)) - U*round(inv(U)) ~= 0))
+    error('Bad Smith form: inv(U) not integer.')
+  end
 
-if any(any(eye(size(V)) - V*round(inv(V))))
-  error('Bad Smith form: inv(V) not integer.')
-end
+  if any(any(eye(size(V)) - V*round(inv(V)) ~= 0))
+    error('Bad Smith form: inv(V) not integer.')
+  end
 
-if abs(round(det(U))) ~= 1
-  error('Bad Smith form: det(U) not +/-1.')
-end
+  if abs(round(det(U))) ~= 1
+    error('Bad Smith form: det(U) not +/-1.')
+  end
 
-if abs(round(det(V))) ~= 1
-  error('Bad Smith form: det(V) not +/-1.')
+  if abs(round(det(V))) ~= 1
+    error('Bad Smith form: det(V) not +/-1.')
+  end
 end
 
 S2 = S(1:min(size(S)),1:min(size(S)));
@@ -39,7 +41,7 @@ if ~isempty(ii)
 end
 
 for i = 1:nmr-1
-  if mod(d(i+1),d(i))
+  if mod(d(i+1),d(i)) ~= 0
     error('Bad Smith form: S(%d,%d) does not divide S(%d,%d).',i,i,i+1,i+1)
   end
 end

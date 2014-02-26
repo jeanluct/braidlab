@@ -26,8 +26,9 @@ end
 
 [m,n] = size(A);
 S = A;
-U = eye(m);
-V = eye(n);
+typ = str2func(class(A));
+U = typ(eye(m));
+V = typ(eye(n));
 
 % Bidiagonalize S with elementary Hermite transforms.
 
@@ -40,7 +41,7 @@ for j = 1:min(m,n)
       E = ehermite(S(j,j),S(i,j));
       % Apply the transform to S and U.
       S([j i],:) = E * S([j i],:);
-      U(:,[j i]) = U(:,[j i]) / E;
+      U(:,[j i]) = U(:,[j i]) * inv2(E);
     end
   end
   % Zero row j after the superdiagonal.
@@ -51,7 +52,7 @@ for j = 1:min(m,n)
       E = ehermite(S(j,j+1),S(j,i));
       % Apply the transform to S and V.
       S(:,[j+1 i]) = S(:,[j+1 i]) * E';
-      V(:,[j+1 i]) = V(:,[j+1 i]) / E;
+      V(:,[j+1 i]) = V(:,[j+1 i]) * inv2(E);
     end
   end
 end
@@ -60,12 +61,13 @@ end
 % Chase the superdiagonal nonzeros away.
 
 D = diag(S,1);
-while any(D)
-  b = min(find(D));
+while any(D ~= 0)
+  b = min(find(D ~= 0));
   % Start chasing bulge at first nonzero superdiagonal element.
 
   % To guarantee reduction in S(b,b), first make S(b,b) positive
   % and make S(b,b+1) nonnegative and less than S(b,b).
+
   if S(b,b) < 0
     S(b,:) = -S(b,:);
     U(:,b) = -U(:,b);
@@ -76,7 +78,7 @@ while any(D)
     E = [1 0 ; -q 1];
 
     S(:,[b b+1]) = S(:,[b b+1]) * E';
-    V(:,[b b+1]) = V(:,[b b+1]) / E;
+    V(:,[b b+1]) = V(:,[b b+1]) * inv2(E);
   end
 
   if S(b,b+1) ~= 0
@@ -85,19 +87,19 @@ while any(D)
     % using columns b and b+1, to start the bulge at S(b+1,b).
     E = ehermite(S(b,b),S(b,b+1));
     S(:,[b b+1]) = S(:,[b b+1]) * E';
-    V(:,[b b+1]) = V(:,[b b+1]) / E;
+    V(:,[b b+1]) = V(:,[b b+1]) * inv2(E);
     for j = 1:min(m,n)
       if j+1 <= m
         % Zero S(j+1,j) using rows j and j+1.
         E = ehermite(S(j,j),S(j+1,j));
         S([j j+1],:) = E * S([j j+1],:);
-        U(:,[j j+1]) = U(:,[j j+1]) / E;
+        U(:,[j j+1]) = U(:,[j j+1]) * inv2(E);
       end
       if j+2 <= n
         % Zero S(j,j+2) using columns j+1 and j+2.
         E = ehermite(S(j,j+1),S(j,j+2));
         S(:,[j+1 j+2]) = S(:,[j+1 j+2]) * E';
-        V(:,[j+1 j+2]) = V(:,[j+1 j+2]) / E;
+        V(:,[j+1 j+2]) = V(:,[j+1 j+2]) * inv2(E);
       end
     end
   end
@@ -125,8 +127,8 @@ for i = 1 : min(m,n)
       E = [ 1 d ; -b/g a*c/g];
       F = [ c 1 ; -b*d/g a/g];
       S([i j],[i j]) = E * S([i j],[i j]) * F';
-      U(:,[i j]) = U(:,[i j]) / E;
-      V(:,[i j]) = V(:,[i j]) / F;
+      U(:,[i j]) = U(:,[i j]) * inv2(E);
+      V(:,[i j]) = V(:,[i j]) * inv2(F);
     end
   end
 end
@@ -136,6 +138,8 @@ V = round(V);
 
 if nargout <= 1
   U = diag(S);
+end
+
 end
 
 %=========================================================================
@@ -155,8 +159,23 @@ function E = ehermite(a,b);
 % Xerox Palo Alto Research Center
 
 [g,c,d] = gcd(a,b);
-if g
+if g ~= 0
   E = [c d ; -b/g a/g];
 else
   E = [1 0 ; 0 1];
+end
+
+end
+
+%=========================================================================
+function Ei = inv2(E)
+
+detE = E(1,1)*E(2,2) - E(1,2)*E(2,1);
+
+if abs(detE) ~= 1
+  error('Determinant should be one.')
+end
+
+Ei = detE*[E(2,2) -E(1,2); -E(2,1) E(1,1)];
+
 end
