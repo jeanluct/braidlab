@@ -15,7 +15,8 @@ for i = 1:period
   M{i} = full(M{i});
 
   % Get rid of "boundary" Dynnikov coordinates, a_(n-1) and b_(n-1).
-  % If we don't do this there is a second curve around the others.
+  % If we don't do this there is an extra reducing curve around the
+  % first n punctures.
   ii = [(1:n-2) (1:n-2)+n-2+1];
   M{i} = M{i}(ii,ii);
 
@@ -49,13 +50,13 @@ for i = 1:period
   else
     Q = intersect(Q',Qit{i}','rows')';
   end
-end
 
-% If Q is empty, there is no reducing curve.
-if isempty(Q)
-  Q = [];
-  linv = [];
-  return
+  % If the nullspace is empty, it cannot be reducible.
+  if isempty(Q)
+    Q = [];
+    linv = [];
+    return
+  end
 end
 
 % If Q has rank one, easy to check if it's an invariant loop.
@@ -124,4 +125,12 @@ while 1
   end
 
   %if w == 2, disp(num2str(Z')); end
+end
+
+if ~strcmp(tn,'reducible') && ~isempty(linv)
+  error('Braid is not reducible, yet we found a reducing curve.')
+end
+
+if strcmp(tn,'reducible') && isempty(linv)
+  warning('Braid is reducible, but we didn''t find a reducing curve.')
 end
