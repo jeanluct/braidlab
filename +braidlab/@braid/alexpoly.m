@@ -180,7 +180,7 @@ elseif strcmp(class(x),'sym') || isnumeric(x)
         break
       catch err
         if ~strcmpi(err.identifier,'symbolic:sym:sym2poly:errmsg2')
-          rethrow
+          rethrow(err)
         end
       end
     end

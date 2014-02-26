@@ -58,7 +58,7 @@ if exist('loopsigma_helper') == 3
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;
       else
-        rethrow
+        rethrow(err)
       end
     end
 
