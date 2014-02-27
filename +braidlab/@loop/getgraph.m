@@ -28,7 +28,7 @@ function [A, C] = getgraph(L)
 
 % This function is heavily based on loop/plot.m function.
 
-error('BRAIDLAB:loop:getgraph','getgraph not implemented');
+%error('BRAIDLAB:loop:getgraph','getgraph not implemented');
 
 if ~isscalar(L)
   error('BRAIDLAB:loop:getgraph:onlyscalar', ...
@@ -53,9 +53,14 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
 % Convert to older P,M,N notation
 % intersections above punctures
+global M_coord;
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
+global N_coord;
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
+
+global T_sum;
+T_sum = cumsum( M_coord + N_coord );
 
 %% GRAPH INDEXING
 %
@@ -66,33 +71,33 @@ N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 %    max(V) == M_coord(P)
 %    min(V) == -N_coord(P)
 
-%% Identify connections of vertices that are above/below same puncture.
+%% Identify hairpins -- connections of vertices that are above/below same
+%% puncture.
 
-% 'left' semicircles are C-shaped
-% 'right' semicircles are D-shaped
+% 'left' hairpins are C-shaped
+% 'right' hairpins are D-shaped
 
 % Cycle through each puncture.  
 for p = 1:n
     
-  % Determine number of semicircles are at the present loop  
+  % Determine number of hairpins are at the present loop  
   if p == n
     nl = M_coord(n); % this is equal to N_coord(n) ?
   else
     nl = b_coord(p);
   end
   
-  % Draw this number of semicircles taking into account the direction
-  % (left/right) around the puncture.
+  % Join vertices connected by hairpins, starting from
+  % the inner most hairpin around the puncture and going out.
   for sc = 1:abs(nl)
-    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
-                puncture_position, pgap, options );
+    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc] );
   end
 end
 
-%%  Draw segments above the puncture line (M_coord).
+%%  Identify segments above the line of punctures.
 for p = 1:n-1
 
-  % How many right-semicircles (b>0) around this puncture?
+  % How many right-hairpins (b>0) around this puncture?
   if p == 1
     nr = 0;
   else
@@ -102,7 +107,7 @@ for p = 1:n-1
   % segments that span two neighboring punctures
   tojoin = M_coord(p)-nr;
   if tojoin > 0
-    % How many left-semicircles (b<0) around the next puncture?
+    % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
       nl = -min(b_coord(p+1),0);
     else
@@ -120,8 +125,7 @@ for p = 1:n-1
       idx_mine = nr + s; % index of the vertex 
       idx_next = -(nl-s+tojoindown+1);
       
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      joinpoints( [p,idx_mine], [p+1,idx_next]);
       
     end                                 
     % The lines that join upwards (on the same side).
@@ -132,8 +136,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      joinpoints( [p,idx_mine], [p+1,idx_next]);
     end
   end
 end
@@ -142,7 +145,7 @@ end
 
 for p = 1:n-1
 
-  % How many right-semicircles (b>0) around this puncture?
+  % How many right-hairpins (b>0) around this puncture?
   if p == 1
     nr = 0;
   else
@@ -152,7 +155,7 @@ for p = 1:n-1
   % segments that span two different punctures
   tojoin = N_coord(p)-nr;
   if tojoin > 0
-    % How many left-semicircles (b<0) around the next puncture?
+    % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
       nl = -min(b_coord(p+1),0);
     else
@@ -169,8 +172,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      joinpoints( [p,idx_mine], [p+1,idx_next]);
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
@@ -180,90 +182,114 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      joinpoints( [p,idx_mine], [p+1,idx_next]);
     end
   end
 end
 
-if ~holdstate
-  hold off
-  axis equal
-  axis off
-  % Add a gap around the edges, to avoid clipping the figure.
-  axis tight
-  ax = axis;
-  sc = .1*max(abs(ax(1)),abs(ax(2)));
-  axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
 
-end
-
-function joinpoints( mine, next, positions, gaps, options )
-%% joinpoints( mine, next, positions, gaps, options )
-%
-% Function that plots segments of loops - either straight lines or semicircles
+function joinpoints( mine, next )
+%% joinpoints( mine, next )
+%  
+% Function that modifies the graph structure by adding segments of
+% loops.
 %
 % *** Inputs: ***
 % mine and next are pairs (puncture index, vertex index) defining
-%    vertices that the function joins using a line.
+%    vertices that the function joins.
 %
 % -- Function will return an error if puncture indices are not the same
 %    or consecutive ascending: k, k+1
 % -- Vertex indices are integers, excluding 0: positive indices are
 %    interpreted as above the puncture, negative as below
-% -- when mine(1) == next(1), semicircles are drawn. In this case
+% -- when mine(1) == next(1), hairpins are added. In this case
 %    it has to hold vertex numbers are the same as well, but with
-%    opposite signs. Semicircles are drawn in positive orientation,
+%    opposite signs. Hairpins are added in positive orientation,
 %    so mine(2) < next(2) will result in D-shaped line, whereas 
 %    mine(2) > next(2) will result in a C-shaped line.
 % 
-%
-% positions - n x 2 matrix of puncture positions 
-% gaps      - 1 x n vector of gaps between loop lines at each puncture
-% options   - options data for line plotting
-%
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
   
 
   dp = next(1) - mine(1); % index distance between punctures
-  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
+  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
          'Requests one or two consecutive punctures');
   
-  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
+  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
           'Vertex indices must be nonzero') ;
+
+  mine_h = keytohash( mine );
+  next_h = keytohash( next );
+  
+  assert( all( hashtokey(mine_h) == mine ), ['Key conversion ' ...
+                      'failed']);
+  
+  fprintf('%s -> %d passed\n', mat2str(mine), mine_h);
+  fprintf('%s -> %d passed\n', mat2str(next), next_h);
+  assert( all( hashtokey(next_h) == next ), 'Key conversion failed');  
   
   if dp == 0
-    %% Draw semicircles
+    %% Add hairpins
+    [];
     
-    assert( abs(mine(2)) == abs(next(2)) && ...
-            sign(mine(2)) ~= sign(next(2)),...
-            'BRAIDLAB:loop:plot:joinpoints',...
-            ['For semicircles, vertex indices must be equal value, ' ...
-             'opposite sign']);
-    
-    order = abs(mine(2));      % order of the loop from the puncture
-    rad = order*gaps(mine(1)); % semi circle radius    
-    cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
-    
-    loop_curve_x = cirsign*linspace(0,rad,50);
-    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
-    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-         options.LineColor,'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
     
   else
-    %% Draw straight lines
-    y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
-    y2 = next(2)*gaps(next(1))+positions(next(1),2);
-    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-         options.LineColor, 'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
+    %% Add straight lines
+    [];
+    
   end
 
+end
+
+function I = keytohash( PV )
+%% I = keytohash( PV )
+%
+% Returns a linear index from a pair (puncture index, vertex index)
+%
+  global M_coord;
+  global T_sum;   % cumulative sum over P of |M| + |N|
+  
+  P = PV(1);
+  V = PV(2);
+
+  if P == 1
+    I = 0 + abs(V);
+  else
+    I = T_sum(P-1) + abs(V);
+  end
+  
+  if V < 0
+    I = I + abs(M_coord(P));
+  end
+  
+end
+
+function PV = hashtokey( I )
+%% PV = hashtokey( I )
+%
+%  Returns a pair (P,V) - puncture index, vertex index (see above)
+%  from the linear index I
+  global M_coord;
+  global N_coord;
+  global T_sum;  
+  
+  P = max( [find( T_sum < I, 1, 'last'), 0] ) + 1;
+  
+  if P > 1
+    T = T_sum(P-1);
+  else
+    T = 0;
+  end
+  if I - T > M_coord(P)
+    V = -( I - T - M_coord(P) );
+  else
+    V = I - T;    
+  end
+  
+  PV = [P,V];
+  
 end
 
 
