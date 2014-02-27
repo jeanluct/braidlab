@@ -142,12 +142,16 @@ b_coord = double(L.b);
 [mu,nu] = L.intersec;
 mu = double(mu); nu = double(nu);
 
-% Extend the coordinates to include the punctures at either end
+% Extend the coordinates to include the punctures at either end.
+% This effectively introduces two extra nu-lines outside the end punctures,
+% that never have any crossings on them
 b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
-% Convert to older P,M,N notation.
+% Convert to older P,M,N notation
+% intersections above punctures
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
-N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
+% intersections below punctures
+N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
 
 %% Set the position of the punctures
 
@@ -238,20 +242,23 @@ for p = 1:n
         options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
 end
 
-%% Draw semicircles.
-% Cycle through each puncture.  
+%% Draw semicircles
+% 'left' semicircles are C-shaped
+% 'right' semicircles are D-shaped
 
+
+% Cycle through each puncture.  
 for p = 1:n
     
   % Determine number of semicircles are at the present loop  
   if p == n
-    nl = M_coord(n);
+    nl = M_coord(n); % this is equal to N_coord(n) ?
   else
     nl = b_coord(p);
   end
   
   % Draw this number of semicircles taking into account the direction
-  % (left/right) of the puncture.  
+  % (left/right) around the puncture.
   for sc = 1:abs(nl)
     rad = sc*pgap(p); % semi circle radius
     loop_curve_x = sign(nl)*linspace(0,rad,50);
@@ -264,10 +271,9 @@ for p = 1:n
   end
 end
 
-%%  Draw the upper part of the loop.
+%%  Draw segments above the puncture line (M_coord).
 
 for p = 1:n-1
-  x = p;
 
   % How many right-semicircles (b>0) around this puncture?
   if p == 1
@@ -275,8 +281,9 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
+  
+  % segments that span two neighboring punctures
   tojoin = M_coord(p)-nr;
-
   if tojoin > 0
     % How many left-semicircles (b<0) around the next puncture?
     if p < n-1
@@ -289,16 +296,28 @@ for p = 1:n-1
     tojoindown = max(tojoin-tojoinup,0);
     % The lines that join downwards.
     for s = 1:tojoindown
-      y1 = pgap(p)*(nr+s)+puncture_position(p,2);
-      y2 = -pgap(p+1)*(nl-s+tojoindown+1)+puncture_position(p+1,2);
+      % idx_mine and _next are indices of vertices of the current (mine)
+      % and following (next) puncture that will be connected
+      % idx_ > 0 -- vertex is above puncture
+      % idx_ < 0 -- vertex is below puncture
+      idx_mine = nr + s; % index of the vertex 
+      idx_next = -(nl-s+tojoindown+1);
+      y1 = idx_mine*pgap(p) + puncture_position(p,2);
+      y2 = idx_next*pgap(p+1) + puncture_position(p+1,2);
       plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
            options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
-      y1 = pgap(p)*(nr+s)+puncture_position(p,2);
-      y2 = pgap(p+1)*(nl+s - (tojoin-tojoinup))+puncture_position(p+1,2);
+      % idx_mine and _next are indices of vertices of the current (mine)
+      % and following (next) puncture that will be connected
+      % idx_ > 0 -- vertex is above puncture
+      % idx_ < 0 -- vertex is below puncture
+      idx_mine = nr+s;
+      idx_next = nl+s - (tojoin-tojoinup);
+      y1 = idx_mine*pgap(p)+puncture_position(p,2);
+      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
       %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
       plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
            options.LineColor, ...
@@ -307,10 +326,9 @@ for p = 1:n-1
   end
 end
 
-%% Draw lower segments of the loop
+%% Draw segments below the puncture line (N_coord)
 
 for p = 1:n-1
-  x = p;
 
   % How many right-semicircles (b>0) around this puncture?
   if p == 1
@@ -318,8 +336,9 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
+  
+  % segments that span two different punctures
   tojoin = N_coord(p)-nr;
-
   if tojoin > 0
     % How many left-semicircles (b<0) around the next puncture?
     if p < n-1
@@ -332,16 +351,28 @@ for p = 1:n-1
     tojoinup = max(tojoin-tojoindown,0);
     % The lines that join upwards.
     for s = 1:tojoinup
-      y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
-      y2 = pgap(p+1)*(nl-s+tojoinup+1)+puncture_position(p+1,2);
+      % idx_mine and _next are indices of vertices of the current (mine)
+      % and following (next) puncture that will be connected
+      % idx_ > 0 -- vertex is above puncture
+      % idx_ < 0 -- vertex is below puncture
+      idx_mine = -(nr+s);
+      idx_next = (nl-s+tojoinup+1);
+      y1 = idx_mine*pgap(p)+puncture_position(p,2);
+      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
       plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
            options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
-      y1 = -pgap(p)*(nr+s)+puncture_position(p,2);
-      y2 = -pgap(p+1)*(nl+s - (tojoin-tojoindown))+puncture_position(p+1,2);
+      % idx_mine and _next are indices of vertices of the current (mine)
+      % and following (next) puncture that will be connected
+      % idx_ > 0 -- vertex is above puncture
+      % idx_ < 0 -- vertex is below puncture
+      idx_mine = -(nr+s);
+      idx_next = -(nl+s - (tojoin-tojoindown));
+      y1 = idx_mine*pgap(p)+puncture_position(p,2);
+      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
       plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
            options.LineColor, ...
            'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
@@ -359,3 +390,60 @@ if ~holdstate
   sc = .1*max(abs(ax(1)),abs(ax(2)));
   axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
+
+end
+
+function joinpoints( mine, next, positions, gaps, options )
+%% joinpoints( mine, next, positions, gaps, options )
+%
+% Function that plots segments of loops - either straight lines or semicircles
+%
+% *** Inputs: ***
+% mine and next are pairs (puncture index, vertex index) defining
+%    vertices that the function joins using a line.
+%
+% -- Function will return an error if puncture indices are not the same
+%    or consecutive ascending: k, k+1
+% -- Vertex indices are integers, excluding 0: positive indices are
+%    interpreted as above the puncture, negative as below
+% -- when mine(1) == next(1), semicircles are drawn. In this case
+%    it has to hold vertex numbers are the same as well, but with
+%    opposite signs. Semicircles are drawn in positive orientation,
+%    so mine(2) < next(2) will result in D-shaped line, whereas 
+%    mine(2) > next(2) will result in a C-shaped line.
+% 
+%
+% positions - n x 2 matrix of puncture positions 
+% gaps      - 1 x n vector of gaps between loop lines at each puncture
+% options   - options data for line plotting
+%
+%
+
+% puncture indices
+  p_m = mine(1);
+  p_n = next(1);
+  
+  dp = next(1) - mine(1); % index distance between punctures
+  
+  assert( dp == 1 || dp == 0, ['Loop plotting function ' ...
+                      'should be used only for one or for consecutive ' ...
+                      'punctures.'] );
+  if dp == 0
+    %% Draw semicircles
+    
+    error('Not implemented');
+    
+  else
+    %% Draw lines
+    
+    y1 = idx_mine*gaps(mine(1))+positions(mine(1),2);
+    y2 = idx_next*gaps(next(1))+positions(next(1),2);
+    plot([gaps(mine(1),1) positions(next(1),1)],[y1 y2], ...
+         options.LineColor, 'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
+  
+  end
+
+end
+
+
