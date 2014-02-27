@@ -8,5 +8,5 @@ function str = num2str(N)
 % arguments: (output)
 %  str - character string form for N
 
-str = disp(N);
+str = disp(N,0);
 
