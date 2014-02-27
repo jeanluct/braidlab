@@ -29,7 +29,10 @@ function [varargout] = loopsigma(ii,u)
 % LICENSE>
 
 if isempty(ii)
-  up = u;
+  varargout{1} = u;
+  if nargout > 1
+    varargout{2} = reshape([],[size(u,1) 0]);
+  end
   return
 end
 

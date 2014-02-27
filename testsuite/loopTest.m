@@ -73,6 +73,17 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:loop:loop:badsize')
     end
 
+    function test_braid_on_loop_action(testCase)
+      % An empty braid (was issue #50).
+      l0 = braidlab.loop(3);
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+
+      l0 = braidlab.loop(5);
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+    end
+
     function test_loopcoords(testCase)
       % Test loop coordinates using various types.
       % This is a method for braid, but essentially uses loops.
