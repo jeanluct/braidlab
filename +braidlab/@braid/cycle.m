@@ -137,17 +137,17 @@ for it = 1:maxit
   end
 end
 
+if doplot
+  % Plot pn signs.
+  imagesc(pnl.'), colormap bone
+  xlabel('iteration'), ylabel('pos / neg')
+end
+
 if it == maxit
   error('BRAIDLAB:braid:cycle:noconv', ...
         ['Failed to achieve convergence after %d iterations.' ...
          '  Try to increase MAXIT.'],it)
 else
-  if doplot
-    % Plot pn signs.
-    imagesc(pnl.'), colormap bone
-    xlabel('iteration'), ylabel('pos / neg')
-  end
-
   % Save the cycle.
   varargout{1} = pnl(end-period+1:end,:);
 end
