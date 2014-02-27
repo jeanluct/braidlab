@@ -49,20 +49,19 @@ for i = 1:length(varargin)
   end
 end
 
-% Get defaults for maxit and nconvreq from cycle.
-%if nargin < 2 || length(varargin) < 1, varargin = {}; end
-
 % Find the limit cycle.
 [pn,it] = cycle(b,varargin{:});
 period = size(pn,1);
 
-% Reconstruct matrices of the linear action, take their product.
+% Reconstruct matrices of the linear action.
 if doiter
+  % Keep individual matrices.
   M = cell(1,period);
   for i = 1:period
     M{i} = linact(b,pn(i,:));
   end
 else
+  % Take their product.
   M = linact(b,pn(1,:));
   for i = 2:period
     M = linact(b,pn(i,:)) * M;
