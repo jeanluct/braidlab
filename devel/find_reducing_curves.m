@@ -2,6 +2,14 @@ function [linv,Q] = find_reducing_curves(b)
 
 import braidlab.*
 
+badbraid = false;
+if nargin < 1
+  % The bad reducible braid.
+  badbraid = true;
+  b = braid([-3  1 -4  2 -3 -1 -2  3 -2  4  3  4]);
+  lred = loop([0 -1 0 0 0 0 0 1]);
+end
+
 n = b.n;
 
 tn = tntype(b);
@@ -13,6 +21,22 @@ Q = [];
 
 for i = 1:period
   M{i} = full(M{i});
+
+  if badbraid
+    lred2 = b*lred;
+    if all(lred2 == lred)
+      fprintf('\nBad news... b*l == l, ');
+    else
+      fprintf('b*l ~= l, ');
+    end
+    if any(M{i}*lred.coords' ~= lred.coords')
+      fprintf('M{%d}*l ~= l\n\n',i);
+    end
+    fprintf('     l = %s\n',num2str(lred.coords))
+    fprintf('   b*l = %s\n',num2str(lred2.coords))
+    fprintf('M{%d}*l = %s\n\n',i,num2str((M{i}*lred.coords')'))
+    error('Invariant curve is not an eigenvector.')
+  end
 
   % Get rid of "boundary" Dynnikov coordinates, a_(n-1) and b_(n-1).
   % If we don't do this there is an extra reducing curve around the
