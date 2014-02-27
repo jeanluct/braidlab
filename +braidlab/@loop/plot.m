@@ -260,19 +260,12 @@ for p = 1:n
   % Draw this number of semicircles taking into account the direction
   % (left/right) around the puncture.
   for sc = 1:abs(nl)
-    rad = sc*pgap(p); % semi circle radius
-    loop_curve_x = sign(nl)*linspace(0,rad,50);
-    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
-    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    plot(puncture_position(p,1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-         puncture_position(p,2) + [loop_curve_y_top loop_curve_y_bottom], ...
-         options.LineColor,'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
+    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
+                puncture_position, pgap, options );
   end
 end
 
 %%  Draw segments above the puncture line (M_coord).
-
 for p = 1:n-1
 
   % How many right-semicircles (b>0) around this puncture?
@@ -302,12 +295,11 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr + s; % index of the vertex 
       idx_next = -(nl-s+tojoindown+1);
-      y1 = idx_mine*pgap(p) + puncture_position(p,2);
-      y2 = idx_next*pgap(p+1) + puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
-           options.LineColor, ...
-           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
-    end
+      
+      joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                  puncture_position, pgap, options );
+      
+    end                                 
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       % idx_mine and _next are indices of vertices of the current (mine)
@@ -316,12 +308,8 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-      y1 = idx_mine*pgap(p)+puncture_position(p,2);
-      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
-      %if y2 <= gap*nl; y2 = -gap*(nl+3-s); end
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
-           options.LineColor, ...
-           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+      joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                  puncture_position, pgap, options );
     end
   end
 end
@@ -357,11 +345,8 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-      y1 = idx_mine*pgap(p)+puncture_position(p,2);
-      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
-           options.LineColor, ...
-           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+      joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                  puncture_position, pgap, options );
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
@@ -371,11 +356,8 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-      y1 = idx_mine*pgap(p)+puncture_position(p,2);
-      y2 = idx_next*pgap(p+1)+puncture_position(p+1,2);
-      plot([puncture_position(p,1) puncture_position(p+1,1)],[y1 y2], ...
-           options.LineColor, ...
-           'LineWidth',options.LineWidth,'LineStyle',options.LineStyle)
+      joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                  puncture_position, pgap, options );
     end
   end
 end
@@ -417,31 +399,45 @@ function joinpoints( mine, next, positions, gaps, options )
 % gaps      - 1 x n vector of gaps between loop lines at each puncture
 % options   - options data for line plotting
 %
-%
+% *** Warning: *** This function is for internal use, error
+% checking is not bullet proof.
+  
 
-% puncture indices
-  p_m = mine(1);
-  p_n = next(1);
-  
   dp = next(1) - mine(1); % index distance between punctures
+  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
+         'Requests one or two consecutive punctures');
   
-  assert( dp == 1 || dp == 0, ['Loop plotting function ' ...
-                      'should be used only for one or for consecutive ' ...
-                      'punctures.'] );
+  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
+          'Vertex indices must be nonzero') ;
+  
   if dp == 0
     %% Draw semicircles
     
-    error('Not implemented');
+    assert( abs(mine(2)) == abs(next(2)) && ...
+            sign(mine(2)) ~= sign(next(2)),...
+            'BRAIDLAB:loop:plot:joinpoints',...
+            ['For semicircles, vertex indices must be equal value, ' ...
+             'opposite sign']);
+    
+    order = abs(mine(2));      % order of the loop from the puncture
+    rad = order*gaps(mine(1)); % semi circle radius    
+    cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
+    
+    loop_curve_x = cirsign*linspace(0,rad,50);
+    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
+    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
+    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         options.LineColor,'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
     
   else
-    %% Draw lines
-    
-    y1 = idx_mine*gaps(mine(1))+positions(mine(1),2);
-    y2 = idx_next*gaps(next(1))+positions(next(1),2);
-    plot([gaps(mine(1),1) positions(next(1),1)],[y1 y2], ...
+    %% Draw straight lines
+    y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
+    y2 = next(2)*gaps(next(1))+positions(next(1),2);
+    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
          options.LineColor, 'LineWidth',options.LineWidth, ...
          'LineStyle',options.LineStyle)
-  
   end
 
 end
