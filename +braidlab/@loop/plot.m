@@ -61,7 +61,7 @@ for j = 1:m
   options.(deblank(optionNames(j,:))) = [];
 end
 
-%% Checking the number of input arguments is valid
+%% Check that the number of input arguments is valid
 
 % Must be of the form L then option name then option value
 
@@ -129,13 +129,18 @@ if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
 if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 
 
-%% Set the coordinates of the loop
+%% Get the coordinates of the loop, convert to crossing numbers.
 
-[~,b_coord] = L.ab;
+% Convert to double, since some scaling is done.
+
 n = L.n;
+
+% Get the b coordinates.
+b_coord = double(L.b);
 
 % Convert Dynnikov coding to intersection numbers.
 [mu,nu] = L.intersec;
+mu = double(mu); nu = double(nu);
 
 % Extend the coordinates to include the punctures at either end
 b_coord = [-nu(1)/2 b_coord nu(end)/2];
@@ -145,6 +150,7 @@ M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 %% Set the position of the punctures
+
 % The default position of the punctures are the integers along the x-axis
 
 if isempty(options.PuncturePositions);
