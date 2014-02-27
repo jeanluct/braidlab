@@ -1,4 +1,4 @@
-function expression = disp(INT)
+function expression = disp(INT,pagewidth)
 % vpi/disp: Disp a vpi object
 %
 % arguments:
@@ -15,6 +15,11 @@ function expression = disp(INT)
 
 Nint = numel(INT);
 Isize = size(INT);
+
+if nargin < 2
+  pagewidth = get(0, 'CommandWindowSize');
+  pagewidth = pagewidth(1);
+end
 
 if Nint == 0
   % an empty array
@@ -130,8 +135,7 @@ else
   end
   
   % is it longer than one line?
-  pagewidth = 80;
-  if n > pagewidth
+  if pagewidth > 0 && n > pagewidth
     % wrap it to more than one line. First
     % append some blanks to the end if necessary.
     r = rem(length(expression),72);
