@@ -1,8 +1,15 @@
-function [A, C] = getgraph(L)
+function [A, Lp] = getgraph(L)
 %GETGRAPH  Get graph representation of the loop.
-%   [A, C] = GETGRAPH(L) returns adjacency (A) and incidence/connectivity (C)
-%   matrices of a graph obtained by subdividing the loop into segments.
+%   [A,Lp] = GETGRAPH(L) returns (nonsymmetric) adjacency matrix (A) 
+%   of a graph obtained by subdividing the loop into segments.
 %   Vertices are placed on the loop above and below punctures.
+%   
+%   A is a sparse, nonsymmetric matrix of 0s and 1s, where edges are
+%   directed from lower puncture index to higher for neighbor-edges,
+%   and by hairpin direction for edges that loop around a puncture.
+%   
+%   Lp - Laplacian matrix of symmetrized A, i.e.,
+%        Lp = diag(sum(A+A.')) - (A+A.')
 %
 %   This is a method for the LOOP class.
 %   See also LOOP.
@@ -70,6 +77,21 @@ T_sum = cumsum( M_coord + N_coord );
 % For each P,
 %    max(V) == M_coord(P)
 %    min(V) == -N_coord(P)
+
+% number of vertices is the index of the last vertex:
+assert(keytohash( [n, -N_coord(n)] ) == T_sum(end), ...
+       'BRAIDLAB:loop:getgraph:hasherror',...
+       'Number of vertices and max linear index do not match' );
+nV = T_sum(end);
+
+global froms;
+global tos;
+global edgecount;
+
+edgecount = 0;
+froms = zeros(1,2*nV);
+tos = zeros(1,2*nV);
+
 
 %% Identify hairpins -- connections of vertices that are above/below same
 %% puncture.
@@ -187,6 +209,12 @@ for p = 1:n-1
   end
 end
 
+froms = froms(1:edgecount);
+tos = tos(1:edgecount);
+
+A = sparse( froms, tos, 1, nV, nV, length(froms) );
+Lp = diag(sum(A+A.')) - (A+A.');
+
 end
 
 function joinpoints( mine, next )
@@ -223,24 +251,25 @@ function joinpoints( mine, next )
   mine_h = keytohash( mine );
   next_h = keytohash( next );
   
-  assert( all( hashtokey(mine_h) == mine ), ['Key conversion ' ...
-                      'failed']);
+  assert( all( hashtokey(mine_h) == mine ), ...
+          'BRAIDLAB:loop:getgraph:hasherror',...
+          'Key inversion failed');
+  
+  assert( all( hashtokey(next_h) == next ), ...
+          'BRAIDLAB:loop:getgraph:hasherror',...
+          'Key inversion failed');
   
   fprintf('%s -> %d passed\n', mat2str(mine), mine_h);
   fprintf('%s -> %d passed\n', mat2str(next), next_h);
-  assert( all( hashtokey(next_h) == next ), 'Key conversion failed');  
   
-  if dp == 0
-    %% Add hairpins
-    [];
-    
-    
-  else
-    %% Add straight lines
-    [];
-    
-  end
-
+  global froms;
+  global tos;
+  global edgecount;
+  
+  edgecount = edgecount + 1;
+  froms(edgecount) = keytohash(mine);
+  tos(edgecount) = keytohash(next);
+  
 end
 
 function I = keytohash( PV )
