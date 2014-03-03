@@ -59,13 +59,16 @@ mu = double(mu); nu = double(nu);
 b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
 % Convert to older P,M,N notation
-% intersections above punctures
+% intersections above punctures 
+% Globals are used to speed up computation in local hash functions
 global M_coord;
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 global N_coord;
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
 
+% cumulative sum of intersections, i.e., intersections at punctures
+% 1, then 1+2, then 1+2+3, ...
 global T_sum;
 T_sum = cumsum( M_coord + N_coord );
 
@@ -79,7 +82,7 @@ T_sum = cumsum( M_coord + N_coord );
 %    min(V) == -N_coord(P)
 
 % number of vertices is the index of the last vertex:
-assert(keytohash( [n, -N_coord(n)] ) == T_sum(end), ...
+assert(keytohashL( [n, -N_coord(n)] ) == T_sum(end), ...
        'BRAIDLAB:loop:getgraph:hasherror',...
        'Number of vertices and max linear index do not match' );
 nV = T_sum(end);
@@ -248,14 +251,14 @@ function joinpoints( mine, next )
   assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
           'Vertex indices must be nonzero') ;
 
-  mine_h = keytohash( mine );
-  next_h = keytohash( next );
+  mine_h = keytohashL( mine );
+  next_h = keytohashL( next );
   
-  assert( all( hashtokey(mine_h) == mine ), ...
+  assert( all( hashtokeyL(mine_h) == mine ), ...
           'BRAIDLAB:loop:getgraph:hasherror',...
           'Key inversion failed');
   
-  assert( all( hashtokey(next_h) == next ), ...
+  assert( all( hashtokeyL(next_h) == next ), ...
           'BRAIDLAB:loop:getgraph:hasherror',...
           'Key inversion failed');
   
@@ -267,13 +270,13 @@ function joinpoints( mine, next )
   global edgecount;
   
   edgecount = edgecount + 1;
-  froms(edgecount) = keytohash(mine);
-  tos(edgecount) = keytohash(next);
+  froms(edgecount) = keytohashL(mine);
+  tos(edgecount) = keytohashL(next);
   
 end
 
-function I = keytohash( PV )
-%% I = keytohash( PV )
+function I = keytohashL( PV )
+%% I = keytohashL( PV )
 %
 % Returns a linear index from a pair (puncture index, vertex index)
 %
@@ -295,8 +298,8 @@ function I = keytohash( PV )
   
 end
 
-function PV = hashtokey( I )
-%% PV = hashtokey( I )
+function PV = hashtokeyL( I )
+%% PV = hashtokeyL( I )
 %
 %  Returns a pair (P,V) - puncture index, vertex index (see above)
 %  from the linear index I
