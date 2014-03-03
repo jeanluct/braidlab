@@ -167,8 +167,8 @@ T_sum = cumsum( M_coord + N_coord );
 keytohashL = @(PV)keytohash(PV, M_coord, T_sum);
 
 % compute components of the vertices
-[Ad,Lp] = L.getgraph;
-[components, Nc] = laplaceToComponents(Lp, ceil(L.n/2));
+[~,Lp] = L.getgraph;
+[components, Nc] = laplaceToComponents(Lp);
 
 % assign a unique color to each component
 if Nc > 1
@@ -490,8 +490,8 @@ function joinpoints( mine, next, positions, gaps, options )
 end
 
 
-function [vertexComponent, Nc] = laplaceToComponents( Lp, n )
-%% [vertexComponent, Nc] = laplaceToComponents( Lp, n )
+function [vertexComponent, Nc] = laplaceToComponents( Lp )
+%% [vertexComponent, Nc] = laplaceToComponents( Lp )
 %
 % Compute connected components in a graph using graph Laplacian.
 %
@@ -510,7 +510,6 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp, n )
 % 
 % Inputs:
 % Lp - graph Laplacian (square, real, symmetric, sparse matrix)
-% n  - maximum number of components expected
 %
 % Output
 %
@@ -522,7 +521,7 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp, n )
 % dimension of the kernel of the laplacian is the number of components
 %
 opts.issym = true; opts.isreal=true;
-[vc,ev] = eigs(Lp,n,'SA'); 
+[vc,ev] = eigs(Lp,size(Lp,1)/2,'SA'); 
 ev = diag(ev);
 
 % signs of eigenvectors on nodal domains form 
@@ -531,17 +530,19 @@ comp = double(vc(:,ev < 1e-12) > 0);
 
 % convert binary coordinates to decimal
 Nc = size(comp, 2);
-colors = comp * 2.^[0:(Nc-1)].';
+colors = int32( comp * 2.^(0:(Nc-1)).' );
 
 % since theoretical max of the binary coordinates
 % goes 2^Nc, re-label the colors, as only
 % Nc out of 2^Nc numbers are used
 ucolors = unique(colors);
-vertexComponent = zeros(size(colors));
+vertexComponent = NaN(size(colors));
 for c = 1:Nc
   vertexComponent( colors == ucolors(c) ) = c;
-  c = c+1;
 end
+
+assert( ~any(isnan(vertexComponent)), 'Some component was not assigned');
+assert(numel(ucolors) == Nc, 'Number of components and zero eigenvalues does not match')
 
 end
 
