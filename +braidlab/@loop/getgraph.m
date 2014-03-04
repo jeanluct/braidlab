@@ -35,8 +35,6 @@ function [A, Lp] = getgraph(L)
 
 % This function is heavily based on loop/plot.m function.
 
-%error('BRAIDLAB:loop:getgraph','getgraph not implemented');
-
 if ~isscalar(L)
   error('BRAIDLAB:loop:getgraph:onlyscalar', ...
         'Can only obtain graph of a single loop, not an array of loops.');
@@ -61,16 +59,16 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 % Convert to older P,M,N notation
 % intersections above punctures 
 % Globals are used to speed up computation in local hash functions
-global M_coord;
-M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
+global M;
+M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 global N_coord;
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
 
 % cumulative sum of intersections, i.e., intersections at punctures
 % 1, then 1+2, then 1+2+3, ...
-global T_sum;
-T_sum = cumsum( M_coord + N_coord );
+global T;
+T = cumsum( M + N_coord );
 
 %% GRAPH INDEXING
 %
@@ -78,14 +76,14 @@ T_sum = cumsum( M_coord + N_coord );
 % the puncture the vertex is associated to, P = 1, ..., n
 % V is the order of the vertex above (V > 0) or below (V < 0) the puncture.
 % For each P,
-%    max(V) == M_coord(P)
+%    max(V) == M(P)
 %    min(V) == -N_coord(P)
 
 % number of vertices is the index of the last vertex:
-assert(keytohashL( [n, -N_coord(n)] ) == T_sum(end), ...
+assert(graph_keytohash( [n, -N_coord(n)], M, T ) == T(end), ...
        'BRAIDLAB:loop:getgraph:hasherror',...
        'Number of vertices and max linear index do not match' );
-nV = T_sum(end);
+nV = T(end);
 
 global froms;
 global tos;
@@ -107,7 +105,7 @@ for p = 1:n
     
   % Determine number of hairpins are at the present loop  
   if p == n
-    nl = M_coord(n); % this is equal to N_coord(n) ?
+    nl = M(n); % this is equal to N_coord(n) ?
   else
     nl = b_coord(p);
   end
@@ -130,7 +128,7 @@ for p = 1:n-1
   end
   
   % segments that span two neighboring punctures
-  tojoin = M_coord(p)-nr;
+  tojoin = M(p)-nr;
   if tojoin > 0
     % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
@@ -139,7 +137,7 @@ for p = 1:n-1
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoinup = M_coord(p+1)-nl;
+    tojoinup = M(p+1)-nl;
     tojoindown = max(tojoin-tojoinup,0);
     % The lines that join downwards.
     for s = 1:tojoindown
@@ -242,6 +240,9 @@ function joinpoints( mine, next )
 % 
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
+
+  global M;
+  global T;
   
 
   dp = next(1) - mine(1); % index distance between punctures
@@ -251,77 +252,16 @@ function joinpoints( mine, next )
   assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
           'Vertex indices must be nonzero') ;
 
-  mine_h = keytohashL( mine );
-  next_h = keytohashL( next );
-  
-  assert( all( hashtokeyL(mine_h) == mine ), ...
-          'BRAIDLAB:loop:getgraph:hasherror',...
-          'Key inversion failed');
-  
-  assert( all( hashtokeyL(next_h) == next ), ...
-          'BRAIDLAB:loop:getgraph:hasherror',...
-          'Key inversion failed');
-  
-  fprintf('%s -> %d passed\n', mat2str(mine), mine_h);
-  fprintf('%s -> %d passed\n', mat2str(next), next_h);
+  mine_h = graph_keytohash( mine, M, T );
+  next_h = graph_keytohash( next, M, T );
   
   global froms;
   global tos;
   global edgecount;
   
   edgecount = edgecount + 1;
-  froms(edgecount) = keytohashL(mine);
-  tos(edgecount) = keytohashL(next);
+  froms(edgecount) = graph_keytohash(mine, M, T);
+  tos(edgecount) = graph_keytohash(next, M, T);
   
 end
-
-function I = keytohashL( PV )
-%% I = keytohashL( PV )
-%
-% Returns a linear index from a pair (puncture index, vertex index)
-%
-  global M_coord;
-  global T_sum;   % cumulative sum over P of |M| + |N|
-  
-  P = PV(1);
-  V = PV(2);
-
-  if P == 1
-    I = 0 + abs(V);
-  else
-    I = T_sum(P-1) + abs(V);
-  end
-  
-  if V < 0
-    I = I + abs(M_coord(P));
-  end
-  
-end
-
-function PV = hashtokeyL( I )
-%% PV = hashtokeyL( I )
-%
-%  Returns a pair (P,V) - puncture index, vertex index (see above)
-%  from the linear index I
-  global M_coord;
-  global N_coord;
-  global T_sum;  
-  
-  P = max( [find( T_sum < I, 1, 'last'), 0] ) + 1;
-  
-  if P > 1
-    T = T_sum(P-1);
-  else
-    T = 0;
-  end
-  if I - T > M_coord(P)
-    V = -( I - T - M_coord(P) );
-  else
-    V = I - T;    
-  end
-  
-  PV = [P,V];
-  
-end
-
 

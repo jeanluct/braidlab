@@ -164,7 +164,7 @@ T_sum = cumsum( M_coord + N_coord );
 
 % initialize hash functions - conversion of puncture-intersection coordinates
 % to linear index of vertices used in adjacency matrix
-keytohashL = @(PV)keytohash(PV, M_coord, T_sum);
+keytohash = @(PV)graph_keytohash(PV, M_coord, T_sum);
 
 % compute components of the vertices
 [~,Lp] = L.getgraph;
@@ -285,7 +285,7 @@ for p = 1:n
   % (left/right) around the puncture.
   for sc = 1:abs(nl)
     
-    mycomp = components( keytohashL([p, -sign(nl)*sc]) );
+    mycomp = components( keytohash([p, -sign(nl)*sc]) );
     mycolor = compcolors(mycomp,:);
     options.LineColor = mycolor;
     
@@ -325,7 +325,7 @@ for p = 1:n-1
       idx_mine = nr + s; % index of the vertex 
       idx_next = -(nl-s+tojoindown+1);
       
-      mycomp = components( keytohashL([p,idx_mine]) );
+      mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
       
@@ -342,7 +342,7 @@ for p = 1:n-1
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
       
-      mycomp = components( keytohashL([p,idx_mine]) );
+      mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
       
@@ -384,7 +384,7 @@ for p = 1:n-1
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
       
-      mycomp = components( keytohashL([p,idx_mine]) );
+      mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
       
@@ -400,7 +400,7 @@ for p = 1:n-1
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
       
-      mycomp = components( keytohashL([p,idx_mine]) );
+      mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
       
@@ -490,87 +490,3 @@ function joinpoints( mine, next, positions, gaps, options )
 end
 
 
-function [vertexComponent, Nc] = laplaceToComponents( Lp )
-%% [vertexComponent, Nc] = laplaceToComponents( Lp )
-%
-% Compute connected components in a graph using graph Laplacian.
-%
-% Number of components is the dimension of the kernel of the
-% Laplacian.  Zero-eigenvectors are constant on components of the
-% graph. The components can be identify solely from signs of
-% eigenvectors, as the positive and negative values of the
-% eigenvectors will partition the graph into two, along component
-% boundaries. For different eigenvectors partitions will be
-% different, so we can take mutual intersections of such partitions 
-% to recover all components.
-% 
-% Numerically, this is done by treating + and - signs as binary
-% digits and the list of + and - corresponding to each vertex gives
-% a binary representation of the component to which the vertex belongs.
-% 
-% Inputs:
-% Lp - graph Laplacian (square, real, symmetric, sparse matrix)
-%
-% Output
-%
-% vertexComponent - each element corresponds to a vertex in the graph
-%                   and elements store component numbers
-% Nc              - number of components
-
-
-% dimension of the kernel of the laplacian is the number of components
-%
-opts.issym = true; opts.isreal=true;
-[vc,ev] = eigs(Lp,size(Lp,1)/2,'SA'); 
-ev = diag(ev);
-
-% signs of eigenvectors on nodal domains form 
-% binary coordinates for the components
-comp = double(vc(:,ev < 1e-12) > 0);
-
-% convert binary coordinates to decimal
-Nc = size(comp, 2);
-colors = int32( comp * 2.^(0:(Nc-1)).' );
-
-% since theoretical max of the binary coordinates
-% goes 2^Nc, re-label the colors, as only
-% Nc out of 2^Nc numbers are used
-ucolors = unique(colors);
-vertexComponent = NaN(size(colors));
-for c = 1:Nc
-  vertexComponent( colors == ucolors(c) ) = c;
-end
-
-assert( ~any(isnan(vertexComponent)), 'Some component was not assigned');
-assert(numel(ucolors) == Nc, 'Number of components and zero eigenvalues does not match')
-
-end
-
-function I = keytohash( PV, M, T )
-%% I = keytohash( PV, M, T )
-%
-% Returns a linear index from a pair (puncture index, vertex index)
-%
-% M - vector of intersection number for coordinate lines above
-%     punctures 
-%  
-% T - cumulative sum (1, 1+2, 1+2+3, ...) over P intersection
-%     numbers for coordinate lines at punctures
-%
-% This function is analogous to the one inside getgraph.m, except it
-% doesn't use global variables.
-  
-  P = PV(1);
-  V = PV(2);
-
-  if P == 1
-    I = 0 + abs(V);
-  else
-    I = T(P-1) + abs(V);
-  end
-  
-  if V < 0
-    I = I + abs(M(P));
-  end
-  
-end
