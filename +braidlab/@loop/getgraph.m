@@ -62,13 +62,13 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 global M;
 M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
-global N_coord;
-N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
+global N;
+N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
 
 % cumulative sum of intersections, i.e., intersections at punctures
 % 1, then 1+2, then 1+2+3, ...
 global T;
-T = cumsum( M + N_coord );
+T = cumsum( M + N );
 
 %% GRAPH INDEXING
 %
@@ -77,10 +77,10 @@ T = cumsum( M + N_coord );
 % V is the order of the vertex above (V > 0) or below (V < 0) the puncture.
 % For each P,
 %    max(V) == M(P)
-%    min(V) == -N_coord(P)
+%    min(V) == -N(P)
 
 % number of vertices is the index of the last vertex:
-assert(graph_keytohash( [n, -N_coord(n)], M, T ) == T(end), ...
+assert(graph_keytohash( [n, -N(n)], M, T ) == T(end), ...
        'BRAIDLAB:loop:getgraph:hasherror',...
        'Number of vertices and max linear index do not match' );
 nV = T(end);
@@ -105,7 +105,7 @@ for p = 1:n
     
   % Determine number of hairpins are at the present loop  
   if p == n
-    nl = M(n); % this is equal to N_coord(n) ?
+    nl = M(n); % this is equal to N(n) ?
   else
     nl = b_coord(p);
   end
@@ -164,7 +164,7 @@ for p = 1:n-1
   end
 end
 
-%% Draw segments below the puncture line (N_coord)
+%% Draw segments below the puncture line (N)
 
 for p = 1:n-1
 
@@ -176,7 +176,7 @@ for p = 1:n-1
   end
   
   % segments that span two different punctures
-  tojoin = N_coord(p)-nr;
+  tojoin = N(p)-nr;
   if tojoin > 0
     % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
@@ -185,7 +185,7 @@ for p = 1:n-1
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoindown = N_coord(p+1)-nl;
+    tojoindown = N(p+1)-nl;
     tojoinup = max(tojoin-tojoindown,0);
     % The lines that join upwards.
     for s = 1:tojoinup
@@ -243,7 +243,6 @@ function joinpoints( mine, next )
 
   global M;
   global T;
-  
 
   dp = next(1) - mine(1); % index distance between punctures
   assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
