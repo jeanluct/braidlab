@@ -14,3 +14,5 @@ syntax: glob
 *.toc
 .depends
 ./doc/lcs_guide.pdf
+./extern/trains/frontend
+./extern/trains/xxxxx.tmp
