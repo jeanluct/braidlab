@@ -254,16 +254,18 @@ end
 
 %%  Draw punctures.
 
-puncture_boundary_x = linspace(-prad,prad,100);
-puncture_boundary_y_top = sqrt(prad^2 - puncture_boundary_x.^2);
-puncture_boundary_y_bottom = -sqrt(prad^2 - puncture_boundary_x(end:-1:1).^2);
-  
-for p = 1:n
-  patch(puncture_position(p,1) + ...
-        [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
-        puncture_position(p,2) + ...
-        [puncture_boundary_y_top puncture_boundary_y_bottom], ...
-        options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
+if prad > 0
+  puncture_boundary_x = linspace(-prad,prad,100);
+  puncture_boundary_y_top = sqrt(prad^2 - puncture_boundary_x.^2);
+  puncture_boundary_y_bottom = -sqrt(prad^2 - puncture_boundary_x(end:-1:1).^2);
+
+  for p = 1:n
+    patch(puncture_position(p,1) + ...
+          [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
+          puncture_position(p,2) + ...
+          [puncture_boundary_y_top puncture_boundary_y_bottom], ...
+          options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
+  end
 end
 
 %% Draw semicircles
