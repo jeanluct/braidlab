@@ -1,7 +1,7 @@
 # Makefile for building MEX files from C and CPP sources.
 
 # Extract architecture, compiler, etc. from MEX configuration.
-MEX         = mex
+MEX         = $(shell { command -v mexsh || command -v mex ; } 2>/dev/null ) 
 MEXENV      = $(MEX) -v 2> /dev/null
 MEXVOUT     := $(shell $(MEXENV))
 MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2))
