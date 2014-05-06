@@ -33,41 +33,16 @@
 #include <vector>
 #include <algorithm>
 #include "mex.h"
+#include "colorbraiding_helper.hpp"
 
-class XY_3D {
-
-  const double *data;         // data matrix
-  mwSize _R, _C, _S; // dimensions: rows, cols, spans
-  
-public:  
-
-  XY_3D( const mxArray *in ) : data( mxGetPr(in) ) {
-    data = mxGetPr(in);
-    const mwSize* sizes = mxGetDimensions(in);
-    _R = sizes[0];
-    _C = sizes[1];
-    _S = sizes[2];
-  }
-
-  // zero-based indexing
-  double operator()( mwSize row, mwSize col, mwSize spn ) {
-    if ( !( row < _R && col < _C && spn < _S ) ){
-      mexErrMsgTxt("Index out of bounds");
-    }
-    mwSize index = (spn*_C + col)*_R + row;
-    return data[index];
-  }
-
-  mwSize R(void) { return _R; }
-  mwSize C(void) { return _C; }
-  mwSize S(void) { return _S; }
-
-};
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
-  XY_3D trj = XY_3D( prhs[0] );
+  Matrix_3D trj = Matrix_3D( prhs[0] );
+
+  if ( trj.C() != 2 )
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input","2 columns required for trajectory");
 
   for ( int s = 0; s < trj.S(); s++ ) {
     printf("Span: %d\n",s);
@@ -79,6 +54,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       printf(" ]\n");    
       }
   }
+
+
+  
 
 
 }
