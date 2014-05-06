@@ -42,6 +42,9 @@ function [varargout] = color_braiding(XY,t,proj)
 
 import braidlab.debugmsg
 
+debugmsg(['Set a global flag COLORBRAIDING_MATLAB to false to turn on C++ ' ...
+          'algorithm.']);
+
 debugmsg('Part 1: Initialize parameters for crossing analysis')
 
 n = size(XY,3); % number of punctures
@@ -64,22 +67,59 @@ end
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
 
-cross_cell = cell(n); % Cell array for crossing times.
+% Convert the physical braid to the list of braid generators (gen).
+% tcr - times of generator occurrence
+% cross_cell(I,J) - cell array storing vector of times
+%                   when strings I and J, initially
+%                   arranged as IJ exchanged positions to JI
+[gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
 
-debugmsg('Part 2: Search for crossings between pairs of strings')
+varargout{1} = braidlab.braid(gen,n);
+if nargout > 1, varargout{2} = tcr; end
+if nargout > 2, varargout{3} = cross_cell; end
+
+% =========================================================================
+
+function [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t )
+%% CROSSINGSTOGENERATORS
+%
+% Helper function that converts a physical braid to the list of braid
+% generators.
+%
+% The order of each particle is determined according to its first (X)
+% coordinate.
+% Crossing happens when the X coordinate of two particles match.
+% The second coordinate Y is used to determine whether the particles
+% exchanged their position in a clockwise or counter-clockwise manner.
+%
+% Output:
+%
+% GEN - vector of integers corresponding to the sequence of
+% generators
+%
+% TCR - vector of (interpolated) times at which generators
+% occurred
+%
+% CROSS_CELL - Times at which a crossing occured is then storred into
+% CROSS_CELL in a numerical vector. The cell index (I,J) indicates both the
+% strings involved and the direction of crossing.  For example if strings I
+% and J cross with string I initially left of J, the time of the crossing
+% will be stored in CROSS_CELL(I,J); otherwise the time will be stored in
+% CROSS_CELL(J,I).  The direction of crossing -- either positive or negative
+% -- is saved in the same cell and is used to determine the generator
+% sequence later.  The outer I,J loop is over all pairs of strings.
+%
+import braidlab.debugmsg
+
+n = size(XYtraj, 3 );
+
+cross_cell = cell(n); % Cell array for crossing times.
 
 %
 % Cycle through all pairs of strings and find all crossings.
 %
-%  The time at which a crossing occured is then storred into CROSS_CELL.
-%  Its location indicates both the strings involved and the direction of
-%  crossing.  For example if strings I and J cross with string I initially
-%  left of J, the time of the crossing will be stored in CROSS_CELL(I,J);
-%  otherwise the time will be stored in CROSS_CELL(J,I).  The direction of
-%  crossing -- either positive or negative -- is saved in the same cell and
-%  is used to determine the generator sequence later.  The outer I,J loop is
-%  over all pairs of strings.
-%
+
+debugmsg('Part 2: Search for crossings between pairs of strings')
 
 for I = 1:n
   debugmsg([num2str(I) '/' num2str(n)]) % Counter to monitor progress
@@ -218,9 +258,6 @@ for i = 1:size(crossdat,1)
   end
 end
 
-varargout{1} = braidlab.braid(gen,n);
-if nargout > 1, varargout{2} = tcr; end
-if nargout > 2, varargout{3} = cross_cell; end
 
 % =========================================================================
 function XYr = rotate_data_clockwise(XY,proj)
