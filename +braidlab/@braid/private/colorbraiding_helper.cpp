@@ -31,32 +31,69 @@
 
 #include <iostream>
 #include <vector>
+#include <deque>
 #include <algorithm>
 #include "mex.h"
 #include "colorbraiding_helper.hpp"
 
+using namespace std;
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
+// A pairwise crossing
+typedef pair<double, char> PWX; // (time, sign) pair
 
-  Matrix_3D trj = Matrix_3D( prhs[0] );
+// A matrix storing pairwise crossings.
+// Nested std::vectors enable [i][j] syntax for access in O(1).
+// deque<PWX> allows O(1) append operation on each element.
+// The constructor just allows for a one-shot initialization.
+class PWCrossings {
 
-  if ( trj.C() != 2 )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input","2 columns required for trajectory");
+private:
+  size_t Ncrossings; // number of crossings stored
+  vector< vector< deque<PWX> > > data;
 
-  for ( int s = 0; s < trj.S(); s++ ) {
-    printf("Span: %d\n",s);
-    for ( int r = 0; r < std::min<mwSize>(trj.R(),5); r++ ) {
-      printf("[ ");          
-      for ( int c = 0; c < trj.C(); c++ ) {
-        printf("\t%.1e\t", trj(r,c,s) );                  
-      }      
-      printf(" ]\n");    
-      }
+public:
+  PWCrossings( size_t Nstrands ) : Ncrossings(0) {
+    data.resize( Nstrands );
+    for (size_t i = 0; i < Nstrands; i++ ) {
+      data[i].resize(Nstrands);
+    }
   }
 
+  // add a crossing and record the size
+  void add( size_t I, size_t J, const PWX& c ) {
+    data[I][J].push_back( c );
+    Ncrossings++;
+  }
 
+  const deque<PWX>& operator() ( size_t I, size_t J ) {
+    return data[I][J];
+  }
+
+  size_t total() {
+    return Ncrossings;
+  }
+
+};
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
+
+  Matrix_3D trj = Matrix_3D( prhs[0] );
+  if ( trj.C() != 2 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input","2 columns required for trajectory");
+  }
+
+  size_t Nstrands = trj.S();
+
+  // Find pairwise crossings and store them into cross_pairwise matrix
+  PWCrossings cross_pairwise( Nstrands );
+
+  cross_pairwise.add( 2,2, PWX(0.5, 1) );
+
+  printf("Total crossings: %d\n", cross_pairwise.total() );
+  printf("Crossing: %f %d\n", cross_pairwise(2,2)[0].first, cross_pairwise(2,2)[0].second );
   
 
+  // Determine time-ordered sequence of crossings and store them into cross_timewise matrix
 
+  // Determine generators from ordered crossing data
 }
