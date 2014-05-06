@@ -34,9 +34,51 @@
 #include <algorithm>
 #include "mex.h"
 
+class XY_3D {
+
+  const double *data;         // data matrix
+  mwSize _R, _C, _S; // dimensions: rows, cols, spans
+  
+public:  
+
+  XY_3D( const mxArray *in ) : data( mxGetPr(in) ) {
+    data = mxGetPr(in);
+    const mwSize* sizes = mxGetDimensions(in);
+    _R = sizes[0];
+    _C = sizes[1];
+    _S = sizes[2];
+  }
+
+  // zero-based indexing
+  double operator()( mwSize row, mwSize col, mwSize spn ) {
+    if ( !( row < _R && col < _C && spn < _S ) ){
+      mexErrMsgTxt("Index out of bounds");
+    }
+    mwSize index = (spn*_C + col)*_R + row;
+    return data[index];
+  }
+
+  mwSize R(void) { return _R; }
+  mwSize C(void) { return _C; }
+  mwSize S(void) { return _S; }
+
+};
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
-  mexPrintf("Nothing is implemented yet");
-  
+  XY_3D trj = XY_3D( prhs[0] );
+
+  for ( int s = 0; s < trj.S(); s++ ) {
+    printf("Span: %d\n",s);
+    for ( int r = 0; r < std::min<mwSize>(trj.R(),5); r++ ) {
+      printf("[ ");          
+      for ( int c = 0; c < trj.C(); c++ ) {
+        printf("\t%.1e\t", trj(r,c,s) );                  
+      }      
+      printf(" ]\n");    
+      }
+  }
+
+
 }
