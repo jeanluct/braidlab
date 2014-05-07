@@ -116,7 +116,6 @@ public:
 
 };
 
-
 // a simple tic-toc style timer for internal profiling
 class Timer {
 
