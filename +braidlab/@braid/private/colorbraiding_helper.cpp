@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <vector>
+#include <list>
 #include <deque>
 #include <algorithm>
 #include <cmath>
@@ -42,76 +43,114 @@
 using namespace std;
 
 // A pairwise crossing
-typedef pair<double, char> PWX; // (time, sign) pair
-
-// A matrix storing pairwise crossings.
-// Nested std::vectors enable [i][j] syntax for access in O(1).
-// deque<PWX> allows O(1) append operation on each element.
-// The constructor just allows for a one-shot initialization.
-class PWCrossings {
-
-private:
-  size_t Ncrossings; // number of crossings stored
-  vector< vector< deque<PWX> > > data; // main data storage
-
+class PWX {
 public:
+  double t;
+  bool is_L_on_Bottom; // is left string on bottom
+  size_t L; // index of the left string
+  size_t R; // index of the right string
 
-  // initialize the structure to accomodate N strands
-  PWCrossings( size_t N );
+  PWX(double nt = 0, bool L_on_Bottom = false, size_t nL=0, size_t nR=0) :
+    t(nt), is_L_on_Bottom(L_on_Bottom), L(nL), R(nR) {}
+  
+}; 
 
-  // Add a crossing c to pair (I,J)
-  void add( size_t I, size_t J, const PWX& c );
+/*
+  Function that checks whether trajectories I and J cross between time instances
+  with indices ti and ti+1.
 
-  // Return all crossings of pair (I,J)
-  const deque<PWX>& operator() ( size_t I, size_t J );
+  The outputs are as follows:
+  .first  - true if crossing occured
+  .second  - crossing data containing crossing information
+            
+ */
+pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
+                           const Real3DMatrix& XYtraj, const RealVector& t) {
 
-  // return the total number of added pairwise crossings
-  size_t total() {
-    return Ncrossings;
-  }
+  // not implemented
 
-};
+  return pair<bool, PWX>( false, PWX() );
+
+  // if (ti == 0) { // record the initial order
+  //   is_I_on_Left = ( XYtraj(ti, 0, I) < XYtraj(ti, 0, J) );
+  // }
+  // else {
+
+  //   if (is_I_on_Left != ( XYtraj(ti, 0, I) < XYtraj(ti, 0, J) )) { // sign flip
+
+  //     size_t icr = ti - 1; // index of crossing is the time-step BEFORE the change (To be consistent with MATLAB code)
+
+  //     // interpolate the crossing. Returns
+  //     // double: interpolated crossing time
+  //     // bool  : is_I_on_Bottom
+  //     PWX crossing = interpcross( XYtraj, icr, I, J );
+
+  //     if (is_I_on_Left) {
+  //       cross_pairwise.add( I, J, crossing );
+  //     }
+  //     else {
+  //       cross_pairwise.add( J, I, crossing );             
+  //     }
+
+  //   }
+
+          
+
+  //   is_I_on_Left = XYtraj(ti, 0, I) < XYtraj(ti, 0, J); // re-set the current order
+  // }  
+}
+
+  /*
+    Check that coordinates of trajectories I and J do not coincide at time-index ti. Throws MATLAB errors if they do.
+    
+    If only X coordinates coincide for a pair of strands, this means a
+    different projection angle will fix things.
+
+    If both X and Y coordinates coincide, then this is a true trajectory
+    intersection, which means that the braid is undefined.
+
+    Equality is checked by a custom areEqual function checks equality within 10 float-representable increments.
+    (or as set by the last argument)
+  */
+inline void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision=10 );
 
 void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
 
   Timer tictoc;
   size_t Nstrands = XYtraj.S();
 
-  // Find pairwise crossings and store them into cross_pairwise matrix
-  PWCrossings cross_pairwise( Nstrands );
-
-  /* 
-     Check there are no coincident trajectories:
-
-     If only X coordinates coincide for a pair of strands, this means a
-     different projection angle will fix things.
-
-     If both X and Y coordinates coincide, then this is a true trajectory
-     intersection, which means that the braid is undefined.
-  */
   tictoc.tic();
-  bool anyXCoinc = false;  
-  for (int I = 0; I < Nstrands; I++) {
-    for (int J = I+1; J < Nstrands; J++) {
-      for (int ti = 0; ti < XYtraj.R(); ti++) {
-        // crossing is detected as "within 10 float-representable numbers"
-        if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), 10 ) ) {
-          anyXCoinc = true;
-          if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), 10 ) ) {
-            printf("Xvalues: %.3e %.3e\n", XYtraj(ti, 0, I), XYtraj(ti, 0, J) );            
-            printf("Yvalues: %.3e %.3e\n", XYtraj(ti, 1, I), XYtraj(ti, 1, J) );
-            mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentparticles",
-                              "Coincident particles: Braid not defined.");
-          }
-        }
+  bool anyXCoinc = false;
+
+  list<PWX> crossings;
+
+  // (I,J) is a triangular double loop over pairs of trajectories
+  for (size_t I = 0; I < Nstrands; I++) {
+    for (size_t J = I+1; J < Nstrands; J++) {
+
+
+      /*
+        Determine times at which coordinates change order.
+        is_I_on_Left records whether the strands are in order ...I...J...
+        When is_I_on_Left changes between two steps, it's an indication that the crossing happened.
+       */
+      // loop over rows      
+      for (size_t ti = 0; ti < XYtraj.R(); ti++) {
+
+        // Check that coordinates do not coincide.
+        assertNotCoincident( XYtraj, ti, I, J );
+
+        // does a crossing occur at time-index ti between trajectories I and J?
+        // interpolated crossing stored in PWX structure interpCross
+        pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
+        if (interpCross.first)
+          crossings.push_back(interpCross.second);
+
       }
     }
   }
-  if (anyXCoinc)
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentproj",
-                      "Coincident projection coordinate: change projection angle.");
 
-  tictoc.toc("Checking coincidence");
+  tictoc.toc("Populate crossing list");
 
   // Determine time-ordered sequence of crossings and store them into cross_timewise matrix
   mexEvalString("braidlab.debugmsg('Part 2: Search for crossings between pairs of strings')");
@@ -119,6 +158,19 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
   // Determine generators from ordered crossing data
   mexEvalString("braidlab.debugmsg('Part 3: Sorting the pair crossings into the generator sequence')");  
 
+}
+
+inline void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision ) {
+  if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
+    if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentparticles",
+                        "Coincident particles: Braid not defined.");
+    }
+    else {
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentproj",
+                        "Coincident projection coordinate: change projection angle.");
+    }
+  }
 }
 
 inline bool areEqual( double a, double b, int D ) {
@@ -160,25 +212,3 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 }
 
-PWCrossings::PWCrossings( size_t Nstrands ) : Ncrossings(0) {
-  // initialize a square Nstrands x Nstrands matrix
-  data.resize( Nstrands );
-  for (size_t i = 0; i < Nstrands; i++ ) {
-    data[i].resize(Nstrands);
-  }
-}
-
-void PWCrossings::add( size_t I, size_t J, const PWX& c ) {
-  if ( !(I < data.size() && J < data.size() ) ) 
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:PWCrossings",
-                      "add() out of bounds");
-  data[I][J].push_back( c );
-  Ncrossings++;
-}
-
-const deque<PWX>& PWCrossings::operator() ( size_t I, size_t J ) {
-  if ( !(I < data.size() && J < data.size() ) ) 
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:PWCrossings",
-                      "operator() out of bounds");
-  return data[I][J];
-}
