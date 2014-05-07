@@ -46,12 +46,20 @@ using namespace std;
 class PWX {
 public:
   double t;
-  bool is_L_on_Bottom; // is left string on bottom
+  bool L_On_Top; // is left string on top
   size_t L; // index of the left string
   size_t R; // index of the right string
 
-  PWX(double nt = 0, bool L_on_Bottom = false, size_t nL=0, size_t nR=0) :
-    t(nt), is_L_on_Bottom(L_on_Bottom), L(nL), R(nR) {}
+  PWX(double nt = 0, bool nSign = false, size_t nL=0, size_t nR=0) :
+    t(nt), L_On_Top(nSign), L(nL), R(nR) {}
+
+  bool operator <(const PWX& rhs) const {
+    return t < rhs.t;
+  }
+
+  void print() {
+    printf("%2f \t %c \t %d \t %d\n", t, L_On_Top ? '+' : '-', L, R);
+  }
   
 }; 
 
@@ -65,39 +73,60 @@ public:
             
  */
 pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
-                           const Real3DMatrix& XYtraj, const RealVector& t) {
+                           Real3DMatrix& XYtraj, RealVector& t) {
 
   // not implemented
 
-  return pair<bool, PWX>( false, PWX() );
+  // printf(" %.1e   %.1e \t %.1e   %.1e\n", XYtraj(ti, 0, I), XYtraj(ti, 0, J), XYtraj(ti+1, 0, I), XYtraj(ti+1, 0, J));
 
-  // if (ti == 0) { // record the initial order
-  //   is_I_on_Left = ( XYtraj(ti, 0, I) < XYtraj(ti, 0, J) );
-  // }
-  // else {
+  bool I_On_Left = ( XYtraj(ti, 0, I) < XYtraj(ti, 0, J) );
 
-  //   if (is_I_on_Left != ( XYtraj(ti, 0, I) < XYtraj(ti, 0, J) )) { // sign flip
+  // NO CROSSING: order is the same -- exit the function
+  if ( I_On_Left == (XYtraj(ti+1, 0, I) < XYtraj(ti+1, 0, J)) ) {
+    return pair<bool, PWX>( false, PWX() );
+  }
+  
+  // CROSSING: order changes
 
-  //     size_t icr = ti - 1; // index of crossing is the time-step BEFORE the change (To be consistent with MATLAB code)
+  // indices of left and right string
+  size_t L, R;
+  if (I_On_Left) {
+    L = I;
+    R = J;
+  }
+  else {
+    L = J;
+    R = I;
+  }
 
-  //     // interpolate the crossing. Returns
-  //     // double: interpolated crossing time
-  //     // bool  : is_I_on_Bottom
-  //     PWX crossing = interpcross( XYtraj, icr, I, J );
+  // INTERPOLATE CROSSING POINT
 
-  //     if (is_I_on_Left) {
-  //       cross_pairwise.add( I, J, crossing );
-  //     }
-  //     else {
-  //       cross_pairwise.add( J, I, crossing );             
-  //     }
+  // length of time interval
+  double T = t(ti+1) - t(ti);
 
-  //   }
+  // differences between two endpoints
+  double dXL = XYtraj(ti+1, 0, L) - XYtraj(ti, 0, L);
+  double dXR = XYtraj(ti+1, 0, R) - XYtraj(ti, 0, R);
+  double dYL = XYtraj(ti+1, 1, L) - XYtraj(ti, 1, L);
+  double dYR = XYtraj(ti+1, 1, R) - XYtraj(ti, 1, R);
 
-          
+  // fraction of the interval at which the points meet
+  double delta = - ( XYtraj(ti, 0, R) - XYtraj(ti, 0, L) ) / ( dXR - dXL );
 
-  //   is_I_on_Left = XYtraj(ti, 0, I) < XYtraj(ti, 0, J); // re-set the current order
-  // }  
+
+  if ( sgn<double>(delta) != sgn<double>(T) )
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:interpolation",
+                      "Interpolation error - interval increment of incorrect sign.");    
+
+  // interpolation
+  double tc = t(ti) + delta * T;
+  double YLc = XYtraj(ti, 1, L) + delta * dYL;
+  double YRc = XYtraj(ti, 1, R) + delta * dYR;
+
+  bool leftOnTop = YLc > YRc;
+
+  return pair<bool, PWX>( true, PWX(tc, leftOnTop, L, R) );
+
 }
 
   /*
@@ -117,9 +146,9 @@ inline void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size
 void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
 
   Timer tictoc;
-  size_t Nstrands = XYtraj.S();
-
   tictoc.tic();
+  
+  size_t Nstrands = XYtraj.S();
   bool anyXCoinc = false;
 
   list<PWX> crossings;
@@ -135,7 +164,7 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
         When is_I_on_Left changes between two steps, it's an indication that the crossing happened.
        */
       // loop over rows      
-      for (size_t ti = 0; ti < XYtraj.R(); ti++) {
+      for (size_t ti = 0; ti < XYtraj.R()-1; ti++) {
 
         // Check that coordinates do not coincide.
         assertNotCoincident( XYtraj, ti, I, J );
@@ -150,13 +179,14 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
     }
   }
 
-  tictoc.toc("Populate crossing list");
 
-  // Determine time-ordered sequence of crossings and store them into cross_timewise matrix
-  mexEvalString("braidlab.debugmsg('Part 2: Search for crossings between pairs of strings')");
-  
+  tictoc.tic();
+  crossings.sort();
+  tictoc.toc("colorbraiding_helper: computing sorted crossdat");
+  printf("colorbraiding_helper: Number of crossings %d\n", crossings.size() );
+
   // Determine generators from ordered crossing data
-  mexEvalString("braidlab.debugmsg('Part 3: Sorting the pair crossings into the generator sequence')");  
+  mexEvalString("braidlab.debugmsg('colorbraiding_helper Part 3: Convert crossings to generator sequence')");  
 
 }
 

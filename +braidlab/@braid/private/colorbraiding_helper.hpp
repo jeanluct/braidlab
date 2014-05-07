@@ -88,17 +88,19 @@ public:
 
 class RealVector {
 
-  const double *data;
+  double *data;
   mwSize _N;
 
 public:
   
-  RealVector( const mxArray *in ) : data( mxGetPr(in) ) {
+  RealVector( const mxArray *in ) {
     if ( mxGetNumberOfDimensions(in) != 2 )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not1d",
                         "Requires 1d matrix (array).");
 
     _N = mxGetDimensions(in)[0] > 1 ? mxGetDimensions(in)[0] : mxGetDimensions(in)[1];
+
+    data = mxGetPr(in);
     
   }
 
@@ -135,6 +137,9 @@ public:
 // check if a and b are within D-th representable number of each other
 bool areEqual( double a, double b, int D = 10 );
 
-
+// signum function
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 
 #endif
