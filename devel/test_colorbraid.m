@@ -1,6 +1,6 @@
 % test for colorbraid using Matlab and CPP code
 
-global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag that can select Matlab vs C++ code
+
 
 %% Set up a random physical braid in XY
 rng('default');
@@ -20,13 +20,17 @@ D = 1.1* sqrt( XY(:,1,:).^2 + XY(:,2,:).^2 );
 XY = XY ./ max(D(:));
 
 %% plotting 
-figure;
-hold all;
-for k = 1:5
-  plot3(XY(:,1,k), XY(:,2,k), t);
-end
-
+% figure;
+% hold all;
+% for k = 1:5
+%   plot3(XY(:,1,k), XY(:,2,k), t);
+% end
+% 
 %% Compute the braid using Matlab code
+
+global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
+                              % that can select Matlab vs C++ code
+
 COLORBRAIDING_MATLAB = true
 b_matlab = braidlab.braid(XY);
 
