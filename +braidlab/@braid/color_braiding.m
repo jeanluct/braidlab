@@ -41,9 +41,9 @@ function [varargout] = color_braiding(XY,t,proj)
 % LICENSE>
 
 import braidlab.debugmsg
+global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag that can select Matlab vs C++ code  
 
-debugmsg(['Set a global flag COLORBRAIDING_MATLAB to false to turn on C++ ' ...
-          'algorithm.']);
+debugmsg('Set a global flag COLORBRAIDING_MATLAB to false to turn on C++ algorithm.');
 
 debugmsg('Part 1: Initialize parameters for crossing analysis')
 
@@ -54,8 +54,8 @@ if nargin < 3
   proj = 0;
 end
 
-% Rotate coordinates according to angle proj.  Note that since the
-% projection line is supposed to be rotated counterclockwise by proj, we
+  % Rotate coordinates according to angle proj.  Note that since the
+  % projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
 if proj ~= 0
   XY = rotate_data_clockwise(XY,proj);
@@ -72,7 +72,17 @@ XYtraj = XY(:,:,idx);
 % cross_cell(I,J) - cell array storing vector of times
 %                   when strings I and J, initially
 %                   arranged as IJ exchanged positions to JI
-[gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
+
+gen = [];
+tcr = [];
+cross_cell = [];
+
+if COLORBRAIDING_MATLAB || exist('colorbraiding_helper', 'file') ~= 3
+  [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
+else
+  warning('Invoking C++ version of colorbraiding')
+  colorbraiding_helper( XYtraj, t )
+end
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
@@ -245,7 +255,7 @@ for i = 1:size(crossdat,1)
         fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
               ' with permutation [' num2str(Iperm) '].'];
         msg = sprintf(fs,i,crossdat(i,1),idx1);
-        error('BRAIDLAB:color_braiding:badcrossing',msg)
+        error('BRAIDLAB:braid:color_braiding:badcrossing',msg)
       end
       % Swap the good crossing with the current one.
       debugmsg(sprintf('Swap crossings %d and %d',i,j))
