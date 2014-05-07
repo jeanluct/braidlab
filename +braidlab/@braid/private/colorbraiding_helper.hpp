@@ -31,30 +31,32 @@
 #ifndef _COLORBRAIDING_HELPER_HPP
 #define _COLORBRAIDING_HELPER_HPP
 
+#include <ctime>
 #include "mex.h"
 
 /*
-Matrix_3D
+Real3DMatrix
 
-Class that helps with access of elements in Matlab 3D matrices.
+Class that helps with access of REAL elements in Matlab 3D matrices.
 Constructed from Matlab matrix mxArray.
 
 Implements operator() for easier access to elements in (row, column, span) notation (ZERO BASED INDEXING)
 Implements functions R(), C(), S() to access individual dimensions.
 
 */
-class Matrix_3D {
+class Real3DMatrix {
 
   const double *data;         // data matrix
   mwSize _R, _C, _S; // dimensions: rows, cols, spans
   
 public:  
 
-  Matrix_3D( const mxArray *in ) : data( mxGetPr(in) ) {
-
+  // use MATLAB mxArray as input, check number of dimensions
+  // and store reference to its real part for easier access
+  Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
     if ( mxGetNumberOfDimensions(in) != 3 )
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not3d","Requires 3d matrix.");
-
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not3d",
+                        "Requires 3d matrix.");
     data = mxGetPr(in);
     const mwSize* sizes = mxGetDimensions(in);
     _R = sizes[0];
@@ -62,21 +64,37 @@ public:
     _S = sizes[2];
   }
 
-  // zero-based indexing
+  // acces  matrix using matrix( r, c, s) syntax
   double operator()( mwSize row, mwSize col, mwSize spn ) {
-    if ( !( row < _R && col < _C && spn < _S ) ){
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds","Index out of bounds");
-    }
-    mwSize index = (spn*_C + col)*_R + row;
-    return data[index];
+    if ( !( row < _R && col < _C && spn < _S ) )
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+                        "Index out of bounds");
+    return data[(spn*_C + col)*_R + row];
   }
 
+  // access sizes
   mwSize R(void) { return _R; }
   mwSize C(void) { return _C; }
   mwSize S(void) { return _S; }
 
 };
 
+
+// a simple tic-toc style timer for internal profiling
+class Timer {
+
+public: 
+  clock_t tictime;
+
+  void tic() { 
+    tictime = clock();
+  }
+
+  void toc( const char* msg = "Process" ) {
+    clock_t t = clock() - tictime;
+    printf("%s took %f msec.", msg, (1000.*t)/CLOCKS_PER_SEC );
+  }
+};
 
 
 #endif
