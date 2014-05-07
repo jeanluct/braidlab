@@ -5,7 +5,7 @@
 %% Set up a random physical braid in XY
 rng('default');
 N = 5;
-L = 1000;
+L = 10000;
 
 t = linspace(0,1,L);
 XY = zeros( L, 2, 5 );
@@ -31,12 +31,16 @@ XY = XY ./ max(D(:));
 global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
                               % that can select Matlab vs C++ code
 
+tic
 COLORBRAIDING_MATLAB = true
 b_matlab = braidlab.braid(XY);
+toc
 
 %% Compute the braid using C++ code
+tic
 COLORBRAIDING_MATLAB = false
 b_cpp = braidlab.braid(XY);
+toc
 
 assert( b_matlab == b_cpp, 'Braids are not equal');
 assert( lexeq(b_matlab,b_cpp), 'Braids are not lexically equal' );

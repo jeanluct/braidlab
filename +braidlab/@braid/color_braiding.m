@@ -45,7 +45,7 @@ global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag that can
 
 debugmsg('Set a global flag COLORBRAIDING_MATLAB to false to turn on C++ algorithm.');
 
-debugmsg('Part 1: Initialize parameters for crossing analysis')
+debugmsg('color_braiding Part 1: Initialize parameters for crossing analysis'); tic;
 
 n = size(XY,3); % number of punctures
 
@@ -66,6 +66,8 @@ end
 [~,idx] = sortrows(squeeze(XY(1,:,:)).');
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
+
+debugmsg(sprintf('color_braiding Part 1 took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -120,7 +122,7 @@ function [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t )
 % sequence later.  The outer I,J loop is over all pairs of strings.
 %
 import braidlab.debugmsg
-
+tic;
 n = size(XYtraj, 3 );
 
 cross_cell = cell(n); % Cell array for crossing times.
@@ -129,7 +131,7 @@ cross_cell = cell(n); % Cell array for crossing times.
 % Cycle through all pairs of strings and find all crossings.
 %
 
-debugmsg('Part 2: Search for crossings between pairs of strings')
+debugmsg('color_braiding Part2: Search for crossings between pairs of strings'); 
 
 for I = 1:n
   debugmsg([num2str(I) '/' num2str(n)]) % Counter to monitor progress
@@ -180,7 +182,9 @@ for I = 1:n
   end
 end
 
-debugmsg('Part 3: Sorting the pair crossings into the generator sequence')
+
+
+debugmsg('color_braiding Part 3: Sorting the pair crossings into the generator sequence');
 
 % At this point CROSS_CELL contains the crossing times and directions for
 % string pairings which are initially in the order I,J along the projection
@@ -212,6 +216,11 @@ end
 
 % Sort the data based on time of crossing.
 crossdat = sortrows(crossdat);
+
+debugmsg(sprintf('color_braiding: computing sorted crossdat took %f msec.',toc*1000));
+
+
+debugmsg(sprintf('color_braiding:Number of crossings: %d\n',size(crossdat,1)),2);
 
 % To determine the generator, the crossings have to be applied to the
 % particle order.  The location of the lower string in the crossing will be
