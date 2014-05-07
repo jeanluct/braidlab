@@ -121,7 +121,7 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
 
 }
 
-bool areEqual( double a, double b, int D ) {
+inline bool areEqual( double a, double b, int D ) {
 
   // ensure a < b
   if (b < a) {
@@ -133,7 +133,7 @@ bool areEqual( double a, double b, int D ) {
   double bnd = a;
   for (int i = 0; i < D; i++)
     bnd = nextafter(bnd, 1.0);
-  // check if b is between a and D-th representable number
+  // check if b is between a and bnd
   return b <= bnd;
 }
 
