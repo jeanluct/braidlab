@@ -32,6 +32,7 @@
 #define _COLORBRAIDING_HELPER_HPP
 
 #include <ctime>
+#include <sstream>
 #include "mex.h"
 
 /*
@@ -57,7 +58,6 @@ public:
     if ( mxGetNumberOfDimensions(in) != 3 )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not3d",
                         "Requires 3d matrix.");
-    data = mxGetPr(in);
     const mwSize* sizes = mxGetDimensions(in);
     _R = sizes[0];
     _C = sizes[1];
@@ -66,9 +66,16 @@ public:
 
   // acces  matrix using matrix( r, c, s) syntax
   double operator()( mwSize row, mwSize col, mwSize spn ) {
-    if ( !( row < _R && col < _C && spn < _S ) )
+    if ( !( row < _R) )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
-                        "Index out of bounds");
+                        "Row index out of bounds");
+    if ( !( col < _C) )
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+                        "Column index out of bounds");
+    if ( !( spn < _S) )
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+                        "Span index out of bounds");
+    
     return data[(spn*_C + col)*_R + row];
   }
 
@@ -76,6 +83,36 @@ public:
   mwSize R(void) { return _R; }
   mwSize C(void) { return _C; }
   mwSize S(void) { return _S; }
+
+};
+
+class RealVector {
+
+  const double *data;
+  mwSize _N;
+
+public:
+  
+  RealVector( const mxArray *in ) : data( mxGetPr(in) ) {
+    if ( mxGetNumberOfDimensions(in) != 2 )
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not1d",
+                        "Requires 1d matrix (array).");
+
+    _N = mxGetDimensions(in)[0] > 1 ? mxGetDimensions(in)[0] : mxGetDimensions(in)[1];
+    
+  }
+
+  // acces  matrix using matrix( n ) syntax
+  double operator()( mwSize n ) {
+    if ( !( n < _N) )
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+                        "Index out of bounds");
+    return data[n];
+  }
+
+  // access sizes
+  mwSize N(void) { return _N; }
+  
 
 };
 
@@ -92,9 +129,13 @@ public:
 
   void toc( const char* msg = "Process" ) {
     clock_t t = clock() - tictime;
-    printf("%s took %f msec.", msg, (1000.*t)/CLOCKS_PER_SEC );
+    printf("%s took %f msec.\n", msg, (1000.*t)/CLOCKS_PER_SEC );
   }
 };
+
+// check if a and b are within D-th representable number of each other
+bool areEqual( double a, double b, int D = 10 );
+
 
 
 #endif

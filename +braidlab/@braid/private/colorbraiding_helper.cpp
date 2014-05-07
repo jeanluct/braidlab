@@ -33,8 +33,11 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
+#include <cmath>
 #include "mex.h"
 #include "colorbraiding_helper.hpp"
+
+
 
 using namespace std;
 
@@ -69,32 +72,92 @@ public:
 
 };
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
+void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
 
   Timer tictoc;
-  tictoc.tic();
-
-  Real3DMatrix trj = Real3DMatrix( prhs[0] );
-  if ( trj.C() != 2 ) {
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input","2 columns required for trajectory");
-  }
-
-  size_t Nstrands = trj.S();
+  size_t Nstrands = XYtraj.S();
 
   // Find pairwise crossings and store them into cross_pairwise matrix
   PWCrossings cross_pairwise( Nstrands );
 
-  cross_pairwise.add( 2,2, PWX(0.5, 1) );
+  /* 
+     Check there are no coincident trajectories:
 
-  printf("Total crossings: %d\n", cross_pairwise.total() );
-  printf("Crossing: %f %d\n", cross_pairwise(2,2)[0].first, cross_pairwise(2,2)[0].second );
+     If only X coordinates coincide for a pair of strands, this means a
+     different projection angle will fix things.
 
-  tictoc.toc();
-  
+     If both X and Y coordinates coincide, then this is a true trajectory
+     intersection, which means that the braid is undefined.
+  */
+  tictoc.tic();
+  bool anyXCoinc = false;  
+  for (int I = 0; I < Nstrands; I++) {
+    for (int J = I+1; J < Nstrands; J++) {
+      for (int ti = 0; ti < XYtraj.R(); ti++) {
+        // crossing is detected as "within 10 float-representable numbers"
+        if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), 10 ) ) {
+          anyXCoinc = true;
+          if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), 10 ) ) {
+            printf("Xvalues: %.3e %.3e\n", XYtraj(ti, 0, I), XYtraj(ti, 0, J) );            
+            printf("Yvalues: %.3e %.3e\n", XYtraj(ti, 1, I), XYtraj(ti, 1, J) );
+            mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentparticles",
+                              "Coincident particles: Braid not defined.");
+          }
+        }
+      }
+    }
+  }
+  if (anyXCoinc)
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentproj",
+                      "Coincident projection coordinate: change projection angle.");
+
+  tictoc.toc("Checking coincidence");
 
   // Determine time-ordered sequence of crossings and store them into cross_timewise matrix
-
+  mexEvalString("braidlab.debugmsg('Part 2: Search for crossings between pairs of strings')");
+  
   // Determine generators from ordered crossing data
+  mexEvalString("braidlab.debugmsg('Part 3: Sorting the pair crossings into the generator sequence')");  
+
+}
+
+bool areEqual( double a, double b, int D ) {
+
+  // ensure a < b
+  if (b < a) {
+    double tmp = b;
+    b = a;
+    a = tmp;
+  }
+  // compute the D-th representable number larger than a
+  double bnd = a;
+  for (int i = 0; i < D; i++)
+    bnd = nextafter(bnd, 1.0);
+  // check if b is between a and D-th representable number
+  return b <= bnd;
+}
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
+
+
+  if (nrhs != 2)
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
+                      "2 arguments required.");
+  
+  Real3DMatrix trj = Real3DMatrix( prhs[0] );
+  if ( trj.C() != 2 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
+                      "Trajectory should have 2 columns.");
+  }
+
+  RealVector t = RealVector( prhs[1] );
+
+  if ( trj.R() != t.N() ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
+                      "Trajectory matrix and time vector should have same number of rows.");
+  }
+  crossingsToGenerators( trj, t);
+
 }
 
 PWCrossings::PWCrossings( size_t Nstrands ) : Ncrossings(0) {
