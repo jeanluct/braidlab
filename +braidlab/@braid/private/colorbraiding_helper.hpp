@@ -61,6 +61,7 @@ t      -- (# timesteps) vector
  */
 class Real3DMatrix;
 class RealVector;
+// pair< vector<int>, vector<double> >
 void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t);
 
 /*
@@ -135,22 +136,22 @@ public:
 class Strings {
 
   /*
-    color == order of the string at the time of initialization of the object
+    color == location of the string at the time of initialization of the object
           -- provides the "natural" index
-    order == order of the string at any later time
+    location == location of the string at any later time
   */
 public:
   
-  // constructor -- number of strands
-  // colors are assumed to be 1,2,...,Nstrands
-  Strings( size_t Nstrands );
+  // constructor -- number of strings
+  // colors are assumed to be 1,2,...,Nstrings
+  Strings( size_t Nstrings );
 
-  // constructor -- X0 positions of strands at the initial time
-  // colors are determined by order of elements X0
+  // constructor -- X0 positions of strings at the initial time
+  // colors are determined by location of elements X0
   // e.g., [-0.3, 7.2, 1] results in colors [1 3 2]
   Strings( vector<double> X0 );
 
-  // applies a pairwise crossing to the strands
+  // applies a pairwise crossing to the strings
   void applyCrossing( PWX );
 
   // retrieve the braid
@@ -158,25 +159,28 @@ public:
 
 private:
 
-  // determine color (element value) of the string based on its current order (element index)
-  vector<size_t> orderToColor;
+  size_t Nstrings;
 
-  // determine current order (element value) of the string based on its color (element index)
-  vector<size_t> colorToOrder;
+  // determine color (element value) of the string based on its current location (element index)
+  vector<size_t> locationToColor;
+
+  // determine current location (element value) of the string based on its color (element index)
+  vector<size_t> colorToLocation;
 
   // storage for braid generators
   deque<double> t;
   deque<int> braid;
-  
-  // perform operation of exchanging braids of ORDER I and J
-  void switchByOrder( size_t I, size_t J );
 
-  // perform operation of exchanging braids of COLOR I and J
-  void switchByColor( size_t I, size_t J );
-
-  // return true if colorToOrder and orderToColor vectors are
+  // return true if colorToLocation and locationToColor vectors are
   // consistent
-  bool sanityOrderColor();
+  void assertLocationColorSanity();
+  
+  // perform operation of exchanging braids of COLOR L and R
+  // returns
+  // .first == true if exchange was successful
+  // .second == generator index if .first == true (otherwise generator == Nstrings) 
+  pair<bool, size_t> switchByColor( size_t L, size_t R );
+
 
 };
 
@@ -208,7 +212,7 @@ bool areEqual( double a, double b, int D);
 /*
   Check that coordinates of trajectories I and J do not coincide at time-index ti. Throws MATLAB errors if they do.
     
-  If only X coordinates coincide for a pair of strands, this means a
+  If only X coordinates coincide for a pair of strings, this means a
   different projection angle will fix things.
 
   If both X and Y coordinates coincide, then this is a true trajectory
@@ -230,19 +234,19 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
   Timer tictoc;
   tictoc.tic();
   
-  size_t Nstrands = XYtraj.S();
+  size_t Nstrings = XYtraj.S();
   bool anyXCoinc = false;
 
   list<PWX> crossings;
 
   // (I,J) is a triangular double loop over pairs of trajectories
-  for (size_t I = 0; I < Nstrands; I++) {
-    for (size_t J = I+1; J < Nstrands; J++) {
+  for (size_t I = 0; I < Nstrings; I++) {
+    for (size_t J = I+1; J < Nstrings; J++) {
 
 
       /*
         Determine times at which coordinates change order.
-        is_I_on_Left records whether the strands are in order ...I...J...
+        is_I_on_Left records whether the strings are in order ...I...J...
         When is_I_on_Left changes between two steps, it's an indication that the crossing happened.
        */
       // loop over rows      
@@ -256,7 +260,6 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
         pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
         if (interpCross.first)
           crossings.push_back(interpCross.second);
-
       }
     }
   }
@@ -264,11 +267,29 @@ void crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
 
   tictoc.tic();
   crossings.sort();
-  tictoc.toc("colorbraiding_helper: computing sorted crossdat");
+  tictoc.toc("colorbraiding_helper: sorting crossdat");
+  
   printf("colorbraiding_helper: Number of crossings %d\n", crossings.size() );
 
   // Determine generators from ordered crossing data
-  mexEvalString("braidlab.debugmsg('colorbraiding_helper Part 3: Convert crossings to generator sequence')");  
+  mexEvalString("braidlab.debugmsg('colorbraiding_helper Part 3: Convert crossings to generator sequence')");
+
+  Strings StringSet(Nstrings);
+
+  // Cycle through all crossings, apply them to the strands
+  bool notcrossed;
+  for ( list<PWX>::it crossings.begin(); it != crossings.end(); it++) {
+
+    // NEED TO LOOK FOR SIMULTANEOUS CROSSINGS AHEAD OF TIME
+    unimplemented
+
+    StringSet.applyCrossing( *it );
+
+  }
+
+  
+
+  
 
 }
 
@@ -325,6 +346,88 @@ double Timer::toc( const char* msg ) {
 // print basic information about PWX
 void PWX::print() {
   printf("%2f \t %c \t %d \t %d\n", t, L_On_Top ? '+' : '-', L, R);
+}
+
+// default location
+Strings::Strings( size_t _N ) : Nstrings(_N), locationToColor(0, _N), colorToLocation(0, _N) {
+
+  for (size_t i = 0; i < _N; i++ ) {
+    locationToColor[i] = i;
+    colorToLocation[i] = i;
+  }
+
+}
+
+// location given by X0
+Strings::Strings( vector<double> X0 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:notimplemented",
+                      "Strings custom color constructor not implemented");
+}
+
+// ensures that the locationToColor and colorToLocation are inverse
+void Strings::assertLocationColorSanity() {
+
+  mxAssert( locationToColor.size() == Nstrings,
+            "locationToColor is not of correct size" );
+  mxAssert( colorToLocation.size() == Nstrings,
+            "colorToLocation is not of correct size" );
+  for (size_t i = 0; i < Nstrings; i++ ) {
+    mxAssert( locationToColor[ colorToLocation[i] ] == i, "locationToColor . colorToLocation != Id" );
+    mxAssert( colorToLocation[ locationToColor[i] ] == i, "colorToLocation . locationToColor != Id" );    
+  }
+
+}
+
+// applies a pairwise crossing to the strings
+bool Strings::applyCrossing( PWX cross ) {
+
+  pair<bool, size_t> success = switchByColor( cross.L, cross.R );
+  if (success.first) {
+    braid.push_back( cross.L_On_Top ? success.second : (-success.second) );
+    t.push_back( cross.t );
+  }
+
+  return success.first;
+  
+}
+
+// applies a pairwise crossing to the strings
+bool Strings::applyCrossing( vector<PWX> crossBlock ) {
+
+  unimplemented
+  
+}
+
+
+
+pair<bool, size_t> Strings::switchByColor( size_t L, size_t R ) {
+
+  // find locations of the string
+  size_t oL = colorToLocation[L];
+  size_t oR = colorToLocation[R];
+
+  // if the higher string is in fact the next string to the right,
+  // apply the crossing
+  pair<bool, size_t> result(false, Nstrings);  
+  if ( oL < Nstrings && (oL + 1 == oR ) ) {
+
+    // swap the locations
+    locationToColor[oL] = R;
+    locationToColor[oR] = L;
+
+    // swap the colors
+    colorToLocation[R] = oL;
+    colorToLocation[L] = oR;
+
+    // assert that the swap was performed correctly
+    assertLocationColorSanity();
+    
+    result.first = true;
+    result.second = oL;
+  }
+  
+  return result;
+
 }
 
 // check and interpolate a crossing between strings I and J at time index ti,

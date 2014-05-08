@@ -51,7 +51,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
                       "Trajectory matrix and time vector should have same number of rows.");
   }
-  crossingsToGenerators( trj, t);
+  //pair< vector<int>, vector<double> > out = crossingsToGenerators( trj, t);
+  crossingsToGenerators( trj, t);  
 
 }
 
