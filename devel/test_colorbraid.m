@@ -1,5 +1,7 @@
 % test for colorbraid using Matlab and CPP code
 
+global BRAIDLAB_debuglvl
+BRAIDLAB_debuglvl = 1    % or higher
 
 
 %% Set up a random physical braid in XY
