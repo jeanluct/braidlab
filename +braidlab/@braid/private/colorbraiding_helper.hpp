@@ -131,6 +131,55 @@ public:
   
 }; 
 
+// Strings -- class generating an algebraic braid
+class Strings {
+
+  /*
+    color == order of the string at the time of initialization of the object
+          -- provides the "natural" index
+    order == order of the string at any later time
+  */
+public:
+  
+  // constructor -- number of strands
+  // colors are assumed to be 1,2,...,Nstrands
+  Strings( size_t Nstrands );
+
+  // constructor -- X0 positions of strands at the initial time
+  // colors are determined by order of elements X0
+  // e.g., [-0.3, 7.2, 1] results in colors [1 3 2]
+  Strings( vector<double> X0 );
+
+  // applies a pairwise crossing to the strands
+  void applyCrossing( PWX );
+
+  // retrieve the braid
+  pair< vector<int>, vector<double> > getBraid();
+
+private:
+
+  // determine color (element value) of the string based on its current order (element index)
+  vector<size_t> orderToColor;
+
+  // determine current order (element value) of the string based on its color (element index)
+  vector<size_t> colorToOrder;
+
+  // storage for braid generators
+  deque<double> t;
+  deque<int> braid;
+  
+  // perform operation of exchanging braids of ORDER I and J
+  void switchByOrder( size_t I, size_t J );
+
+  // perform operation of exchanging braids of COLOR I and J
+  void switchByColor( size_t I, size_t J );
+
+  // return true if colorToOrder and orderToColor vectors are
+  // consistent
+  bool sanityOrderColor();
+
+};
+
 /*
   Function that checks whether trajectories I and J cross between time
   instances with indices ti and ti+1.
