@@ -83,7 +83,7 @@ if COLORBRAIDING_MATLAB || exist('colorbraiding_helper', 'file') ~= 3
   [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
 else
   warning('Invoking C++ version of colorbraiding')
-  colorbraiding_helper( XYtraj, t )
+  [gen, tcr] = colorbraiding_helper( XYtraj, t );
 end
 
 varargout{1} = braidlab.braid(gen,n);

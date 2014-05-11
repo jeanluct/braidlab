@@ -31,9 +31,17 @@
 #include "colorbraiding_helper.hpp"
 #include "mex.h"
 
-using namespace std;
+
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
+
+  // read off global debug level
+  mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (isDebug) {
+    BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
+  }
+
+  Timer tictoc(1);
 
   if (nrhs != 2)
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
@@ -51,8 +59,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
                       "Trajectory matrix and time vector should have same number of rows.");
   }
-  //pair< vector<int>, vector<double> > out = crossingsToGenerators( trj, t);
-  crossingsToGenerators( trj, t);  
+
+  tictoc.tic();
+  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t);  
+  tictoc.toc("Algorithm");
+
+  tictoc.tic();
+  //  return;
+  
+  // create the list of generators 
+  if (nlhs >= 1) {
+    plhs[0] = mxCreateDoubleMatrix( retval.first.size(), 1, mxREAL );
+    double* out = mxGetPr(plhs[0]);
+    
+    for ( vector<int>::iterator it = retval.first.begin(); it != retval.first.end(); it++ ) {
+      *out = (double) *it;
+      out++;
+    }
+  }
+
+  if (nlhs >= 2) {
+    plhs[1] = mxCreateDoubleMatrix( retval.second.size(), 1, mxREAL );
+    double* out = mxGetPr(plhs[1]);
+    
+    for ( vector<double>::iterator it = retval.second.begin(); it != retval.second.end(); it++ ) {
+      *out = (double) *it;
+      out++;
+    }
+  }
+
+  tictoc.toc("Copying the output");
+
 
 }
 
