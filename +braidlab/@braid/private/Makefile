@@ -35,7 +35,7 @@ CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2)) -fPI
 
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
-MEXFLAGS  = -largeArrayDims -O -v CFLAGS="${CFLAGS}"
+MEXFLAGS  = -largeArrayDims -O CFLAGS="${CFLAGS}"
 
 CBRAID_LIBDIR     = ../../../extern/cbraid/lib
 CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
