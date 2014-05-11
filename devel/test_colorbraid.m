@@ -1,18 +1,18 @@
 % test for colorbraid using Matlab and CPP code
 
 global BRAIDLAB_debuglvl
-BRAIDLAB_debuglvl = 1    % or higher
+BRAIDLAB_debuglvl = 1  % or higher
 
 
 %% Set up a random physical braid in XY
 rng('default');
-N = 5;
+N = 20;
 L = 10000;
 
 t = linspace(0,1,L);
-XY = zeros( L, 2, 5 );
+XY = zeros( L, 2, N );
 
-for k = 1:5
+for k = 1:N
 
   XY(:,1,k) = cumsum( randn( L, 1) );
   XY(:,2,k) = cumsum( randn( L, 1) );  
@@ -33,19 +33,20 @@ XY = XY ./ max(D(:));
 global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
                               % that can select Matlab vs C++ code
 
+%% Compute the braid using C++ code
+tic
+COLORBRAIDING_MATLAB = false
+b_cpp = braidlab.braid(XY);
+toc                              
+                              
 tic
 COLORBRAIDING_MATLAB = true
 b_matlab = braidlab.braid(XY);
 toc
 
-%% Compute the braid using C++ code
-tic
-COLORBRAIDING_MATLAB = false
-b_cpp = braidlab.braid(XY);
-toc
-
 assert( b_matlab == b_cpp, 'Braids are not equal');
 assert( lexeq(b_matlab,b_cpp), 'Braids are not lexically equal' );
 
+disp('BRAIDS ARE EQUAL');
 
 
