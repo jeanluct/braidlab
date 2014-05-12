@@ -1,13 +1,13 @@
 % test for colorbraid using Matlab and CPP code
 
 global BRAIDLAB_debuglvl
-BRAIDLAB_debuglvl = 1  % or higher
+BRAIDLAB_debuglvl = 0  % or higher
 
 
 %% Set up a random physical braid in XY
 rng('default');
-N = 20;
-L = 10000;
+N = 50;
+L = 20000;
 
 t = linspace(0,1,L);
 XY = zeros( L, 2, N );
@@ -44,7 +44,7 @@ COLORBRAIDING_MATLAB = true
 b_matlab = braidlab.braid(XY);
 toc
 
-assert( b_matlab == b_cpp, 'Braids are not equal');
+%assert( b_matlab == b_cpp, 'Braids are not equal');
 assert( lexeq(b_matlab,b_cpp), 'Braids are not lexically equal' );
 
 disp('BRAIDS ARE EQUAL');

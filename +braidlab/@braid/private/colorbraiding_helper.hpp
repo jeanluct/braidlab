@@ -38,6 +38,7 @@
 #include <cmath>
 #include <ctime>
 #include <sstream>
+#include <mutex>
 #include "mex.h"
 
 using namespace std;
@@ -114,6 +115,8 @@ public:
   
 };
 
+
+
 // A pairwise crossing
 class PWX {
 public:
@@ -132,6 +135,60 @@ public:
   void print(int debuglevel);
   
 }; 
+
+// simple wrapper around list<PWX> object to prevent it from being
+// written concurrently by two threads
+class ThreadSafeWrapper {
+
+public:
+
+  ThreadSafeWrapper( list<PWX>& s ) : storage(s) {}
+
+  void push_back( PWX data ) {
+    mtx.lock();
+    storage.push_back(data);
+    mtx.unlock();
+  }
+
+private:
+  list<PWX>& storage;
+  mutex mtx;
+
+};
+
+/*
+  Class that detects pairwise crossings from 
+  the trajectory data.
+
+  Implemented as an object to facilitate multithreading computation.
+ */
+class PairCrossings {
+
+public:
+
+  // inputs: _XYtraj (trajectory) _t (time)
+  // output: storage
+  PairCrossings( Real3DMatrix& _XYtraj,
+                 RealVector& _t,
+                 list<PWX>& storage) : wrapper(storage), 
+                                       XYtraj(_XYtraj),
+                                       t(_t),
+                                       Nstrings(_XYtraj.S()) {}
+
+  // run the calculation on T threads
+  void run( size_t T = 1 );
+
+private:
+  ThreadSafeWrapper wrapper;
+  Real3DMatrix& XYtraj;
+  RealVector& t;
+  size_t Nstrings;
+
+  // Detects crossings between string with color "anchor" and all subsequent strings
+  void detectCrossings( size_t anchor );
+
+};
+
 
 // Strings -- class generating an algebraic braid
 class Strings {
@@ -252,36 +309,14 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
   size_t Nstrings = XYtraj.S();
   bool anyXCoinc = false;
 
-  list<PWX> crossings;
-
   // return braid information
   pair< vector<int>, vector<double> > retval;
 
-  // (I,J) is a triangular double loop over pairs of trajectories
-  for (size_t I = 0; I < Nstrings; I++) {
-    for (size_t J = I+1; J < Nstrings; J++) {
+  list<PWX> crossings;
 
-      /*
-        Determine times at which coordinates change order.
-        is_I_on_Left records whether the strings are in order ...I...J...
-        When is_I_on_Left changes between two steps, it's an indication that the crossing happened.
-      */
-      // loop over rows      
-      for (size_t ti = 0; ti < XYtraj.R()-1; ti++) {
-
-        // Check that coordinates do not coincide.
-        assertNotCoincident( XYtraj, ti, I, J );
-
-        // does a crossing occur at time-index ti between trajectories I and J?
-        // interpolated crossing stored in PWX structure interpCross
-        pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
-        if (interpCross.first)
-          crossings.push_back(interpCross.second);
-      }
-    }
-  }
+  PairCrossings pairCrosser( XYtraj, t, crossings );
+  pairCrosser.run();
   tictoc.toc("colorbraiding_helper: pairwise crossing detection", true);
-
 
   crossings.sort();
   tictoc.toc("colorbraiding_helper: sorting crossdat", true);
@@ -413,6 +448,38 @@ void PWX::print(int debuglevel = 0) {
     printf("%2f \t %c \t %d \t %d\n", t, L_On_Top ? '+' : '-', L, R);
     mexEvalString("pause(0.001);");
   }
+}
+
+void PairCrossings::detectCrossings( size_t I ) {
+
+    for (size_t J = I+1; J < Nstrings; J++) {
+      /*
+        Determine times at which coordinates change order.
+        is_I_on_Left records whether the strings are in order
+        ...I...J...  J is_I_on_Left changes between two steps, it's
+        an indication that the crossing happened.
+      */
+      // loop over rows      
+      for (size_t ti = 0; ti < XYtraj.R()-1; ti++) {
+
+        // Check that coordinates do not coincide.
+        assertNotCoincident( XYtraj, ti, I, J );
+
+        // does a crossing occur at time-index ti between trajectories I and J?
+        // interpolated crossing stored in PWX structure interpCross
+        pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
+        if (interpCross.first)
+          wrapper.push_back(interpCross.second);
+      }
+    }
+}
+
+void PairCrossings::run( size_t T ) {
+
+  for (size_t I = 0; I < Nstrings; I++) {
+    detectCrossings( I );
+  }  
+
 }
 
 // default location
@@ -610,7 +677,6 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
   bool leftOnTop = YLc > YRc;
 
   return pair<bool, PWX>( true, PWX(tc, leftOnTop, L, R) );
-
 }
 
 // signum function
