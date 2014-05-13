@@ -23,15 +23,15 @@
 MEX         = $(shell { command -v mexsh || command -v mex ; } 2>/dev/null ) 
 MEXENV      = $(MEX) -v 2> /dev/null
 MEXVOUT     := $(shell $(MEXENV))
-MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2))
+MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2-))
 MEXSUFFIX   = $(strip $(shell $(MEXENV) | \
-		grep "^ *LDEXTENSION *=" | cut -d = -f 2 | cut -d . -f 2))
-CXX         = $(strip $(shell $(MEXENV) | grep "\-> *CXX *=" | cut -d = -f 2))
-CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2))
+		grep "^ *LDEXTENSION *=" | cut -d = -f 2- | cut -d . -f 2))
+CXX         = $(strip $(shell $(MEXENV) | grep "\-> *CXX *=" | cut -d = -f 2-))
+CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2-))
 MATLABHOME  = $(strip $(shell $(MEXENV) | \
-		grep "\-> *MATLAB *=" | cut -d = -f 2))
+		grep "\-> *MATLAB *=" | cut -d = -f 2-))
 
-CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
+CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2-)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 CXXFLAGS   = $(CFLAGS) -std=c++0x
 
 #LIBS      = -lm
