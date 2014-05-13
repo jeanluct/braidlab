@@ -32,8 +32,8 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-#ifndef _COLORBRAIDING_HELPER_HPP
-#define _COLORBRAIDING_HELPER_HPP
+#ifndef BRAIDLAB_COLORBRAIDING_HELPER_HPP
+#define BRAIDLAB_COLORBRAIDING_HELPER_HPP
 
 #include <iostream>
 #include <vector>
@@ -752,15 +752,15 @@ void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, i
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentparticles",
-                        "Coincident particles: Braid not defined.");
+                        "Coincident particles: braid not defined.");
     }
     else {
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentproj",
-                        "Coincident projection coordinate: change projection angle.");
+                        "Coincident projection coordinate; change projection angle (type help braid.braid).");
     }
   }
 }
 
 
 
-#endif
+#endif // BRAIDLAB_COLORBRAIDING_HELPER_HPP
