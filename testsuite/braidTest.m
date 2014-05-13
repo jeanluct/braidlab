@@ -82,6 +82,17 @@ classdef braidTest < matlab.unittest.TestCase
       % single-particle dataset.  Print a warning, though.
       testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
                              'BRAIDLAB:braid:onetraj');
+
+      % Two particles have a coincident position.
+      XY = zeros(4,2,2);
+      testCase.verifyError(@() braidlab.braid(XY), ...
+                           'BRAIDLAB:braid:color_braiding:coincidentparticles');
+      % Now they only coincide in the default projection.
+      XY(:,2,2) = 2;
+      testCase.verifyError(@() braidlab.braid(XY), ...
+                           'BRAIDLAB:braid:color_braiding:coincidentproj');
+      % Changing the projection gets rid of the error.
+      testCase.verifyTrue(braidlab.braid(XY,.1) == braidlab.braid([],2));
     end
 
     function test_braid_from_randomwalk(testCase)
