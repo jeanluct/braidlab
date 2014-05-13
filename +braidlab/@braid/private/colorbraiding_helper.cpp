@@ -41,6 +41,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   }
 
+  // read off global number of threads that should be used
+  mxArray *nThreads = mexGetVariable("global", "BRAIDLAB_threads");
+  if (nThreads) {
+    BRAIDLAB_threads = (size_t) mxGetScalar(nThreads);
+  }
+
+
   Timer tictoc(1);
 
   if (nrhs != 2)

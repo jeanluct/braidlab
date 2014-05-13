@@ -6,6 +6,10 @@
 // functions are intended to speed up the colorbrading Matlab code
 // used by the braid constructor. Written by Marko Budisic.
 //
+// Responds to MATLAB global variables:
+// BRAIDLAB_debuglvl  -- sets the level of logging output from the code
+// BRAIDLAB_threads   -- sets max number of parallel threads of execution
+//
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
 //
@@ -39,11 +43,15 @@
 #include <ctime>
 #include <sstream>
 #include <mutex>
+
+#include "ThreadPool.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
+
 #include "mex.h"
 
 using namespace std;
 
 int BRAIDLAB_debuglvl = -1;
+size_t BRAIDLAB_threads = 1;
 
 ////////////////// DECLARATIONS  /////////////////////////
 
@@ -178,14 +186,16 @@ public:
   // run the calculation on T threads
   void run( size_t T = 1 );
 
+  // Detects crossings between string with color "anchor" and all subsequent strings
+  void detectCrossings( size_t anchor );
+
+
 private:
   ThreadSafeWrapper wrapper;
   Real3DMatrix& XYtraj;
   RealVector& t;
   size_t Nstrings;
 
-  // Detects crossings between string with color "anchor" and all subsequent strings
-  void detectCrossings( size_t anchor );
 
 };
 
@@ -315,7 +325,8 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
   list<PWX> crossings;
 
   PairCrossings pairCrosser( XYtraj, t, crossings );
-  pairCrosser.run();
+
+  pairCrosser.run(BRAIDLAB_threads);
   tictoc.toc("colorbraiding_helper: pairwise crossing detection", true);
 
   crossings.sort();
@@ -328,7 +339,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 
   // Determine generators from ordered crossing data
   if (1 <= BRAIDLAB_debuglvl)  {
-    printf("colorbraiding_helper: Convert crossings to generator sequence");
+    printf("colorbraiding_helper: Convert crossings to generator sequence\n");
     mexEvalString("pause(0.001);");
   }
 
@@ -476,13 +487,48 @@ void PairCrossings::detectCrossings( size_t I ) {
 
 void PairCrossings::run( size_t T ) {
 
-  for (size_t I = 0; I < Nstrings; I++) {
-    detectCrossings( I );
-  }  
+  // each tasks is one "row" of the (I,J) pairing matrix
+  // ensure that we do not call more workers than we have tasks
+  T = min( T, Nstrings ); 
+
+  // std::bind creates a function reference to a member function
+  // needed here b/c passing references to member functions
+  // requires explicit object to be referred
+  //
+  // I'm using it in both threaded and unthreaded version to 
+  // clarify the difference in calling the threaded version.
+  auto ptrDetectCrossings = bind(&PairCrossings::detectCrossings,
+                                 this, placeholders::_1);
+
+  // unthreaded version
+  if ( T == 0 ) {
+    if (1 <= BRAIDLAB_debuglvl)  {
+      printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
+      mexEvalString("pause(0.001);"); //flush
+    }
+  
+    for (size_t I = 0; I < Nstrings; I++) {
+      // could be just detectCrossings(I)
+      ptrDetectCrossings(I);
+    }  
+  }
+  // threaded version
+  else {
+    ThreadPool pool(T); // (c) Jakob Progsch
+
+    if (1 <= BRAIDLAB_debuglvl)  {
+      printf("colorbraiding_helper: pairwise crossings running on %d threads.\n",T );
+      mexEvalString("pause(0.001);"); //flush
+    }
+
+    for (size_t I = 0; I < Nstrings; I++) {
+      pool.enqueue( ptrDetectCrossings, I);
+    }  
+  }
 
 }
 
-// default location
+// initial locations are equal to colors of strings
 Strings::Strings( size_t _N ) {
   
   Nstrings = _N;
