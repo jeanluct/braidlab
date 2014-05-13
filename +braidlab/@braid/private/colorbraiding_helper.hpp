@@ -51,7 +51,7 @@
 using namespace std;
 
 int BRAIDLAB_debuglvl = -1;
-size_t BRAIDLAB_threads = 1;
+size_t BRAIDLAB_threads = 0;
 
 ////////////////// DECLARATIONS  /////////////////////////
 

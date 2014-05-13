@@ -45,9 +45,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   mxArray *nThreads = mexGetVariable("global", "BRAIDLAB_threads");
   if (nThreads) {
     BRAIDLAB_threads = (size_t) mxGetScalar(nThreads);
+    if (1 <= BRAIDLAB_debuglvl)  {
+      printf("colorbraiding_helper: Number of threads requested %d\n",
+             BRAIDLAB_threads );
+    }
   }
-
-
+    
   Timer tictoc(1);
 
   if (nrhs != 2)
