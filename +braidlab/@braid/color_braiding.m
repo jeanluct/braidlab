@@ -22,7 +22,8 @@ function [varargout] = color_braiding(XY,t,proj)
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse,
+%                            Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -41,11 +42,15 @@ function [varargout] = color_braiding(XY,t,proj)
 % LICENSE>
 
 import braidlab.debugmsg
-global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag that can select Matlab vs C++ code  
+% modified colorbraiding will have a flag that can select Matlab vs C++ code
+global COLORBRAIDING_MATLAB
 
-debugmsg('Set a global flag COLORBRAIDING_MATLAB to false to turn on C++ algorithm.');
+debugmsg(['Set a global flag COLORBRAIDING_MATLAB to false to turn on C++' ...
+          ' algorithm.']);
 
-debugmsg('color_braiding Part 1: Initialize parameters for crossing analysis'); tic;
+debugmsg(['color_braiding Part 1: Initialize parameters for crossing' ...
+          ' analysis']);
+tic
 
 n = size(XY,3); % number of punctures
 
@@ -67,7 +72,7 @@ end
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
 
-debugmsg(sprintf('color_braiding Part 1 took %f msec',toc*1000));
+debugmsg(sprintf('color_braiding Part 1: took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -131,7 +136,8 @@ cross_cell = cell(n); % Cell array for crossing times.
 % Cycle through all pairs of strings and find all crossings.
 %
 
-debugmsg('color_braiding Part2: Search for crossings between pairs of strings'); 
+debugmsg(['color_braiding Part 2: Search for crossings between pairs of' ...
+          ' strings']);
 
 for I = 1:n
   debugmsg([num2str(I) '/' num2str(n)],2) % Counter to monitor progress
@@ -217,10 +223,12 @@ end
 % Sort the data based on time of crossing.
 crossdat = sortrows(crossdat);
 
-debugmsg(sprintf('color_braiding: computing sorted crossdat took %f msec.',toc*1000));
+debugmsg(sprintf(['color_braiding: computing sorted crossdat took' ...
+                  ' %f msec.'], toc*1000));
 
 
-debugmsg(sprintf('color_braiding:Number of crossings: %d\n',size(crossdat,1)),2);
+debugmsg(sprintf('color_braiding:Number of crossings: %d\n', ...
+                 size(crossdat,1)),2);
 
 % To determine the generator, the crossings have to be applied to the
 % particle order.  The location of the lower string in the crossing will be
