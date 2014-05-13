@@ -32,10 +32,11 @@ MATLABHOME  = $(strip $(shell $(MEXENV) | \
 		grep "\-> *MATLAB *=" | cut -d = -f 2))
 
 CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
+CXXFLAGS     = $(strip $(shell $(MEXENV) | grep "CXXFLAGS *=" | cut -d = -f 2)) -std=c++11 -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
-MEXFLAGS  = -largeArrayDims -O CFLAGS="${CFLAGS}"
+MEXFLAGS  = -largeArrayDims -O CFLAGS="${CFLAGS} CXXFLAGS="${CXXFLAGS}"
 
 CBRAID_LIBDIR     = ../../../extern/cbraid/lib
 CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
