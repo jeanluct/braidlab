@@ -380,7 +380,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
       msg << "Concurrent block at time " << blockTime << ", ";
       msg << distance( blockStart, blockEnd );
       msg << " crossings between " << startN << " and " << endN << " cannot be resolved.";
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:badcrossing", msg.str().c_str());
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:badcrossing", msg.str().c_str());
     }
   }
 
@@ -397,7 +397,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 // access elements
 Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
   if ( mxGetNumberOfDimensions(in) != 3 )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not3d",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:not3d",
                       "Requires 3d matrix.");
   const mwSize* sizes = mxGetDimensions(in);
   _R = sizes[0];
@@ -408,13 +408,13 @@ Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
 // access elements
 double Real3DMatrix::operator()( mwSize row, mwSize col, mwSize spn ) {
   if ( !( row < _R) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:out_of_bounds",
                       "Row index out of bounds");
   if ( !( col < _C) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:out_of_bounds",
                       "Column index out of bounds");
   if ( !( spn < _S) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:out_of_bounds",
                       "Span index out of bounds");
     
   return data[(spn*_C + col)*_R + row];
@@ -423,7 +423,7 @@ double Real3DMatrix::operator()( mwSize row, mwSize col, mwSize spn ) {
 // constructor from MATLAB
 RealVector::RealVector( const mxArray *in ) {
   if ( mxGetNumberOfDimensions(in) != 2 )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:not1d",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:not1d",
                       "Requires 1d matrix (array).");
   _N = mxGetDimensions(in)[0] > 1 ? mxGetDimensions(in)[0] : mxGetDimensions(in)[1];
   data = mxGetPr(in);
@@ -432,7 +432,7 @@ RealVector::RealVector( const mxArray *in ) {
 // access elements using vector( n ) syntax
 double RealVector::operator()( mwSize n ) {
   if ( !( n < _N) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:out_of_bounds",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:out_of_bounds",
                       "Index out of bounds");
   return data[n];
 }
@@ -544,7 +544,7 @@ Strings::Strings( size_t _N ) {
 
 // location given by X0
 Strings::Strings( vector<double> X0 ) {
-  mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:notimplemented",
+  mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:notimplemented",
                     "Strings custom color constructor not implemented");
 }
 
@@ -584,9 +584,8 @@ bool Strings::applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end
   list<PWX>::iterator it = concurrentBlock.begin();
   while ( it != concurrentBlock.end() ) {
 
-    if ( !areEqual(blockTime,it->t,2 ) )
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:blockCrossingsNotConcurrent",
-                        "The block of crossings should have the same time (up to 2 representable doubles).");    
+    mxAssert(areEqual(blockTime,it->t,2),
+             "The block of crossings should have the same time (up to 2 representable doubles).");    
 
     if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
       concurrentBlock.erase(it); 
@@ -710,9 +709,8 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
   // fraction of the time interval at which the points meet
   double delta = - ( XYtraj(ti, 0, R) - XYtraj(ti, 0, L) ) / ( dXR - dXL );
 
-  if ( sgn<double>(delta) != sgn<double>(T) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:interpolation",
-                      "Interpolation error - interval increment of incorrect sign.");    
+  mxAssert(sgn<double>(delta) == sgn<double>(T),
+           "Interpolation error - interval increment of incorrect sign.");    
 
   // interpolation
   double tc = t(ti) + delta * T;
@@ -751,11 +749,11 @@ bool areEqual( double a, double b, int D ) {
 void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision ) {
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentparticles",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:coincidentparticles",
                         "Coincident particles: braid not defined.");
     }
     else {
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:coincidentproj",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:color_braiding:coincidentproj",
                         "Coincident projection coordinate; change projection angle (type help braid.braid).");
     }
   }
