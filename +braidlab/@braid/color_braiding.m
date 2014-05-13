@@ -134,7 +134,7 @@ cross_cell = cell(n); % Cell array for crossing times.
 debugmsg('color_braiding Part2: Search for crossings between pairs of strings'); 
 
 for I = 1:n
-  debugmsg([num2str(I) '/' num2str(n)]) % Counter to monitor progress
+  debugmsg([num2str(I) '/' num2str(n)],2) % Counter to monitor progress
   for J = I+1:n
     % Save the current pair of trajectories.
     Xtraj1 = XYtraj(:,1,I); Xtraj2 = XYtraj(:,1,J);
