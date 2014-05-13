@@ -7,7 +7,7 @@
 // used by the braid constructor. Written by Marko Budisic.
 //
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 //
 //   This file is part of Braidlab.
 //
