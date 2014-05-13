@@ -42,10 +42,11 @@ function [varargout] = color_braiding(XY,t,proj)
 % LICENSE>
 
 import braidlab.debugmsg
+  
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
-global COLORBRAIDING_MATLAB
+global BRAIDLAB_COLORBRAIDING_CPP
 
-debugmsg(['Set a global flag COLORBRAIDING_MATLAB to false to turn on C++' ...
+debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" to turn on C++' ...
           ' algorithm.']);
 
 debugmsg(['color_braiding Part 1: Initialize parameters for crossing' ...
@@ -84,12 +85,14 @@ gen = [];
 tcr = [];
 cross_cell = [];
 
-if COLORBRAIDING_MATLAB || exist('colorbraiding_helper', 'file') ~= 3
-  [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
-else
-  warning('Invoking C++ version of colorbraiding')
+if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
+        ~isempty(BRAIDLAB_COLORBRAIDING_CPP) && ...
+        all(BRAIDLAB_COLORBRAIDING_CPP) )
+  warning('BRAIDLAB:braid:color_braiding:cpp','Invoking C++ version of colorbraiding')
   [gen, tcr] = colorbraiding_helper( XYtraj, t );
-end
+else
+  [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
+end 
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end

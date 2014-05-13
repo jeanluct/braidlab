@@ -32,17 +32,17 @@ XY = XY ./ max(D(:));
 % 
 %% Compute the braid using Matlab code
 
-global COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
+global BRAIDLAB_COLORBRAIDING_CPP   % modified colorbraiding will have a flag
                               % that can select Matlab vs C++ code
 
 %% Compute the braid using C++ code
 tic
-COLORBRAIDING_MATLAB = false
+BRAIDLAB_COLORBRAIDING_CPP = true
 b_cpp = braidlab.braid(XY);
 toc                              
                               
 tic
-COLORBRAIDING_MATLAB = true
+BRAIDLAB_COLORBRAIDING_CPP = false
 b_matlab = braidlab.braid(XY);
 toc
 
