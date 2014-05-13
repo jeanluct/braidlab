@@ -3,13 +3,13 @@
 # Extract architecture, compiler, etc. from MEX configuration.
 MEX         = $(shell { command -v mexsh || command -v mex ; } 2>/dev/null ) 
 MEXENV      = $(MEX) -v 2> /dev/null
-MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2))
+MEXOPTSFILE = $(strip $(shell $(MEXENV) | grep "^ *FILE *=" | cut -d = -f 2-))
 MEXSUFFIX   = $(strip $(shell $(MEXENV) | \
-		grep "^ *LDEXTENSION *=" | cut -d = -f 2 | cut -d . -f 2))
-CXX         = $(strip $(shell $(MEXENV) | grep "\-> *CXX *=" | cut -d = -f 2))
-CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2))
+		grep "^ *LDEXTENSION *=" | cut -d = -f 2- | cut -d . -f 2))
+CXX         = $(strip $(shell $(MEXENV) | grep "\-> *CXX *=" | cut -d = -f 2-))
+CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2-))
 MATLABHOME  = $(strip $(shell $(MEXENV) | \
-		grep "\-> *MATLAB *=" | cut -d = -f 2))
+		grep "\-> *MATLAB *=" | cut -d = -f 2-))
 
 CFLAGS     = -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
 #LIBS      = -lm
