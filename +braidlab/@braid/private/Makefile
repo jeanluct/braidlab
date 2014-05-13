@@ -32,7 +32,7 @@ MATLABHOME  = $(strip $(shell $(MEXENV) | \
 		grep "\-> *MATLAB *=" | cut -d = -f 2))
 
 CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
-CXXFLAGS   = -std=c++0x
+CXXFLAGS   = $(CFLAGS) -std=c++0x
 
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
