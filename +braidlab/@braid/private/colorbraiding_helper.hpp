@@ -35,6 +35,36 @@
 #ifndef BRAIDLAB_COLORBRAIDING_HELPER_HPP
 #define BRAIDLAB_COLORBRAIDING_HELPER_HPP
 
+
+// real GCC feature list:
+// https://gcc.gnu.org/projects/cxx0x.html
+#if ( (defined __GNUC__) && (!defined __clang__) )
+
+#define GCCVERSION (__GNUC__ * 10000           \
+                    + __GNUC_MINOR__ * 100     \
+                    + __GNUC_PATCHLEVEL__)
+
+# if ( (!defined _BRAIDLAB_NOTHREADING) &&          \
+       ( GCCVERSION < 40500) ) // less than GCC 4.5
+# define _BRAIDLAB_NOTHREADING
+# endif
+#endif // gcc
+
+// CLANG: feature list:
+// http://clang.llvm.org/cxx_status.html
+#if (defined __clang__) 
+
+#define CLANGVERSION (__clang_major__ * 10000           \
+                     + __clang_minor__ * 100     \
+                     + __clang_patchlevel__)
+
+# if ( (!defined _BRAIDLAB_NOTHREADING) &&      \
+       (CLANGVERSION < 30300) ) // less than Clang 3.3
+# define _BRAIDLAB_NOTHREADING
+# endif
+
+#endif // clang
+
 #include <iostream>
 #include <vector>
 #include <list>
@@ -42,13 +72,10 @@
 #include <cmath>
 #include <ctime>
 #include <sstream>
-#include <mutex>
 
-#if (defined _NOFUTURE || ((defined __GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__<6)))
-#include "ThreadPool.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
-#else
-#include "ThreadPool_nofuture.h" // (c) Jakob Progsch
-                                 // https://github.com/progschj/ThreadPool
+#ifndef _BRAIDLAB_NOTHREADING
+#include <mutex>
+#include "ThreadPool_nofuture.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
 #endif
 
 #include "mex.h"
@@ -158,15 +185,20 @@ public:
   ThreadSafeWrapper( list<PWX>& s ) : storage(s) {}
 
   void push_back( PWX data ) {
+#ifndef _BRAIDLAB_NOTHREADING    
     mtx.lock();
+#endif
     storage.push_back(data);
+#ifndef _BRAIDLAB_NOTHREADING        
     mtx.unlock();
+#endif
   }
 
 private:
-  list<PWX>& storage;
-  mutex mtx;
-
+  std::list<PWX>& storage;
+#ifndef _BRAIDLAB_NOTHREADING  
+  std::mutex mtx;
+#endif
 };
 
 /*
@@ -492,18 +524,13 @@ void PairCrossings::detectCrossings( size_t I ) {
 
 void PairCrossings::run( size_t T ) {
 
+#ifndef _BRAIDLAB_NOTHREADING
   // each tasks is one "row" of the (I,J) pairing matrix
   // ensure that we do not call more workers than we have tasks
-  T = min( T, Nstrings ); 
-
-  // std::bind creates a function reference to a member function
-  // needed here b/c passing references to member functions
-  // requires explicit object to be referred
-  //
-  // I'm using it in both threaded and unthreaded version to 
-  // clarify the difference in calling the threaded version.
-  auto ptrDetectCrossings = bind(&PairCrossings::detectCrossings,
-                                 this, placeholders::_1);
+  T = min( T, Nstrings );
+#else
+  T = 0;
+#endif
 
   // unthreaded version
   if ( T == 0 ) {
@@ -511,14 +538,19 @@ void PairCrossings::run( size_t T ) {
       printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
-  
     for (size_t I = 0; I < Nstrings; I++) {
-      // could be just detectCrossings(I)
-      ptrDetectCrossings(I);
+      detectCrossings(I);
     }  
   }
+#ifndef _BRAIDLAB_NOTHREADING
   // threaded version
   else {
+  // std::bind creates a function reference to a member function
+  // needed here b/c passing references to member functions
+  // requires explicit object to be referred
+  //
+    auto ptrDetectCrossings = bind(&PairCrossings::detectCrossings,
+                                   this, placeholders::_1);
     ThreadPool pool(T); // (c) Jakob Progsch
 
     if (1 <= BRAIDLAB_debuglvl)  {
@@ -530,6 +562,7 @@ void PairCrossings::run( size_t T ) {
       pool.enqueue( ptrDetectCrossings, I);
     }  
   }
+#endif
 
 }
 
