@@ -31,8 +31,8 @@ CC          = $(strip $(shell $(MEXENV) | grep "\-> *CC *=" | cut -d = -f 2-))
 MATLABHOME  = $(strip $(shell $(MEXENV) | \
 		grep "\-> *MATLAB *=" | cut -d = -f 2-))
 
-CFLAGS     = $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2-)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE
-CXXFLAGS   = $(CFLAGS) -std=c++0x
+CFLAGS     := $(strip $(shell $(MEXENV) | grep "CFLAGS *=" | cut -d = -f 2-)) -fPIC -ansi -pthread -DMX_COMPAT_32 -DMATLAB_MEX_FILE $(CFLAGS)
+CXXFLAGS   := $(CFLAGS) -std=c++0x -pthread $(CXXFLAGS)
 
 #LIBS      = -lm
 #INCLUDE   = -I$(MATLABHOME)/extern/include
