@@ -44,11 +44,11 @@
 #include <sstream>
 #include <mutex>
 
-#if (defined _NOFUTURE || ((defined __GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__<6)))
-#include "ThreadPool.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
+// (c) Jakob Progsch https://github.com/progschj/ThreadPool
+#if (defined _NOFUTURE || ((defined __GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 6)))
+#include "ThreadPool_nofuture.h" 
 #else
-#include "ThreadPool_nofuture.h" // (c) Jakob Progsch
-                                 // https://github.com/progschj/ThreadPool
+#include "ThreadPool.h"
 #endif
 
 #include "mex.h"
