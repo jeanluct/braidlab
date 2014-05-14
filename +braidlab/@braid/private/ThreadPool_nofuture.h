@@ -64,11 +64,16 @@ public:
     template<class F, class... Args>
       void enqueue(F&& f, Args&&... args);
     ~ThreadPool();
+
+    void doWork();
+    
 private:
     // need to keep track of threads so we can join them
     std::vector< std::thread > workers;
     // the task queue
     std::queue< std::function<void()> > tasks;
+
+
     
     // synchronization
     std::mutex queue_mutex;
@@ -80,24 +85,27 @@ private:
 inline ThreadPool::ThreadPool(size_t threads)
     :   stop(false)
 {
-    for(size_t i = 0;i<threads;++i)
-        workers.emplace_back(
-            [this]
-            {
-                for(;;)
-                {
-                    std::unique_lock<std::mutex> lock(this->queue_mutex);
-                    while(!this->stop && this->tasks.empty())
-                        this->condition.wait(lock);
-                    if(this->stop && this->tasks.empty())
-                        return;
-                    std::function<void()> task(this->tasks.front());
-                    this->tasks.pop();
-                    lock.unlock();
-                    task();
-                }
-            }
-        );
+
+  auto ptrWork = std::bind(&ThreadPool::doWork,this);
+  
+  for(size_t i = 0;i<threads;++i)
+    workers.emplace_back( ptrWork );
+}
+
+void ThreadPool::doWork() {
+
+  for(;;)
+    {
+      std::unique_lock<std::mutex> lock(this->queue_mutex);
+      while(!this->stop && this->tasks.empty())
+        this->condition.wait(lock);
+      if(this->stop && this->tasks.empty())
+        return;
+      std::function<void()> task(this->tasks.front());
+      this->tasks.pop();
+      lock.unlock();
+      task();
+    }
 }
 
 
@@ -128,7 +136,7 @@ void ThreadPool::enqueue(F&& f, Args&&... args)
     //    std::future<return_type> res = task->get_future(); 
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        tasks.push([task](){ task(); });
+        tasks.push(task);
     }
     condition.notify_one();
     //    return res;
