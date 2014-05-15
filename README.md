@@ -6,19 +6,19 @@
 
 [Michael Allshouse][3] and [Marko Budisic][4] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; and Markus Buehren's [assignmentoptimal][9].
+*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; Markus Buehren's [assignmentoptimal][9]; and Jakob Progsch's [ThreadPool][10].
 
 ### license
 
-*braidlab* is released under the [GNU General Public License v3][10].  See [COPYING][11] and [LICENSE][12].
+*braidlab* is released under the [GNU General Public License v3][11].  See [COPYING][12] and [LICENSE][13].
 
 ### documentation
 
-See the [*braidlab* user's guide][13].
+See the [*braidlab* user's guide][14].
 
 ### support
 
-The development of *braidlab* was supported by the [US National Science Foundation][14], under grants DMS-0806821 and CMMI-1233935.
+The development of *braidlab* was supported by the [US National Science Foundation][15], under grants DMS-0806821 and CMMI-1233935.
 
 [1]: http://www.math.wisc.edu/~jeanluc/
 [2]: http://www.mathworks.com/products/matlab/
@@ -29,8 +29,9 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [7]: http://personal.us.es/meneses/index2.swf
 [8]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
 [9]: http://www.mathworks.com/matlabcentral/fileexchange/6543
-[10]: http://www.gnu.org/licenses/gpl-3.0.html
-[11]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
-[12]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
-[13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/doc/braidlab_guide.pdf
-[14]: http://www.nsf.gov
+[10]: https://github.com/progschj/ThreadPool
+[11]: http://www.gnu.org/licenses/gpl-3.0.html
+[12]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
+[13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
+[14]: http://bitbucket.org/jeanluc/braidlab/raw/tip/doc/braidlab_guide.pdf
+[15]: http://www.nsf.gov
