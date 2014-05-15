@@ -3,7 +3,7 @@
 //
 // COLORBRAIDING Construct a sequence of braid generators from a
 // physical braid specified by a set of trajectories. These cpp
-// functions are intended to speed up the colorbrading Matlab code
+// functions are intended to speed up the color_braiding Matlab code
 // used by the braid constructor. Written by Marko Budisic.
 //
 // <LICENSE
@@ -30,7 +30,6 @@
 
 #include "colorbraiding_helper.hpp"
 #include "mex.h"
-
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
@@ -121,6 +120,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   tictoc.toc("Copying the output");
 
-
 }
-
