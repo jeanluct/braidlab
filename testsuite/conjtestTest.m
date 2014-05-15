@@ -40,7 +40,7 @@ classdef conjtestTest < matlab.unittest.TestCase
       testCase.b1c = testCase.b1.compact;
       testCase.verifyError(@() braidlab.braid(XY,pi/4), ...
                            'BRAIDLAB:braid:color_braiding:coincidentproj');
-      testCase.b2 = braidlab.braid(XY,-pi/4);
+      testCase.b2 = braidlab.braid(XY,-pi/4 + 1e-8);
       testCase.b2c = testCase.b2.compact;
     end
   end
