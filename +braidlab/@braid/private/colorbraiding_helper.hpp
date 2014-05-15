@@ -769,6 +769,8 @@ template <typename T> int sgn(T val) {
 // check for equality taking float precision into account
 bool areEqual( double a, double b, int D ) {
 
+  if (a == b) return true;
+
   // ensure a < b
   if (b < a) {
     double tmp = b;
