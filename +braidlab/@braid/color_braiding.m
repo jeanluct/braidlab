@@ -1,4 +1,4 @@
-function [varargout] = color_braiding(XY,t,proj)
+function [varargout] = color_braiding(XY,t,proj,nthreads)
 %COLOR_BRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLOR_BRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -42,7 +42,7 @@ function [varargout] = color_braiding(XY,t,proj)
 % LICENSE>
 
 import braidlab.debugmsg
-  
+
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
 global BRAIDLAB_COLORBRAIDING_CPP
 
@@ -54,6 +54,11 @@ debugmsg(['color_braiding Part 1: Initialize parameters for crossing' ...
 tic
 
 n = size(XY,3); % number of punctures
+
+if nargin < 4
+  % Default number of threads is 1.
+  nthreads = 1;
+end
 
 if nargin < 3
   % Default projection line is X axis.
