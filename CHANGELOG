@@ -1,11 +1,21 @@
 ------------------------------------------------------------------------
-1.1 [2014-xx-xx]
+2.0 [2014-xx-xx]
 
-* braid.mtimes acting on loops takes an option output argument that
+* When constructing a braid object from data, the braid constructor
+  now uses a C++ MEX file (written by Marko Budisic) giving a big
+  speedup for large datasets.  Support for parallelization on multiple
+  cores is included.  The global variable BRAIDLAB_threads determines
+  the number of threads used.  [*** document in guide ***]
+
+* The braid constructor can make knot representatives, e.g.,
+  b=braid('8_3') for a braid representative for the third 8-crossing
+  knot.
+
+* braid.mtimes acting on loops has an optional output argument that
   records the signs of the pos/neg operators in the update rules
   (loopsigma).  This allows reconstruction of the matrix for the
-  effective linear action, as well as checking for limit cycles for the
-  action.
+  effective linear action, as well as checking for limit cycles for
+  the action.
 
 * New methods in the braid class: braid.linact converts the optional
   output from braid.mtimes (see above) to a matrix.  braid.cycle looks
@@ -13,9 +23,9 @@
   uses braid.cycle to return a matrix corresponding to this limit
   cycle.  The largest eigenvalue of this matrix, normalized by the
   period, gives the Perron root of the largest pseudo-Anosov
-  components.
+  component(s).
 
-* loopsigma's C++ helper functions can now handle int32, int64,
+* loopsigma's C++ helper functions can now handle int32, int64, and
   single, in addition to double.  This makes checking braid equality
   and triviality much faster, unless overflow occurs and VPI has to be
   used.
@@ -26,9 +36,8 @@
   (GMP) to be installed, but it gives a massive speedup when working
   with VPI types.
 
-* The braid constructor can make knot representatives, i.e.,
-  b=braid('8_3') for a braid representative for the third 8-crossing
-  knot.
+* New methods in the loop class: loop.plotcomponents, loop.getgraph.
+  [*** document in guide ***]
 
 * braid.burau and braid.alexpoly can use the symbolic toolbox.
   alexpoly no longer centers the polynomial by default, since
