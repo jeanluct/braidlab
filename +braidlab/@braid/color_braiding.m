@@ -10,9 +10,6 @@ function [varargout] = color_braiding(XY,t,proj,nthreads)
 %
 %   [B,TCR] = COLOR_BRAIDING(XY,T) also returns the time of crossing (TCR).
 %
-%   [B,TCR,CROSS_CELL] = COLOR_BRAIDING(XY,T) also returns the cell array
-%   containing times of crossings for each pair of strings (CROSS_CELL).
-%
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
 %
@@ -104,7 +101,6 @@ end
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
-if nargout > 2, varargout{3} = cross_cell; end
 
 % =========================================================================
 
