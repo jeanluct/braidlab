@@ -6,9 +6,8 @@
 // functions are intended to speed up the colorbrading Matlab code
 // used by the braid constructor. Written by Marko Budisic.
 //
-// Responds to MATLAB global variables:
+// Responds to MATLAB global variable:
 // BRAIDLAB_debuglvl  -- sets the level of logging output from the code
-// BRAIDLAB_threads   -- sets max number of parallel threads of execution
 //
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
@@ -44,9 +43,9 @@
                     + __GNUC_MINOR__ * 100     \
                     + __GNUC_PATCHLEVEL__)
 
-# if ( (!defined _BRAIDLAB_NOTHREADING) &&          \
+# if ( (!defined BRAIDLAB_NOTHREADING) &&          \
        ( GCCVERSION < 40600) ) // less than GCC 4.5
-# define _BRAIDLAB_NOTHREADING
+# define BRAIDLAB_NOTHREADING
 # endif
 #endif // gcc
 
@@ -58,9 +57,9 @@
                      + __clang_minor__ * 100     \
                      + __clang_patchlevel__)
 
-# if ( (!defined _BRAIDLAB_NOTHREADING) &&      \
+# if ( (!defined BRAIDLAB_NOTHREADING) &&      \
        (CLANGVERSION < 30300) ) // less than Clang 3.3
-# define _BRAIDLAB_NOTHREADING
+# define BRAIDLAB_NOTHREADING
 # endif
 
 #endif // clang
@@ -73,7 +72,7 @@
 #include <ctime>
 #include <sstream>
 
-#ifndef _BRAIDLAB_NOTHREADING
+#ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
 #include "ThreadPool_nofuture.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
 #endif
@@ -185,18 +184,18 @@ public:
   ThreadSafeWrapper( list<PWX>& s ) : storage(s) {}
 
   void push_back( PWX data ) {
-#ifndef _BRAIDLAB_NOTHREADING    
+#ifndef BRAIDLAB_NOTHREADING    
     mtx.lock();
 #endif
     storage.push_back(data);
-#ifndef _BRAIDLAB_NOTHREADING        
+#ifndef BRAIDLAB_NOTHREADING        
     mtx.unlock();
 #endif
   }
 
 private:
   std::list<PWX>& storage;
-#ifndef _BRAIDLAB_NOTHREADING  
+#ifndef BRAIDLAB_NOTHREADING  
   std::mutex mtx;
 #endif
 };
@@ -524,7 +523,7 @@ void PairCrossings::detectCrossings( size_t I ) {
 
 void PairCrossings::run( size_t T ) {
 
-#ifndef _BRAIDLAB_NOTHREADING
+#ifndef BRAIDLAB_NOTHREADING
   // each tasks is one "row" of the (I,J) pairing matrix
   // ensure that we do not call more workers than we have tasks
   T = min( T, Nstrings );
@@ -542,7 +541,7 @@ void PairCrossings::run( size_t T ) {
       detectCrossings(I);
     }  
   }
-#ifndef _BRAIDLAB_NOTHREADING
+#ifndef BRAIDLAB_NOTHREADING
   // threaded version
   else {
   // std::bind creates a function reference to a member function
