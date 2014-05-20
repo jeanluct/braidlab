@@ -77,6 +77,8 @@
 #include "ThreadPool_nofuture.h" // (c) Jakob Progsch https://github.com/progschj/ThreadPool
 #endif
 
+#include "areEqual.hpp"
+
 #include "mex.h"
 
 using namespace std;
@@ -765,24 +767,6 @@ template <typename T> int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 
-// check for equality taking float precision into account
-bool areEqual( double a, double b, int D ) {
-
-  if (a == b) return true;
-
-  // ensure a < b
-  if (b < a) {
-    double tmp = b;
-    b = a;
-    a = tmp;
-  }
-  // compute the D-th representable number larger than a
-  double bnd = a;
-  for (int i = 0; i < D; i++)
-    bnd = nextafter(bnd, 1.0);
-  // check if b is between a and bnd
-  return b <= bnd;
-}
 
 // assert that trajectories I and J are not coincident at time step ti
 void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision ) {

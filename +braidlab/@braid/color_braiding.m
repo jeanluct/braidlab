@@ -43,9 +43,6 @@ import braidlab.debugmsg
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
 global BRAIDLAB_COLORBRAIDING_CPP
 
-debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
-          'to turn on C++ algorithm.']);
-
 debugmsg(['color_braiding Part 1: Initialize parameters for crossing' ...
           ' analysis']);
 tic
@@ -96,6 +93,8 @@ if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
                       'suppress this message'])
   [gen, tcr] = colorbraiding_helper( XYtraj, t, nthreads );
 else
+  debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
+          'to turn on C++ algorithm.']);
   [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
 end 
 
@@ -157,10 +156,18 @@ for I = 1:n
     % projection coordinates (usually fixed by a change in projection
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
-    nearcoinc = find(abs(dXtraj) < 10*eps);
+    % % uses absolute precision to test equalty
+    % nearcoinc = find(abs(dXtraj) < 10*eps); 
+    
+    % uses relative precision to test equality (same as C++ code)
+    nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
+    
     if ~isempty(nearcoinc)
       dYtraj = Ytraj1(nearcoinc) - Ytraj2(nearcoinc);
-      if any(abs(dYtraj) < 10*eps)
+      %      % uses absolute precision to test equality
+      %      if any(abs(dYtraj) < 10*eps)
+      % uses relative precision to test equality (same as C++ code)        
+      if any( areEqual(Ytraj1(nearcoinc), Ytraj2(nearcoinc), 10) )
         error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
               'Coincident particles: braid not defined.')
       else
