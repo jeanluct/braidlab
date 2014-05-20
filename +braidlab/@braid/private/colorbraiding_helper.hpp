@@ -45,7 +45,7 @@
                     + __GNUC_PATCHLEVEL__)
 
 # if ( (!defined _BRAIDLAB_NOTHREADING) &&          \
-       ( GCCVERSION < 40500) ) // less than GCC 4.5
+       ( GCCVERSION < 40600) ) // less than GCC 4.5
 # define _BRAIDLAB_NOTHREADING
 # endif
 #endif // gcc
@@ -533,7 +533,7 @@ void PairCrossings::run( size_t T ) {
 #endif
 
   // unthreaded version
-  if ( T == 0 ) {
+  if ( T <= 1 ) {
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush

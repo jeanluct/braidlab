@@ -31,7 +31,17 @@
 #include "colorbraiding_helper.hpp"
 #include "mex.h"
 
+/*
+*** Inputs:
+XY       - nT x 2 x nStrings matrix specifying the trajectory
+t        - nT x 1            vector specifying the time vector
+Nthreads - number of computational threads requested
 
+*** Outputs:
+gen      - nG x 1 vector of generators in the braid
+tgen     - nG x 1 vector of timesteps ast which the generators were detected
+
+*/
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // read off global debug level
@@ -41,9 +51,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   // read off global number of threads that should be used
-  mxArray *nThreads = mexGetVariable("global", "BRAIDLAB_threads");
-  if (nThreads) {
-    BRAIDLAB_threads = (size_t) mxGetScalar(nThreads);
+  // global BRAIDLAB_threads defined in the hpp
+  if (nrhs >= 3) {
+    if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
+        !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:colorbraiding_helper:threadsinput",
+                         "Number of threads must be "
+                         "noncomplex scalar double.");
+    }
+
+    BRAIDLAB_threads = (size_t) mxGetScalar(prhs[2]);
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("colorbraiding_helper: Number of threads requested %d\n",
              BRAIDLAB_threads );
@@ -73,7 +90,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     
   Timer tictoc(1);
 
-  if (nrhs != 2)
+  if (nrhs < 2)
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
                       "2 arguments required.");
   
