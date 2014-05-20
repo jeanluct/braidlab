@@ -2,13 +2,12 @@
 
 global BRAIDLAB_debuglvl
 BRAIDLAB_debuglvl = 1  % or higher
-global BRAIDLAB_threads
 BRAIDLAB_threads = 2
 
 
 %% Set up a random physical braid in XY
 rng('default');
-N = 80;
+N = 120;
 L = 20000;
 
 t = linspace(0,1,L);
@@ -38,7 +37,12 @@ global BRAIDLAB_COLORBRAIDING_CPP   % modified colorbraiding will have a flag
 %% Compute the braid using C++ code
 tic
 BRAIDLAB_COLORBRAIDING_CPP = true
-b_cpp = braidlab.braid(XY);
+b_cpp_p = braidlab.braid(XY, 'threads', BRAIDLAB_threads);
+toc                              
+
+tic
+BRAIDLAB_COLORBRAIDING_CPP = true
+b_cpp_s = braidlab.braid(XY, 'threads', 0);
 toc                              
                               
 tic
@@ -47,7 +51,11 @@ b_matlab = braidlab.braid(XY);
 toc
 
 %assert( b_matlab == b_cpp, 'Braids are not equal');
-assert( lexeq(b_matlab,b_cpp), 'Braids are not lexically equal' );
+assert( lexeq(b_matlab,b_cpp_p), ['C++ multithreaded and MATLAB ' ...
+                    'braids are not lexically equal'] );
+assert( lexeq(b_matlab,b_cpp_s), ['C++ singlethreaded and MATLAB ' ...
+                    'braids are not lexically equal'] );
+
 
 disp('BRAIDS ARE EQUAL');
 
