@@ -61,7 +61,7 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) colorbraiding_helper.$(MEXSUFFIX)
+all: compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) colorbraiding_helper.$(MEXSUFFIX) areEqual.$(MEXSUFFIX)
 
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 ifndef MEXVOUT
