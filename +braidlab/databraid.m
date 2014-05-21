@@ -103,7 +103,7 @@ classdef databraid < braidlab.braid
       if nargin > 3
         error('BRAIDLAB:databraid:badarg','Too many input arguments.')
       end
-      [b,br.tcross] = braidlab.braid.color_braiding(XY,t,proj);
+      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
       br.word = b.word;
       br.n = b.n;
     end

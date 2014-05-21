@@ -22,10 +22,10 @@ else
 end
 
 if paralyze
-  pctRunOnAll warning('off','BRAIDLAB:braid:color_braiding:coincident')
+  pctRunOnAll warning('off','BRAIDLAB:braid:colorbraiding:coincident')
   pctRunOnAll warning('off','BRAIDLAB:braid:entropy:noconv')
 else
-  warning('off','BRAIDLAB:braid:color_braiding:coincident')
+  warning('off','BRAIDLAB:braid:colorbraiding:coincident')
   warning('off','BRAIDLAB:braid:entropy:noconv')
 end
 

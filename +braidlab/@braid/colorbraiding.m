@@ -1,6 +1,6 @@
-function [varargout] = color_braiding(XY,t,proj,nthreads)
-%COLOR_BRAIDING   Find braid generators from trajectories using colored braids.
-%   B = COLOR_BRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
+function [varargout] = colorbraiding(XY,t,proj,nthreads)
+%COLORBRAIDING   Find braid generators from trajectories using colored braids.
+%   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
 %   braiding method.
 %
@@ -8,12 +8,12 @@ function [varargout] = color_braiding(XY,t,proj,nthreads)
 %   that occur between the two.  This is done for all pairs, and then the
 %   crossings for each pair are converted to generators.
 %
-%   [B,TCR] = COLOR_BRAIDING(XY,T) also returns the time of crossing (TCR).
+%   [B,TCR] = COLORBRAIDING(XY,T) also returns the time of crossing (TCR).
 %
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
 %
-%   COLOR_BRAIDING is a protected static method of the BRAID class.  It
+%   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
 %
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
@@ -43,7 +43,7 @@ import braidlab.debugmsg
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
 global BRAIDLAB_COLORBRAIDING_CPP
 
-debugmsg(['color_braiding Part 1: Initialize parameters for crossing' ...
+debugmsg(['colorbraiding Part 1: Initialize parameters for crossing' ...
           ' analysis']);
 tic
 
@@ -72,7 +72,7 @@ end
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
 
-debugmsg(sprintf('color_braiding Part 1: took %f msec',toc*1000));
+debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -87,7 +87,7 @@ cross_cell = [];
 if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
         ~isempty(BRAIDLAB_COLORBRAIDING_CPP) && ...
         all(BRAIDLAB_COLORBRAIDING_CPP) )
-  warning('BRAIDLAB:braid:color_braiding:cpp', ...
+  warning('BRAIDLAB:braid:colorbraiding:cpp', ...
           'Invoking C++ version of colorbraiding.')
   [gen, tcr] = colorbraiding_helper( XYtraj, t, nthreads );
 else
@@ -140,7 +140,7 @@ cross_cell = cell(n); % Cell array for crossing times.
 % Cycle through all pairs of strings and find all crossings.
 %
 
-debugmsg(['color_braiding Part 2: Search for crossings between pairs of' ...
+debugmsg(['colorbraiding Part 2: Search for crossings between pairs of' ...
           ' strings']);
 
 for I = 1:n
@@ -166,10 +166,10 @@ for I = 1:n
       %      if any(abs(dYtraj) < 10*eps)
       % uses relative precision to test equality (same as C++ code)        
       if any( areEqual(Ytraj1(nearcoinc), Ytraj2(nearcoinc), 10) )
-        error('BRAIDLAB:braid:color_braiding:coincidentparticles',...
+        error('BRAIDLAB:braid:colorbraiding:coincidentparticles',...
               'Coincident particles: braid not defined.')
       else
-        error('BRAIDLAB:braid:color_braiding:coincidentproj',...
+        error('BRAIDLAB:braid:colorbraiding:coincidentproj',...
               [ 'Coincident projection coordinate; change ' ...
                 'projection angle (type help braid.braid).' ])
       end
@@ -181,7 +181,7 @@ for I = 1:n
 
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0))
-      error('BRAIDLAB:braid:color_braiding:coincidentproj',...
+      error('BRAIDLAB:braid:colorbraiding:coincidentproj',...
             'Somehow there are still coincident projection coordinates...')
     end
 
@@ -202,7 +202,7 @@ end
 
 
 
-debugmsg('color_braiding Part 3: Sorting the pair crossings into the generator sequence');
+debugmsg('colorbraiding Part 3: Sorting the pair crossings into the generator sequence');
 
 % At this point CROSS_CELL contains the crossing times and directions for
 % string pairings which are initially in the order I,J along the projection
@@ -235,11 +235,11 @@ end
 % Sort the data based on time of crossing.
 crossdat = sortrows(crossdat);
 
-debugmsg(sprintf(['color_braiding: computing sorted crossdat took' ...
+debugmsg(sprintf(['colorbraiding: computing sorted crossdat took' ...
                   ' %f msec.'], toc*1000));
 
 
-debugmsg(sprintf('color_braiding:Number of crossings: %d\n', ...
+debugmsg(sprintf('colorbraiding:Number of crossings: %d\n', ...
                  size(crossdat,1)),2);
 
 % To determine the generator, the crossings have to be applied to the
@@ -284,7 +284,7 @@ for i = 1:size(crossdat,1)
         fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
               ' with permutation [' num2str(Iperm) '].'];
         msg = sprintf(fs,i,crossdat(i,1),idx1);
-        error('BRAIDLAB:braid:color_braiding:badcrossing',msg)
+        error('BRAIDLAB:braid:colorbraiding:badcrossing',msg)
       end
       % Swap the good crossing with the current one.
       debugmsg(sprintf('Swap crossings %d and %d',i,j))
