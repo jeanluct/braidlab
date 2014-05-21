@@ -3,7 +3,7 @@
 //
 // COLORBRAIDING Construct a sequence of braid generators from a
 // physical braid specified by a set of trajectories. These cpp
-// functions are intended to speed up the color_braiding Matlab code
+// functions are intended to speed up the colorbraiding Matlab code
 // used by the braid constructor. Written by Marko Budisic.
 //
 // <LICENSE

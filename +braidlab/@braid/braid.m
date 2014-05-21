@@ -215,7 +215,7 @@ classdef braid < matlab.mixin.CustomDisplay
         else
         end
         % The input is an array of data.
-        br = braidlab.braid.color_braiding(b,1:size(b,1),proj,nthreads);
+        br = braidlab.braid.colorbraiding(b,1:size(b,1),proj,nthreads);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
@@ -469,9 +469,9 @@ classdef braid < matlab.mixin.CustomDisplay
   % Need to execute 'clear classes' to register changes here.
   %
 
-  % The subclass databraid has access to color_braiding.
+  % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
-    [varargout] = color_braiding(XY,t,proj,nthreads)
+    [varargout] = colorbraiding(XY,t,proj,nthreads)
   end % methods block
 
 end % braid classdef

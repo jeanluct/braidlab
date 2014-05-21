@@ -86,11 +86,11 @@ classdef braidTest < matlab.unittest.TestCase
       % Two particles have a coincident position.
       XY = zeros(4,2,2);
       testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:color_braiding:coincidentparticles');
+                           'BRAIDLAB:braid:colorbraiding:coincidentparticles');
       % Now they only coincide in the default projection.
       XY(:,2,2) = 2;
       testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:color_braiding:coincidentproj');
+                           'BRAIDLAB:braid:colorbraiding:coincidentproj');
       % Changing the projection gets rid of the error.
       testCase.verifyTrue(braidlab.braid(XY,.1) == braidlab.braid([],2));
     end
