@@ -352,18 +352,14 @@ classdef braid < matlab.mixin.CustomDisplay
         % Have to define this here, rather than in the loop class, since the
         % braid goes on the left, and Matlab determines which overloaded
         % function to call by looking at the first argument.
-        if (size(b2,2) > 1)
-          error('BRAIDLAB:braid:mtimes:notcolumn', ...
-                'Need column vector of loops.')
-        end
         if b1.n > b2(1).n
           error('BRAIDLAB:braid:mtimes:badgen', ...
-                'Generator values too large for the loop.')
+                'Braid has too many strings for the loop.')
         end
         [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
-        varargout{1} = braidlab.loop(varargout{1});
+        varargout{1} = reshape(braidlab.loop(varargout{1}),size(b2));
       else
-        error('BRAIDLAB:braid:mtimes', ...
+        error('BRAIDLAB:braid:mtimes:badobject', ...
               'Cannot act with a braid on this object.')
       end
     end
