@@ -12,7 +12,7 @@ function [A, Lp] = getgraph(L)
 %        Lp = diag(sum(A+A.')) - (A+A.')
 %
 %   This is a method for the LOOP class.
-%   See also LOOP, LOOP.PLOTCOMPONENTS.
+%   See also LOOP, LOOP.PLOTCOMP.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic,
