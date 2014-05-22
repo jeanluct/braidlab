@@ -33,7 +33,7 @@ function I = graph_keytohash( PV, M, T )
 %   See also LOOP.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %

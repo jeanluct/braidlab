@@ -1,21 +1,22 @@
 function [A, Lp] = getgraph(L)
 %GETGRAPH  Get graph representation of the loop.
-%   [A,Lp] = GETGRAPH(L) returns (nonsymmetric) adjacency matrix (A) 
-%   of a graph obtained by subdividing the loop into segments.
+%   [A,Lp] = GETGRAPH(L) returns the (nonsymmetric) adjacency matrix (A) of
+%   the directed graph obtained by subdividing the loop L into segments.
 %   Vertices are placed on the loop above and below punctures.
-%   
+%
 %   A is a sparse, nonsymmetric matrix of 0s and 1s, where edges are
-%   directed from lower puncture index to higher for neighbor-edges,
+%   directed from lower puncture index to higher for adjacent edges,
 %   and by hairpin direction for edges that loop around a puncture.
-%   
-%   Lp - Laplacian matrix of symmetrized A, i.e.,
+%
+%   Lp is the Laplacian matrix of the symmetrized A, i.e.,
 %        Lp = diag(sum(A+A.')) - (A+A.')
 %
 %   This is a method for the LOOP class.
-%   See also LOOP.
+%   See also LOOP, LOOP.PLOTCOMPONENTS.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic,
+%                            Michael Allshouse
 %
 %   This file is part of Braidlab.
 %
@@ -263,4 +264,3 @@ function joinpoints( mine, next )
   tos(edgecount) = graph_keytohash(next, M, T);
   
 end
-
