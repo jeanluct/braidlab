@@ -31,7 +31,7 @@ classdef loopTest < matlab.unittest.TestCase
       import braidlab.braid
       import braidlab.loop
       testCase.l1 = loop([1 -1 2 3]);
-      testCase.l2 = loop([1 -1 2 3; 2 3 -1 2]);  % two loops
+      testCase.l2 = loop([1 -1 2 3; 2 3 -1 2]);  % two loops (column)
       testCase.b = braid([1 -2 1 -2 1 -2]);
     end
   end
@@ -50,8 +50,14 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l.a,braidlab.loop([1 -1],[2 3]).a);
       testCase.verifyEqual(l.b,braidlab.loop([1 -1],[2 3]).b);
 
-      % A row-list of loops.
+      % A column vector of loops.
       l = testCase.l2;
+      [c1,c2] = l.coords;
+      testCase.verifyEqual(c1,[1 -1 2 3]);
+      testCase.verifyEqual(c2,[2 3 -1 2]);
+
+      % A row vector of loops.
+      l = testCase.l2.';
       [c1,c2] = l.coords;
       testCase.verifyEqual(c1,[1 -1 2 3]);
       testCase.verifyEqual(c2,[2 3 -1 2]);
@@ -82,6 +88,27 @@ classdef loopTest < matlab.unittest.TestCase
       l0 = braidlab.loop(5);
       l = braidlab.braid([],3)*l0;
       testCase.verifyEqual(l,l0);
+
+      % Trying to act with a braid with more strings than the loop.
+      testCase.verifyError(@() braidlab.braid([],7)*l0, ...
+                           'BRAIDLAB:braid:mtimes:badgen')
+
+      % Trying to act with a braid on unsupported object.
+      testCase.verifyError(@() braidlab.braid([],7)*3, ...
+                           'BRAIDLAB:braid:mtimes:badobject')
+
+      % Column vector of loops.
+      l0 = testCase.l2;
+      b = testCase.b;
+      l = b*l0;
+      testCase.verifyEqual(size(l),[2 1]);
+
+      % Row vector of loops.
+      l0 = testCase.l2.';
+      ll = b*l0;
+      testCase.verifyEqual(size(ll),[1 2]);
+
+      testCase.verifyEqual(l,ll.');
     end
 
     function test_loopcoords(testCase)
