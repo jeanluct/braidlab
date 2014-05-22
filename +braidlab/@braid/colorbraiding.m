@@ -1,4 +1,4 @@
-function [varargout] = colorbraiding(XY,t,proj,nthreads)
+function [varargout] = colorbraiding(XY,t,proj)
 %COLORBRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -49,11 +49,6 @@ tic
 
 n = size(XY,3); % number of punctures
 
-if nargin < 4
-  % Default number of threads is 1.
-  nthreads = 1;
-end
-
 if nargin < 3
   % Default projection line is X axis.
   proj = 0;
@@ -89,7 +84,7 @@ if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
         all(BRAIDLAB_COLORBRAIDING_CPP) )
   warning('BRAIDLAB:braid:colorbraiding:cpp', ...
           'Invoking C++ version of colorbraiding.')
-  [gen, tcr] = colorbraiding_helper( XYtraj, t, nthreads );
+  [gen, tcr] = colorbraiding_helper( XYtraj, t );
 else
   debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
           'to turn on C++ algorithm.']);
