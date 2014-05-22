@@ -84,7 +84,6 @@
 using namespace std;
 
 int BRAIDLAB_debuglvl = -1;
-size_t BRAIDLAB_threads = 0;
 
 ////////////////// DECLARATIONS  /////////////////////////
 
@@ -349,7 +348,7 @@ template <typename T> int sgn(T val);
 
 
 //////////////////////////// DEFINITIONS  ////////////////////////////
-pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t) {
+pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads) {
 
   Timer tictoc( 1 );
   tictoc.tic();
@@ -364,7 +363,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 
   PairCrossings pairCrosser( XYtraj, t, crossings );
 
-  pairCrosser.run(BRAIDLAB_threads);
+  pairCrosser.run(Nthreads);
   tictoc.toc("colorbraiding_helper: pairwise crossing detection", true);
 
   crossings.sort();
@@ -523,18 +522,18 @@ void PairCrossings::detectCrossings( size_t I ) {
     }
 }
 
-void PairCrossings::run( size_t T ) {
+void PairCrossings::run( size_t NThreadsRequested ) {
 
 #ifndef BRAIDLAB_NOTHREADING
   // each tasks is one "row" of the (I,J) pairing matrix
   // ensure that we do not call more workers than we have tasks
-  T = min( T, Nstrings );
+  NThreadsRequested = min( NThreadsRequested, Nstrings );
 #else
-  T = 0;
+  NThreadsRequested = 0;
 #endif
 
   // unthreaded version
-  if ( T <= 1 ) {
+  if ( NThreadsRequested <= 1 ) {
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
@@ -552,10 +551,10 @@ void PairCrossings::run( size_t T ) {
   //
     auto ptrDetectCrossings = bind(&PairCrossings::detectCrossings,
                                    this, placeholders::_1);
-    ThreadPool pool(T); // (c) Jakob Progsch
+    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
 
     if (1 <= BRAIDLAB_debuglvl)  {
-      printf("colorbraiding_helper: pairwise crossings running on %d threads.\n",T );
+      printf("colorbraiding_helper: pairwise crossings running on %d threads.\n",NThreadsRequested );
       mexEvalString("pause(0.001);"); //flush
     }
 

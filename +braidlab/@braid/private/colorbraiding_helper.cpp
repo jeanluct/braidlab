@@ -51,7 +51,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   // read off global number of threads that should be used
-  // global BRAIDLAB_threads defined in the hpp
+  size_t NThreadsRequested;
   if (nrhs >= 3) {
     if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
         !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
@@ -60,14 +60,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                          "noncomplex scalar double.");
     }
 
-    BRAIDLAB_threads = (size_t) mxGetScalar(prhs[2]);
+    NThreadsRequested = (size_t) mxGetScalar(prhs[2]);
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("colorbraiding_helper: Number of threads requested %d\n",
-             BRAIDLAB_threads );
+             NThreadsRequested );
     }
   }
   else {
-    BRAIDLAB_threads = 0;
+    NThreadsRequested = 0;
   }
 
 #ifdef BRAIDLAB_NOTHREADING
@@ -77,12 +77,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #endif
 
 #ifdef BRAIDLAB_NOTHREADING
-  if (BRAIDLAB_threads > 0) {
+  if (NThreadsRequested > 1) {
   mexWarnMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
     "You requested multithreaded execution, but "
     "either your compiler does not support it or "
     "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
     "Defaulting to single-threaded execution.");
+  NThreadsRequested = 0;
   }
 #endif
     
@@ -106,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   tictoc.tic();
-  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t);  
+  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t, NThreadsRequested );  
   tictoc.toc("Algorithm");
 
   tictoc.tic();
