@@ -43,9 +43,9 @@ function plotcomp(varargin)
 
 % LineColor and LineStyle set automatically
 optionNames = [
-    'LineColor        '        
+    'LineColor        '
     'LineWidth        '
-    'LineStyle        '    
+    'LineStyle        '
     'PunctureColor    '
     'PunctureEdgeColor'
     'PunctureSize     '
@@ -81,10 +81,9 @@ if ~isscalar(L)
         'Can only plot scalar loop, not array of loops.');
 end
 
-
-argin_index = 2; % The first argument needs to be the loop, so the 
+argin_index = 2; % The first argument needs to be the loop, so the
                    % second index will be the first property name
-                   
+
 val = 0; % We do not expect the next argument to be a value
 
 while argin_index <= nargin
@@ -132,9 +131,6 @@ if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
 if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 
 
-
-
-
 %% Get the coordinates of the loop, convert to crossing numbers.
 
 % Convert to double, since some scaling is done.
@@ -157,7 +153,7 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 % intersections above punctures
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
-N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
+N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 % cumulative sum of intersections, i.e., intersections at punctures
 % 1, then 1+2, then 1+2+3, ...
@@ -274,24 +270,24 @@ end
 % 'right' semicircles are D-shaped
 
 
-% Cycle through each puncture.  
+% Cycle through each puncture.
 for p = 1:n
-    
-  % Determine number of semicircles are at the present loop  
+
+  % Determine number of semicircles are at the present loop
   if p == n
     nl = M_coord(n); % this is equal to N_coord(n) ?
   else
     nl = b_coord(p);
   end
-  
+
   % Draw this number of semicircles taking into account the direction
   % (left/right) around the puncture.
   for sc = 1:abs(nl)
-    
+
     mycomp = components( keytohash([p, -sign(nl)*sc]) );
     mycolor = compcolors(mycomp,:);
     options.LineColor = mycolor;
-    
+
     joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
                 puncture_position, pgap, options );
   end
@@ -306,7 +302,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two neighboring punctures
   tojoin = M_coord(p)-nr;
   if tojoin > 0
@@ -325,17 +321,17 @@ for p = 1:n-1
       % and following (next) puncture that will be connected
       % idx_ > 0 -- vertex is above puncture
       % idx_ < 0 -- vertex is below puncture
-      idx_mine = nr + s; % index of the vertex 
+      idx_mine = nr + s; % index of the vertex
       idx_next = -(nl-s+tojoindown+1);
-      
+
       mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
-      
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
-      
-    end                                 
+
+    end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       % idx_mine and _next are indices of vertices of the current (mine)
@@ -344,11 +340,11 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-      
+
       mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
-      
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -365,7 +361,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two different punctures
   tojoin = N_coord(p)-nr;
   if tojoin > 0
@@ -386,11 +382,11 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-      
+
       mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
-      
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -402,11 +398,11 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-      
+
       mycomp = components( keytohash([p,idx_mine]) );
       mycolor = compcolors(mycomp,:);
       options.LineColor = mycolor;
-      
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -442,37 +438,38 @@ function joinpoints( mine, next, positions, gaps, options )
 % -- when mine(1) == next(1), semicircles are drawn. In this case
 %    it has to hold vertex numbers are the same as well, but with
 %    opposite signs. Semicircles are drawn in positive orientation,
-%    so mine(2) < next(2) will result in D-shaped line, whereas 
+%    so mine(2) < next(2) will result in D-shaped line, whereas
 %    mine(2) > next(2) will result in a C-shaped line.
-% 
 %
-% positions - n x 2 matrix of puncture positions 
+%
+% positions - n x 2 matrix of puncture positions
 % gaps      - 1 x n vector of gaps between loop lines at each puncture
 % options   - options data for line plotting
 %
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
 
+
   dp = next(1) - mine(1); % index distance between punctures
   assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
          'Requests one or two consecutive punctures');
-  
+
   assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
           'Vertex indices must be nonzero') ;
-  
+
   if dp == 0
     %% Draw semicircles
-    
+
     assert( abs(mine(2)) == abs(next(2)) && ...
             sign(mine(2)) ~= sign(next(2)),...
             'BRAIDLAB:loop:plot:joinpoints',...
             ['For semicircles, vertex indices must be equal value, ' ...
              'opposite sign']);
-    
+
     order = abs(mine(2));      % order of the loop from the puncture
-    rad = order*gaps(mine(1)); % semi circle radius    
+    rad = order*gaps(mine(1)); % semi circle radius
     cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
-    
+
     loop_curve_x = cirsign*linspace(0,rad,50);
     loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
     loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
@@ -480,7 +477,7 @@ function joinpoints( mine, next, positions, gaps, options )
          positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
          'Color', options.LineColor,'LineWidth',options.LineWidth, ...
          'LineStyle',options.LineStyle)
-    
+
   else
     %% Draw straight lines
     y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
@@ -491,5 +488,3 @@ function joinpoints( mine, next, positions, gaps, options )
   end
 
 end
-
-
