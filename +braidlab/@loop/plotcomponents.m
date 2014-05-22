@@ -17,10 +17,11 @@ function plotcomponents(varargin)
 %                      the punctures at integer values on the X-axis.
 %
 %   This is a method for the LOOP class.
-%   See also LOOP.
+%   See also LOOP, LOOP.GETGRAPH.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic,
+%                            Michael Allshouse
 %
 %   This file is part of Braidlab.
 %
