@@ -434,7 +434,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
-    [varargout] = colorbraiding(XY,t,proj,nthreads)
+    [varargout] = colorbraiding(XY,t,proj)
   end % methods block
 
 end % braid classdef

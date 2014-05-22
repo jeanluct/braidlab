@@ -84,7 +84,28 @@ if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
         all(BRAIDLAB_COLORBRAIDING_CPP) )
   warning('BRAIDLAB:braid:colorbraiding:cpp', ...
           'Invoking C++ version of colorbraiding.')
-  [gen, tcr] = colorbraiding_helper( XYtraj, t );
+
+  % detect number of threads to be used in C++ code
+  global BRAIDLAB_threads;
+  if ~( isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0 )
+    % use the global variable to set the number of threads    
+    Nthreads = ceil(BRAIDLAB_threads);
+    debugmsg(sprintf(['Number of threads set by BRAIDLAB_threads to: %d.'], Nthreads));    
+  else
+    % try to autodetect the optimal number of threads (== number of cores)    
+    try      
+      Nthreads = feature('numcores');
+      debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
+                        '"feature".'], Nthreads));
+    % 'feature' fails - auto set number of threads to 1    
+    catch me 
+      Nthreads = 1;
+      warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
+          ['Number of processor cores cannot be detected. Number of ' ...
+           'threads set to 1.'])
+    end
+  end
+  [gen, tcr] = colorbraiding_helper( XYtraj, t, Nthreads );
 else
   debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
           'to turn on C++ algorithm.']);

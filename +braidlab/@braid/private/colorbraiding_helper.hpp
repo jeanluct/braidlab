@@ -529,11 +529,16 @@ void PairCrossings::run( size_t NThreadsRequested ) {
   // ensure that we do not call more workers than we have tasks
   NThreadsRequested = min( NThreadsRequested, Nstrings );
 #else
-  NThreadsRequested = 0;
+  NThreadsRequested = 1;
 #endif
 
+  if ( NThreadsRequested == 0 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:numthreadsnotpositive",
+                      "Number of threads requested must be positive");
+  }
+
   // unthreaded version
-  if ( NThreadsRequested <= 1 ) {
+  if ( NThreadsRequested == 1 ) {
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
