@@ -78,12 +78,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 #ifdef BRAIDLAB_NOTHREADING
   if (NThreadsRequested > 1) {
-  mexWarnMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
-    "You requested multithreaded execution, but "
-    "either your compiler does not support it or "
-    "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
-    "Defaulting to single-threaded execution.");
-  NThreadsRequested = 0;
+    mexWarnMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
+                       "You requested multithreaded execution, but "
+                       "either your compiler does not support it or "
+                       "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
+                       "Defaulting to single-threaded execution.");
+    NThreadsRequested = 1;
+  }
+#else
+  if (NThreadsRequested < 1) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:numthreadsnotpositive",
+                      "Number of threads requested must be positive"
+                      " when running in multithreaded mode");
   }
 #endif
     
