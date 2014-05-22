@@ -1,0 +1,43 @@
+function checkvpi
+%CHECKVPI   Check if Variable Precision Intergers library is on path.
+%   CHECKVPI looks for the 'vpi' class on Matlab's path, and if it doesn't
+%   find it tries to add it to the path, assuming the default installation
+%   of braidlab.
+%
+%   VPI was written by John D'Errico.
+%   http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic.
+%   See braidlab/extern/VariablePrecisionIntegers/license.txt
+%
+%   See also VPI, BRAID.LOOPCOORDS, LOOP.LOOP.
+
+% <LICENSE
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%
+%   This file is part of Braidlab.
+%
+%   Braidlab is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   Braidlab is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+% LICENSE>
+
+% Check if variable precision integers library is available.
+if ~(exist('vpi') == 2)
+  % No VPI... try to add the path.
+  blbase = fileparts(fileparts(which('braidlab.checkvpi')));
+  addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
+  if ~(exist('vpi') == 2)
+    % For some reason this didn't work.
+    error('BRAIDLAB:checkvpi:novpi',...
+          ['vpi type not on path.  Try ''addpath ' ...
+           'extern/VariablePrecisionIntegers'' from braidlab folder.'])
+  end
+end
