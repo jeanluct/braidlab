@@ -310,6 +310,18 @@ classdef loop < matlab.mixin.CustomDisplay
       end
     end
 
+    function Nc = components(obj)
+    %COMPONENTS   Number of connected components of a loop.
+    %   NC = COMPONENTS(L) returns the number of connected components NC of
+    %   a loop L.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP, LOOP.GETGRAPH.
+
+      [~,Lp] = obj.getgraph;
+      [~,Nc] = laplaceToComponents(Lp);
+    end
+
   end % methods block
 
 
