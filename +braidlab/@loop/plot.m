@@ -15,12 +15,15 @@ function plot(varargin)
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
+%   Components         [true/false] Plot connected components in
+%                      different colors.  LineColor and LineStyle are ignored.
 %
 %   This is a method for the LOOP class.
 %   See also LOOP.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%                            Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -40,6 +43,7 @@ function plot(varargin)
 
 %% List of option names that can be used
 
+% With 'Components' option, LineColor and LineStyle set automatically.
 optionNames = [
     'LineColor        '
     'LineStyle        '
@@ -48,6 +52,7 @@ optionNames = [
     'PunctureEdgeColor'
     'PunctureSize     '
     'PuncturePositions'
+    'Components       '
     ];
 
 names = lower(optionNames);
@@ -79,9 +84,9 @@ if ~isscalar(L)
         'Can only plot scalar loop, not array of loops.');
 end
 
-argin_index = 2; % The first argument needs to be the loop, so the 
+argin_index = 2; % The first argument needs to be the loop, so the
                    % second index will be the first property name
-                   
+
 val = 0; % We do not expect the next argument to be a value
 
 while argin_index <= nargin
@@ -106,7 +111,7 @@ while argin_index <= nargin
       else
         matches = deblank(optionNames(j(1),:));
         for k = j(2:length(j))'
-          matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
+          matches = [matches ', ' deblank(optionNames(k,:))];
         end
         error('BRAIDLAB:loop:plot:ambiguouspropname', ...
               'Property %s is ambiguous; matches %s.',arg,matches);
@@ -122,11 +127,12 @@ while argin_index <= nargin
   argin_index = argin_index + 1;
 end
 
-if isempty(options.LineColor);  options.LineColor = 'b'; end
-if isempty(options.LineStyle);  options.LineStyle = '-'; end
-if isempty(options.LineWidth);  options.LineWidth = 2; end
+if isempty(options.LineColor); options.LineColor = 'b'; end
+if isempty(options.LineStyle); options.LineStyle = '-'; end
+if isempty(options.LineWidth); options.LineWidth = 2; end
 if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
 if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
+if isempty(options.Components); options.Components = false; end
 
 
 %% Get the coordinates of the loop, convert to crossing numbers.
@@ -151,7 +157,28 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 % intersections above punctures
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
-N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
+N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
+
+if options.Components
+  % cumulative sum of intersections, i.e., intersections at punctures
+  % 1, then 1+2, then 1+2+3, ...
+  T_sum = cumsum( M_coord + N_coord );
+
+  % initialize hash functions - conversion of puncture-intersection coordinates
+  % to linear index of vertices used in adjacency matrix
+  keytohash = @(PV)graph_keytohash(PV, M_coord, T_sum);
+
+  % compute components of the vertices
+  [~,Lp] = L.getgraph;
+  [components, Nc] = laplaceToComponents(Lp);
+
+  % assign a unique color to each component
+  if Nc > 1
+    compcolors = hsv(Nc);
+  else
+    compcolors = options.LineColor;
+  end
+end
 
 %% Set the position of the punctures
 
@@ -249,19 +276,25 @@ end
 % 'right' semicircles are D-shaped
 
 
-% Cycle through each puncture.  
+% Cycle through each puncture.
 for p = 1:n
-    
-  % Determine number of semicircles are at the present loop  
+
+  % Determine number of semicircles are at the present loop
   if p == n
     nl = M_coord(n); % this is equal to N_coord(n) ?
   else
     nl = b_coord(p);
   end
-  
+
   % Draw this number of semicircles taking into account the direction
   % (left/right) around the puncture.
   for sc = 1:abs(nl)
+    if options.Components
+      mycomp = components( keytohash([p, -sign(nl)*sc]) );
+      mycolor = compcolors(mycomp,:);
+      options.LineColor = mycolor;
+    end
+
     joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
                 puncture_position, pgap, options );
   end
@@ -276,7 +309,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two neighboring punctures
   tojoin = M_coord(p)-nr;
   if tojoin > 0
@@ -295,13 +328,19 @@ for p = 1:n-1
       % and following (next) puncture that will be connected
       % idx_ > 0 -- vertex is above puncture
       % idx_ < 0 -- vertex is below puncture
-      idx_mine = nr + s; % index of the vertex 
+      idx_mine = nr + s; % index of the vertex
       idx_next = -(nl-s+tojoindown+1);
-      
+
+      if options.Components
+        mycomp = components( keytohash([p,idx_mine]) );
+        mycolor = compcolors(mycomp,:);
+        options.LineColor = mycolor;
+      end
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
-      
-    end                                 
+
+    end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       % idx_mine and _next are indices of vertices of the current (mine)
@@ -310,6 +349,13 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
+
+      if options.Components
+        mycomp = components( keytohash([p,idx_mine]) );
+        mycolor = compcolors(mycomp,:);
+        options.LineColor = mycolor;
+      end
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -326,7 +372,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two different punctures
   tojoin = N_coord(p)-nr;
   if tojoin > 0
@@ -347,6 +393,13 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
+
+      if options.Components
+        mycomp = components( keytohash([p,idx_mine]) );
+        mycolor = compcolors(mycomp,:);
+        options.LineColor = mycolor;
+      end
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -358,6 +411,13 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
+
+      if options.Components
+        mycomp = components( keytohash([p,idx_mine]) );
+        mycolor = compcolors(mycomp,:);
+        options.LineColor = mycolor;
+      end
+
       joinpoints( [p,idx_mine], [p+1,idx_next], ...
                   puncture_position, pgap, options );
     end
@@ -393,55 +453,65 @@ function joinpoints( mine, next, positions, gaps, options )
 % -- when mine(1) == next(1), semicircles are drawn. In this case
 %    it has to hold vertex numbers are the same as well, but with
 %    opposite signs. Semicircles are drawn in positive orientation,
-%    so mine(2) < next(2) will result in D-shaped line, whereas 
+%    so mine(2) < next(2) will result in D-shaped line, whereas
 %    mine(2) > next(2) will result in a C-shaped line.
-% 
 %
-% positions - n x 2 matrix of puncture positions 
+%
+% positions - n x 2 matrix of puncture positions
 % gaps      - 1 x n vector of gaps between loop lines at each puncture
 % options   - options data for line plotting
 %
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
-  
+
 
   dp = next(1) - mine(1); % index distance between punctures
   assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
          'Requests one or two consecutive punctures');
-  
+
   assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
           'Vertex indices must be nonzero') ;
-  
+
   if dp == 0
     %% Draw semicircles
-    
+
     assert( abs(mine(2)) == abs(next(2)) && ...
             sign(mine(2)) ~= sign(next(2)),...
             'BRAIDLAB:loop:plot:joinpoints',...
             ['For semicircles, vertex indices must be equal value, ' ...
              'opposite sign']);
-    
+
     order = abs(mine(2));      % order of the loop from the puncture
-    rad = order*gaps(mine(1)); % semi circle radius    
+    rad = order*gaps(mine(1)); % semi circle radius
     cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
-    
+
     loop_curve_x = cirsign*linspace(0,rad,50);
     loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
     loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-         options.LineColor,'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
-    
+    if options.Components
+      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+           'Color', options.LineColor,'LineWidth',options.LineWidth, ...
+           'LineStyle',options.LineStyle)
+    else
+      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+           options.LineColor,'LineWidth',options.LineWidth, ...
+           'LineStyle',options.LineStyle)
+    end
+
   else
     %% Draw straight lines
     y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
     y2 = next(2)*gaps(next(1))+positions(next(1),2);
-    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-         options.LineColor, 'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
+    if options.Components
+      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+           'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
+           'LineStyle',options.LineStyle)
+    else
+      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+           options.LineColor, 'LineWidth',options.LineWidth, ...
+           'LineStyle',options.LineStyle)
+    end
   end
-
 end
-
-
