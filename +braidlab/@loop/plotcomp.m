@@ -1,9 +1,9 @@
-function plotcomponents(varargin)
-%PLOTCOMPONENTS   Plot a loop and color its components differently.
-%   PLOTCOMPONENTS(L) plots a representative of the equivalence class
+function plotcomp(varargin)
+%PLOTCOMP   Plot a loop and color its components differently.
+%   PLOTCOMP(L) plots a representative of the equivalence class
 %   defined by the loop L.
 %
-%   PLOTCOMPONENTS(L,'PROPNAME',VALUE,...) can be used to set property
+%   PLOTCOMP(L,'PROPNAME',VALUE,...) can be used to set property
 %   PROPNAME to VALUE.  Valid properties are
 %
 %   LineColor          -- Accepted as input but overriden by function
@@ -17,10 +17,11 @@ function plotcomponents(varargin)
 %                      the punctures at integer values on the X-axis.
 %
 %   This is a method for the LOOP class.
-%   See also LOOP.
+%   See also LOOP, LOOP.GETGRAPH.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic,
+%                            Michael Allshouse
 %
 %   This file is part of Braidlab.
 %
