@@ -37,7 +37,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   methods
 
-    function br = braid(b,secnd,third,fourth)
+    function br = braid(b,secnd,third)
     %BRAID   Construct a braid object.
     %   B = BRAID(W) creates a braid object B from a vector of generators W.
     %   B = BRAID(W,N) specifies the number of strings N of the braid group,
@@ -54,9 +54,6 @@ classdef braid < matlab.mixin.CustomDisplay
     %   B = BRAID(XY,PROJANG) uses a projection line with angle PROJANG (in
     %   radians) from the X axis to determine crossings.  The default is to
     %   project onto the X axis (PROJANG = 0).
-    %
-    %   B = BRAID(XY,...,'threads',NTHREADS) uses NTHREADS parallel
-    %   threads when computing the braid from data (default 1).
     %
     %   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
     %   object BC.
@@ -178,44 +175,14 @@ classdef braid < matlab.mixin.CustomDisplay
           end
         end
       elseif max(size(size(b))) == 3
-        % b is a 3-dim array of data.
-        nthreads = 1;
-        proj = 0;
-        if nargin > 4
+        % b is a 3-dim array of data.  secnd contains the projection angle.
+        if nargin > 2
           error('BRAIDLAB:braid:badarg','Too many input arguments.')
-        elseif nargin == 2
-          % Argument secnd gives the projection angle.
-          proj = secnd;
-        elseif nargin == 3
-          if ischar(secnd)
-            if strcmpi(secnd,'threads')
-              % Number of threads to use.
-              nthreads = third;
-            else
-              error('BRAIDLAB:braid:badarg', ...
-                    'Unknown string option ''%s''.',secnd)
-            end
-          else
-            error('BRAIDLAB:braid:badarg','Bad argument type.')
-          end
-        elseif nargin == 4
-          % Argument secnd gives the projection angle.
-          proj = secnd;
-          if ischar(third)
-            if strcmpi(third,'threads')
-              % Number of threads to use.
-              nthreads = fourth;
-            else
-              error('BRAIDLAB:braid:badarg', ...
-                    'Unknown string option ''%s''.',third)
-            end
-          else
-            error('BRAIDLAB:braid:badarg','Bad argument type.')
-          end
-        else
+        elseif nargin < 2
+          % Use a zero projection angle.
+          secnd = 0;
         end
-        % The input is an array of data.
-        br = braidlab.braid.colorbraiding(b,1:size(b,1),proj,nthreads);
+        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
