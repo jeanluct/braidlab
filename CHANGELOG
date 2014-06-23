@@ -36,8 +36,8 @@
   (GMP) to be installed, but it gives a massive speedup when working
   with VPI types.
 
-* New methods in the loop class: loop.plotcomp, loop.getgraph.
-  [*** document in guide ***]
+* New methods in the loop class: loop.components, loop.plot
+  'Components' option, loop.getgraph.  [*** document in guide ***]
 
 * braid.burau and braid.alexpoly can use the symbolic toolbox.
   alexpoly no longer centers the polynomial by default, since
