@@ -38,6 +38,11 @@ function [varargout] = cycle(b,varargin)
 %        1    -1    -1     0
 %        0     1     1     1
 %
+%   BUG: sometimes fails to find the limit cycle ("Failed to achieve
+%   convergence after 1000 iterations.  Try to increase MAXIT.").  If
+%   increasing MAXIT doesn't work, then this is likely a rare case such as
+%   the one discussed in issue #52.
+%
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LINACT, BRAID.CYCLEMAT.
 
