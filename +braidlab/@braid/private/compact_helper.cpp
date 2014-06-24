@@ -33,8 +33,8 @@
 #include <algorithm>
 #include "mex.h"
 
-#undef BRAIDLAB_BANGERT_RESTORE
-#undef BRAIDLAB_COMPACT_DEBUG
+// #undef BRAIDLAB_BANGERT_RESTORE
+// #undef BRAIDLAB_COMPACT_DEBUG
 
 extern void _main();
 
@@ -204,9 +204,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   std::cerr << "Entering compact_helper...\n";
 #endif
 
+  if ( nrhs < 1 )
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument", 
+                      "Not enough arguments");
+
   const mxArray *wA = prhs[0];
-  const int *w = (int *)mxGetData(wA); // wA contains int32's.
+
+  if ( !mxIsInt32(wA) && !mxIsEmpty(wA) )
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument", 
+                      "Argument should be a non-empty vector of int32");
+
+#ifdef BRAIDLAB_COMPACT_DEBUG
+  std::cerr << "Dimensions are " << mxGetM(wA) << "," << mxGetN(wA) << std::endl;
+#endif
+
   const mwSize N = max(mxGetM(wA),mxGetN(wA));
+  const int *w = (int *)mxGetData(wA); // wA contains int32's.
+
   int n = 1;
 
   // Convert braid word to vector.
