@@ -53,6 +53,10 @@ function c = compact(b)
 %  return;
 %end
 
-bc = compact_helper(b.word);
+if ~isempty(b.word) && length(b) > 1
+  bc = compact_helper(b.word);
+else
+  bc = b.word;
+end
 
 c = braidlab.braid(bc,b.n);
