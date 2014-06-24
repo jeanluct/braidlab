@@ -1,0 +1,130 @@
+------------------------------------------------------------------------
+2.0 [2014-xx-xx]
+
+* When constructing a braid object from data, the braid constructor
+  now uses a C++ MEX file (written by Marko Budisic) giving a big
+  speedup for large datasets.  Support for parallelization on multiple
+  cores is included.  The global variable BRAIDLAB_threads determines
+  the number of threads used.  [*** document in guide ***]
+
+* The braid constructor can make knot representatives, e.g.,
+  b=braid('8_3') for a braid representative for the third 8-crossing
+  knot.
+
+* braid.mtimes acting on loops has an optional output argument that
+  records the signs of the pos/neg operators in the update rules
+  (loopsigma).  This allows reconstruction of the matrix for the
+  effective linear action, as well as checking for limit cycles for
+  the action.
+
+* New methods in the braid class: braid.linact converts the optional
+  output from braid.mtimes (see above) to a matrix.  braid.cycle looks
+  for a limit cycle in the braid action on on loops.  braid.cyclemat
+  uses braid.cycle to return a matrix corresponding to this limit
+  cycle.  The largest eigenvalue of this matrix, normalized by the
+  period, gives the Perron root of the largest pseudo-Anosov
+  component(s).
+
+* loopsigma's C++ helper functions can now handle int32, int64, and
+  single, in addition to double.  This makes checking braid equality
+  and triviality much faster, unless overflow occurs and VPI has to be
+  used.
+
+* loopsigma's C++ helper functions can also handle VPI (Variable
+  Precision Integers) if braidlab is compiled with "make
+  BRAIDLAB_USE_GMP=1".  This requires the GNU MultiPrecision library
+  (GMP) to be installed, but it gives a massive speedup when working
+  with VPI types.
+
+* New methods in the loop class: loop.plotcomp, loop.getgraph.
+  [*** document in guide ***]
+
+* braid.burau and braid.alexpoly can use the symbolic toolbox.
+  alexpoly no longer centers the polynomial by default, since
+  centering cannot always be used with a laurpoly object, and can
+  never be used for integral types.  Use option 'centered'.
+
+* Many other small bugfixes and improvements.
+
+Several improvements to the method braid.entropy:
+
+* It has a C MEX helper function and is much faster.  It no longer
+  checks if the braid is trivial, which avoids overflow and speeds up
+  the function.
+
+* Its convergence has been greatly improved (see next item for more
+  details).  With enough iterations, machine precision can usually be
+  achieved.
+
+* Its optional second return argument has changed from a list of
+  iterates to the final generalized eigenvector.  The reason is that
+  the internal algorithm has changed: the Dynnikov coordinates get
+  renormalized at every step, much like the power iteration method for
+  finding the largest eigenvalue of a matrix.  A consequence of this
+  is that it is no longer natural to store the iterates.  This
+  shouldn't affect things very much, since this optional argument was
+  not used widely.
+
+------------------------------------------------------------------------
+1.0.5 [2014-01-31]
+
+* Constructors for Rupert Venzke's psi-family of low-entropy braids.
+
+* Fix bug involving single-trajectory dataset.
+
+* Plot empty braids (why not...).
+
+* braid.compact no longer checks for trivial braid, since this can
+  take a lot of time (more than the compact itself).
+
+* Unit test for entropy added to testsuite.
+
+* Lighter distribution (just compiled files).
+
+* A few more small bugfixes.
+
+------------------------------------------------------------------------
+1.0.4 [2014-01-03]
+
+* The databraid class records crossing times of a dataset.
+
+* Added an example section on taffy pullers to braidlab guide.
+
+* bugfix in testsuite.
+
+------------------------------------------------------------------------
+1.0.3 [2013-12-20]
+
+* The braidlab guide has been updated and expanded, and now has a
+  table of contents and a detailed index.
+
+* New methods in braid class: 'alexpoly' returns the Alexander
+  polynomial.  'burau' can now construct a matrix of Laurent
+  polynomials (wavelet toolbox required).  'tensor' is the tensor
+  product of braids.
+
+* Big speedup in creating braids from data, due to improved safety
+  checks on the particle trajectories.
+
+------------------------------------------------------------------------
+1.0.2 [2013-12-13]
+
+* loopTest.m in testsuite.
+
+* Clean up files.  Eliminate subrepos.
+
+* First public release.
+
+------------------------------------------------------------------------
+1.0.1 [2013-12-12]
+
+* Check for overflow of loop coordinates.
+
+* Several bugfixes.
+
+* Improved support for VPI (Variable Precision Integers).
+
+------------------------------------------------------------------------
+1.0 [2013-10-02]
+
+First release of braidlab.
