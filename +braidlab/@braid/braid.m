@@ -183,6 +183,8 @@ classdef braid < matlab.mixin.CustomDisplay
           secnd = 0;
         end
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
+        % Make sure the empty word is 0 by 0.
+        if isempty(br.word), br.word = []; end
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
