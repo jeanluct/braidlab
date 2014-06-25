@@ -183,8 +183,6 @@ classdef braid < matlab.mixin.CustomDisplay
           secnd = 0;
         end
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
-        % Make sure the empty word is 0 by 0.
-        if isempty(br.word), br.word = []; end
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
@@ -231,6 +229,8 @@ classdef braid < matlab.mixin.CustomDisplay
     % Make sure it's an int32, internally.
     function obj = set.word(obj,value)
       obj.word = int32(value);
+      % Make sure the empty word is 0 by 0.
+      if isempty(obj.word), obj.word = []; end
       % Raise n if necessary, and convert to double (eventually make int32?).
       obj.n = double(max(obj.n,max(abs(obj.word))+1));
     end
