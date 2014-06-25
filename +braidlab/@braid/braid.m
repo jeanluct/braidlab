@@ -230,7 +230,7 @@ classdef braid < matlab.mixin.CustomDisplay
     function obj = set.word(obj,value)
       obj.word = int32(value);
       % Make sure the empty word is 0 by 0.
-      if isempty(obj.word), obj.word = []; end
+      if isempty(obj.word), obj.word = int32([]); end
       % Raise n if necessary, and convert to double (eventually make int32?).
       obj.n = double(max(obj.n,max(abs(obj.word))+1));
     end
