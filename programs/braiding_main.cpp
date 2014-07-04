@@ -45,11 +45,11 @@ int main()
   list<sint16>::iterator itw, itg;
 
   ArtinBraid B=ArtinBraid(1), B1=ArtinBraid(1),
-    B2=ArtinBraid(1), B3=ArtinBraid(1), C=ArtinBraid(1);
+    B2=ArtinBraid(1), B3=ArtinBraid(1), C=ArtinBraid(1); 
   list<ArtinBraid> sss, traj, Cent, vertices, barrows;
   list<ArtinBraid>::iterator it, itb, itb2;
 
-  list<list<ArtinBraid> > uss;
+  list<list<ArtinBraid> > uss, sc;
   list<list<ArtinBraid> >::iterator ituss, ituss2;
 
   list<ArtinFactor> Min, arrows;
@@ -76,11 +76,13 @@ int main()
 	   << endl
 	   << "v: Least Common Multiple     ^: Greatest Common Divisor " << endl
 	   << endl
-	   << "c: Conjugacy Test            z: Centralizer             " << endl
+	   << "s: Super Summit Set          z: Centralizer             " << endl
 	   << endl
-	   << "s: Super Summit Set          u: Ultra Summit Set        " << endl
+	   << "e: Conjugacy Test            u: Ultra Summit Set        " << endl
 	   << endl
-	   << "a: Ask for Powers (On/Off)   q: Quit             " << endl;
+       << "t: Set of Sliding Circuits   a: Ask for Powers (On/Off)   " << endl
+       << endl
+       << "q: Quit             " << endl;
 
       while(1)
 	{
@@ -362,7 +364,7 @@ int main()
 
 	  //////////////////////////////////////////////////////////
 
-	  if(c=='c')
+	  if(c=='e')
 	    {
 	      n=ReadIndex();
 	      word=ReadWord(n);
@@ -439,6 +441,163 @@ int main()
 	    }
 
 	  /////////////////////////////////////////////////////////////
+
+if(c=='d')
+	    {
+	      n=ReadIndex();
+	      word=ReadWord(n);
+	      if(p)
+		power=ReadPower();
+
+	      B1=ArtinBraid(n);
+	      B1=WordToBraid(word,n);
+	      if(p && power!=1)
+		B1=RaisePower(B1,power);
+
+	      B1.MakeLCF();
+
+	      word2=ReadWord(n);
+	      if(p)
+		power2=ReadPower();
+
+	      B2=ArtinBraid(n);
+	      B2=WordToBraid(word2,n);
+	      if(p && power2!=1)
+		B2=RaisePower(B2,power2);
+
+	      B2.MakeLCF();
+
+	      file=ReadFileName();
+
+	      C=ArtinBraid(n);
+
+	      conj=AreConjugateSC(B1,B2,C);
+
+	      if(conj)
+		{
+		  cout << endl << "These braids are conjugate." << endl << endl
+		       << "A conjugating braid is: ";
+		  PrintBraidWord(C);
+		  cout << endl;
+		}
+	      else
+		{
+		  cout << endl << "These braids are not conjugate." << endl;
+		}
+
+	      f.open(file);
+
+	      f << "The braids on " << n << " strands" << endl << endl;
+	      f.close();
+	      PrintWord(word,n,power,file);
+	      f.open(file,ios::app);
+
+	      f << endl << endl << "and" << endl << endl;
+
+	      f.close();
+	      PrintWord(word2,n,power2,file);
+	      f.open(file,ios::app);
+
+
+
+	      f << endl << endl;
+
+	      if(conj)
+		{
+		  f << "are conjugate." << endl << endl
+		    << "A conjugating braid is" << endl << endl;
+		  f.close();
+		  PrintBraidWord(C,file);
+		}
+	      else
+		{
+		  f << "are not conjugate.";
+		  f.close();
+		}
+
+	      word.clear();
+	    }
+
+	  /////////////////////////////////////////////////////////////
+if(c=='c')
+	    {
+	      n=ReadIndex();
+	      word=ReadWord(n);
+	      if(p)
+		power=ReadPower();
+
+	      B1=ArtinBraid(n);
+	      B1=WordToBraid(word,n);
+	      if(p && power!=1)
+		B1=RaisePower(B1,power);
+
+	      B1.MakeLCF();
+
+	      word2=ReadWord(n);
+	      if(p)
+		power2=ReadPower();
+
+	      B2=ArtinBraid(n);
+	      B2=WordToBraid(word2,n);
+	      if(p && power2!=1)
+		B2=RaisePower(B2,power2);
+
+	      B2.MakeLCF();
+
+	      file=ReadFileName();
+
+	      C=ArtinBraid(n);
+
+	      conj=AreConjugateSC2(B1,B2,C);
+
+	      if(conj)
+		{
+		  cout << endl << "These braids are conjugate." << endl << endl
+		       << "A conjugating braid is: ";
+		  PrintBraidWord(C);
+		  cout << endl;
+		}
+	      else
+		{
+		  cout << endl << "These braids are not conjugate." << endl;
+		}
+
+	      f.open(file);
+
+	      f << "The braids on " << n << " strands" << endl << endl;
+	      f.close();
+	      PrintWord(word,n,power,file);
+	      f.open(file,ios::app);
+
+	      f << endl << endl << "and" << endl << endl;
+
+	      f.close();
+	      PrintWord(word2,n,power2,file);
+	      f.open(file,ios::app);
+
+
+
+	      f << endl << endl;
+
+	      if(conj)
+		{
+		  f << "are conjugate." << endl << endl
+		    << "A conjugating braid is" << endl << endl;
+		  f.close();
+		  PrintBraidWord(C,file);
+		}
+	      else
+		{
+		  f << "are not conjugate.";
+		  f.close();
+		}
+
+	      word.clear();
+	    }
+
+	  /////////////////////////////////////////////////////////////
+
+
 
 	  if(c=='z')
 	    {
@@ -587,6 +746,35 @@ int main()
 
 	      word.clear();
 	      uss.clear();
+	      delete[] file;
+	    }
+
+	  ////////////////////////////////////////////////////////////////
+
+	  if(c=='t')
+	    {
+	      n=ReadIndex();
+	      word=ReadWord(n);
+	      if(p)
+		power=ReadPower();
+	      file=ReadFileName();
+
+	      B=ArtinBraid(n);
+	      B=WordToBraid(word,n);
+
+	      if(p && power!=1)
+		B=RaisePower(B,power);
+
+	      B.MakeLCF();
+
+	      sc=SC(B);
+
+	      type=ThurstonType(sc);
+
+	      PrintSC(sc,word,n,power,file,type);
+
+	      word.clear();
+	      sc.clear();
 	      delete[] file;
 	    }
 
