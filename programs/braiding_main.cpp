@@ -45,7 +45,7 @@ int main()
   list<sint16>::iterator itw, itg;
 
   ArtinBraid B=ArtinBraid(1), B1=ArtinBraid(1),
-    B2=ArtinBraid(1), B3=ArtinBraid(1), C=ArtinBraid(1); 
+    B2=ArtinBraid(1), B3=ArtinBraid(1), C=ArtinBraid(1);
   list<ArtinBraid> sss, traj, Cent, vertices, barrows;
   list<ArtinBraid>::iterator it, itb, itb2;
 
