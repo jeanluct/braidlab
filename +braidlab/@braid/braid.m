@@ -400,7 +400,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   this length, often dramatically when B is created from data.
     %
     %   This is a method for the BRAID class.
-    %   See also BRAID, COMPACT.
+    %   See also BRAID, BRAID.COMPACT.
       l = length(b.word);
     end
     
@@ -417,7 +417,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   sum(C) is equal to length of the braid.
     %
     %   This is a method for the BRAID class.
-    %   See also BRAID, LENGTH.
+    %   See also BRAID, BRAID.LENGTH.
 
       highestIndex = (b.n-1);
       i = double([-highestIndex : highestIndex]);
