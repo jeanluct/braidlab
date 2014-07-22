@@ -296,7 +296,6 @@ classdef braid < matlab.mixin.CustomDisplay
 
     function [varargout] = mtimes(b1,b2)
     %MTIMES   Multiply two braids together or act on a loop with a braid.
-    %
     %   C = B1*B2, where B1 and B2 are braid objects, return the product of
     %   the two braids.  The product is the group operation in the braid
     %   group (braid concatenation).
@@ -335,7 +334,6 @@ classdef braid < matlab.mixin.CustomDisplay
 
     function bm = mpower(b,m)
     %MPOWER   Raise a braid to some positive or negative power.
-    %
     %   C = B^N, where B is a braid and N is a positive integer, returns the
     %   Nth power of the braid B, C = B*B*...*B (N times).
     %
@@ -406,7 +404,6 @@ classdef braid < matlab.mixin.CustomDisplay
     
     function [c,i] = gencount(b)
     %GENCOUNT Count number of ocurrences of each generator.
-    %
     %   [C,I] = GENCOUNT(B) returns a vector C containing generator
     %   distribution, i.e., number of occurrences of each braid generator
     %   within the braid. Vector I contains corresponding generator
