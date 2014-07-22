@@ -43,6 +43,10 @@ import braidlab.debugmsg
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
 global BRAIDLAB_COLORBRAIDING_CPP
 
+if any(isnan(XY) | isinf(XY))
+  error('BRAIDLAB:braid:colorbraiding:badarg','Data contains NaNs or Infs.')
+end
+
 debugmsg(['colorbraiding Part 1: Initialize parameters for crossing' ...
           ' analysis']);
 tic
