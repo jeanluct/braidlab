@@ -144,7 +144,6 @@ classdef databraid < braidlab.braid
 
     function b12 = mtimes(b1,b2)
     %MTIMES   Multiply two databraids together or act on a loop by a databraid.
-    %
     %   C = B1*B2, where B1 and B2 are braid objects, return the product of
     %   the two databraids.  This is only well-defined if the crossing
     %   times of B1 are all earlier than those of B2.
