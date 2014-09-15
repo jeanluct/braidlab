@@ -169,7 +169,7 @@ classdef databraid < braidlab.braid
     end
 
     function bs = subbraid(b,s)
-      ;
+        ;
       % Do not put comments above the first line of code, so the help
       % message from braid.subbraid is displayed.
 
@@ -230,7 +230,38 @@ classdef databraid < braidlab.braid
         [c,shorter] = canceladj(c);
       end
     end
-
+    
+    function bt = trunc(b, interval)
+    %TRUNC Truncate databraid by choosing crossings from a time subinterval.
+    %
+    %   BT = TRUNC(b, interval) Truncates the braid generators to those
+    %   whose crossing times tcross lie in the interval 
+    %   interval(1) <= tcross <= interval(2). 
+    %   If interval is a single number, then selected crossings will be 
+    %   tcross <= interval.
+    
+    bt = b;    
+    if nargin < 2 || ~isnumeric(interval)
+        error('BRAIDLAB:databraid:badarg','Not enough input arguments.')
+    end    
+    
+    if isempty(interval) || ...
+            numel(interval) < 1 || ... 
+            numel(interval) > 2
+        error('BRAIDLAB:databraid:badarg','Interval has to be a non-empty 1 or 2 element vector.')
+    end    
+        
+    % select the desired crossing times
+    if numel(interval) == 1
+        sel = bt.tcross <= interval;
+    else
+        sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
+    end
+    
+    bt.tcross = bt.tcross(sel);
+    bt.word = bt.word(sel);    
+    end
+    
   end % methods block
 
   % Some operations are not appropriate for databraids, since they break
