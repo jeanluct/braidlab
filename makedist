@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Script to tar up the braidlab distribution files.
+#   exclude LCS toolbox for now
+
+TARCMD=tar
+
+# release version:
+VERSION=`hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g'`
+BLNAME=braidlab-${VERSION}
+
+# test for compatibility of the mex command
+if [[ -z $(mex -help | grep -n MATLAB) ]]; then
+    echo $0": command 'mex' on search path is not Matlab's MEX compiler."
+    echo "It is most likely a LaTeX-related command (which you probably" \
+	"don't need unless you speak Polish)."
+    echo "Please make MEX compiler available in your execution path."
+    exit 1
+fi
+
+# build the braidlab user's guide
+cd doc
+make braidlab_guide.pdf
+cd ..
+
+# Make 32 and 64 bit, cross-compile for Mac, Windows (we wish).
+# Or compile separately and add to subfolders.
+make all
+
+rm -f ${BLNAME}.tar.gz ${BLNAME}.zip
+
+# Modify tar flags according to GNU or BSD tar.
+if [[ $($TARCMD --version | grep -n GNU) ]]; then
+    TARFLAGS=(--transform "s,^,${BLNAME}/,")
+else
+    if [[ $($TARCMD --version | grep -n bsd) ]]; then
+	TARFLAGS=(-s ",^,${BLNAME}/,")
+    else
+	echo $0": unknown 'tar' command."
+	exit 1
+    fi
+fi
+${TARCMD} cvzf ${BLNAME}.tar.gz "${TARFLAGS[@]}" \
+    --exclude='+braidlab/+lcs' \
+    --exclude='*.c' --exclude='*.cpp' --exclude='Makefile' \
+    +braidlab \
+    README.md \
+    CHANGELOG \
+    COPYING \
+    LICENSE \
+    testsuite \
+    extern/README \
+    extern/VariablePrecisionIntegers \
+    doc/braidlab_guide.pdf \
+    doc/examples
+
+# Also make a zip.
+mkdir tmp-zip
+cd tmp-zip
+${TARCMD} xvzf ../${BLNAME}.tar.gz
+zip -r ../${BLNAME}.zip ${BLNAME}
+cd ..
+rm -rf tmp-zip
