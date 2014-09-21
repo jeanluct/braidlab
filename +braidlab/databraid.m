@@ -63,7 +63,8 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also DATABRAID, BRAID, BRAID.BRAID.
       if nargin < 1
-        error('BRAIDLAB:databraid:badarg','Not enough input arguments.')
+        error('BRAIDLAB:databraid:databraid:badarg', ...
+              'Not enough input arguments.')
       elseif isa(XY,'braidlab.braid')
         br.word = XY.word;
         br.n = XY.n;
@@ -101,7 +102,8 @@ classdef databraid < braidlab.braid
         proj = third;
       end
       if nargin > 3
-        error('BRAIDLAB:databraid:badarg','Too many input arguments.')
+        error('BRAIDLAB:databraid:databraid:badarg', ...
+              'Too many input arguments.')
       end
       [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
       br.word = b.word;
@@ -230,7 +232,7 @@ classdef databraid < braidlab.braid
       end
     end
 
-    function bt = trunc(b, interval)
+    function bt = trunc(b,interval)
     %TRUNC   Truncate databraid by choosing crossings from a time subinterval.
     %
     %   BT = TRUNC(B,INTERVAL) Truncates the braid generators to those

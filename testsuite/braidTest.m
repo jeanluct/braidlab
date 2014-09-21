@@ -50,6 +50,10 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(b.word,int32([1 -2 3 5]));
       testCase.verifyEqual(b.n,7);
 
+      % Zero is not a valid generator value.
+      testCase.verifyError(@() braidlab.braid([0 0 1]), ...
+                           'BRAIDLAB:braid:setword:badarg');
+
       b = braidlab.braid('halftwist',5);
       testCase.verifyEqual(b.word,int32([4 3 2 1 4 3 2 4 3 4]));
 
@@ -58,16 +62,16 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(b,braidlab.braid([-2 2 -3 -2 -3 -1 -4]));
 
       testCase.verifyError(@() braidlab.braid('garbage'), ...
-                           'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:braid:badarg');
 
       b = braidlab.braid('HironakaKin',3,1);
       testCase.verifyEqual(b,braidlab.braid([1 2 3 3 2 1 1 2 3 4]));
 
       testCase.verifyError(@() braidlab.braid('HironakaKin',4), ...
-                           'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:braid:badarg');
 
       testCase.verifyError(@() braidlab.braid('VenzkePsi',4), ...
-                           'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:braid:badarg');
 
       b = braidlab.braid('VenzkePsi',5);
       testCase.verifyEqual(b,braidlab.braid([4 3 2 1 4 3 2 1 -1 -2]));
@@ -76,12 +80,12 @@ classdef braidTest < matlab.unittest.TestCase
 
       % Too many input arguments for creating a braid from data.
       testCase.verifyError(@() braidlab.braid(zeros(3,2,4),1,1), ...
-                           'BRAIDLAB:braid:badarg');
+                           'BRAIDLAB:braid:braid:badarg');
 
       % Creating a braid from a two-dimensional array is assumed to be a
       % single-particle dataset.  Print a warning, though.
       testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
-                             'BRAIDLAB:braid:onetraj');
+                             'BRAIDLAB:braid:braid:onetraj');
 
       % Two particles have a coincident position.
       XY = zeros(4,2,2);

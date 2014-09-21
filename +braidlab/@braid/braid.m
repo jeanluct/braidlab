@@ -123,7 +123,8 @@ classdef braid < matlab.mixin.CustomDisplay
           m = secnd;
           if nargin < 3
             if m < 5
-              error('BRAIDLAB:braid:badarg','Need at least five strings.')
+              error('BRAIDLAB:braid:braid:badarg', ...
+                    'Need at least five strings.')
             end
             if mod(m,2) == 1
               n = (m+1)/2;
@@ -142,7 +143,7 @@ classdef braid < matlab.mixin.CustomDisplay
           % See page 1 of Venzke's thesis.
           n = secnd;
           if n < 5
-            error('BRAIDLAB:braid:badarg','Need at least five strings.')
+            error('BRAIDLAB:braid:braid:badarg','Need at least five strings.')
           end
           br.n = n;
           if n == 6
@@ -171,13 +172,13 @@ classdef braid < matlab.mixin.CustomDisplay
           try
             br = knot2braid(b);
           catch err
-            error('BRAIDLAB:braid:badarg','Unrecognized string argument.')
+            error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
       elseif max(size(size(b))) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
-          error('BRAIDLAB:braid:badarg','Too many input arguments.')
+          error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
         elseif nargin < 2
           % Use a zero projection angle.
           secnd = 0;
@@ -190,13 +191,13 @@ classdef braid < matlab.mixin.CustomDisplay
           % create several braids at once (which is not currently
           % allowed).  By default, print a warning.
           if size(b,2) == 2
-            warning('BRAIDLAB:braid:onetraj', ...
+            warning('BRAIDLAB:braid:braid:onetraj', ...
                     [ 'Creating trivial braid from single ' ...
                       'trajectory (did you mean that?).' ])
             br.word = [];
             br.n = 1;
           else
-            error('BRAIDLAB:braid:badarg','Bad array size.')
+            error('BRAIDLAB:braid:braid:badarg','Bad array size.')
           end
         else
           % Store word as row vector.
@@ -215,11 +216,11 @@ classdef braid < matlab.mixin.CustomDisplay
 
     function obj = set.n(obj,value)
       if value < 1
-        error('BRAIDLAB:braid:setn','Need at least one string.')
+        error('BRAIDLAB:braid:setn:badarg','Need at least one string.')
       end
       if ~isempty(obj.word)
         if value < max(abs(obj.word))+1
-          error('BRAIDLAB:braid:setn',...
+          error('BRAIDLAB:braid:setn:badarg', ...
                 'Too few strings for generators.')
         end
       end
@@ -228,6 +229,9 @@ classdef braid < matlab.mixin.CustomDisplay
 
     % Make sure it's an int32, internally.
     function obj = set.word(obj,value)
+      if ~all(value)
+        error('BRAIDLAB:braid:setword:badarg','Generators cannot be zero.')
+      end
       obj.word = int32(value);
       % Make sure the empty word is 0 by 0.
       if isempty(obj.word), obj.word = int32([]); end
