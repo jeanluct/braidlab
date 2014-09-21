@@ -92,17 +92,18 @@ if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
   % detect number of threads to be used in C++ code
   global BRAIDLAB_threads;
   if ~( isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0 )
-    % use the global variable to set the number of threads    
+    % use the global variable to set the number of threads
     Nthreads = ceil(BRAIDLAB_threads);
-    debugmsg(sprintf(['Number of threads set by BRAIDLAB_threads to: %d.'], Nthreads));    
+    debugmsg(sprintf(['Number of threads set by BRAIDLAB_threads to: %d.'],...
+                     Nthreads));
   else
-    % try to autodetect the optimal number of threads (== number of cores)    
-    try      
+    % try to autodetect the optimal number of threads (== number of cores)
+    try
       Nthreads = feature('numcores');
       debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
                         '"feature".'], Nthreads));
-    % 'feature' fails - auto set number of threads to 1    
-    catch me 
+    % 'feature' fails - auto set number of threads to 1
+    catch me
       Nthreads = 1;
       warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
           ['Number of processor cores cannot be detected. Number of ' ...
@@ -114,7 +115,7 @@ else
   debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
           'to turn on C++ algorithm.']);
   [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
-end 
+end
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
@@ -175,16 +176,16 @@ for I = 1:n
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
     % % uses absolute precision to test equalty
-    % nearcoinc = find(abs(dXtraj) < 10*eps); 
-    
+    % nearcoinc = find(abs(dXtraj) < 10*eps);
+
     % uses relative precision to test equality (same as C++ code)
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
-    
+
     if ~isempty(nearcoinc)
       dYtraj = Ytraj1(nearcoinc) - Ytraj2(nearcoinc);
       %      % uses absolute precision to test equality
       %      if any(abs(dYtraj) < 10*eps)
-      % uses relative precision to test equality (same as C++ code)        
+      % uses relative precision to test equality (same as C++ code)
       if any( areEqual(Ytraj1(nearcoinc), Ytraj2(nearcoinc), 10) )
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles',...
               'Coincident particles: braid not defined.')
@@ -222,7 +223,8 @@ end
 
 
 
-debugmsg('colorbraiding Part 3: Sorting the pair crossings into the generator sequence');
+debugmsg(['colorbraiding Part 3: ' ...
+          'Sorting the pair crossings into the generator sequence']);
 
 % At this point CROSS_CELL contains the crossing times and directions for
 % string pairings which are initially in the order I,J along the projection
