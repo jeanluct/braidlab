@@ -243,19 +243,19 @@ classdef databraid < braidlab.braid
 
       bt = b;
       if nargin < 2 || ~isnumeric(interval)
-	error('BRAIDLAB:databraid:trunc:badarg','Not enough input arguments.')
+        error('BRAIDLAB:databraid:trunc:badarg','Not enough input arguments.')
       end
 
       if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
-	error('BRAIDLAB:databraid:trunc:badarg',...
-	      'Interval has to be a non-empty 1 or 2 element vector.')
+        error('BRAIDLAB:databraid:trunc:badarg',...
+              'Interval has to be a non-empty 1 or 2 element vector.')
       end
 
       % select the desired crossing times
       if numel(interval) == 1
-	sel = bt.tcross <= interval;
+        sel = bt.tcross <= interval;
       else
-	sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
+        sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
       end
 
       bt.tcross = bt.tcross(sel);
