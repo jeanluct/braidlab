@@ -21,6 +21,12 @@ function [varargout] = entropy(b,tol,maxit,nconvreq)
 %   convergence is not checked for.  The final value of the entropy at
 %   the end of iteration is returned.
 %
+%   Note that the "length" of the loop is not computed using LOOP.MINLENGTH
+%   or LOOP.INTAXIS.  Rather, the L^2 norm of the Dynnikov coordinates is
+%   used.  This is more expedient and doesn't change the growth rate, but
+%   may lead to differences between BRAID.ENTROPY and the normalized output
+%   of BRAID.COMPLEXITY when a small number of iterations is used.
+%
 %   ENTR = ENTROPY(B,TOL,MAXIT,NCONV) or ENTROPY(B,TOL,[],NCONV) demands
 %   that the tolerance TOL be achieved NCONV consecutive times (default 3).
 %   For low-entropy braids, achieving TOL a few times does not guarantee TOL
