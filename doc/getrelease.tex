@@ -2,5 +2,4 @@
 % 'release-1.3.4.5'.
 %
 % Need to run 'pdflatex -shell-escape' to allow shell commands.
-
 \input{"| hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g'"}
