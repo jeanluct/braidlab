@@ -401,15 +401,15 @@ classdef braid < matlab.mixin.CustomDisplay
     %   See also BRAID, BRAID.COMPACT.
       l = length(b.word);
     end
-    
+
     function [c,i] = gencount(b)
-    %GENCOUNT Count number of ocurrences of each generator.
-    %   [C,I] = GENCOUNT(B) returns a vector C containing generator
-    %   distribution, i.e., number of occurrences of each braid generator
-    %   within the braid. Vector I contains corresponding generator
-    %   indices. In other words C(k) counts the number of times generator
-    %   sigma_{I(k)} occurs in the braid.  Plotting I vs. C plots the
-    %   generator distribution.
+    %GENCOUNT   Count number of occurrences of each generator in a braid.
+    %   [C,I] = GENCOUNT(B) returns a vector C containing the generator
+    %   distribution of B, i.e., the number of occurrences of each braid
+    %   generator within the braid B.  The vector I contains the
+    %   corresponding generator indices.  In other words C(k) counts the
+    %   number of times the generator sigma_{I(k)} occurs in the braid.
+    %   Plotting I vs. C plots the generator distribution.
     %
     %   sum(C) is equal to length of the braid.
     %
