@@ -18,7 +18,7 @@ See the [*braidlab* user's guide][14].
 
 ### support
 
-The development of *braidlab* was supported by the [US National Science Foundation][15], under grants DMS-0806821 and CMMI-1233935.
+The development of *braidlab* was supported by the [US National Science Foundation][15], under grants [DMS-0806821][16] and [CMMI-1233935][17].
 
 [1]: http://www.math.wisc.edu/~jeanluc/
 [2]: http://www.mathworks.com/products/matlab/
@@ -35,3 +35,5 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
 [14]: http://bitbucket.org/jeanluc/braidlab/raw/tip/doc/braidlab_guide.pdf
 [15]: http://www.nsf.gov
+[16]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
+[17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
