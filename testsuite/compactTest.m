@@ -1,5 +1,5 @@
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -24,10 +24,10 @@ classdef compactTest < matlab.unittest.TestCase
       % Verify that compacting the trivial braid returns the trivial braid.
       id = braidlab.braid([],5);
       testCase.verifyTrue(isempty(id.compact.word));
-      
+
       % Verify that compacting the trivial braid constructed from a
       % trajectory returns the trivial braid.
-      id = braidlab.braid(cat(3, [0,0], [1,1]),5);
+      id = braidlab.braid(cat(3,[0 0],[1 1]),5);
       testCase.verifyTrue(isempty(id.compact.word));
 
       % Verify that compacting gives the trivial braid in simple cases.

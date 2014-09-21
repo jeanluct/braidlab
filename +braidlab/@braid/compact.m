@@ -25,7 +25,7 @@ function c = compact(b)
 %   See also BRAID.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %
