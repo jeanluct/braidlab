@@ -17,18 +17,20 @@
 #   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 # LICENSE>
 
-PDFFILES = braidlab_guide.pdf
+LATEXCMD = pdflatex -shell-escape
+MASTERFILE = braidlab_guide
+PDFFILES = $(MASTERFILE).pdf
 
 # Build everything.
 all: $(PDFFILES)
 
-braidlab_guide.pdf: braidlab_guide.tex braidlab_guide.bib
-	@pdflatex braidlab_guide.tex
-	@bibtex braidlab_guide
-	@pdflatex braidlab_guide.tex
-	@makeindex braidlab_guide
-	@pdflatex braidlab_guide.tex
-	@pdflatex braidlab_guide.tex
+$(MASTERFILE).pdf: $(MASTERFILE).tex $(MASTERFILE).bib
+	@$(LATEXCMD) $(MASTERFILE).tex
+	@bibtex $(MASTERFILE)
+	@$(LATEXCMD) $(MASTERFILE).tex
+	@makeindex $(MASTERFILE)
+	@$(LATEXCMD) $(MASTERFILE).tex
+	@$(LATEXCMD) $(MASTERFILE).tex
 
 clean:
-	rmtex braidlab_guide
+	rmtex $(MASTERFILE)
