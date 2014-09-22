@@ -21,6 +21,8 @@ LATEXCMD = pdflatex -shell-escape
 MASTERFILE = braidlab_guide
 PDFFILES = $(MASTERFILE).pdf
 
+.PHONY: all clean distclean
+
 # Build everything.
 all: $(PDFFILES)
 
@@ -31,6 +33,15 @@ $(MASTERFILE).pdf: $(MASTERFILE).tex $(MASTERFILE).bib
 	@makeindex $(MASTERFILE)
 	@$(LATEXCMD) $(MASTERFILE).tex
 	@$(LATEXCMD) $(MASTERFILE).tex
+	@$(LATEXCMD) $(MASTERFILE).tex
 
 clean:
-	rmtex $(MASTERFILE)
+	# Remove latex clutter.
+	rm -f *.aux *.bbl *.blg *.idx *.ilg *.ind *.log *.out *.toc
+
+distclean: clean
+	# Revert PDF file to latest revision.
+	hg revert -C $(MASTERFILE).pdf
+	# Update timestamp so make knows to remake the file.
+	touch -d "`hg parent  $(MASTERFILE).pdf -T '{date|isodate}\n'`" \
+		$(MASTERFILE).pdf
