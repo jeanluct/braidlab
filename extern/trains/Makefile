@@ -45,5 +45,5 @@ clean:
 	rm -f $(OBJS) $(DEPFILE)
 
 # Clean up everything, including executables and library.
-distclean:
-	rm -f frontend libtrains.a $(OBJS) $(DEPFILE)
+distclean: clean
+	rm -f xxxxx.tmp frontend libtrains.a
