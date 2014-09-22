@@ -19,8 +19,27 @@
 #   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 # LICENSE>
 
+# Find architecture, set correct mex file suffix.
+ARCH = $(shell uname -m)
+ifeq ($(ARCH), i386)
+	MEXSUFFIX = mexglx
+else
+ifeq ($(ARCH), x86_64)
+	MEXSUFFIX = mexa64
+else
+ifeq ($(ARCH), mac32)
+	MEXSUFFIX = mexmaci
+else
+ifeq ($(ARCH), mac64)
+	MEXSUFFIX = mexmaci64
+else
+	$(error Unknown architecture.)
+endif
+endif
+endif
+endif
+
 MEX         = mex
-MEXSUFFIX   = mexa64
 CFLAGS      := -DMATLAB_MEX_FILE $(CFLAGS)
 CXXFLAGS    := $(CFLAGS) -std=c++0x -fPIC $(CXXFLAGS)
 
