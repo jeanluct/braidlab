@@ -159,5 +159,12 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(testCase.b1.length,4);
       testCase.verifyEqual(testCase.id.length,0);
     end
+
+    function test_braid_subbraid(testCase)
+      b = testCase.b3;
+      bsub = braidlab.braid([3 1 -1],4);
+      testCase.verifyEqual(b.subbraid(3:6),bsub);
+      testCase.verifyTrue(lexeq(b.subbraid(3:6),bsub));
+    end
   end
 end
