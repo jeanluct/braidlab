@@ -35,7 +35,7 @@ import braidlab.braid
 
 switch K
  case {'0_1','unknot'}
-  b = braid([1]);
+  b = braid([1]); %#ok<NBRAK>
  case {'3_1','trefoil'}
   b = braid([1 1 1]);
  case {'4_1','figure-eight','figure-8'}

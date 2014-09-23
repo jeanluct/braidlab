@@ -1,26 +1,21 @@
-% areEqual(A, B, precision)
+function result = areEqual(A,B,precision) %#ok<STOUT,INUSD>
+%AREEQUAL   Check for equality within given precision.
+%   AREEQUAL(A,B,PRECISION) Checks if elements of A and B are within
+%   10^PRECISION (int exponent) float-representable numbers.
 %
-% AREEQUAL
+%   Returns a logical matrix of size equal to A and B containing results of
+%   tests.
 %
-% Checks if elements of A and B are within precision (int)
-% float-representable numbers.
+%   AREEQUAL is implemented as a MATLAB MEX file. This file holds only its
+%   documentation.
 %
-% Returns a logical matrix of size equal to A and B containing results of
-% tests.
-% 
-% AREEQUAL is implemented as a MATLAB MEX file. This file holds only its
-% documentation.
-%
-% Ex.
-% A = rand(10,10);
-% areEqual(A,A+5*eps(A),5)
-% vs
-% areEqual(A,A+5*eps(A),3)
-% 
-% as a crude test.
+%   Example
+%      A = rand(10,10);
+%      areEqual(A,A+5*eps(A),5)
+%      areEqual(A,A+5*eps(A),3)
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Marko Budisic
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -37,28 +32,25 @@
 %   You should have received a copy of the GNU General Public License
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
-function result = areEqual(A, B, precision)
 
 warning('BRAIDLAB:braid:areEqual:notcompiled',...
-    ['areEqual MEX file not detected. Attempting to compile ' ...
-    'from inside MATLAB.' ...
-    'If you repeatedly get this message, please check your braidlab ' ...
-    'distribution has been MEX-compiled correctly.']);
+        ['areEqual MEX file not detected. Attempting to compile ' ...
+         'from inside MATLAB.' ...
+         'If you repeatedly get this message, please check your braidlab ' ...
+         'distribution has been MEX-compiled correctly.']);
 
 try
-    filename = [mfilename('fullpath') '.cpp'];
-    [pathstr,~,~] = fileparts(filename);
-    whereami = pwd;
-    cd(pathstr);
-    mex('areEqual.cpp');
-    cd(whereami);
-catch me
-    error('BRAIDLAB:braid:areEqual:notcompiled',...
-        ['Matlab MEX compilation failed. Please check that '...
-        'braidlab was installed and MEX-compiled properly']);
+  filename = [mfilename('fullpath') '.cpp'];
+  [pathstr,~,~] = fileparts(filename);
+  whereami = pwd;
+  cd(pathstr);
+  mex('areEqual.cpp');
+  cd(whereami);
+catch
+  error('BRAIDLAB:braid:areEqual:notcompiled', ...
+        ['Matlab MEX compilation failed. Please check that ' ...
+         'braidlab was installed and MEX-compiled properly']);
 end
-error('BRAIDLAB:braid:areEqual:notcompiled',...
-    ['Matlab MEX compilation successful. Please re-run '...
-    'your code']);
 
-        
+error('BRAIDLAB:braid:areEqual:notcompiled', ...
+      'Matlab MEX compilation successful. Please re-run your code');

@@ -47,7 +47,7 @@ for j = 1:length(b)
       % pn(j,2) = sign(bp(1));
 
       % ap(1) = -b(1) + pos(a(1) + pos(b(1)));
-      T(a0+1,b0+1) = -1 + pos(pn(j,1))*pos(pn(j,2));
+      T(a0+1,b0+1) = -1 + pos(pn(j,1))*pos(pn(j,2)); %#ok<*SPRIX>
       T(a0+1,a0+1) = pos(pn(j,2));
       % bp(1) = a(1) + pos(b(1));
       T(b0+1,a0+1) = 1;
