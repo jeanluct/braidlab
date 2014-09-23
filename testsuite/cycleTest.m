@@ -69,7 +69,7 @@ classdef cycleTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_cycle(testCase)
-      [pn1,it1] = cycle(testCase.b1);
+      [pn1,it1] = cycle(testCase.b1); %#ok<*PROP>
       [pn2,it2] = cycle(testCase.b2);
       [pn12,it12] = cycle(tensor(testCase.b1,testCase.b2));
 
@@ -100,6 +100,7 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyEqual(M11,testCase.M11);
 
       % Matrix for each iterate.
+      M1cell = cell(1,size(pn1,1));
       for i = 1:size(pn1,1)
         M1cell{i} = linact(testCase.b1,pn1(i,:));
       end

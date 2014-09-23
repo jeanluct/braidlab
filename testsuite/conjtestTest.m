@@ -31,8 +31,8 @@ classdef conjtestTest < matlab.unittest.TestCase
 
   methods (TestMethodSetup)
     function createBraids(testCase)
-      load testdata
-      XY = XY(1:length(ti),:,:);
+      load('testdata','XY','ti')
+      XY = XY(1:length(ti),:,:); %#ok<NODEF>
       % Close the braid.
       XY = braidlab.closure(XY);
 

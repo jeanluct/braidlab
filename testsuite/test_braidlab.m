@@ -34,4 +34,4 @@ suite = TestSuite.fromFolder(pwd);
 %suite = TestSuite.fromClass(?entropyTest);
 %suite = TestSuite.fromClass(?cycleTest);
 runner = TestRunner.withTextOutput;
-res = runner.run(suite)
+res = runner.run(suite) %#ok<NOPTS>

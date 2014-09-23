@@ -30,11 +30,11 @@ function checkvpi
 % LICENSE>
 
 % Check if variable precision integers library is available.
-if ~(exist('vpi') == 2)
+if ~exist('vpi','file')
   % No VPI... try to add the path.
   blbase = fileparts(fileparts(which('braidlab.checkvpi')));
   addpath(fullfile(blbase,'/extern/VariablePrecisionIntegers'))
-  if ~(exist('vpi') == 2)
+  if ~exist('vpi','file')
     % For some reason this didn't work.
     error('BRAIDLAB:checkvpi:novpi',...
           ['vpi type not on path.  Try ''addpath ' ...

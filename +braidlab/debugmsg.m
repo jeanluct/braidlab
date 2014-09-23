@@ -39,7 +39,7 @@ end
 
 if nargin < 2, lvl = 1; end
 
-if exist('BRAIDLAB_debuglvl') == 1
+if exist('BRAIDLAB_debuglvl','var')
   if BRAIDLAB_debuglvl >= lvl
     disp(msg)
   end
