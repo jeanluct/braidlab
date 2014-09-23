@@ -36,8 +36,8 @@ CFLAGS = -O -DMATLAB_MEX_FILE
 CXXFLAGS = $(CFLAGS) -std=c++0x -fPIC
 MEXFLAGS  = -largeArrayDims -O
 
-# Use BRAIDLAB_USE_GMP=1 on command line to compile with GMP.
-ifeq ($(BRAIDLAB_USE_GMP), 1)
+# Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
+ifneq ($(BRAIDLAB_USE_GMP), 0)
 	GMP_LD = -lgmpxx -lgmp
 	MEXFLAGS += -DBRAIDLAB_USE_GMP
 endif

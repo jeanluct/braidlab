@@ -122,13 +122,13 @@ to compile the MEX files.  Note that you can still use \braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly.
 
-\index{GMP} If GMP (the GNU MultiPrecision library) is installed on your
-system, instead of the above you can compile braidlab with
+\index{GMP} If you receive error messages because GMP (the GNU MultiPrecision
+library) is not installed on your system, instead of the above use
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
-# cd braidlab; make BRAIDLAB_USE_GMP=1
+# cd braidlab; make BRAIDLAB_USE_GMP=0
 \end{lstlisting}
-This will speed up some functions, in particular testing for equality of large
-braids.
+This will slow down some functions, in particular testing for equality of
+large braids.
 
 
 \subsection{Setting Matlab's path}

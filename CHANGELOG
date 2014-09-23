@@ -24,10 +24,10 @@
   used.
 
 * loopsigma's C++ helper functions can also handle VPI (Variable
-  Precision Integers) if braidlab is compiled with "make
-  BRAIDLAB_USE_GMP=1".  This requires the GNU MultiPrecision library
-  (GMP) to be installed, but it gives a massive speedup when working
-  with VPI types.
+  Precision Integers) by using GMP, the GNU MultiPrecision library.
+  If you don't have GMP installed, compile with option
+  "BRAIDLAB_USE_GMP=0".  However, this will lead to a massive slowdown
+  when working with VPI types.
 
 * New methods in the loop class: loop.components, loop.plot
   'Components' option, loop.getgraph.  [*** document in guide ***]
