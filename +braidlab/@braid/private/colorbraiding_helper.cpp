@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   }
 
-  // read off global number of threads that should be used
+  // read off number of threads that are requested
   size_t NThreadsRequested;
   if (nrhs >= 3) {
     if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||

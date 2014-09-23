@@ -20,59 +20,63 @@ end
 D = 1.1* sqrt( XY(:,1,:).^2 + XY(:,2,:).^2 );
 XY = XY ./ max(D(:));
 
-%% plotting 
+% % plotting 
 % figure;
 % hold all;
 % for k = 1:5
 %   plot3(XY(:,1,k), XY(:,2,k), t);
 % end
-% 
-%% Compute the braid using Matlab code
 
-global BRAIDLAB_COLORBRAIDING_CPP   % modified colorbraiding will have a flag
-                              % that can select Matlab vs C++ code
+%% prepare the simulation setup by clearing all globals
+clearvars -global BRAIDLAB_COLORBRAIDING_MATLAB BRAIDLAB_threads
 
-%% Compute the braid using C++ code
+global BRAIDLAB_COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
+                                       % that can select Matlab vs C++ code
+
 timing = {};
 
+%% Compute braid using default settings (C++ and autodetect thread #)
+fprintf('\n*************************************\n')
 setn = 1; tic
-
-clearvars -global BRAIDLAB_threads
-BRAIDLAB_COLORBRAIDING_CPP = true
 b_cpp_p = braidlab.braid(XY);
 timing{setn}.type = 'Threaded (autoset)';
 timing{setn}.time = toc;
 
+%% Compute braid using C++ code and fixed number of threads (3)
+fprintf('\n*************************************\n')
 setn = setn + 1; tic
 global BRAIDLAB_threads
-BRAIDLAB_threads = 2;
-BRAIDLAB_COLORBRAIDING_CPP = true
+BRAIDLAB_threads = 3;
 b_cpp_p = braidlab.braid(XY);
-timing{setn}.type = 'Threaded (2 threads)';
+timing{setn}.type = sprintf('Threaded (%d threads)', BRAIDLAB_threads);
 timing{setn}.time = toc;
 
-
+%% Compute braid using C++ code and a single thread
+fprintf('\n*************************************\n')
 setn = setn + 1; tic
-BRAIDLAB_threads = 1
-BRAIDLAB_COLORBRAIDING_CPP = true
+BRAIDLAB_threads = 1;
 b_cpp_s = braidlab.braid(XY);
 timing{setn}.type = 'Unthreaded';
 timing{setn}.time = toc;
-                              
+
+%% Compute braid using MATLAB version of the code
+fprintf('\n*************************************\n')
 setn = setn + 1; tic
-BRAIDLAB_COLORBRAIDING_CPP = false
+BRAIDLAB_COLORBRAIDING_MATLAB = true;
 b_matlab = braidlab.braid(XY);
 timing{setn}.type = 'Matlab';
 timing{setn}.time = toc;
+fprintf('\n*************************************\n')
 
+%% Compare Matlab and C++ single/multithreaded braids
 %assert( b_matlab == b_cpp, 'Braids are not equal');
 assert( lexeq(b_matlab,b_cpp_p), ['C++ multithreaded and MATLAB ' ...
                     'braids are not lexically equal'] );
 assert( lexeq(b_matlab,b_cpp_s), ['C++ singlethreaded and MATLAB ' ...
                     'braids are not lexically equal'] );
-
 disp('BRAIDS ARE EQUAL');
 
+%% Display timing info
 disp('Timing information (sec)')
 for k = 1:length(timing)
   fprintf('Timing type: %s \n\t Time (sec): %f\n', timing{k}.type, ...
