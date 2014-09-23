@@ -73,6 +73,7 @@ else
     X0 = XY(1,:,:);
     X1 = XY(end,:,:);
     % Create matrix of distances.
+    D = zeros(n,n);
     for i = 1:n
       for j = 1:n
         D(i,j) = norm(X1(1,:,i)-X0(1,:,j));

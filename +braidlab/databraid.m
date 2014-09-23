@@ -74,7 +74,7 @@ classdef databraid < braidlab.braid
           br.tcross = 1:length(br.word);
         end
         return
-      elseif ndims(XY) < 3
+      elseif ismatrix(XY)
         br.n = max(size(XY));
         br.word = reshape(XY,[1 br.n]);
         if nargin > 1
@@ -170,7 +170,7 @@ classdef databraid < braidlab.braid
     end
 
     function bs = subbraid(b,s)
-      ;
+      ; %#ok<NOSEM>
       % Do not put comments above the first line of code, so the help
       % message from braid.subbraid is displayed.
 
@@ -212,12 +212,12 @@ classdef databraid < braidlab.braid
 
         i1 = 1:2:length(cc.word)-1;
         ic = find(cc.word(i1) == -cc.word(i1+1));
-        if ~isempty(ic) shorter = true; end
+        if ~isempty(ic), shorter = true; end
         cc.word(i1(ic)) = 0; cc.word(i1(ic)+1) = 0;
 
         i2 = 2:2:length(cc.word)-1;
         ic = find(cc.word(i2) == -cc.word(i2+1));
-        if ~isempty(ic) shorter = true; end
+        if ~isempty(ic), shorter = true; end
         cc.word(i2(ic)) = 0; cc.word(i2(ic)+1) = 0;
 
         i0 = find(cc.word ~= 0);
@@ -270,12 +270,12 @@ classdef databraid < braidlab.braid
   % chronology.  Hide these, though they can still be called and will
   % return an error message.
   methods (Hidden)
-    function bm = mpower(b,m)
+    function mpower(~,~)
       error('BRAIDLAB:databraid:mpower:undefined',...
             'This operation is not defined for databraids.')
     end
 
-    function bi = inv(b)
+    function inv(~)
       error('BRAIDLAB:databraid:inv:undefined',...
             'This operation is not defined for databraids.')
     end

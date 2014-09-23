@@ -43,7 +43,7 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l.coords,[1 -1 2 3]);
       testCase.verifyEqual(l.a,[1 -1]);
       testCase.verifyEqual(l.b,[2 3]);
-      [a,b] = l.ab;
+      [a,b] = l.ab; %#ok<*PROP>
       testCase.verifyEqual(a,[1 -1]);
       testCase.verifyEqual(b,[2 3]);
       % Create the same loop by specifying a,b.
