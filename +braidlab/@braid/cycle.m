@@ -84,7 +84,7 @@ for i = 1:length(varargin)
 end
 
 % Turn false convergence warning off by default.
-if exist('BRAIDLAB_debuglvl') == 1
+if exist('BRAIDLAB_debuglvl','var')
   if BRAIDLAB_debuglvl >= 1
     warning('on','BRAIDLAB:braid:cycle:falseconv');
   else
@@ -111,8 +111,8 @@ nconv = 0;
 pnl = [];
 
 for it = 1:maxit
-  [l,pn] = b*l;
-  pnl = [pnl ; pn];
+  [l,pn] = b*l; %#ok<RHSFN>
+  pnl = [pnl ; pn]; %#ok<AGROW>
   if nconv == 0
     % Check if we appear to have reached a limit cycle.
     for p = 1:it-1

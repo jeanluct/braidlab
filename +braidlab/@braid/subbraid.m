@@ -44,19 +44,19 @@ is = [];
 
 for i = 1:length(b)
   gen = abs(b.word(i)); % unsigned generator
-  i1 = find(p(gen) == s); i2 = find(p(gen+1) == s);
+  i1 = find(p(gen) == s,1); i2 = find(p(gen+1) == s,1);
   if ~isempty(i1) && ~isempty(i2)
     % The current generator involves two of our substrings.
     % Find the position of all sub-strings in p.
-    pos = find(ismember(p,s));
+    pos = ismember(p,s);
     % Of the substrings, find the order of the one we just switched.
     % This gives the unsigned generator for the subbraid.
     sgen = find(p(pos) == s(i1));
     % Restore sign and append to list.
-    bs = [bs sign(b.word(i))*sgen];
+    bs = [bs sign(b.word(i))*sgen]; %#ok<AGROW>
     % Optionally also keep track of which generators we kept.  This is
     % used by the subclass databraid.
-    if nargout > 1, is = [is i]; end
+    if nargout > 1, is = [is i]; end %#ok<AGROW>
   end
   p([gen gen+1]) = p([gen+1 gen]); % update permutation
 end

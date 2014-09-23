@@ -41,7 +41,7 @@ if nargin < 2, l = braidlab.loop(b.n); end
 
 if isa(l,'braidlab.loop')
   if isscalar(l)
-    [l2,pn] = b*l;
+    [l2,pn] = b*l; %#ok<RHSFN>
     varargout{1} = update_rules_matrix(b,pn,size(l.coords,2));
     if nargout > 1, varargout{2} = l2; end
   else
