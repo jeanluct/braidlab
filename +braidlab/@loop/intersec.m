@@ -70,8 +70,6 @@ else
       mu(i) = mu(i) + nu(ic+1)/2;
     end
   end
-  size(mu)
-  size(nu)
 end
 
 if nargout > 1
