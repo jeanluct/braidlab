@@ -1,18 +1,10 @@
 //
 // MATLAB MEX file
 //
-// AREEQUAL
-//
 // Check equality of two vectors up to D float-representable numbers.
 //
-// For example, use
-// A = rand(10,10);
-// areEqual(A,A+5*eps(A),5)
-// vs
-// areEqual(A,A+5*eps(A),3)
-// 
-// As a crude test.
-//
+// See areEqual.m for documentation.
+
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 //
@@ -31,9 +23,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
-// Use the group relations to shorten a braid word as much as
-// possible.
 
 
 #include "areEqual.hpp"
