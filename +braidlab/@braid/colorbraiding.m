@@ -42,6 +42,7 @@ import braidlab.debugmsg
 
 % modified colorbraiding will have a flag that can select Matlab vs C++ code
 global BRAIDLAB_COLORBRAIDING_CPP
+global BRAIDLAB_threads
 
 if any(isnan(XY) | isinf(XY))
   error('BRAIDLAB:braid:colorbraiding:badarg','Data contains NaNs or Infs.')
@@ -58,12 +59,10 @@ if nargin < 3
   proj = 0;
 end
 
-  % Rotate coordinates according to angle proj.  Note that since the
-  % projection line is supposed to be rotated counterclockwise by proj, we
+% Rotate coordinates according to angle proj.  Note that since the
+% projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
-if proj ~= 0
-  XY = rotate_data_clockwise(XY,proj);
-end
+if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 
 % Sort the initial conditions from left to right according to their initial
 % X coord; IDX contains the indices of the sort.
@@ -75,26 +74,18 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
-% cross_cell(I,J) - cell array storing vector of times
-%                   when strings I and J, initially
-%                   arranged as IJ exchanged positions to JI
 
-gen = [];
-tcr = [];
-cross_cell = [];
-
-if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
-        ~isempty(BRAIDLAB_COLORBRAIDING_CPP) && ...
-        all(BRAIDLAB_COLORBRAIDING_CPP) )
+if (exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
+    ~isempty(BRAIDLAB_COLORBRAIDING_CPP) && ...
+    all(BRAIDLAB_COLORBRAIDING_CPP))
   warning('BRAIDLAB:braid:colorbraiding:cpp', ...
           'Invoking C++ version of colorbraiding.')
 
   % detect number of threads to be used in C++ code
-  global BRAIDLAB_threads;
-  if ~( isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0 )
+  if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
     % use the global variable to set the number of threads
     Nthreads = ceil(BRAIDLAB_threads);
-    debugmsg(sprintf(['Number of threads set by BRAIDLAB_threads to: %d.'],...
+    debugmsg(sprintf('Number of threads set by BRAIDLAB_threads to: %d.', ...
                      Nthreads));
   else
     % try to autodetect the optimal number of threads (== number of cores)
@@ -103,18 +94,18 @@ if ( exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
       debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
                         '"feature".'], Nthreads));
     % 'feature' fails - auto set number of threads to 1
-    catch me
+    catch
       Nthreads = 1;
       warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
           ['Number of processor cores cannot be detected. Number of ' ...
            'threads set to 1.'])
     end
   end
-  [gen, tcr] = colorbraiding_helper( XYtraj, t, Nthreads );
+  [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
 else
   debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
           'to turn on C++ algorithm.']);
-  [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t );
+  [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
 end
 
 varargout{1} = braidlab.braid(gen,n);
@@ -122,7 +113,7 @@ if nargout > 1, varargout{2} = tcr; end
 
 % =========================================================================
 
-function [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t )
+function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t)
 %% CROSSINGSTOGENERATORS
 %
 % Helper function that converts a physical braid to the list of braid
@@ -142,7 +133,7 @@ function [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t )
 % TCR - vector of (interpolated) times at which generators
 % occurred
 %
-% CROSS_CELL - Times at which a crossing occured is then storred into
+% CROSS_CELL - Times at which a crossing occured is then stored into
 % CROSS_CELL in a numerical vector. The cell index (I,J) indicates both the
 % strings involved and the direction of crossing.  For example if strings I
 % and J cross with string I initially left of J, the time of the crossing
@@ -150,10 +141,10 @@ function [gen, tcr, cross_cell] = crossingsToGenerators( XYtraj, t )
 % CROSS_CELL(J,I).  The direction of crossing -- either positive or negative
 % -- is saved in the same cell and is used to determine the generator
 % sequence later.  The outer I,J loop is over all pairs of strings.
-%
+
 import braidlab.debugmsg
 tic;
-n = size(XYtraj, 3 );
+n = size(XYtraj,3);
 
 cross_cell = cell(n); % Cell array for crossing times.
 
@@ -182,15 +173,12 @@ for I = 1:n
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
 
     if ~isempty(nearcoinc)
-      dYtraj = Ytraj1(nearcoinc) - Ytraj2(nearcoinc);
-      %      % uses absolute precision to test equality
-      %      if any(abs(dYtraj) < 10*eps)
       % uses relative precision to test equality (same as C++ code)
-      if any( areEqual(Ytraj1(nearcoinc), Ytraj2(nearcoinc), 10) )
-        error('BRAIDLAB:braid:colorbraiding:coincidentparticles',...
+      if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
+        error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
               'Coincident particles: braid not defined.')
       else
-        error('BRAIDLAB:braid:colorbraiding:coincidentproj',...
+        error('BRAIDLAB:braid:colorbraiding:coincidentproj', ...
               [ 'Coincident projection coordinate; change ' ...
                 'projection angle (type help braid.braid).' ])
       end
@@ -201,8 +189,8 @@ for I = 1:n
     perm = sign(dXtraj);
 
     % Do some X coordinates coincide?
-    if ~isempty(find(perm == 0))
-      error('BRAIDLAB:braid:colorbraiding:coincidentproj',...
+    if ~isempty(find(perm == 0,1))
+      error('BRAIDLAB:braid:colorbraiding:coincidentproj', ...
             'Somehow there are still coincident projection coordinates...')
     end
 
@@ -260,7 +248,6 @@ crossdat = sortrows(crossdat);
 debugmsg(sprintf(['colorbraiding: computing sorted crossdat took' ...
                   ' %f msec.'], toc*1000));
 
-
 debugmsg(sprintf('colorbraiding:Number of crossings: %d\n', ...
                  size(crossdat,1)),2);
 
@@ -305,8 +292,8 @@ for i = 1:size(crossdat,1)
         % Cannot find two strings crossing that are not next to each other.
         fs = ['crossdat inconsistency at crossing %d, time %f, index %d,' ...
               ' with permutation [' num2str(Iperm) '].'];
-        msg = sprintf(fs,i,crossdat(i,1),idx1);
-        error('BRAIDLAB:braid:colorbraiding:badcrossing',msg)
+        error('BRAIDLAB:braid:colorbraiding:badcrossing', ...
+              fs,i,crossdat(i,1),idx1)
       end
       % Swap the good crossing with the current one.
       debugmsg(sprintf('Swap crossings %d and %d',i,j))

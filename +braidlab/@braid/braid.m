@@ -116,8 +116,9 @@ classdef braid < matlab.mixin.CustomDisplay
         switch lower(b)
          case {'halftwist','delta'}
           br.n = secnd;
+          % D has size br.n*(br.n-1)/2. Could preallocate if speed important.
           D = [];
-          for i = 1:br.n-1, D = [D br.n-1:-1:i]; end
+          for i = 1:br.n-1, D = [D br.n-1:-1:i]; end %#ok<AGROW>
           br.word = D;
          case {'hironakakin','hironaka-kin','hk'}
           m = secnd;
@@ -127,7 +128,7 @@ classdef braid < matlab.mixin.CustomDisplay
                     'Need at least five strings.')
             end
             if mod(m,2) == 1
-              n = (m+1)/2;
+              n = (m+1)/2; %#ok<*PROP>
               m = (m-3)/2;
             else
               n = (m+2)/2;
@@ -421,7 +422,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   See also BRAID, BRAID.LENGTH.
 
       highestIndex = (b.n-1);
-      i = double([-highestIndex : highestIndex]);
+      i = double(-highestIndex:highestIndex);
       c = hist( b.word, i );
     end
 
@@ -436,13 +437,13 @@ classdef braid < matlab.mixin.CustomDisplay
       wc = textwrap({c},sz(1)-4);
       for i = 1:length(wc)
         % Indent rows.
-        if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
+        if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
         % If the format is loose rather than compact, add a line break.
         if strcmp(get(0,'FormatSpacing'),'loose')
           wc{i} = sprintf('%s\n',wc{i});
         end
       end
-      disp(strvcat(wc))
+      disp(char(wc))
     end
 
   end % methods block

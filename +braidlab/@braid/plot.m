@@ -69,8 +69,7 @@ if ~uselines
   bline{1} = f(xx);
   % The 'under' line.
   bline{2} = f(xx);
-  igap = find(cutf*gapX < xx & xx < (1-cutf)*gapX);
-  bline{2}(igap) = NaN;
+  bline{2}(cutf*gapX < xx & xx < (1-cutf)*gapX) = NaN;
   % Pad xx with an extra point at the beginning and end, to create a bit of
   % overlap.
   xx = [0 xx gapX];
@@ -107,7 +106,7 @@ for k = 1:b.length
   end
   % Plot the remaining vertical lines.
   for l = 1:b.n
-    if l ~= gen & l ~= gen+1
+    if l ~= gen && l ~= gen+1
       posX = baseX + gapX*(l-1);
       plot([posX posX],[posY posY+gapY],lat{:})
     end

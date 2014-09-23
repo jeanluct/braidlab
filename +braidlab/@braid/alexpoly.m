@@ -99,9 +99,9 @@ end
 if nargin == 3, stringopt = true; end
 
 if nargin < 2 || isempty(x)
-  if exist('laurpoly') == 2
+  if exist('laurpoly','file')
     x = laurpoly(1,1);
-  elseif exist('sym') == 2
+  elseif exist('sym','file')
     x = sym('x');
   else
     error('BRAIDLAB:braid:alexpoly:notoolbox',...
@@ -125,7 +125,7 @@ if stringopt
     center = false;
   else
     error('BRAIDLAB:braid:alexpoly:badarg', ...
-          'Unknown option %s.')
+          'Unknown option %s.',opt)
   end
 end
 
@@ -139,7 +139,7 @@ errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
 bu = burau(b,x);
 n = b.n;
 
-if strcmp(class(x),'laurpoly')
+if isa(x,'laurpoly')
   for i = 1:n-1, bu{i,i} = bu{i,i} - 1; end
 
   num = (-1)^(n-1)*det(bu);
@@ -161,11 +161,11 @@ if strcmp(class(x),'laurpoly')
     p = p * laurpoly(1,deg/2);
   end
 
-elseif strcmp(class(x),'sym') || isnumeric(x)
+elseif isa(x,'sym') || isnumeric(x)
   for i = 1:n-1, bu(i,i) = bu(i,i) - 1; end
 
   num = (-1)^(n-1)*det(bu);
-  denom = sum(x.^[0:n-1]);
+  denom = sum(x.^(0:n-1));
 
   % The polynomials always divide each other exactly.
   p = num / denom;

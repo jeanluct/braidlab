@@ -118,7 +118,7 @@ if nargin < 4, nconvreq = 3; end
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n,@double);
 
-if exist('entropy_helper') == 3
+if exist('entropy_helper','file') == 3
   % If MEX file is available, use that.
   % Only works on double precision numbers.
   [entr,i,u.coords] = entropy_helper(b.word,u.coords,maxit,nconvreq,tol);
