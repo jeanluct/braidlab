@@ -31,8 +31,23 @@
 
 classdef braid < matlab.mixin.CustomDisplay
   properties
-    n = 1            % number of strings
     word = int32([]) % braid word in Artin generators
+  end
+
+  % The number of strings is a dependent property (not stored internally).
+  % It is obtained through the get.n method by the max over generators and
+  % the private data member obj.privaten.  The reason for this is that the
+  % set.n property needs to check that the generators in obj.word are
+  % compatible with a new value of n.  But if n is a class data member then
+  % it is not allowed to refer to obj.word, because there is no guarantee of
+  % the order in which the data members are created.
+  %
+  % See http://www.mathworks.com/help/matlab/matlab_oop/tips-for-saving-and-loading.html
+  properties (Dependent)
+    n                % number of strings
+  end
+  properties (Access=private)
+    privaten = 0;
   end
 
   methods
@@ -225,7 +240,15 @@ classdef braid < matlab.mixin.CustomDisplay
                 'Too few strings for generators.')
         end
       end
-      obj.n = value;
+      obj.privaten = double(value);
+    end
+
+    function value = get.n(obj)
+      if isempty(obj.word)
+        value = double(max(1,obj.privaten));
+        return
+      end
+      value = double(max(max(abs(obj.word))+1,obj.privaten));
     end
 
     % Make sure it's an int32, internally.
@@ -236,8 +259,6 @@ classdef braid < matlab.mixin.CustomDisplay
       obj.word = int32(value);
       % Make sure the empty word is 0 by 0.
       if isempty(obj.word), obj.word = int32([]); end
-      % Raise n if necessary, and convert to double (eventually make int32?).
-      obj.n = double(max(obj.n,max(abs(obj.word))+1));
     end
 
     function ee = eq(b1,b2)
