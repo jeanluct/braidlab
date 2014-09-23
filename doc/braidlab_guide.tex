@@ -509,7 +509,7 @@ so it can be used to determine when two knots are not the same.  For knots,
 the centered polynomial is guaranteed to have integral powers.  For links,
 such as the Hopf link consisting of two singly-linked loops, it might not:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1],'centered'))  % the Hopf link
+>> alexpoly(braid([1 1]),'centered')  % the Hopf link
 
 Error using braidlab.braid/alexpoly
 Polynomial with fractional powers.  Remove 'centered' option or use the symbolic toolbox.
