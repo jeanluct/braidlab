@@ -90,7 +90,11 @@ showstringspaces=false}
 \title{\braidlab\ user's guide}
 \author{Jean-Luc Thiffeault}
 \date{release \input{getrelease}} % Need to run 'pdflatex -shell-escape'
+
 \maketitle
+
+%\begin{abstract}
+%\end{abstract}
 
 \tableofcontents
 
@@ -1415,7 +1419,8 @@ b2 = < 1 -2  1 -2  1  2 >
 which is \emph{not} \lstinline{b^4} (Fig.~\ref{fig:s1s-2s1s-2s1s2_diagram})!
 However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
   showed that the entropy of a pure braid \index{braid!pure} is greater
-  than~$1.4436$, if it is nonzero.}  \index{braid!finite-order|(}%
+  than~$\log(2+\sqrt5) \simeq 1.4436$, if it is nonzero.}
+\index{braid!finite-order|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> entropy(a^4), entropy(b2)
 
