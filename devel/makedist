@@ -2,10 +2,13 @@
 
 # Script to tar up the braidlab distribution files.
 #   exclude LCS toolbox for now
+#
+# Run from braidlab root folder as ./devel/makedist
 
 TARCMD=tar
 
-# release version:
+# Get latest braidlab release from 'hg tags'.  Release tags are of the form
+# 'release-1.3.4.5'.
 VERSION=`hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g'`
 BLNAME=braidlab-${VERSION}
 
