@@ -152,9 +152,9 @@ classdef cfbraid < matlab.mixin.CustomDisplay
       if ~isempty(b.factors)
         for i = 1:length(b.factors)
           if i == 1 && b.delta == 0
-            str = [str num2str(b.factors{i})];
+            str = [str num2str(b.factors{i})]; %#ok<AGROW>
           else
-            str = [str ' . ' num2str(b.factors{i})];
+            str = [str ' . ' num2str(b.factors{i})]; %#ok<AGROW>
           end
         end
       end
@@ -184,13 +184,13 @@ classdef cfbraid < matlab.mixin.CustomDisplay
        wc = textwrap({c},sz(1)-4);
        for i = 1:length(wc)
          % Indent rows.
-         if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
+         if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
          % If the format is loose rather than compact, add a line break.
          if strcmp(get(0,'FormatSpacing'),'loose')
            wc{i} = sprintf('%s\n',wc{i});
          end
        end
-       disp(strvcat(wc))
+       disp(char(wc))
     end
 
   end % methods block

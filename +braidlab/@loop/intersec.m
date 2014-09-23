@@ -56,6 +56,7 @@ else
   A = [0 a 0];
 
   % Find nu, mu (intersection numbers).
+  mu = zeros(1,2*n-4); nu = zeros(1,n-1);
   nu(1) = -2*b0;
   for i = 2:n-1
     nu(i) = nu(i-1) - 2*B(i-1 + 1);
@@ -69,6 +70,8 @@ else
       mu(i) = mu(i) + nu(ic+1)/2;
     end
   end
+  size(mu)
+  size(nu)
 end
 
 if nargout > 1

@@ -34,7 +34,7 @@ if nargout > 2
   error('BRAIDLAB:cfbraid:conjtest:nargout','Too many output arguments.');
 end
 
-if ~isa(b1,'braidlab.cfbraid') | ~isa(b2,'braidlab.cfbraid')
+if ~isa(b1,'braidlab.cfbraid') || ~isa(b2,'braidlab.cfbraid')
   error('BRAIDLAB:cfbraid:conjtest:badargs', ...
         'Function takes two CFBRAIDS as arguments.');
 end

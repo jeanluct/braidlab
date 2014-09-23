@@ -234,7 +234,7 @@ classdef loop < matlab.mixin.CustomDisplay
           if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
           for i = 2:length(obj.coords)
             oo = num2str(obj.coords(i)); oo(1:2) = '';
-            objstr = [objstr oo];
+            objstr = [objstr oo]; %#ok<AGROW>
           end
         end
         str = ['(( ' objstr ' ))'];
@@ -242,11 +242,11 @@ classdef loop < matlab.mixin.CustomDisplay
         str = '';
         if size(obj,1) > size(obj,2)
           for i = 1:size(obj,1)
-            str = [str ; char(obj(i,:))];
+            str = [str ; char(obj(i,:))]; %#ok<AGROW>
           end
         else
           for i = 1:size(obj,2)
-            str = [str '  ' char(obj(:,i))];
+            str = [str '  ' char(obj(:,i))]; %#ok<AGROW>
           end
         end
       end
@@ -337,13 +337,13 @@ classdef loop < matlab.mixin.CustomDisplay
         wc = textwrap({char(obj(j,:))},sz(1)-6);
         for i = 1:length(wc)
           % Indent rows.
-          if i > 1, wc{i} = ['      ' wc{i}]; else, wc{i} = ['   ' wc{i}]; end
+          if i > 1, wc{i} = ['      ' wc{i}]; else wc{i} = ['   ' wc{i}]; end
           % If the format is loose rather than compact, add a line break.
           if strcmp(get(0,'FormatSpacing'),'loose')
             wc{i} = sprintf('%s\n',wc{i});
           end
         end
-        disp(strvcat(wc))
+        disp(char(wc))
       end
     end
 
