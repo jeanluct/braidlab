@@ -99,19 +99,19 @@ while argin_index <= nargin
     end
 
     lowArg = lower(arg);
-    j = strmatch(lowArg,names);
+    j = strmatch(lowArg,names); %#ok<MATCH2>
     if isempty(j)                       % if no matches
       error('BRAIDLAB:loop:plot:invalidpropname', ...
             'Invalid property ''%s''.',arg);
     elseif length(j) > 1                % if more than one match
       % Check for any exact matches (in case any names are subsets of others)
-      k = strmatch(lowArg,names,'exact');
+      k = strmatch(lowArg,names,'exact'); %#ok<MATCH3>
       if length(k) == 1
         j = k;
       else
         matches = deblank(optionNames(j(1),:));
         for k = j(2:length(j))'
-          matches = [matches ', ' deblank(optionNames(k,:))];
+          matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
         end
         error('BRAIDLAB:loop:plot:ambiguouspropname', ...
               'Property %s is ambiguous; matches %s.',arg,matches);

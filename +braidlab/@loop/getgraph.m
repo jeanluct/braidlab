@@ -58,13 +58,13 @@ mu = double(mu); nu = double(nu);
 b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
 % Convert to older P,M,N notation
-% intersections above punctures 
+% intersections above punctures
 % Globals are used to speed up computation in local hash functions
 global M;
 M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 global N;
-N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2]; 
+N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 % cumulative sum of intersections, i.e., intersections at punctures
 % 1, then 1+2, then 1+2+3, ...
@@ -73,7 +73,7 @@ T = cumsum( M + N );
 
 %% GRAPH INDEXING
 %
-% Each vertex is indexed by a pair (P,V) where P corresponds to 
+% Each vertex is indexed by a pair (P,V) where P corresponds to
 % the puncture the vertex is associated to, P = 1, ..., n
 % V is the order of the vertex above (V > 0) or below (V < 0) the puncture.
 % For each P,
@@ -101,20 +101,20 @@ tos = zeros(1,2*nV);
 % 'left' hairpins are C-shaped
 % 'right' hairpins are D-shaped
 
-% Cycle through each puncture.  
+% Cycle through each puncture.
 for p = 1:n
-    
-  % Determine number of hairpins are at the present loop  
+
+  % Determine number of hairpins are at the present loop
   if p == n
     nl = M(n); % this is equal to N(n) ?
   else
     nl = b_coord(p);
   end
-  
+
   % Join vertices connected by hairpins, starting from
   % the inner most hairpin around the puncture and going out.
   for sc = 1:abs(nl)
-    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc] );
+    joinpoints([p, -sign(nl)*sc],[p, sign(nl)*sc]);
   end
 end
 
@@ -127,7 +127,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two neighboring punctures
   tojoin = M(p)-nr;
   if tojoin > 0
@@ -146,12 +146,12 @@ for p = 1:n-1
       % and following (next) puncture that will be connected
       % idx_ > 0 -- vertex is above puncture
       % idx_ < 0 -- vertex is below puncture
-      idx_mine = nr + s; % index of the vertex 
+      idx_mine = nr + s; % index of the vertex
       idx_next = -(nl-s+tojoindown+1);
-      
-      joinpoints( [p,idx_mine], [p+1,idx_next]);
-      
-    end                                 
+
+      joinpoints([p,idx_mine],[p+1,idx_next]);
+
+    end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
       % idx_mine and _next are indices of vertices of the current (mine)
@@ -160,7 +160,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-      joinpoints( [p,idx_mine], [p+1,idx_next]);
+      joinpoints([p,idx_mine],[p+1,idx_next]);
     end
   end
 end
@@ -175,7 +175,7 @@ for p = 1:n-1
   else
     nr = max(b_coord(p),0);
   end
-  
+
   % segments that span two different punctures
   tojoin = N(p)-nr;
   if tojoin > 0
@@ -196,7 +196,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-      joinpoints( [p,idx_mine], [p+1,idx_next]);
+      joinpoints([p,idx_mine],[p+1,idx_next]);
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
@@ -206,7 +206,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-      joinpoints( [p,idx_mine], [p+1,idx_next]);
+      joinpoints([p,idx_mine],[p+1,idx_next]);
     end
   end
 end
@@ -217,11 +217,10 @@ tos = tos(1:edgecount);
 A = sparse( froms, tos, 1, nV, nV, length(froms) );
 Lp = diag(sum(A+A.')) - (A+A.');
 
-end
 
-function joinpoints( mine, next )
+function joinpoints(mine,next)
 %% joinpoints( mine, next )
-%  
+%
 % Function that modifies the graph structure by adding segments of
 % loops.
 %
@@ -236,31 +235,25 @@ function joinpoints( mine, next )
 % -- when mine(1) == next(1), hairpins are added. In this case
 %    it has to hold vertex numbers are the same as well, but with
 %    opposite signs. Hairpins are added in positive orientation,
-%    so mine(2) < next(2) will result in D-shaped line, whereas 
+%    so mine(2) < next(2) will result in D-shaped line, whereas
 %    mine(2) > next(2) will result in a C-shaped line.
-% 
+%
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
 
-  global M;
-  global T;
+global M
+global T
+global froms
+global tos
+global edgecount
 
-  dp = next(1) - mine(1); % index distance between punctures
-  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
-         'Requests one or two consecutive punctures');
-  
-  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
-          'Vertex indices must be nonzero') ;
+dp = next(1) - mine(1); % index distance between punctures
+assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
+	'Requests one or two consecutive punctures');
 
-  mine_h = graph_keytohash( mine, M, T );
-  next_h = graph_keytohash( next, M, T );
-  
-  global froms;
-  global tos;
-  global edgecount;
-  
-  edgecount = edgecount + 1;
-  froms(edgecount) = graph_keytohash(mine, M, T);
-  tos(edgecount) = graph_keytohash(next, M, T);
-  
-end
+assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
+	'Vertex indices must be nonzero') ;
+
+edgecount = edgecount + 1;
+froms(edgecount) = graph_keytohash(mine, M, T);
+tos(edgecount) = graph_keytohash(next, M, T);
