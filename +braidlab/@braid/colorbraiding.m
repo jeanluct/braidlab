@@ -19,7 +19,7 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   ** Implementation: ** By default, the function invokes a C++
 %   implementation of the algorithm from file colorbraiding_helper.cpp. To
 %   use a slower, MATLAB implementation, set a global MATLAB variable
-%   BRAIDLAB_COLORBRAIDING_MATLAB to true. A comparison between MATLAB and
+%   BRAIDLAB_colorbraiding_nomex to true. A comparison between MATLAB and
 %   C++ versions of the algorithm can be run by executing
 %   braidlab/devel/test_colorbraid.m
 %
@@ -56,10 +56,10 @@ function [varargout] = colorbraiding(XY,t,proj)
 import braidlab.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_COLORBRAIDING_MATLAB
-useMatlabVersion = (exist('BRAIDLAB_COLORBRAIDING_MATLAB','var') && ...
-                    ~isempty(BRAIDLAB_COLORBRAIDING_MATLAB) && ...
-                    all(BRAIDLAB_COLORBRAIDING_MATLAB));
+global BRAIDLAB_colorbraiding_nomex
+useMatlabVersion = (exist('BRAIDLAB_colorbraiding_nomex','var') && ...
+                    ~isempty(BRAIDLAB_colorbraiding_nomex) && ...
+                    all(BRAIDLAB_colorbraiding_nomex));
 
 if any(isnan(XY) | isinf(XY))
   error('BRAIDLAB:braid:colorbraiding:badarg',...

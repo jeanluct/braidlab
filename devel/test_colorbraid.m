@@ -14,13 +14,13 @@ XY = zeros( L, 2, N );
 for k = 1:N
 
   XY(:,1,k) = cumsum( randn( L, 1) );
-  XY(:,2,k) = cumsum( randn( L, 1) );  
+  XY(:,2,k) = cumsum( randn( L, 1) );
 
 end
 D = 1.1* sqrt( XY(:,1,:).^2 + XY(:,2,:).^2 );
 XY = XY ./ max(D(:));
 
-% % plotting 
+% % plotting
 % figure;
 % hold all;
 % for k = 1:5
@@ -28,10 +28,10 @@ XY = XY ./ max(D(:));
 % end
 
 %% prepare the simulation setup by clearing all globals
-clearvars -global BRAIDLAB_COLORBRAIDING_MATLAB BRAIDLAB_threads
+clearvars -global BRAIDLAB_colorbraiding_nomex BRAIDLAB_threads
 
-global BRAIDLAB_COLORBRAIDING_MATLAB   % modified colorbraiding will have a flag
-                                       % that can select Matlab vs C++ code
+global BRAIDLAB_colorbraiding_nomex   % colorbraiding has a flag
+                                      % to select Matlab vs C++ code
 
 timing = {};
 
@@ -62,7 +62,7 @@ timing{setn}.time = toc;
 %% Compute braid using MATLAB version of the code
 fprintf('\n*************************************\n')
 setn = setn + 1; tic
-BRAIDLAB_COLORBRAIDING_MATLAB = true;
+BRAIDLAB_colorbraiding_nomex = true;
 b_matlab = braidlab.braid(XY);
 timing{setn}.type = 'Matlab';
 timing{setn}.time = toc;
