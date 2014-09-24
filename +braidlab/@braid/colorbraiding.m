@@ -17,18 +17,18 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   is also used by the DATABRAID subclass.
 %
 %   ** Implementation: ** By default, the function invokes a C++
-%   implementation of the algorithm from file colorbraiding_helper.m. To use
-%   a slower, MATLAB implementation, set a global MATLAB variable
+%   implementation of the algorithm from file colorbraiding_helper.cpp. To
+%   use a slower, MATLAB implementation, set a global MATLAB variable
 %   BRAIDLAB_COLORBRAIDING_MATLAB to true. A comparison between MATLAB and
 %   C++ versions of the algorithm can be run by executing
 %   braidlab/devel/test_colorbraid.m
 %
-%   When MATLAB version is used, code emits the warning 
+%   When MATLAB version is used, code emits the warning
 %   BRAIDLAB:braid:colorbraiding:matlab
 %
 %   C++ version of the code additionally tries to run in a multi-threaded
 %   mode, using as many threads as available to Matlab. If you want to
-%   manually set the number of threads used, set a global MATLAB variable 
+%   manually set the number of threads used, set a global MATLAB variable
 %   BRAIDLAB_threads to a positive integer.
 %
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
@@ -92,7 +92,7 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
 
-if useMatlabVersion 
+if useMatlabVersion
   %% MATLAB version of the algorithm
   warning('BRAIDLAB:braid:colorbraiding:matlab', ...
           'Invoking MATLAB version of colorbraiding.')
@@ -161,8 +161,6 @@ for I = 1:n
     % projection coordinates (usually fixed by a change in projection
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
-    % % uses absolute precision to test equalty
-    % nearcoinc = find(abs(dXtraj) < 10*eps);
 
     % uses relative precision to test equality (same as C++ code)
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
@@ -339,4 +337,3 @@ else
              'threads set to 1.'])
   end
 end
-
