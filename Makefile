@@ -46,7 +46,7 @@ MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 	CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 	GMP_LD="$(GMP_LD)"
 
-.PHONY: check-env all clean distclean
+.PHONY: all check-env doc clean distclean
 
 all: check-env
 	cd +braidlab/private; $(MAKE) all
@@ -61,6 +61,9 @@ check-env:
 ifndef MEXSUFFIX
 	$(error Unknown system/architecture $(SYS)/$(ARCH))
 endif
+
+doc:
+	cd doc; make
 
 # remove MEX files and object files.
 clean:
