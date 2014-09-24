@@ -16,6 +16,21 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
 %
+%   ** Implementation: **
+%   By default, the function invokes a C++ implementation of the algorithm
+%   from file colorbraiding_helper.m. To use a slower, MATLAB
+%   implementation, set a global MATLAB variable BRAIDLAB_COLORBRAIDING_CPP
+%   to true. A comparison between MATLAB and C++ versions of the algorithm
+%   can be run by executing braidlab/devel/test_colorbraid.m
+%
+%   When MATLAB version is used, code emits the warning 
+%   BRAIDLAB:braid:colorbraiding:matlab
+%
+%   C++ version of the code additionally tries to run in a multi-threaded
+%   mode, using as many threads as available to Matlab. If you want to
+%   manually set the number of threads used, set a global MATLAB variable 
+%   BRAIDLAB_threads to a positive integer.
+%
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
 % <LICENSE
@@ -40,18 +55,20 @@ function [varargout] = colorbraiding(XY,t,proj)
 
 import braidlab.debugmsg
 
-% modified colorbraiding will have a flag that can select Matlab vs C++ code
-global BRAIDLAB_COLORBRAIDING_CPP
-global BRAIDLAB_threads
+% set to true to use Matlab instead of C++ version of the algorithm
+global BRAIDLAB_COLORBRAIDING_MATLAB
+useMatlabVersion = (exist('BRAIDLAB_COLORBRAIDING_MATLAB','var') && ...
+                    ~isempty(BRAIDLAB_COLORBRAIDING_MATLAB) && ...
+                    all(BRAIDLAB_COLORBRAIDING_MATLAB));
 
 if any(isnan(XY) | isinf(XY))
-  error('BRAIDLAB:braid:colorbraiding:badarg','Data contains NaNs or Infs.')
+  error('BRAIDLAB:braid:colorbraiding:badarg',...
+        'Data contains NaNs or Infs.')
 end
 
 debugmsg(['colorbraiding Part 1: Initialize parameters for crossing' ...
           ' analysis']);
 tic
-
 n = size(XY,3); % number of punctures
 
 if nargin < 3
@@ -75,37 +92,15 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
 
-if (exist('BRAIDLAB_COLORBRAIDING_CPP','var') && ...
-    ~isempty(BRAIDLAB_COLORBRAIDING_CPP) && ...
-    all(BRAIDLAB_COLORBRAIDING_CPP))
-  warning('BRAIDLAB:braid:colorbraiding:cpp', ...
-          'Invoking C++ version of colorbraiding.')
-
-  % detect number of threads to be used in C++ code
-  if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
-    % use the global variable to set the number of threads
-    Nthreads = ceil(BRAIDLAB_threads);
-    debugmsg(sprintf('Number of threads set by BRAIDLAB_threads to: %d.', ...
-                     Nthreads));
-  else
-    % try to autodetect the optimal number of threads (== number of cores)
-    try
-      Nthreads = feature('numcores');
-      debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
-                        '"feature".'], Nthreads));
-    % 'feature' fails - auto set number of threads to 1
-    catch
-      Nthreads = 1;
-      warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
-          ['Number of processor cores cannot be detected. Number of ' ...
-           'threads set to 1.'])
-    end
-  end
-  [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
-else
-  debugmsg(['Set a global flag BRAIDLAB_COLORBRAIDING_CPP to "true" ' ...
-          'to turn on C++ algorithm.']);
+if useMatlabVersion 
+  %% MATLAB version of the algorithm
+  warning('BRAIDLAB:braid:colorbraiding:matlab', ...
+          'Invoking MATLAB version of colorbraiding.')
   [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
+else
+  %% C++ version of the algorithm
+  Nthreads = getAvailableThreadNumber(); % defined at the end
+  [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
 end
 
 varargout{1} = braidlab.braid(gen,n);
@@ -209,8 +204,6 @@ for I = 1:n
   end
 end
 
-
-
 debugmsg(['colorbraiding Part 3: ' ...
           'Sorting the pair crossings into the generator sequence']);
 
@@ -313,3 +306,37 @@ function XYr = rotate_data_clockwise(XY,proj)
 XYr = zeros(size(XY));
 XYr(:,1,:) = cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
 XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
+
+function Nthreads = getAvailableThreadNumber
+%%GETAVAILABLETHREADNUMBER
+%
+% Determines number of threads used in C++ code.
+%
+% - First tries to honor global BRAIDLAB_threads.
+% - If it is invalid/not available, tries to set number of threads to number
+% of available cores.
+% - If number of cores cannot be detected, defaults to one thread.
+
+import braidlab.debugmsg
+global BRAIDLAB_threads
+
+if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
+  % use the global variable to set the number of threads
+  Nthreads = ceil(BRAIDLAB_threads);
+  debugmsg(sprintf('Number of threads set by BRAIDLAB_threads to: %d.', ...
+                   Nthreads));
+else
+  % try to autodetect the optimal number of threads (== number of cores)
+  try
+    Nthreads = feature('numcores');
+    debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
+                      '"feature".'], Nthreads));
+    % 'feature' fails - auto set number of threads to 1
+  catch
+    Nthreads = 1;
+    warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
+            ['Number of processor cores cannot be detected. Number of ' ...
+             'threads set to 1.'])
+  end
+end
+
