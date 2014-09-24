@@ -128,7 +128,7 @@ public:
   Real3DMatrix( const mxArray *in );
 
   // access matrix elements using matrix( r, c, s) syntax
-  double operator()( const mwSize row, const mwSize col, const mwSize spn )
+  double operator()( const mwIndex row, const mwIndex col, const mwIndex spn )
     const;
 
   // access sizes
@@ -149,7 +149,7 @@ public:
   RealVector( const mxArray *in );
 
   // access elements using vector( n ) syntax
-  double operator()( const mwSize n ) const;
+  double operator()( const mwIndex n ) const;
 
   // access size
   mwSize N(void) { return _N; }
@@ -163,10 +163,10 @@ class PWX {
 public:
   double t;
   bool L_On_Top; // is left string on top
-  size_t L; // index of the left string
-  size_t R; // index of the right string
+  mwIndex L; // index of the left string
+  mwIndex R; // index of the right string
 
-  PWX(double nt = 0, bool nSign = false, size_t nL=0, size_t nR=0) :
+  PWX(double nt = 0, bool nSign = false, mwIndex nL=0, mwIndex nR=0) :
     t(nt), L_On_Top(nSign), L(nL), R(nR) {}
 
   // PWX1 < PWX2 if their times are in that order
@@ -225,14 +225,14 @@ public:
   void run( size_t T = 1 );
 
   // Detects crossings between string with color "anchor" and all subsequent strings
-  void detectCrossings( size_t anchor );
+  void detectCrossings( mwIndex anchor );
 
 
 private:
   ThreadSafeWrapper wrapper;
   Real3DMatrix& XYtraj;
   RealVector& t;
-  size_t Nstrings;
+  mwSize Nstrings;
 
 
 };
@@ -250,7 +250,7 @@ public:
 
   // constructor -- number of strings
   // colors are assumed to be 1,2,...,N
-  Strings( size_t N);
+  Strings( mwSize N);
 
   // constructor -- X0 positions of strings at the initial time
   // colors are determined by location of elements X0
@@ -263,19 +263,19 @@ public:
   bool applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end );
 
   // copy braid and time to PREALLOCATED double arrays
-  size_t braidSize();
+  mwSize braidSize();
   void getBraid( vector<int>& data );
   void getTime( vector<double>& data );
 
 private:
 
-  size_t Nstrings;
+  mwSize Nstrings;
 
   // determine color (element value) of the string based on its current location (element index)
-  vector<size_t> locationToColor;
+  vector<mwIndex> locationToColor;
 
   // determine current location (element value) of the string based on its color (element index)
-  vector<size_t> colorToLocation;
+  vector<mwIndex> colorToLocation;
 
   // storage for braid generators
   list<double> t;
@@ -289,7 +289,7 @@ private:
   // returns
   // .first == true if exchange was successful
   // .second == generator index if .first == true (otherwise generator == Nstrings)
-  pair<bool, size_t> switchByColor( size_t L, size_t R );
+  pair<bool, mwIndex> switchByColor( mwIndex L, mwIndex R );
 
   // Applies a single pairwise crossing to the strings.  Crossing can
   // be applied only if the strings (specified by color) were
@@ -309,7 +309,7 @@ private:
   .second  - crossing data containing crossing information
 
 */
-pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
+pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
                            Real3DMatrix& XYtraj, RealVector& t);
 
 
@@ -341,8 +341,8 @@ bool areEqual( double a, double b, int D);
   Equality is checked by a custom areEqual function checks equality within 10 float-representable increments.
   (or as set by the last argument)
 */
-void assertNotCoincident(const Real3DMatrix& XYtraj, const size_t ti,
-			 const size_t I, const size_t J,
+void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
+			 const mwIndex I, const mwIndex J,
 			 const int precision = 10);
 
 // signum function
@@ -356,7 +356,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
   Timer tictoc( 1 );
   tictoc.tic();
 
-  size_t Nstrings = XYtraj.S();
+  mwSize Nstrings = XYtraj.S();
   bool anyXCoinc = false;
 
   // return braid information
@@ -446,7 +446,7 @@ Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
 }
 
 // access elements
-double Real3DMatrix::operator()(const mwSize row, const mwSize col, const mwSize spn ) const {
+double Real3DMatrix::operator()(const mwIndex row, const mwIndex col, const mwIndex spn ) const {
   if ( !( row < _R) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Row index out of bounds");
@@ -470,7 +470,7 @@ RealVector::RealVector( const mxArray *in ) {
 }
 
 // access elements using vector( n ) syntax
-double RealVector::operator()( const mwSize n ) const {
+double RealVector::operator()( const mwIndex n ) const {
   if ( !( n < _N) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Index out of bounds");
@@ -500,8 +500,8 @@ void PWX::print(int debuglevel = 0) {
   }
 }
 
-void PairCrossings::detectCrossings( size_t I ) {
-    for (size_t J = I+1; J < Nstrings; J++) {
+void PairCrossings::detectCrossings( mwIndex I ) {
+    for (mwIndex J = I+1; J < Nstrings; J++) {
       /*
         Determine times at which coordinates change order.
         is_I_on_Left records whether the strings are in order
@@ -509,7 +509,7 @@ void PairCrossings::detectCrossings( size_t I ) {
         an indication that the crossing happened.
       */
       // loop over rows
-      for (size_t ti = 0; ti < XYtraj.R()-1; ti++) {
+      for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
 
         // Check that coordinates do not coincide.
         assertNotCoincident( XYtraj, ti, I, J );
@@ -544,7 +544,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
       printf("colorbraiding_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
-    for (size_t I = 0; I < Nstrings; I++) {
+    for (mwIndex I = 0; I < Nstrings; I++) {
       detectCrossings(I);
     }
   }
@@ -564,7 +564,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
       mexEvalString("pause(0.001);"); //flush
     }
 
-    for (size_t I = 0; I < Nstrings; I++) {
+    for (mwIndex I = 0; I < Nstrings; I++) {
       pool.enqueue( ptrDetectCrossings, I);
     }
   }
@@ -573,13 +573,13 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 }
 
 // initial locations are equal to colors of strings
-Strings::Strings( size_t _N ) {
+Strings::Strings( mwIndex _N ) {
 
   Nstrings = _N;
   locationToColor.reserve(_N);
   colorToLocation.reserve(_N);
 
-  for (size_t i = 0; i < _N; i++ ) {
+  for (mwIndex i = 0; i < _N; i++ ) {
     locationToColor[i] = i;
     colorToLocation[i] = i;
   }
@@ -599,7 +599,7 @@ void Strings::assertLocationColorSanity() {
             "locationToColor is not of correct size" );
   mxAssert( colorToLocation.size() == Nstrings,
             "colorToLocation is not of correct size" );
-  for (size_t i = 0; i < Nstrings; i++ ) {
+  for (mwIndex i = 0; i < Nstrings; i++ ) {
     mxAssert( locationToColor[ colorToLocation[i] ] == i, "locationToColor . colorToLocation != Id" );
     mxAssert( colorToLocation[ locationToColor[i] ] == i, "colorToLocation . locationToColor != Id" );
   }
@@ -647,7 +647,7 @@ bool Strings::applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end
 
 // copy braid and time to PREALLOCATED double arrays
 
-size_t Strings::braidSize() {
+mwSize Strings::braidSize() {
 
   mxAssert(braid.size() == t.size(), "Braid and time vector have inconsistent sizes" );
   return braid.size();
@@ -673,7 +673,7 @@ bool Strings::applyCrossing( const PWX& cross ) {
 
   //  printf("Crossing time: %f\n", cross.t);
 
-  pair<bool, size_t> success = switchByColor( cross.L, cross.R );
+  pair<bool, mwIndex> success = switchByColor( cross.L, cross.R );
   if (success.first) {
     // generator has a positive sign if left string crosses above the right string
     braid.push_back( cross.L_On_Top ? (success.second+1) : (-(success.second+1)) );
@@ -682,15 +682,15 @@ bool Strings::applyCrossing( const PWX& cross ) {
   return success.first;
 }
 
-pair<bool, size_t> Strings::switchByColor( size_t L, size_t R ) {
+pair<bool, mwIndex> Strings::switchByColor( mwIndex L, mwIndex R ) {
 
   // find locations of the string
-  size_t oL = colorToLocation[L];
-  size_t oR = colorToLocation[R];
+  mwIndex oL = colorToLocation[L];
+  mwIndex oR = colorToLocation[R];
 
   // if the higher string is in fact the next string to the right,
   // apply the crossing
-  pair<bool, size_t> result(false, Nstrings);
+  pair<bool, mwIndex> result(false, Nstrings);
   if ( oL < Nstrings && (oL + 1 == oR ) ) {
 
     // swap the locations
@@ -714,7 +714,7 @@ pair<bool, size_t> Strings::switchByColor( size_t L, size_t R ) {
 
 // check and interpolate a crossing between strings I and J at time index ti,
 // i.e., between times t(ti) and t(ti+1)
-pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
+pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
                            Real3DMatrix& XYtraj, RealVector& t) {
 
   // printf(" %.1e   %.1e \t %.1e   %.1e\n", XYtraj(ti, 0, I), XYtraj(ti, 0, J), XYtraj(ti+1, 0, I), XYtraj(ti+1, 0, J));
@@ -729,7 +729,7 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
   // CROSSING == order of strings changes
 
   // calculate indices of the Left and Right string
-  size_t L, R;
+  mwIndex L, R;
   if (I_On_Left) {
     L = I;
     R = J;
@@ -774,8 +774,8 @@ template <typename T> int sgn(T val) {
 
 
 // assert that trajectories I and J are not coincident at time step ti
-void assertNotCoincident(const Real3DMatrix& XYtraj, const size_t ti,
-			 const size_t I, const size_t J, const int precision) {
+void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
+			 const mwIndex I, const mwIndex J, const int precision) {
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:coincidentparticles",
