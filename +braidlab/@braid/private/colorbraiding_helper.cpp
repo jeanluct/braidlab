@@ -92,13 +92,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                       " when running in multithreaded mode");
   }
 #endif
-    
+
   Timer tictoc(1);
 
   if (nrhs < 2)
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
                       "2 arguments required.");
-  
+
   Real3DMatrix trj = Real3DMatrix( prhs[0] );
   if ( trj.C() != 2 ) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
@@ -113,17 +113,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   tictoc.tic();
-  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t, NThreadsRequested );  
+  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t, NThreadsRequested );
   tictoc.toc("Algorithm");
 
   tictoc.tic();
   //  return;
-  
-  // create the list of generators 
+
+  // create the list of generators
   if (nlhs >= 1) {
     plhs[0] = mxCreateDoubleMatrix( retval.first.size(), 1, mxREAL );
     double* out = mxGetPr(plhs[0]);
-    
+
     for ( vector<int>::iterator it = retval.first.begin(); it != retval.first.end(); it++ ) {
       *out = (double) *it;
       out++;
@@ -133,7 +133,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (nlhs >= 2) {
     plhs[1] = mxCreateDoubleMatrix( retval.second.size(), 1, mxREAL );
     double* out = mxGetPr(plhs[1]);
-    
+
     for ( vector<double>::iterator it = retval.second.begin(); it != retval.second.end(); it++ ) {
       *out = (double) *it;
       out++;
