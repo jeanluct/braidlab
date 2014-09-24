@@ -39,11 +39,11 @@
 // https://gcc.gnu.org/projects/cxx0x.html
 #if ( (defined __GNUC__) && (!defined __clang__) )
 
-#define GCCVERSION (__GNUC__ * 10000           \
-                    + __GNUC_MINOR__ * 100     \
+#define GCCVERSION (__GNUC__ * 10000            \
+                    + __GNUC_MINOR__ * 100      \
                     + __GNUC_PATCHLEVEL__)
 
-# if ( (!defined BRAIDLAB_NOTHREADING) &&          \
+# if ( (!defined BRAIDLAB_NOTHREADING) &&           \
        ( GCCVERSION < 40600) ) // less than GCC 4.5
 # define BRAIDLAB_NOTHREADING
 # endif
@@ -53,11 +53,11 @@
 // http://clang.llvm.org/cxx_status.html
 #if (defined __clang__)
 
-#define CLANGVERSION (__clang_major__ * 10000           \
-                     + __clang_minor__ * 100     \
-                     + __clang_patchlevel__)
+#define CLANGVERSION (__clang_major__ * 10000   \
+                      + __clang_minor__ * 100   \
+                      + __clang_patchlevel__)
 
-# if ( (!defined BRAIDLAB_NOTHREADING) &&      \
+# if ( (!defined BRAIDLAB_NOTHREADING) &&               \
        (CLANGVERSION < 30300) ) // less than Clang 3.3
 # define BRAIDLAB_NOTHREADING
 # endif
@@ -71,6 +71,7 @@
 #include <cmath>
 #include <ctime>
 #include <sstream>
+#include <stdexcept>
 
 #ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
@@ -156,8 +157,6 @@ public:
 
 };
 
-
-
 // A pairwise crossing
 class PWX {
 public:
@@ -179,11 +178,11 @@ public:
 
 // simple wrapper around list<PWX> object to prevent it from being
 // written concurrently by two threads
-class ThreadSafeWrapper {
+class ThreadSafePWXList {
 
 public:
 
-  ThreadSafeWrapper( list<PWX>& s ) : storage(s) {}
+  ThreadSafePWXList( list<PWX>& s ) : storage(s) {}
 
   void push_back( PWX data ) {
 #ifndef BRAIDLAB_NOTHREADING
@@ -202,12 +201,73 @@ private:
 #endif
 };
 
+// Exception used for thread-safe error reporting in pairwise detection part
+class PWXexception : public std::logic_error
+{
+public:
+  using std::logic_error::logic_error;
+
+  int code;
+  // return code of the Matlab error that should be reported
+  const char* id() {
+    switch (code) {
+    case 1:
+      return "BRAIDLAB:braid:colorbraiding:interpolationerror";
+    case 2:
+      return "BRAIDLAB:braid:colorbraiding:coincidentproj";
+    case 3:
+      return "BRAIDLAB:braid:colorbraiding:coincidentparticles";
+    default:
+      return "BRAIDLAB:braid:colorbraiding:UNKNOWN";
+    }
+  }
+
+  // virtual const char* what() const throw()
+  // {
+  //   switch (code) {
+  //   case 1:
+  //     return "Error in interpolating crossing time. Interpolated time-point is not within the interval determined by input.";
+  //   case 2:
+  //     return "X coordinates of two trajectories are coincident. Try changing the projection angle.";
+  //   case 3:
+  //     return "X and Y coordinates of two trajectories are coincident. Trajectories have to be distinct at every time.";
+  //   default:
+  //     return "Unknown error. This should never happen!";
+  //   }
+  // }
+  
+};
+
+class ThreadSafeExceptionList {
+
+public:
+
+  ThreadSafeExceptionList( list<PWXexception>& s ) : externalStorage(s) {}
+
+  void push_back( PWXexception data ) {
+#ifndef BRAIDLAB_NOTHREADING
+    mtx.lock();
+#endif
+    externalStorage.push_back(data);
+#ifndef BRAIDLAB_NOTHREADING
+    mtx.unlock();
+#endif
+  }
+
+private:
+  std::list<PWXexception>& externalStorage;
+#ifndef BRAIDLAB_NOTHREADING
+  std::mutex mtx;
+#endif
+};
+
+
 /*
   Class that detects pairwise crossings from
   the trajectory data.
 
   Implemented as an object to facilitate multithreading computation.
- */
+*/
 class PairCrossings {
 
 public:
@@ -215,11 +275,14 @@ public:
   // inputs: _XYtraj (trajectory) _t (time)
   // output: storage
   PairCrossings( Real3DMatrix& _XYtraj,
-                 RealVector& _t,
-                 list<PWX>& storage) : wrapper(storage),
-                                       XYtraj(_XYtraj),
-                                       t(_t),
-                                       Nstrings(_XYtraj.S()) {}
+                 RealVector& _t, 
+                 list<PWX>& crossingStorage, 
+                 list<PWXexception>& errorStorage) 
+    : listOfCrossings(crossingStorage),
+      listOfErrors(errorStorage),
+      XYtraj(_XYtraj),
+      t(_t),
+      Nstrings(_XYtraj.S()) {}
 
   // run the calculation on T threads
   void run( size_t T = 1 );
@@ -229,11 +292,11 @@ public:
 
 
 private:
-  ThreadSafeWrapper wrapper;
+  ThreadSafePWXList listOfCrossings;
+  ThreadSafeExceptionList listOfErrors;
   Real3DMatrix& XYtraj;
   RealVector& t;
   mwSize Nstrings;
-
 
 };
 
@@ -308,6 +371,8 @@ private:
   .first  - true if crossing occured
   .second  - crossing data containing crossing information
 
+  Throws PWXexception in case input trajectories 
+  overlap in X or XY coordinates.
 */
 pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
                            Real3DMatrix& XYtraj, RealVector& t);
@@ -326,24 +391,31 @@ public:
   double toc( const char* msg = "Process", bool reset=false );
 };
 
+
 // check if a and b are within D-th representable number of each other
 bool areEqual( double a, double b, int D);
 
 /*
-  Check that coordinates of trajectories I and J do not coincide at time-index ti. Throws MATLAB errors if they do.
+  Check that coordinates of trajectories I and J do not coincide at
+  time-index ti.  
 
-  If only X coordinates coincide for a pair of strings, this means a
-  different projection angle will fix things.
+  Returns 0 if 
+  X coordinates do not coincide (everything is OK).
 
-  If both X and Y coordinates coincide, then this is a true trajectory
-  intersection, which means that the braid is undefined.
+  Returns 1 if 
+  only X coordinates coincide for a pair of strings. This means a
+  different projection angle will fix things. 
 
-  Equality is checked by a custom areEqual function checks equality within 10 float-representable increments.
-  (or as set by the last argument)
+  Returns 2 if
+  both X and Y coordinates coincide, this is a true trajectory
+  intersection, which means that the braid is undefined. 
+
+  Equality is checked by a custom areEqual function checks equality 
+  within 10 float-representable increments (or as set by the last argument).
 */
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
-			 const mwIndex I, const mwIndex J,
-			 const int precision = 10);
+                         const mwIndex I, const mwIndex J,
+                         const int precision = 10);
 
 // signum function
 template <typename T> int sgn(T val);
@@ -363,11 +435,33 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
   pair< vector<int>, vector<double> > retval;
 
   list<PWX> crossings;
+  list<PWXexception> crossingErrors;
 
-  PairCrossings pairCrosser( XYtraj, t, crossings );
+  PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors );
 
   pairCrosser.run(Nthreads);
   tictoc.toc("colorbraiding_helper: pairwise crossing detection", true);
+
+  // there were crossingErrors in pairwise detection
+  if (! crossingErrors.empty() ) {
+    int count  = 1;
+    // output individual errors 
+    if (1 <= BRAIDLAB_debuglvl)  {
+      mexPrintf("List of all crossingErrors encountered:\n");
+      for( list<PWXexception>::iterator e = crossingErrors.begin();
+           e != crossingErrors.end();
+           e++, count++ ) {
+        mexPrintf("Error %d: ", count);
+        mexPrintf( e->what() );
+        mexPrintf("\n");
+      }
+    }
+    stringstream report;
+    report << crossingErrors.begin()->what();
+    report << " (NOTE: This is error 1/" << count << " errors detected).";
+    // first error is invoked as a MATLAB error
+    mexErrMsgIdAndTxt(crossingErrors.begin()->id(), report.str().c_str() );
+  }
 
   crossings.sort();
   tictoc.toc("colorbraiding_helper: sorting crossdat", true);
@@ -501,26 +595,38 @@ void PWX::print(int debuglevel = 0) {
 }
 
 void PairCrossings::detectCrossings( mwIndex I ) {
-    for (mwIndex J = I+1; J < Nstrings; J++) {
-      /*
-        Determine times at which coordinates change order.
-        is_I_on_Left records whether the strings are in order
-        ...I...J...  J is_I_on_Left changes between two steps, it's
-        an indication that the crossing happened.
-      */
-      // loop over rows
-      for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
+  for (mwIndex J = I+1; J < Nstrings; J++) {
+    /*
+      Determine times at which coordinates change order.
+      is_I_on_Left records whether the strings are in order
+      ...I...J...  J is_I_on_Left changes between two steps, it's
+      an indication that the crossing happened.
+    */
+    // loop over rows
+    for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
+
+      // does a crossing occur at time-index ti between trajectories I and J?
+      try {
 
         // Check that coordinates do not coincide.
         assertNotCoincident( XYtraj, ti, I, J );
 
-        // does a crossing occur at time-index ti between trajectories I and J?
-        // interpolated crossing stored in PWX structure interpCross
+        // first element is true if crossing occurs
+        // second element stores data about crossing 
         pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
+
+        // interpolated crossing stored in PWX structure interpCross
         if (interpCross.first)
-          wrapper.push_back(interpCross.second);
+          listOfCrossings.push_back(interpCross.second);
+
       }
+      catch( PWXexception& e ) {
+        listOfErrors.push_back( e );
+        continue;
+      }
+
     }
+  }
 }
 
 void PairCrossings::run( size_t NThreadsRequested ) {
@@ -551,10 +657,10 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 #ifndef BRAIDLAB_NOTHREADING
   // threaded version
   else {
-  // std::bind creates a function reference to a member function
-  // needed here b/c passing references to member functions
-  // requires explicit object to be referred
-  //
+    // std::bind creates a function reference to a member function
+    // needed here b/c passing references to member functions
+    // requires explicit object to be referred
+    //
     auto ptrDetectCrossings = bind(&PairCrossings::detectCrossings,
                                    this, placeholders::_1);
     ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
@@ -753,8 +859,13 @@ pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
   // fraction of the time interval at which the points meet
   double delta = - ( XYtraj(ti, 0, R) - XYtraj(ti, 0, L) ) / ( dXR - dXL );
 
-  mxAssert(sgn<double>(delta) == sgn<double>(T),
-           "Interpolation error - interval increment of incorrect sign.");
+  if (sgn<double>(delta) != sgn<double>(T) ) {
+    PWXexception e("Error in interpolating crossing time."
+                   " Interpolated time-point is outside the interval "
+                   "determined by input.");
+    e.code = 1;
+    throw e;
+  }
 
   // interpolation
   double tc = t(ti) + delta * T;
@@ -773,18 +884,36 @@ template <typename T> int sgn(T val) {
 }
 
 
-// assert that trajectories I and J are not coincident at time step ti
+// Assert that trajectories I and J are not coincident at time step ti
+// throws PWXexception otherwise
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
-			 const mwIndex I, const mwIndex J, const int precision) {
+                         const mwIndex I, const mwIndex J, const int precision) {
+
+  int code = 0;
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
+    code = 2; // for code explanation, see PWXexceptio
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:coincidentparticles",
-                        "Coincident particles: braid not defined.");
-    } else {
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:coincidentproj",
-                        "Coincident projection coordinate; change projection angle (type help braid.braid).");
+      code = 3; // for code explanation, see PWXexceptio
     }
   }
+
+  if ( code == 0 ) return; // no error
+
+  // Construct error message
+  stringstream report;
+  if (code == 2 )
+    report << "Projection ";
+  else
+    report << "Particle ";
+
+  report << "overlap error for crossing at time-index " << ti;
+  report << " between trajectories " << I << " and " << J;
+
+  PWXexception e(report.str());
+  e.code = code;
+  throw e;
+
+  return;
 }
 
 
