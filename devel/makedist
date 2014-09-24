@@ -21,10 +21,11 @@ if [[ -z $(mex -help | grep -n MATLAB) ]]; then
     exit 1
 fi
 
+# start over from scratch
+make distclean
+
 # build the braidlab user's guide
-cd doc
-make braidlab_guide.pdf
-cd ..
+make doc
 
 # Make 32 and 64 bit, cross-compile for Mac, Windows (we wish).
 # Or compile separately and add to subfolders.
