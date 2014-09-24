@@ -51,7 +51,7 @@
 
 // CLANG: feature list:
 // http://clang.llvm.org/cxx_status.html
-#if (defined __clang__) 
+#if (defined __clang__)
 
 #define CLANGVERSION (__clang_major__ * 10000           \
                      + __clang_minor__ * 100     \
@@ -96,7 +96,7 @@ int BRAIDLAB_debuglvl = -1;
   Trajectories are assumed to be sorted by values of the X coordinate at the first time step.
 
   Arguments:
-  XYtraj -- (# timesteps) x 2 x (# trajectories/strings) matrix 
+  XYtraj -- (# timesteps) x 2 x (# trajectories/strings) matrix
   -- "X" and "Y" coordinates correspond to indexing by the second dimension
   t      -- (# timesteps) vector
 
@@ -120,20 +120,21 @@ class Real3DMatrix {
 
   const double *data;         // data matrix
   mwSize _R, _C, _S; // dimensions: rows, cols, spans
-  
-public:  
+
+public:
 
   // use MATLAB mxArray as input, check number of dimensions
   // and store reference to its real part for easier access
   Real3DMatrix( const mxArray *in );
 
   // access matrix elements using matrix( r, c, s) syntax
-  double operator()( mwSize row, mwSize col, mwSize spn );
+  double operator()( const mwSize row, const mwSize col, const mwSize spn )
+    const;
 
   // access sizes
-  mwSize R(void) { return _R; }
-  mwSize C(void) { return _C; }
-  mwSize S(void) { return _S; }
+  mwSize R(void) const { return _R; }
+  mwSize C(void) const { return _C; }
+  mwSize S(void) const { return _S; }
 
 };
 
@@ -143,16 +144,16 @@ class RealVector {
   mwSize _N;
 
 public:
-  
+
   // constructor: takes MATLAB array as an argument
   RealVector( const mxArray *in );
 
   // access elements using vector( n ) syntax
-  double operator()( mwSize n );
+  double operator()( const mwSize n ) const;
 
   // access size
   mwSize N(void) { return _N; }
-  
+
 };
 
 
@@ -164,7 +165,7 @@ public:
   bool L_On_Top; // is left string on top
   size_t L; // index of the left string
   size_t R; // index of the right string
-  
+
   PWX(double nt = 0, bool nSign = false, size_t nL=0, size_t nR=0) :
     t(nt), L_On_Top(nSign), L(nL), R(nR) {}
 
@@ -173,8 +174,8 @@ public:
 
   // basic log to stdout
   void print(int debuglevel);
-  
-}; 
+
+};
 
 // simple wrapper around list<PWX> object to prevent it from being
 // written concurrently by two threads
@@ -185,24 +186,24 @@ public:
   ThreadSafeWrapper( list<PWX>& s ) : storage(s) {}
 
   void push_back( PWX data ) {
-#ifndef BRAIDLAB_NOTHREADING    
+#ifndef BRAIDLAB_NOTHREADING
     mtx.lock();
 #endif
     storage.push_back(data);
-#ifndef BRAIDLAB_NOTHREADING        
+#ifndef BRAIDLAB_NOTHREADING
     mtx.unlock();
 #endif
   }
 
 private:
   std::list<PWX>& storage;
-#ifndef BRAIDLAB_NOTHREADING  
+#ifndef BRAIDLAB_NOTHREADING
   std::mutex mtx;
 #endif
 };
 
 /*
-  Class that detects pairwise crossings from 
+  Class that detects pairwise crossings from
   the trajectory data.
 
   Implemented as an object to facilitate multithreading computation.
@@ -215,7 +216,7 @@ public:
   // output: storage
   PairCrossings( Real3DMatrix& _XYtraj,
                  RealVector& _t,
-                 list<PWX>& storage) : wrapper(storage), 
+                 list<PWX>& storage) : wrapper(storage),
                                        XYtraj(_XYtraj),
                                        t(_t),
                                        Nstrings(_XYtraj.S()) {}
@@ -246,7 +247,7 @@ class Strings {
     location == location of the string at any later time
   */
 public:
-  
+
   // constructor -- number of strings
   // colors are assumed to be 1,2,...,N
   Strings( size_t N);
@@ -283,11 +284,11 @@ private:
   // return true if colorToLocation and locationToColor vectors are
   // consistent
   void assertLocationColorSanity();
-  
+
   // perform operation of exchanging braids of COLOR L and R
   // returns
   // .first == true if exchange was successful
-  // .second == generator index if .first == true (otherwise generator == Nstrings) 
+  // .second == generator index if .first == true (otherwise generator == Nstrings)
   pair<bool, size_t> switchByColor( size_t L, size_t R );
 
   // Applies a single pairwise crossing to the strings.  Crossing can
@@ -306,7 +307,7 @@ private:
   The outputs are as follows:
   .first  - true if crossing occured
   .second  - crossing data containing crossing information
-            
+
 */
 pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
                            Real3DMatrix& XYtraj, RealVector& t);
@@ -315,7 +316,7 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
 // a simple tic-toc style timer for internal profiling
 class Timer {
 
-public: 
+public:
 
   Timer( int level ) : debuglevel(level) {}
 
@@ -330,7 +331,7 @@ bool areEqual( double a, double b, int D);
 
 /*
   Check that coordinates of trajectories I and J do not coincide at time-index ti. Throws MATLAB errors if they do.
-    
+
   If only X coordinates coincide for a pair of strings, this means a
   different projection angle will fix things.
 
@@ -340,7 +341,9 @@ bool areEqual( double a, double b, int D);
   Equality is checked by a custom areEqual function checks equality within 10 float-representable increments.
   (or as set by the last argument)
 */
-void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision=10 );
+void assertNotCoincident(const Real3DMatrix& XYtraj, const size_t ti,
+			 const size_t I, const size_t J,
+			 const int precision = 10);
 
 // signum function
 template <typename T> int sgn(T val);
@@ -352,7 +355,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 
   Timer tictoc( 1 );
   tictoc.tic();
-  
+
   size_t Nstrings = XYtraj.S();
   bool anyXCoinc = false;
 
@@ -368,7 +371,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 
   crossings.sort();
   tictoc.toc("colorbraiding_helper: sorting crossdat", true);
-  
+
   if (1 <= BRAIDLAB_debuglvl)  {
     printf("colorbraiding_helper: Number of crossings %d\n", crossings.size() );
     mexEvalString("pause(0.001);"); //flush
@@ -431,7 +434,7 @@ pair< vector<int>, vector<double> > crossingsToGenerators( Real3DMatrix& XYtraj,
 
 }
 
-// access elements
+// constructor from MATLAB
 Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
   if ( mxGetNumberOfDimensions(in) != 3 )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:not3d",
@@ -443,7 +446,7 @@ Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
 }
 
 // access elements
-double Real3DMatrix::operator()( mwSize row, mwSize col, mwSize spn ) {
+double Real3DMatrix::operator()(const mwSize row, const mwSize col, const mwSize spn ) const {
   if ( !( row < _R) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Row index out of bounds");
@@ -453,7 +456,7 @@ double Real3DMatrix::operator()( mwSize row, mwSize col, mwSize spn ) {
   if ( !( spn < _S) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Span index out of bounds");
-    
+
   return data[(spn*_C + col)*_R + row];
 }
 
@@ -467,13 +470,12 @@ RealVector::RealVector( const mxArray *in ) {
 }
 
 // access elements using vector( n ) syntax
-double RealVector::operator()( mwSize n ) {
+double RealVector::operator()( const mwSize n ) const {
   if ( !( n < _N) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Index out of bounds");
   return data[n];
 }
-
 
 
 // retrieve and print elapsed time
@@ -499,7 +501,6 @@ void PWX::print(int debuglevel = 0) {
 }
 
 void PairCrossings::detectCrossings( size_t I ) {
-
     for (size_t J = I+1; J < Nstrings; J++) {
       /*
         Determine times at which coordinates change order.
@@ -507,7 +508,7 @@ void PairCrossings::detectCrossings( size_t I ) {
         ...I...J...  J is_I_on_Left changes between two steps, it's
         an indication that the crossing happened.
       */
-      // loop over rows      
+      // loop over rows
       for (size_t ti = 0; ti < XYtraj.R()-1; ti++) {
 
         // Check that coordinates do not coincide.
@@ -545,7 +546,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
     }
     for (size_t I = 0; I < Nstrings; I++) {
       detectCrossings(I);
-    }  
+    }
   }
 #ifndef BRAIDLAB_NOTHREADING
   // threaded version
@@ -565,7 +566,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 
     for (size_t I = 0; I < Nstrings; I++) {
       pool.enqueue( ptrDetectCrossings, I);
-    }  
+    }
   }
 #endif
 
@@ -573,7 +574,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 
 // initial locations are equal to colors of strings
 Strings::Strings( size_t _N ) {
-  
+
   Nstrings = _N;
   locationToColor.reserve(_N);
   colorToLocation.reserve(_N);
@@ -600,7 +601,7 @@ void Strings::assertLocationColorSanity() {
             "colorToLocation is not of correct size" );
   for (size_t i = 0; i < Nstrings; i++ ) {
     mxAssert( locationToColor[ colorToLocation[i] ] == i, "locationToColor . colorToLocation != Id" );
-    mxAssert( colorToLocation[ locationToColor[i] ] == i, "colorToLocation . locationToColor != Id" );    
+    mxAssert( colorToLocation[ locationToColor[i] ] == i, "colorToLocation . locationToColor != Id" );
   }
 
 }
@@ -620,7 +621,7 @@ bool Strings::applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end
   // Multiple crossings were sent -- cycle through all of them and try
   // to apply them sequentially and whittle the block to size zero.
   // Every time we successfully apply a crossing, remove it from the list
-  // and re-start the application from the beginning. 
+  // and re-start the application from the beginning.
   // Reaching the end of the list means that in that pass, no applications
   // were successful, so the list is inconsistent.
   list<PWX> concurrentBlock( start, end );
@@ -628,17 +629,17 @@ bool Strings::applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end
   while ( it != concurrentBlock.end() ) {
 
     mxAssert(areEqual(blockTime,it->t,2),
-             "The block of crossings should have the same time (up to 2 representable doubles).");    
+             "The block of crossings should have the same time (up to 2 representable doubles).");
 
     if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
-      concurrentBlock.erase(it); 
+      concurrentBlock.erase(it);
       it = concurrentBlock.begin();
     }
     else { // not successful -- try the next
       it++;
     }
   }
-  
+
   // only empty list is a success
   return !concurrentBlock.empty();
 
@@ -647,7 +648,7 @@ bool Strings::applyCrossings( list<PWX>::iterator start, list<PWX>::iterator end
 // copy braid and time to PREALLOCATED double arrays
 
 size_t Strings::braidSize() {
-  
+
   mxAssert(braid.size() == t.size(), "Braid and time vector have inconsistent sizes" );
   return braid.size();
 
@@ -658,7 +659,7 @@ void Strings::getBraid( vector<int>& data ) {
   std::copy(braid.begin(), braid.end(), std::back_inserter(data));
 
 }
-void Strings::getTime( vector<double>& data ) {  
+void Strings::getTime( vector<double>& data ) {
 
   data.clear();
   std::copy(t.begin(), t.end(), std::back_inserter(data));
@@ -666,10 +667,10 @@ void Strings::getTime( vector<double>& data ) {
 }
 
 
-// Attempt to apply a pairwise crossing to the list 
+// Attempt to apply a pairwise crossing to the list
 // Successful if two strings were next to each other
 bool Strings::applyCrossing( const PWX& cross ) {
-  
+
   //  printf("Crossing time: %f\n", cross.t);
 
   pair<bool, size_t> success = switchByColor( cross.L, cross.R );
@@ -689,7 +690,7 @@ pair<bool, size_t> Strings::switchByColor( size_t L, size_t R ) {
 
   // if the higher string is in fact the next string to the right,
   // apply the crossing
-  pair<bool, size_t> result(false, Nstrings);  
+  pair<bool, size_t> result(false, Nstrings);
   if ( oL < Nstrings && (oL + 1 == oR ) ) {
 
     // swap the locations
@@ -702,11 +703,11 @@ pair<bool, size_t> Strings::switchByColor( size_t L, size_t R ) {
 
     // assert that the swap was performed correctly
     assertLocationColorSanity();
-    
+
     result.first = true;
     result.second = oL;
   }
-  
+
   return result;
 
 }
@@ -724,7 +725,7 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
   if ( I_On_Left == (XYtraj(ti+1, 0, I) < XYtraj(ti+1, 0, J)) ) {
     return pair<bool, PWX>( false, PWX() );
   }
-  
+
   // CROSSING == order of strings changes
 
   // calculate indices of the Left and Right string
@@ -753,7 +754,7 @@ pair<bool,PWX> isCrossing( size_t ti, size_t I, size_t J,
   double delta = - ( XYtraj(ti, 0, R) - XYtraj(ti, 0, L) ) / ( dXR - dXL );
 
   mxAssert(sgn<double>(delta) == sgn<double>(T),
-           "Interpolation error - interval increment of incorrect sign.");    
+           "Interpolation error - interval increment of incorrect sign.");
 
   // interpolation
   double tc = t(ti) + delta * T;
@@ -773,19 +774,18 @@ template <typename T> int sgn(T val) {
 
 
 // assert that trajectories I and J are not coincident at time step ti
-void assertNotCoincident( Real3DMatrix& XYtraj, double ti, size_t I, size_t J, int precision ) {
+void assertNotCoincident(const Real3DMatrix& XYtraj, const size_t ti,
+			 const size_t I, const size_t J, const int precision) {
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X coordinate
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y coordinate
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:coincidentparticles",
                         "Coincident particles: braid not defined.");
-    }
-    else {
+    } else {
       mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:coincidentproj",
                         "Coincident projection coordinate; change projection angle (type help braid.braid).");
     }
   }
 }
-
 
 
 #endif // BRAIDLAB_COLORBRAIDING_HELPER_HPP
