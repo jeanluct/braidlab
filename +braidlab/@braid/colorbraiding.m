@@ -16,12 +16,12 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
 %
-%   ** Implementation: **
-%   By default, the function invokes a C++ implementation of the algorithm
-%   from file colorbraiding_helper.m. To use a slower, MATLAB
-%   implementation, set a global MATLAB variable BRAIDLAB_COLORBRAIDING_CPP
-%   to true. A comparison between MATLAB and C++ versions of the algorithm
-%   can be run by executing braidlab/devel/test_colorbraid.m
+%   ** Implementation: ** By default, the function invokes a C++
+%   implementation of the algorithm from file colorbraiding_helper.m. To use
+%   a slower, MATLAB implementation, set a global MATLAB variable
+%   BRAIDLAB_COLORBRAIDING_MATLAB to true. A comparison between MATLAB and
+%   C++ versions of the algorithm can be run by executing
+%   braidlab/devel/test_colorbraid.m
 %
 %   When MATLAB version is used, code emits the warning 
 %   BRAIDLAB:braid:colorbraiding:matlab
