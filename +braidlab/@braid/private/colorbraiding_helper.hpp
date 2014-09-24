@@ -205,7 +205,10 @@ private:
 class PWXexception : public std::logic_error
 {
 public:
-  using std::logic_error::logic_error;
+  // The next line is for gcc >= 4.8 (c++11 I think).
+  // using std::logic_error::logic_error;
+  // Explicitly declare and define the constructor instead.
+  PWXexception(const string& __arg) : std::logic_error(__arg) {};
 
   int code;
   // return code of the Matlab error that should be reported
