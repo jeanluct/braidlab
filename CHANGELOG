@@ -1,10 +1,10 @@
 ------------------------------------------------------------------------
-2.0 [2014-xx-xx]
+2.0 [2014-09-24]
 
 * Complete rewrite of the Makefiles to simplify them and make them
   compatible with Matlab 2014a (which broke a lot of things).  The
   Makefiles no longer attempt to detect which compiler MEX uses, so
-  you'll have to set it manualy if you use a nonstandard one (e.g.,
+  you'll have to set it manually if you use a nonstandard one (e.g.,
   'make CXX=g++-4.7.1 CC=gcc-4.7.1').  This has been tested on 64-bit
   Linux and Mac OS.
 
@@ -12,25 +12,28 @@
   now uses a C++ MEX file (written by Marko Budisic) giving a big
   speedup for large datasets.  Support for parallelization on multiple
   cores is included.  The global variable BRAIDLAB_threads determines
-  the number of threads used.  [*** document in guide ***]
+  the number of threads used.
 
 * The braid constructor can make knot representatives, e.g.,
   b=braid('8_3') returns a braid representative for the third
   8-crossing knot.
 
-* loopsigma's C++ helper functions can now handle int32, int64, and
-  single, in addition to double.  This makes checking braid equality
-  and triviality much faster, unless overflow occurs and VPI has to be
-  used.
+* The private method braid.loopsigma's C++ helper functions (used by
+  braid*loop) can now handle int32, int64, and single, in addition to
+  double.  This makes checking braid equality and triviality much
+  faster, unless overflow occurs and VPI has to be used.
 
-* loopsigma's C++ helper functions can also handle VPI (Variable
-  Precision Integers) by using GMP, the GNU MultiPrecision library.
-  If you don't have GMP installed, compile with option
-  "BRAIDLAB_USE_GMP=0".  However, this will lead to a massive slowdown
-  when working with VPI types.
+* The private method braid.loopsigma's C++ helper functions can also
+  handle VPI (Variable Precision Integers) by using GMP, the GNU
+  MultiPrecision library.  If you don't have GMP installed, compile
+  with option "BRAIDLAB_USE_GMP=0".  However, this will lead to a
+  massive slowdown when working with VPI types (Variable Precision
+  Integers).
 
 * New methods in the loop class: loop.components, loop.plot
-  'Components' option, loop.getgraph.  [*** document in guide ***]
+  'Components' option, loop.getgraph.  These are not yet documented in
+  the guide, as they are an advanced feature, though they are
+  described in the help text to the functions.
 
 * braid.burau and braid.alexpoly can use the symbolic toolbox.
   alexpoly no longer centers the polynomial by default, since
@@ -45,30 +48,32 @@
 
 * New methods in the braid class: braid.linact converts the optional
   output from braid.mtimes (see above) to a matrix.  braid.cycle looks
-  for a limit cycle in the braid action on on loops.  braid.cyclemat
-  uses braid.cycle to return a matrix corresponding to this limit
-  cycle.  The largest eigenvalue of this matrix, normalized by the
-  period, gives the Perron root of the largest pseudo-Anosov
-  component(s).
+  for a limit cycle in the braid action on loops.  braid.cyclemat uses
+  braid.cycle to return a matrix corresponding to this limit cycle.
+  The largest eigenvalue of this matrix, normalized by the period,
+  gives the Perron root of the largest pseudo-Anosov component(s).
+  This is not documented in the guide yet, because it's still a bit
+  experimental.  In particular it sometimes fails to find the limit
+  cycle (issue #52).
 
 * Many other small bugfixes and improvements.
 
 Several improvements to the method braid.entropy:
 
-* It has a C MEX helper function and is much faster.  It no longer
-  checks if the braid is trivial, which avoids overflow and speeds up
-  the function.
+* braid.entropy has a C MEX helper function and is much faster.  It no
+  longer checks if the braid is trivial, which avoids overflow and
+  speeds up the function.
 
-* Its convergence has been greatly improved (see next item for more
-  details).  With enough iterations, machine precision can usually be
-  achieved.
+* braid.entropy's convergence has been greatly improved (see next item
+  for more details).  With enough iterations, machine precision can
+  usually be achieved.
 
-* Its optional second return argument has changed from a list of
-  iterates to the final generalized eigenvector.  The reason is that
-  the internal algorithm has changed: the Dynnikov coordinates get
-  renormalized at every step, much like the power iteration method for
-  finding the largest eigenvalue of a matrix.  A consequence of this
-  is that it is no longer natural to store the iterates.  This
+* braid.entropy's optional second return argument has changed from a
+  list of iterates to the final generalized eigenvector.  The reason
+  is that the internal algorithm has changed: the Dynnikov coordinates
+  get renormalized at every step, much like the power iteration method
+  for finding the largest eigenvalue of a matrix.  A consequence of
+  this is that it is no longer natural to store the iterates.  This
   shouldn't affect things very much, since this optional argument was
   not used widely.
 
