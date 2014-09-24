@@ -78,18 +78,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 #ifdef BRAIDLAB_NOTHREADING
   if (NThreadsRequested > 1) {
-    mexWarnMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
-                       "You requested multithreaded execution, but "
-                       "either your compiler does not support it or "
-                       "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
-                       "Defaulting to single-threaded execution.");
+    mexWarnMsgIdAndTxt(
+                 "BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
+                 "You requested multithreaded execution, but "
+                 "either your compiler does not support it or "
+                 "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
+                 "Defaulting to single-threaded execution.");
     NThreadsRequested = 1;
   }
 #else
   if (NThreadsRequested < 1) {
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:numthreadsnotpositive",
-                      "Number of threads requested must be positive"
-                      " when running in multithreaded mode");
+    mexErrMsgIdAndTxt(
+                "BRAIDLAB:braid:colorbraiding_helper:numthreadsnotpositive",
+                "Number of threads requested must be positive"
+                " when running in multithreaded mode");
   }
 #endif
 
@@ -108,23 +110,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   RealVector t = RealVector( prhs[1] );
 
   if ( trj.R() != t.N() ) {
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
-                      "Trajectory matrix and time vector should have same number of rows.");
+    mexErrMsgIdAndTxt(
+        "BRAIDLAB:braid:colorbraiding_helper:input",
+        "Trajectory matrix and time vector should have same number of rows.");
   }
 
   tictoc.tic();
-  pair< vector<int>, vector<double> > retval = crossingsToGenerators( trj, t, NThreadsRequested );
+  std::pair< std::vector<int>, std::vector<double> >
+    retval = crossingsToGenerators( trj, t, NThreadsRequested );
   tictoc.toc("Algorithm");
 
   tictoc.tic();
-  //  return;
 
   // create the list of generators
   if (nlhs >= 1) {
     plhs[0] = mxCreateDoubleMatrix( retval.first.size(), 1, mxREAL );
     double* out = mxGetPr(plhs[0]);
 
-    for ( vector<int>::iterator it = retval.first.begin(); it != retval.first.end(); it++ ) {
+    for ( std::vector<int>::iterator it = retval.first.begin();
+          it != retval.first.end(); it++ ) {
       *out = (double) *it;
       out++;
     }
@@ -134,12 +138,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     plhs[1] = mxCreateDoubleMatrix( retval.second.size(), 1, mxREAL );
     double* out = mxGetPr(plhs[1]);
 
-    for ( vector<double>::iterator it = retval.second.begin(); it != retval.second.end(); it++ ) {
+    for ( std::vector<double>::iterator it = retval.second.begin();
+          it != retval.second.end(); it++ ) {
       *out = (double) *it;
       out++;
     }
   }
 
   tictoc.toc("Copying the output");
-
 }

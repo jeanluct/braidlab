@@ -29,7 +29,6 @@
 #include "mex.h"
 #include "braiding.h"
 
-using namespace std;
 
 extern void _main();
 
