@@ -140,7 +140,7 @@ public:
 
 class RealVector {
 
-  double *data;
+  const double *data;
   mwSize _N;
 
 public:
@@ -152,7 +152,7 @@ public:
   double operator()( const mwIndex n ) const;
 
   // access size
-  mwSize N(void) { return _N; }
+  mwSize N(void) const { return _N; }
 
 };
 
