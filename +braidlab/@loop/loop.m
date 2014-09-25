@@ -71,13 +71,13 @@ classdef loop < matlab.mixin.CustomDisplay
     %   punctures.  Here, loop means a "topological loop", or more precisely
     %   an equivalence class of simple closed multicurves under isotopy.
     %
-    %   L = LOOP(D), where D is an array with 2*N-4 columns, creates an
-    %   array of loop objects, one for each row.
+    %   L = LOOP(D), where D is a matrix with 2*N-4 columns, creates a
+    %   vector of loop objects, one for each row.
     %
     %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
     %   coordinates, each of length N-2, where N is the number of punctures.
-    %   If A and B are arrays of equal dimension and with N-2 columns, then
-    %   an array of several loop objects is created, one for each row.
+    %   If A and B are matrices of equal dimension and with N-2 columns,
+    %   then a vector of several loop objects is created, one for each row.
     %
     %   Note that the coordinates of the loop are of the same type as the
     %   vectors used in its construction (usually double by default).  For
