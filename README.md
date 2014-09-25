@@ -33,7 +33,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [11]: http://www.gnu.org/licenses/gpl-3.0.html
 [12]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
 [13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
-[14]: http://bitbucket.org/jeanluc/braidlab/raw/tip/doc/braidlab_guide.pdf
+[14]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
 [15]: http://www.nsf.gov
 [16]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
 [17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
