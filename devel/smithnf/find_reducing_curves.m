@@ -1,6 +1,7 @@
 function [linv,Q] = find_reducing_curves(b,l0)
 
 import braidlab.*
+global BRAIDLAB_debuglvl
 
 badbraid = false;
 if nargin < 1
@@ -12,8 +13,10 @@ end
 
 n = b.n;
 
-tn = tntype(b);
-fprintf('braid is %s.\n',tn)
+if exist('BRAIDLAB_debuglvl','var') && BRAIDLAB_debuglvl >= 1
+  tn = tntype(b);
+  fprintf('braid is %s.\n',tn)
+end
 
 % Use random initial loop if not specified.
 if nargin < 2, l0 = loop(randi(5,1,2*n-2)-3); end
@@ -51,7 +54,9 @@ for i = 1:period
   [U,D,V] = snf(A);  % Smith form of A.
 
   % Check that everything is ok.
-  checksnf(A,U,D,V);
+  if exist('BRAIDLAB_debuglvl','var') && BRAIDLAB_debuglvl >= 1
+    checksnf(A,U,D,V);
+  end
 
   D = diag(D);
 
@@ -150,15 +155,17 @@ while 1
       linv = [linv ; l];
     end
   end
-
-  %if w == 2, disp(num2str(Z')); end
 end
 
-if ~strcmp(tn,'reducible') && ~isempty(linv)
-  error('Braid is not reducible, yet we found a reducing curve.')
+if exist('BRAIDLAB_debuglvl','var') && BRAIDLAB_debuglvl >= 1
+  if ~strcmp(tn,'reducible') && ~isempty(linv)
+    warning('Braid is not reducible, yet we found a reducing curve.')
+  end
 end
 
-if strcmp(tn,'reducible') && isempty(linv)
-  % Example: < -3  1 -4  2 -3 -1 -2  3 -2  4  3  4 >  Why?
-  warning('Braid is reducible, but we didn''t find a reducing curve.')
+if exist('BRAIDLAB_debuglvl','var') && BRAIDLAB_debuglvl >= 1
+  if strcmp(tn,'reducible') && isempty(linv)
+    % Example: < -3  1 -4  2 -3 -1 -2  3 -2  4  3  4 >  Why?
+    warning('Braid is reducible, but we didn''t find a reducing curve.')
+  end
 end
