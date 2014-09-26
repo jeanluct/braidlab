@@ -10,11 +10,15 @@ function [varargout] = cyclemat(b,varargin)
 %   value), to the power 1/PERIOD, corresponds to the dilatation of braid if
 %   it contains at least one pseudo-Anosov component.
 %
-%   CYCLEMAT(B,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.CYCLE.
+%   CYCLEMAT(B,L) uses the initial loop L (default loop(B.n)) for the
+%   iteration.
 %
-%   MI = CYCLEMAT(B,'iterates') or CYCLEMAT(B,'iter') returns a cell arrary
-%   MI with PERIOD elements, each containing the matrix of an iterate from
-%   the limit cycle.  The matrix M above is MI{PERIOD}*...*MI{1}.
+%   CYCLEMAT(B,...,MAXIT,NCONVREQ) passes MAXIT and NCONVREQ to BRAID.CYCLE.
+%   Either argument can be replaced by [] to use its default value.
+%
+%   MI = CYCLEMAT(B,...,'iterates') or CYCLEMAT(B,...,'iter') returns a cell
+%   arrary MI with PERIOD elements, each containing the matrix of an iterate
+%   from the limit cycle.  The matrix M above is MI{PERIOD}*...*MI{1}.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP, BRAID.CYCLE, BRAID.LINACT.

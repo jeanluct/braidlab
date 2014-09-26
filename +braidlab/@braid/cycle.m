@@ -1,13 +1,17 @@
 function [varargout] = cycle(b,varargin)
 %CYCLE   Find limit cycle of effective linear action of a braid.
-%   PN = CYCLE(B) finds a limit cycle for the effective linear action
-%   of B on the starting loop loop(B.n).  The output matrix PN has
-%   dimension [PERIOD 5*B.n].  It contains the signs of the pos/neg
-%   operators in the piecewise-linear action given by BRAID.MTIMES.
+%   PN = CYCLE(B) finds a limit cycle for the effective linear action of B.
+%   The output matrix PN has dimension [PERIOD 5*(B.n-1)].  It contains the
+%   signs of the pos/neg operators in the piecewise-linear action given by
+%   BRAID.MTIMES.
 %
-%   CYCLE(B,MAXIT,NCONVREQ) also specifies the maximum number of
+%   CYCLE(B,L) uses the initial loop L (default loop(B.n)) for the
+%   iteration.
+%
+%   CYCLE(B,...,MAXIT,NCONVREQ) also specifies the maximum number of
 %   iterations MAXIT (default 1000) and the number of required consecutive
-%   convergences for the cycle NCONVREQ (default 5).
+%   convergences for the cycle NCONVREQ (default 5).  Either argument can be
+%   replaced by [] to use its default value.
 %
 %   [PN,IT] = CYCLE(B,...) also returns the number of iterations IT that
 %   were required to achieve convergence.
@@ -72,12 +76,20 @@ for i = 1:length(varargin)
     if strcmpi(varargin{i},'plot')
       doplot = true;
       varargin(i) = []; % delete string element from cell.
-      break
     else
       error('BRAIDLAB:braid:cycle:badarg', ...
             'Unknown option ''%s''',varargin{i})
     end
+  elseif isa(varargin{i},'braidlab.loop')
+    % Get the initial loop from arguments.
+    l = loop(vpi(varargin{i}.coords));
+    varargin{i} = []; % delete loop element from cell.
   end
+end
+
+% Assign default initial loop if it wasn't specified as an argument.
+if ~exist('l','var')
+  l = loop(b.n,'vpi');
 end
 
 % Turn false convergence warning off by default.
@@ -101,8 +113,6 @@ if length(varargin) < 2 || isempty(varargin{2})
 else
   nconvreq = varargin{2};
 end
-
-l = loop(b.n,'vpi');
 
 % Partitions of n with the largest LCM.  See issue #52.
 % Mathematica: Table[Max[LCM @@ # & /@ IntegerPartitions[n]], {n, 70}]
