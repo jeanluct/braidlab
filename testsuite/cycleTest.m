@@ -82,6 +82,10 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyEqual(it2,testCase.it2);
       testCase.verifyEqual(it12,testCase.it12);
 
+      % Specify initial loop.
+      cycle(testCase.b2,braidlab.loop([1 2 3 4 5 6]));
+      testCase.verifyEqual(size(pn2,1),testCase.period2);
+
       % Request more consecutive convergences (10).
       [pn1b,it1b] = cycle(testCase.b1,[],10);
       testCase.verifyEqual(pn1,pn1b);
