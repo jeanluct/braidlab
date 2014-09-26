@@ -1,4 +1,4 @@
-function [linv,Q] = find_reducing_curves(b)
+function [linv,Q] = find_reducing_curves(b,l0)
 
 import braidlab.*
 
@@ -15,27 +15,30 @@ n = b.n;
 tn = tntype(b);
 fprintf('braid is %s.\n',tn)
 
-[M,period] = b.cyclemat('iter');
+% Use random initial loop if not specified.
+if nargin < 2, l0 = loop(randi(5,1,2*n-2)-3); end
+
+[M,period] = b.cyclemat('iter',l0);
 
 Q = [];
 
 for i = 1:period
   M{i} = full(M{i});
 
+  % Check the badbraid case, where we know the reducing curve.
   if badbraid
     lred2 = b*lred;
-    if all(lred2 == lred)
-      fprintf('\nBad news... b*l == l, ');
-    else
-      fprintf('b*l ~= l, ');
+    if ~all(lred2 == lred)
+      fprintf('\nbadbraid: Somethings''s wrong... not a reducing curve.\n');
     end
     if any(M{i}*lred.coords' ~= lred.coords')
-      fprintf('M{%d}*l ~= l\n\n',i);
+      fprintf('M{%d}*l ~= l',i);
+      fprintf('\n\n')
+      fprintf('     l = %s\n',num2str(lred.coords))
+      fprintf('   b*l = %s\n',num2str(lred2.coords))
+      fprintf('M{%d}*l = %s\n\n',i,num2str((M{i}*lred.coords')'))
+      error('Invariant curve is not an eigenvector.')
     end
-    fprintf('     l = %s\n',num2str(lred.coords))
-    fprintf('   b*l = %s\n',num2str(lred2.coords))
-    fprintf('M{%d}*l = %s\n\n',i,num2str((M{i}*lred.coords')'))
-    error('Invariant curve is not an eigenvector.')
   end
 
   % Get rid of "boundary" Dynnikov coordinates, a_(n-1) and b_(n-1).
