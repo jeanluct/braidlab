@@ -1,7 +1,8 @@
 ------------------------------------------------------------------------
 2.x [2014-xx-xx]
 
-* Fix detection of some limit cycles (issue #52).
+* Fix detection of some limit cycles (issue #52).  Also allow
+  specification of an initial loop when looking for cycles.
 
 * Move some utility functions to namespace +util, to make them less
   visible to user.
