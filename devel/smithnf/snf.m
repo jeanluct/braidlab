@@ -16,8 +16,11 @@ function [U,S,V] = snf(A);
 % gilbert@parc.xerox.com
 % Xerox Palo Alto Research Center
 
+% Modified by Jean-Luc Thiffeault for braidlab to work with VPI (Variable
+% Precision Integers).
+
 if round(A) ~= A
-  error('Requires integer input.');
+  error('BRAIDLAB:braid:snf:badarg','Requires integer input.');
 end
 
 % This looks much like an SVD algorithm that first bidiagonalizes
@@ -173,7 +176,7 @@ function Ei = inv2(E)
 detE = E(1,1)*E(2,2) - E(1,2)*E(2,1);
 
 if abs(detE) ~= 1
-  error('Determinant should be one.')
+  error('BRAIDLAB:braid:snf:detnotone','Determinant should be one.')
 end
 
 Ei = detE*[E(2,2) -E(1,2); -E(2,1) E(1,1)];
