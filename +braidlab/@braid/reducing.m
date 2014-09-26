@@ -1,5 +1,5 @@
-function l = reducing(b)
-%REDUCING   Find reducing curves for a braid.
+function l = reducing(b,ntries)
+%REDUCING   Find reducing curves for a braid, if they exist.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP.LOOP, BRAID.CYCLE, BRAID.CYCLEMAT.
@@ -28,4 +28,16 @@ function l = reducing(b)
 % Reducing curve is
 %   lred = loop([0 -1 0 0 0 0 0 1]);
 
-l = find_reducing_curves(b);
+if nargin < 2, ntries = 5; end
+
+lc = [];
+for i = 1:ntries
+  l = find_reducing_curves(b);
+  for j = 1:length(l)
+    lc = [lc ; l(j).coords];
+  end
+end
+
+lc = unique(lc,'rows');
+
+l = braidlab.loop(lc);
