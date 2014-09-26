@@ -87,8 +87,12 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyEqual(pn1,pn1b);
       testCase.verifyEqual(it1b,testCase.it1b);
 
+      % Too few maxit for known cycle bound.
+      testCase.verifyWarning(@() cycle(braidlab.braid([1 2],17)), ...
+                             'BRAIDLAB:braid:cycle:longcycle');
+
       % Request too many consecutive convergences for the number of iterations.
-      testCase.verifyError(@() cycle(testCase.b2,10,10), ...
+      testCase.verifyError(@() cycle(testCase.b2,12,3), ...
                            'BRAIDLAB:braid:cycle:noconv');
 
       % Unknown flag.

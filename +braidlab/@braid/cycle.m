@@ -104,9 +104,32 @@ end
 
 l = loop(b.n,'vpi');
 
-% The maximum period we can detect, based on the convergence requirement and
+% Partitions of n with the largest LCM.  See issue #52.
+% Mathematica: Table[Max[LCM @@ # & /@ IntegerPartitions[n]], {n, 70}]
+maxperiods = [1, 2, 3, 4, 6, 6, 12, 15, 20, 30, 30, 60, 60, 84, 105, 140, ...
+              210, 210, 420, 420, 420, 420, 840, 840, 1260, 1260, 1540, ...
+              2310, 2520, 4620, 4620, 5460, 5460, 9240, 9240, 13860, 13860, ...
+              16380, 16380, 27720, 30030, 32760, 60060, 60060, 60060, ...
+              60060, 120120, 120120, 180180, 180180, 180180, 180180, 360360, ...
+              360360, 360360, 360360, 471240, 510510, 556920, 1021020, ...
+              1021020, 1141140, 1141140, 2042040, 2042040, 3063060, 3063060, ...
+              3423420, 3423420, 6126120];
+
+% The longest period we can detect, based on the convergence requirement and
 % the maximum number of iterations.
 maxperiod = floor(maxit/nconvreq);
+
+issuewarning = false;
+if b.n <= length(maxperiods)
+  maxperiod = min(maxperiod,maxperiods(b.n));
+  if maxperiod < maxperiods(b.n), issuewarning = true; end
+end
+
+if b.n > length(maxperiods) || issuewarning
+  warning('BRAIDLAB:braid:cycle:longcycle', ...
+          ['The cycle could be longer than can be detected with ' ...
+           'MAXIT=%d and NCONVREQ=%d.'],maxit,nconvreq)
+end
 
 pnl = [];
 nconvperiod = zeros(1,maxperiod);
@@ -119,8 +142,8 @@ for it = 1:maxit
   % Check if we appear to have reached a limit cycle.
   %
   % We need to check all periods since we can have "false convergences"
-  % where we appear to converge to, say, a fixed point for a few
-  % iterates.  This resolves issue #52.
+  % where we appear to converge to, say, a fixed point for a few iterates.
+  % See issue #52.
   for p = 1:min(maxperiod,it-1)
     if all(pnl(end,:) == pnl(end-p,:))
       nconvperiod(p) = nconvperiod(p) + 1;
