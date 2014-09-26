@@ -63,7 +63,7 @@ function [varargout] = entropy(b,tol,maxit,nconvreq)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-import braidlab.debugmsg
+import braidlab.util.debugmsg
 
 if isempty(b.word) || b.n < 3
   varargout{1} = 0;

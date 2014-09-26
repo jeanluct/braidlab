@@ -68,6 +68,7 @@ function [varargout] = cycle(b,varargin)
 global BRAIDLAB_debuglvl
 
 import braidlab.*
+import braidlab.util.debugmsg
 
 doplot = false;
 for i = 1:length(varargin)

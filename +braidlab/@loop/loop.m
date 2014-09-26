@@ -120,7 +120,7 @@ classdef loop < matlab.mixin.CustomDisplay
         else
           htyp = @double;
         end
-        if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
+        if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
         l.coords = htyp(zeros(1,2*n1));
         l.coords(n1+1:end) = htyp(-1);
         return

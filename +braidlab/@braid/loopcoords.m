@@ -79,7 +79,7 @@ else
   notypespec = true;
 end
 
-if strcmp(char(htyp),'vpi'), braidlab.checkvpi; end
+if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
 
 switch lower(conv)
  case {'left','dehornoy'}
@@ -105,7 +105,7 @@ catch err
     if strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
       warning('BRAIDLAB:braid:loopcoords:overflow',...
               'loopcoords overflowed... using VPI.')
-      braidlab.checkvpi
+      braidlab.util.checkvpi
       l = braidlab.loop(loopsigma(w,vpi(l.coords)));
     end
   else
