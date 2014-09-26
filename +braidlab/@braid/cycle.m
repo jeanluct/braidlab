@@ -104,10 +104,9 @@ end
 
 l = loop(b.n,'vpi');
 
-% Right now it's a conjecture that the maximum cycle period is bounded by
-% the number of punctures.  This is sharp (example: < 1 2 >).  It hasn't
-% failed yet!
-maxperiod = b.n;
+% The maximum period we can detect, based on the convergence requirement and
+% the maximum number of iterations.
+maxperiod = floor(maxit/nconvreq);
 
 pnl = [];
 nconvperiod = zeros(1,maxperiod);
