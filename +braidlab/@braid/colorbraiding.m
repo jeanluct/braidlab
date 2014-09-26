@@ -53,7 +53,7 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-import braidlab.debugmsg
+import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
 global BRAIDLAB_colorbraiding_nomex
@@ -137,7 +137,7 @@ function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t)
 % -- is saved in the same cell and is used to determine the generator
 % sequence later.  The outer I,J loop is over all pairs of strings.
 
-import braidlab.debugmsg
+import braidlab.util.debugmsg
 tic;
 n = size(XYtraj,3);
 
@@ -315,7 +315,7 @@ function Nthreads = getAvailableThreadNumber
 % of available cores.
 % - If number of cores cannot be detected, defaults to one thread.
 
-import braidlab.debugmsg
+import braidlab.util.debugmsg
 global BRAIDLAB_threads
 
 if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
