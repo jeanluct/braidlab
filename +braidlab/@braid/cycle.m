@@ -38,11 +38,6 @@ function [varargout] = cycle(b,varargin)
 %        1    -1    -1     0
 %        0     1     1     1
 %
-%   BUG: sometimes fails to find the limit cycle ("Failed to achieve
-%   convergence after 1000 iterations.  Try to increase MAXIT.").  If
-%   increasing MAXIT doesn't work, then this is likely a rare case such as
-%   the one discussed in issue #52.
-%
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LINACT, BRAID.CYCLEMAT.
 
@@ -70,6 +65,7 @@ global BRAIDLAB_debuglvl
 import braidlab.*
 import braidlab.util.debugmsg
 
+% Parse options.
 doplot = false;
 for i = 1:length(varargin)
   if ischar(varargin{i})
@@ -108,39 +104,47 @@ end
 
 l = loop(b.n,'vpi');
 
-nconv = 0;
+% Right now it's a conjecture that the maximum cycle period is bounded by
+% the number of punctures.  This is sharp (example: < 1 2 >).  It hasn't
+% failed yet!
+maxperiod = b.n;
+
 pnl = [];
+nconvperiod = zeros(1,maxperiod);
+converged = false;
 
 for it = 1:maxit
   [l,pn] = b*l; %#ok<RHSFN>
   pnl = [pnl ; pn]; %#ok<AGROW>
-  if nconv == 0
-    % Check if we appear to have reached a limit cycle.
-    for p = 1:it-1
-      if all(pnl(end,:) == pnl(end-p,:))
-        period = p;
-        nconv = 1;
-        break
+
+  % Check if we appear to have reached a limit cycle.
+  %
+  % We need to check all periods since we can have "false convergences"
+  % where we appear to converge to, say, a fixed point for a few
+  % iterates.  This resolves issue #52.
+  for p = 1:min(maxperiod,it-1)
+    if all(pnl(end,:) == pnl(end-p,:))
+      nconvperiod(p) = nconvperiod(p) + 1;
+      if ~mod(nconvperiod(p),p)
+        debugmsg(sprintf('Converged for %d period(s) with period %d...', ...
+                         nconvperiod(p)/p,p),2)
       end
-    end
-  else
-    % Are we still in the same limit cycle?
-    if all(pnl(end,:) == pnl(end-period,:))
-      nconv = nconv + 1;
-      if ~mod(nconv,period)
-        debugmsg(sprintf('Converged for %d period(s)...',nconv/period),2)
-      end
-      if nconv >= nconvreq*period
+      if nconvperiod(p) >= nconvreq*p
         debugmsg(sprintf('Converged after %d iterations with period %d.', ...
-                         it,period),1)
+                         it,p),1)
+        converged = true;
         break
       end
-    else
+    elseif nconvperiod(p)
       warning('BRAIDLAB:braid:cycle:falseconv', ...
-              'False convergence after %d time(s)!\n',nconv)
-      nconv = 0;
+              'False convergence of period %d after %d time(s)!\n', ...
+              nconvperiod(p),p)
+      nconvperiod(p) = 0;
     end
   end
+
+  if converged, break; end
+
 end
 
 if doplot
@@ -155,7 +159,7 @@ if it == maxit
          '  Try to increase MAXIT.'],it)
 else
   % Save the cycle.
-  varargout{1} = pnl(end-period+1:end,:);
+  varargout{1} = pnl(end-p+1:end,:);
 end
 
 if nargout > 1, varargout{2} = it; end
