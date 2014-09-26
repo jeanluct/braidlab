@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------
+2.x [2014-xx-xx]
+
+* Fix detection of some limit cycles (issue #52).
+
+* Move some utility functions to namespace +util, to make them less
+  visible to user.
+
+------------------------------------------------------------------------
 2.0 [2014-09-24]
 
 * Complete rewrite of the Makefiles to simplify them and make them
