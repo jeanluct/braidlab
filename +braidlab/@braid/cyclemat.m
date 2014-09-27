@@ -57,19 +57,24 @@ end
 [pn,it] = cycle(b,varargin{:});
 period = size(pn,1);
 
+nn = sqrt(size(pn,2));
+if floor(nn) ~= nn
+  error('BRAIDLAB:braid:cyclemat:badsize','Bad column size for iterates.');
+end
+
 % Reconstruct matrices of the linear action.
-if doiter
-  % Keep individual matrices.
-  M = cell(1,period);
-  for i = 1:period
-    M{i} = linact(b,pn(i,:));
-  end
-else
+M = cell(1,period);
+for i = 1:period
+  M{i} = reshape(pn(i,:),[nn nn]);
+end
+
+if ~doiter
   % Take their product.
-  M = linact(b,pn(1,:));
+  MM = M{1};
   for i = 2:period
-    M = linact(b,pn(i,:)) * M;
+    MM = M{i} * MM;
   end
+  M = MM;
 end
 
 varargout{1} = M;

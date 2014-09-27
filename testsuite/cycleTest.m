@@ -104,13 +104,13 @@ classdef cycleTest < matlab.unittest.TestCase
                            'BRAIDLAB:braid:cycle:badarg');
 
       % Explicitly verify one matrix.
-      M11 = full(linact(testCase.b1,pn1(1,:)));
-      testCase.verifyEqual(M11,testCase.M11);
+      testCase.verifyEqual(reshape(pn1(1,:),size(testCase.M11)),testCase.M11);
 
       % Matrix for each iterate.
       M1cell = cell(1,size(pn1,1));
+      nn = sqrt(size(pn1,2));
       for i = 1:size(pn1,1)
-        M1cell{i} = linact(testCase.b1,pn1(i,:));
+        M1cell{i} = reshape(pn1(i,:),[nn nn]);
       end
       M1cell2 = cyclemat(testCase.b1,'iter');
       testCase.verifyEqual(M1cell,M1cell2);

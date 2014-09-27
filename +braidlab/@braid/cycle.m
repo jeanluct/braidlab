@@ -141,13 +141,13 @@ if b.n > length(maxperiods) || issuewarning
            'MAXIT=%d and NCONVREQ=%d.'],maxit,nconvreq)
 end
 
-pnl = [];
+Ml = [];
 nconvperiod = zeros(1,maxperiod);
 converged = false;
 
 for it = 1:maxit
-  [l,pn] = b*l; %#ok<RHSFN>
-  pnl = [pnl ; pn]; %#ok<AGROW>
+  [l,M] = b*l; %#ok<RHSFN>
+  Ml = [Ml ; full(M(:).')]; %#ok<AGROW>
 
   % Check if we appear to have reached a limit cycle.
   %
@@ -155,7 +155,7 @@ for it = 1:maxit
   % where we appear to converge to, say, a fixed point for a few iterates.
   % See issue #52.
   for p = 1:min(maxperiod,it-1)
-    if all(pnl(end,:) == pnl(end-p,:))
+    if all(Ml(end,:) == Ml(end-p,:))
       nconvperiod(p) = nconvperiod(p) + 1;
       if ~mod(nconvperiod(p),p)
         debugmsg(sprintf('Converged for %d period(s) with period %d...', ...
@@ -180,8 +180,8 @@ for it = 1:maxit
 end
 
 if doplot
-  % Plot pn signs.
-  imagesc(pnl.'), colormap bone
+  % Plot Ml.
+  imagesc(Ml.'), colormap bone
   xlabel('iteration'), ylabel('pos / neg')
 end
 
@@ -191,7 +191,7 @@ if it == maxit
          '  Try to increase MAXIT.'],it)
 else
   % Save the cycle.
-  varargout{1} = pnl(end-p+1:end,:);
+  varargout{1} = Ml(end-p+1:end,:);
 end
 
 if nargout > 1, varargout{2} = it; end
