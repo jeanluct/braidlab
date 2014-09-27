@@ -2,7 +2,7 @@ function l = reducing(b,ntries)
 %REDUCING   Find reducing curves for a braid, if they exist.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP.LOOP, BRAID.CYCLE, BRAID.CYCLEMAT.
+%   See also BRAID, LOOP.LOOP, BRAID.CYCLE.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault

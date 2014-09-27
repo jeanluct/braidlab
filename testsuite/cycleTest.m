@@ -69,26 +69,26 @@ classdef cycleTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_cycle(testCase)
-      [pn1,it1] = cycle(testCase.b1); %#ok<*PROP>
-      [pn2,it2] = cycle(testCase.b2);
-      [pn12,it12] = cycle(tensor(testCase.b1,testCase.b2));
+      [M1,period1,it1] = cycle(testCase.b1); %#ok<*PROP>
+      [M2,period2,it2] = cycle(testCase.b2);
+      [M12,period12,it12] = cycle(tensor(testCase.b1,testCase.b2));
 
       % Check periods.
-      testCase.verifyEqual(size(pn1,1),testCase.period1);
-      testCase.verifyEqual(size(pn2,1),testCase.period2);
-      testCase.verifyEqual(size(pn12,1),testCase.period1*testCase.period2);
+      testCase.verifyEqual(period1,testCase.period1);
+      testCase.verifyEqual(period2,testCase.period2);
+      testCase.verifyEqual(period12,testCase.period1*testCase.period2);
       % Check iterations for convernce.
       testCase.verifyEqual(it1,testCase.it1);
       testCase.verifyEqual(it2,testCase.it2);
       testCase.verifyEqual(it12,testCase.it12);
 
       % Specify initial loop.
-      cycle(testCase.b2,braidlab.loop([1 2 3 4 5 6]));
-      testCase.verifyEqual(size(pn2,1),testCase.period2);
+      [~,period2] = cycle(testCase.b2,braidlab.loop([1 2 3 4 5 6]));
+      testCase.verifyEqual(period2,testCase.period2);
 
       % Request more consecutive convergences (10).
-      [pn1b,it1b] = cycle(testCase.b1,[],10);
-      testCase.verifyEqual(pn1,pn1b);
+      [M1b,~,it1b] = cycle(testCase.b1,[],10);
+      testCase.verifyEqual(M1,M1b);
       testCase.verifyEqual(it1b,testCase.it1b);
 
       % Too few maxit for known cycle bound.
@@ -103,24 +103,19 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyError(@() cycle(testCase.b2,'garbage'), ...
                            'BRAIDLAB:braid:cycle:badarg');
 
-      % Explicitly verify one matrix.
-      testCase.verifyEqual(reshape(pn1(1,:),size(testCase.M11)),testCase.M11);
-
-      % Matrix for each iterate.
-      M1cell = cell(1,size(pn1,1));
-      nn = sqrt(size(pn1,2));
-      for i = 1:size(pn1,1)
-        M1cell{i} = reshape(pn1(i,:),[nn nn]);
-      end
-      M1cell2 = cyclemat(testCase.b1,'iter');
-      testCase.verifyEqual(M1cell,M1cell2);
+      % Check the product of the matrices in the cycle.
+      M1it = cycle(testCase.b1,'iter');
+      testCase.verifyEqual(M1it{3}*M1it{2}*M1it{1},M1);
+      % Explicitly verify one matrix in the cycle.
+      testCase.verifyEqual(full(M1it{1}),testCase.M11);
 
       % Explicitly verify the matrix for the full cycle.
-      M2 = cyclemat(testCase.b2);
+      M2it = cycle(testCase.b2,'iter','plot');
+      testCase.verifyEqual(full(M2it{4}*M2it{3}*M2it{2}*M2it{1}),testCase.M2);
       testCase.verifyEqual(full(M2),testCase.M2);
 
       % Verify a more difficult characteristic polynomial.
-      [Mpsi12,periodpsi12,itpsi12] = cyclemat(testCase.bpsi12);
+      [Mpsi12,periodpsi12,itpsi12] = cycle(testCase.bpsi12);
       testCase.verifyEqual(periodpsi12,testCase.periodpsi12);
       testCase.verifyEqual(itpsi12,testCase.itpsi12);
       testCase.verifyEqual(charpoly(Mpsi12),testCase.polypsi12);

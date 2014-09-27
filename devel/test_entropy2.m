@@ -38,7 +38,7 @@ if nargin < 2, tol = 1e-6; end
 if nargin < 3, maxit = []; end
 if nargin < 4, nconvreq = []; end
 
-[M,period] = cyclemat(b,maxit,nconvreq);
+[M,period] = cycle(b,maxit,nconvreq);
 
 method = 'eigs';
 
