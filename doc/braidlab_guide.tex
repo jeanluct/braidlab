@@ -48,8 +48,8 @@
 % Commands
 %
 
-\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
-%\newcommand{\jlt}[1]{}
+%\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
+\newcommand{\jlt}[1]{}
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
@@ -1145,6 +1145,8 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \section{The effective linear action and cycles}
 \label{sec:elacycles}
 
+\jlt{This section is not indexed yet.}
+
 \subsection{Effective linear action}
 \label{sec:linact}
 
@@ -1230,7 +1232,7 @@ ans = 1
      -1
 \end{lstlisting}
 The difference is that \lstinline{M} may only be applied \emph{to this
-  speficic loop} (or a loop that happens to share the same effective linear
+  specific loop} (or a loop that happens to share the same effective linear
 action).
 
 A common thing to do is to find the effective linear action on the canonical
@@ -1246,13 +1248,127 @@ ans = 0     0    -1     0
 The canonical set assumes an extra puncture, so the matrix dimension is larger
 by~$2$.
 
-The effective linear action doesn't offer much at this point.  Its real
-advantage will become apparent in Section~\ref{sec:cycles}, when we find that
-it can achieve periodic limit cycles.
+The effective linear action doesn't seem to offer much at this point.  Its
+real advantage will become apparent in Section~\ref{sec:cycles}, when we find
+that it can achieve periodic limit cycles.
 
 
 \subsection{Limit cycles of the effective linear action}
 \label{sec:cycles}
+
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.37\textheight]{efflinact1}
+  \label{fig:efflinact1}
+}\hspace{.5em}
+\subfigure[]{
+  \includegraphics[height=.37\textheight]{efflinact2}
+  \label{fig:efflinact2}
+}\hspace{.5em}
+\subfigure[]{
+  \includegraphics[height=.37\textheight]{efflinact3}
+  \label{fig:efflinact3}
+}
+\end{center}
+\caption{The plot produced by \lstinline{cycle(b,'plot')} for (a) \lstinline{b
+    = braid([1 -2])}; (b) \lstinline{b = braid([1 2 3])}; (c) \lstinline{b =
+    braid('psi',11)}.}
+\end{figure}
+%
+
+The effective linear action has a very interesting behavior when a braid is
+iterated on some initial curve.  
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> [l,M] = b*l; l, full(M)
+
+l = (( 3 -1 ))
+
+M = 2   1
+   -1   0
+\end{lstlisting}
+Now repeat this last command:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); l = loop([1 1]);
+>> [l,M] = b*l; l, full(M)
+
+l = (( 7 -4 ))
+
+M = 2  -1
+   -1   1
+\end{lstlisting}
+And again:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); l = loop([1 1]);
+>> [l,M] = b*l; l, full(M)
+
+l = (( 18 -11 ))
+
+M = 2  -1
+   -1   1
+\end{lstlisting}
+The effective linear action \lstinline{M} has not changed.  In fact it has
+achieved a fixed point: running the same command again will change the loop,
+but the linear action will remain the same forever.  \braidlab\ can automate
+the iteration with the command \lstinline{cycle}.  Figure~\ref{fig:efflinact1}
+shows the output of
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); M = cycle(b,'plot');
+\end{lstlisting}
+The member function \lstinline{cycle} iterates the braid on an initial loop,
+taken to be the canonical set \lstinline{loop(b.n)}.  The vertical axis in
+Fig.~\ref{fig:efflinact1} shows the elements of the effective linear action as
+a function of iterates of the braid.  The matrix of the action is flattened
+into a vector of length~$4^2$, where~$4$ is the dimension the initial loop
+\lstinline{loop(b.n)}.  It is evident that the fixed point is reached rapidly,
+since the `stripes' stop changing.
+
+Perhaps the existence of this fixed point is not surprising, since the braid
+$\sigma_1\sigma_2^{-1}$ corresponds to a pseudo-Anosov isotopy class.  In
+general, instead of a fixed point we may find a \emph{limit cycle} of some
+period.  Figure~\ref{fig:efflinact2} is produced by
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 2 3]); [~,period] = cycle(b,'plot')
+
+period = 4
+\end{lstlisting}
+Indeed, staring at the pattern in Fig.~\ref{fig:efflinact2} it is easy to see
+that the effective action does achieve a limit cycle of period~$4$.  This
+braid is definitely not pseudo-Anosov: it is finite-order.
+
+pseudo-Anosov braids can also achieve cycles: Figure~\ref{fig:efflinact2} is
+the plot produced by
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid('psi',11); [M,period] = cycle(b,'plot');
+\end{lstlisting}
+The period here is~$5$.  The matrix~$M$ is~$20$ by~$20$.  The braid
+\lstinline{braid('psi',11)} is the braid~$\psi_{11}$ in the notation of
+\citet{Venzke_thesis}.  It is a pseudo-Anosov braid with low
+dilatation~\citep{Hironaka2006,Thiffeault2006}, conjectured to be the lowest
+possible for~$11$ strings.
+
+The largest eigenvalue of the matrix \lstinline{M} gives us the dilatation of
+the braid, which in itself is not a real improvement over our earlier entropy
+iterative algorithm.  However, with the matrix in hand we can find the
+characteristic polynomial:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid('psi',7); [M,period] = cycle(b);
+>> factor(poly2sym(charpoly(M)))
+
+ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2 
+\end{lstlisting}
+Compare this to the known polynomial that gives the dilation:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> factor(poly2sym(psiroots(7,'poly')))
+
+ans = (x + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)
+\end{lstlisting}
+(The function \lstinline{psiroots} returns the roots and characteristic
+polynomials of the~$\psi$ braids, for testing purposes.)  Note that the factor
+carrying the dilatation, \lstinline{x^3 - x^2 - 1}, appears in both
+polynomials.  This is not always the case, though the dilatation has to be a
+root of both polynomials.
 
 
 \section{An example: Taffy pullers}
