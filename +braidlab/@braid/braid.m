@@ -330,14 +330,13 @@ classdef braid < matlab.mixin.CustomDisplay
     %   loop L2 given by the action of B on L.  L can also be a column
     %   vector of loops.
     %
-    %   [L2,PN] = B*L records in PN the choices of the pos/neg operators in
-    %   the piecewise linear action on a loop L.  PN has dimension
-    %   [size(L,1) 5*length(B)], since there are at most 5 choices of
-    %   pos/neg for each generator.  This allows reconstruction of the
-    %   matrix induced by the braid B acting on L.  See BRAID.LINACT.
+    %   [L2,M] = B*L also returns the sparse matrix M giving the effective
+    %   linear action of the braid B on the loop L.  This means that the
+    %   piecewise-linear action B*L is equal to the matrix-vector
+    %   multiplication M*L.coords' for this particular loop L.
     %
     %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MPOWER, BRAID.LINACT, LOOP.
+    %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
       if isa(b2,'braidlab.braid')
         varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
@@ -352,6 +351,10 @@ classdef braid < matlab.mixin.CustomDisplay
         end
         [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
         varargout{1} = reshape(braidlab.loop(varargout{1}),size(b2));
+        % Actuallly, return the matrix of the linear action instead of pn.
+        if nargout > 1
+          varargout{2} = linact(b1,varargout{2},size(b2(1).coords,2));
+        end
       else
         error('BRAIDLAB:braid:mtimes:badobject', ...
               'Cannot act with a braid on this object.')
