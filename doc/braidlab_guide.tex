@@ -48,8 +48,8 @@
 % Commands
 %
 
-%\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
-\newcommand{\jlt}[1]{}
+\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
+%\newcommand{\jlt}[1]{}
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
@@ -57,6 +57,7 @@
 
 \newcommand{\mathnotation}[2]{\newcommand{#1}{\ensuremath{#2}}}
 
+\DeclareMathOperator{\sign}{sign}
 
 %
 % Symbols
@@ -67,8 +68,17 @@
 \mathnotation{\nn}{n}				% # of strings
 \mathnotation{\ac}{a}				% Dynnikov coord a
 \mathnotation{\bc}{b}				% Dynnikov coord b
+\mathnotation{\cc}{c}				% Dynnikov coord c
+\mathnotation{\dc}{d}				% Dynnikov coord d
+\mathnotation{\fc}{f}				% Dynnikov coord f
+\mathnotation{\acnew}{\ac'}
+\mathnotation{\bcnew}{\bc'}
 \mathnotation{\abv}{\bm{u}}			% Dynnikov coord vector
 \mathnotation{\ip}{i}				% Counter for braid elements
+\newcommand{\pos}[1]{#1^+}
+\renewcommand{\neg}[1]{#1^-}
+\mathnotation{\ldef}{\mathrel{\raisebox{.069ex}{:}\!\!=}}% Left define
+\mathnotation{\rdef}{\mathrel{=\!\!\raisebox{.069ex}{:}}}% Right define
 
 
 \begin{document}
@@ -1128,6 +1138,88 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \index{braid!loop coordinates|)}
 
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
+
+
+\section{Limit cycles of loop coordinates}
+\label{sec:cycles}
+
+\mathnotation{\siv}{\bm{s}}
+\mathnotation{\Siv}{\bm{S}}
+
+For~$1 < \ip < \nn-1$, we can express the update rules for the braid group
+generator~$\sigma_\ip$ acting
+on~$\abv=(\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2})$ as
+\begin{subequations}
+\begin{align}
+  \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
+    - \pos{\l(\pos{\bc_\ip} + \cc_{\ip-1}\r)}\,,\\
+  \bcnew_{\ip-1} &= \bc_\ip + \neg{\cc_{\ip-1}}\,,\\
+  \acnew_\ip &= \ac_\ip - \neg{\bc_\ip}
+    - \neg{\l(\neg{\bc_{\ip-1}} - \cc_{\ip-1}\r)}\,,\\
+  \bcnew_\ip &= \bc_{\ip-1} - \neg{\cc_{\ip-1}}\,,
+\end{align}
+\label{eq:ur}%
+\end{subequations}
+where
+\begin{equation}
+  \cc_{\ip-1} = \ac_{\ip-1} - \ac_\ip - \pos{\bc_\ip} + \neg{\bc_{\ip-1}}\,.
+  \label{eq:ccdef}
+\end{equation}
+Coordinates not listed (i.e., $\ac_k$ and~$\bc_k$ for~$k\ne\ip$ or~$\ip-1$)
+are unchanged.
+
+The superscripts~${}^{+/-}$ are defined as
+\begin{equation}
+  \pos\fc \ldef \max(\fc,0),\qquad
+  \neg\fc \ldef \min(\fc,0).
+\end{equation}
+(See~\citet{Thiffeault2010} for the update rules for the
+generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.)  By
+update rules we mean that the coordinates are updated to reflect the action of
+the generator~$\sigma_\ip$ on a loop expressed in terms of coordinates.
+Notice that the action~\eqref{eq:ur} is \emph{piecewise-linear} in the loop
+coordinates.  Define the vector
+\begin{equation}
+  \Siv(\sigma_\ip;\abv) =
+  %\siv^{(\ip)} =
+  \sign\l(\bc_{\ip} \,,\, \bc_{\ip-1} \,,\, \cc_{\ip-1} \,,\,
+  \pos{\bc_\ip} + \cc_{\ip-1} \,,\, \neg{\bc_{\ip-1}} - \cc_{\ip-1}\r),
+\end{equation}
+that is, the vector~$\Siv(\sigma_\ip;\abv)$ %$\siv^{(\ip)}$
+contains five numbers corresponding to the sign of each quantity, which can
+take the value~$-1$, $0$, or~$1$.  These quantities appear on the right-hand
+side of~\eqref{eq:ur} with a~$+$ or~$-$ superscript.  If we know the
+vector~$\Siv(\sigma_\ip;\abv)$, %~$\siv^{(\ip)}$,
+we can uniquely reconstruct the linear action of~$\sigma_\ip$ on a given set
+of coordinates.  For example, if~$\Siv(\sigma_\ip;\abv) = (1,1,1,1,1,1)$,
+\jlt{Finish example.}
+\begin{subequations}
+\begin{align}
+  \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
+    - \pos{\l(\pos{\bc_\ip} + \cc_{\ip-1}\r)}\,,\\
+  \bcnew_{\ip-1} &= \bc_\ip + \neg{\cc_{\ip-1}}\,,\\
+  \acnew_\ip &= \ac_\ip - \neg{\bc_\ip}
+    - \neg{\l(\neg{\bc_{\ip-1}} - \cc_{\ip-1}\r)}\,,\\
+  \bcnew_\ip &= \bc_{\ip-1} - \neg{\cc_{\ip-1}}\,,
+\end{align}
+%\label{eq:ur}%
+\end{subequations}
+which gives the matrix
+\begin{equation}
+dsds
+\end{equation}
+for the linearized action.
+
+For a braid~$\gamma=\sigma_{\ip_1}\cdots\sigma_{\ip_k}$ acting on an initial
+set of loop coordinates~$\abv$, we construct the vector
+\begin{equation}
+  \Siv(\sigma_{\ip_1}\cdots\sigma_{\ip_k};\abv) =
+  \l(\Siv(\sigma_{\ip_1};\sigma_{\ip_1}\cdots\sigma_{\ip_k}\abv) \,,\,\ldots \,,\,
+  \Siv(\sigma_{\ip_{k-1}};\sigma_{\ip_k}\cdot\abv) \,,\,
+  \Siv(\sigma_{\ip_k};\abv) \r)
+\end{equation}
+with~$5k$ components.  The vector~$\Siv(\gamma;\abv)$, together with~$\gamma$
+itself, allows us to reconstruct the net linear action of a braid.
 
 
 \section{An example: Taffy pullers}
