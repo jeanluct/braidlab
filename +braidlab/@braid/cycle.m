@@ -240,7 +240,6 @@ if ~doiter
   M = MM;
 end
 
-varargout{1} = M;
-
+if ~doplot || nargout > 0, varargout{1} = M; end
 if nargout > 1, varargout{2} = p; end
 if nargout > 2, varargout{3} = it; end
