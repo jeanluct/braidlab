@@ -827,6 +827,7 @@ ordering of the crossing times.
 \index{loop class@\loopc\ class|(}
 
 \subsubsection{Loop coordinates}
+\label{sec:loopc}
 
 A simple closed loop on a disk with~$5$ punctures %
 \index{disk, punctured}%
@@ -936,6 +937,7 @@ As for braids, \lstinline{l.n} returns the number of punctures (or strings). %
 
 
 \subsubsection{Acting on loops with braids}
+\label{sec:actingonloops}
 
 Now we can act on this loop with braids. %
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
@@ -1140,15 +1142,25 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
 
 
-\section{Limit cycles of loop coordinates}
-\label{sec:cycles}
+\section{The effective linear action and cycles}
+\label{sec:elacycles}
 
-\mathnotation{\siv}{\bm{s}}
-\mathnotation{\Siv}{\bm{S}}
+%\mathnotation{\Siv}{\bm{s}}
+\mathnotation{\Siv}{\mathbf{pn}}
+
+\subsection{Effective linear action}
+\label{sec:linact}
+
+In Section~\ref{sec:actingonloops} we introduced the action of a
+braid~$\gamma$ on a loop~$\abv$.
+Here~$\abv=(\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2})$ is a vector of
+coordinates for the loop, defined in Section~\ref{sec:loopc}.  We write~$\abv'
+= \gamma\cdot\abv$ for the new, updated coordinates after the action.  These
+updated coordinates are given by composing the action of individual
+generators.
 
 For~$1 < \ip < \nn-1$, we can express the update rules for the braid group
-generator~$\sigma_\ip$ acting
-on~$\abv=(\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2})$ as
+generator~$\sigma_\ip$ acting on~$\abv$ as
 \begin{subequations}
 \begin{align}
   \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
@@ -1166,60 +1178,150 @@ where
   \label{eq:ccdef}
 \end{equation}
 Coordinates not listed (i.e., $\ac_k$ and~$\bc_k$ for~$k\ne\ip$ or~$\ip-1$)
-are unchanged.
-
-The superscripts~${}^{+/-}$ are defined as
+are unchanged.  The superscripts~${}^{+/-}$ are defined as
 \begin{equation}
   \pos\fc \ldef \max(\fc,0),\qquad
   \neg\fc \ldef \min(\fc,0).
 \end{equation}
 (See~\citet{Thiffeault2010} for the update rules for the
-generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.)  By
-update rules we mean that the coordinates are updated to reflect the action of
-the generator~$\sigma_\ip$ on a loop expressed in terms of coordinates.
+generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.)
+% By update rules we mean that the coordinates are updated to reflect the
+% action of the generator~$\sigma_\ip$ on a loop expressed in terms of
+% coordinates.
+
 Notice that the action~\eqref{eq:ur} is \emph{piecewise-linear} in the loop
-coordinates.  Define the vector
+coordinates: one the~${}^{+/-}$ operators are resolved, what is left is a
+linear operation on the vector~$\abv$.  We can thus write
 \begin{equation}
-  \Siv(\sigma_\ip;\abv) =
-  %\siv^{(\ip)} =
+  \abv' = M(\gamma,\abv)\cdot\abv,
+  \qquad
+  M(\gamma,\abv) \in \mathrm{SL}_{2\nn-4}(\mathbb{Z}).
+\end{equation}
+Here~$M(\gamma,\abv)$ is the \emph{effective linear action} of the braid on
+the loop~$\abv$.
+
+Let's show an example using \braidlab.  We take the
+braid~$\sigma_1\sigma_2^{-1}$ and the loop with coordinates~$\ac_1=0$,
+$\bc_1=-1$.  The action is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); l = loop([0 -1]);
+>> lp = b*l
+
+lp = (( 1 -1 ))
+\end{lstlisting}
+The effective linear action can be obtained with the \lstinline{linact}
+method:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> M = full(b.linact(l))
+
+ans = 1 -1
+      0  1
+\end{lstlisting}
+Note that \lstinline{linact} by default returns a sparse matrix, since the
+effective linear action is often sparse.  We can then verify that the matrix
+product of \lstinline{M} and the column vector of coordinates
+\lstinline{l.coords'} is the same as the action \lstinline{lp=b*l}:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> M*l.coords'
+
+ans = 1
+     -1
+>> lp.coords'
+
+ans = 1
+     -1
+\end{lstlisting}
+The difference is that \lstinline{M} may only be applied \emph{to this
+  speficic loop} (or a loop that happens to share the same effective linear
+action).
+
+If no loop is specified, then \lstinline{linact} assumes braid is acting on
+the canonical set \lstinline{loop(b.n)} (see Section~\ref{sec:loopcoords}):
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> full(linact(b))
+
+ans = 0     0    -1     0
+      0     1     0     1
+      0     1     1     1
+      1    -1    -1     0
+\end{lstlisting}
+The canonical set assumes an extra puncture, so the matrix dimension is larger
+by~$2$.
+
+The effective linear action doesn't offer much at this point.  Its real
+advantage will become apparent in Section~\ref{sec:cycles}, when we find that
+it can achieve periodic limit cycles.
+
+
+\subsection{Limit cycles of the effective linear action}
+\label{sec:cycles}
+
+On a computer, the effective linear action of a single generator, defined in
+Section~\ref{sec:linact}, is not most compactly stored as a matrix.  The
+reason is that it only depends on the `choices' made by the~${}^{+/-}$
+operations in \eqref{eq:ur}.  We thus define the vector
+\begin{equation}
+  \Siv_\ip(\abv) =
   \sign\l(\bc_{\ip} \,,\, \bc_{\ip-1} \,,\, \cc_{\ip-1} \,,\,
   \pos{\bc_\ip} + \cc_{\ip-1} \,,\, \neg{\bc_{\ip-1}} - \cc_{\ip-1}\r),
 \end{equation}
-that is, the vector~$\Siv(\sigma_\ip;\abv)$ %$\siv^{(\ip)}$
-contains five numbers corresponding to the sign of each quantity, which can
-take the value~$-1$, $0$, or~$1$.  These quantities appear on the right-hand
-side of~\eqref{eq:ur} with a~$+$ or~$-$ superscript.  If we know the
-vector~$\Siv(\sigma_\ip;\abv)$, %~$\siv^{(\ip)}$,
-we can uniquely reconstruct the linear action of~$\sigma_\ip$ on a given set
-of coordinates.  For example, if~$\Siv(\sigma_\ip;\abv) = (1,1,1,1,1,1)$,
-\jlt{Finish example.}
-\begin{subequations}
-\begin{align}
-  \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
-    - \pos{\l(\pos{\bc_\ip} + \cc_{\ip-1}\r)}\,,\\
-  \bcnew_{\ip-1} &= \bc_\ip + \neg{\cc_{\ip-1}}\,,\\
-  \acnew_\ip &= \ac_\ip - \neg{\bc_\ip}
-    - \neg{\l(\neg{\bc_{\ip-1}} - \cc_{\ip-1}\r)}\,,\\
-  \bcnew_\ip &= \bc_{\ip-1} - \neg{\cc_{\ip-1}}\,,
-\end{align}
-%\label{eq:ur}%
-\end{subequations}
-which gives the matrix
-\begin{equation}
-dsds
-\end{equation}
-for the linearized action.
+that is, the vector~$\Siv_\ip(\abv)$ contains five numbers corresponding to
+the sign of each quantity, which can take the value~$-1$, $0$, or~$1$.  These
+quantities appear on the right-hand side of~\eqref{eq:ur} with a~$+$ or~$-$
+superscript.  If we know the vector~$\Siv_\ip(\abv)$, we can uniquely
+reconstruct the linear action of~$\sigma_\ip$ on a given set of coordinates.
+A similar vector~$\Siv_{-\ip}(\abv)$ can be defined for the inverse
+generators, though we do not give its form here.
 
-For a braid~$\gamma=\sigma_{\ip_1}\cdots\sigma_{\ip_k}$ acting on an initial
-set of loop coordinates~$\abv$, we construct the vector
+%For example, if~$\Siv_\ip(\abv) = (1,1,1,1,1,1)$, \jlt{Finish example.}
+%\begin{subequations}
+%\begin{align}
+%  \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
+%    - \pos{\l(\pos{\bc_\ip} + \cc_{\ip-1}\r)}\,,\\
+%  \bcnew_{\ip-1} &= \bc_\ip + \neg{\cc_{\ip-1}}\,,\\
+%  \acnew_\ip &= \ac_\ip - \neg{\bc_\ip}
+%    - \neg{\l(\neg{\bc_{\ip-1}} - \cc_{\ip-1}\r)}\,,\\
+%  \bcnew_\ip &= \bc_{\ip-1} - \neg{\cc_{\ip-1}}\,,
+%\end{align}
+%%\label{eq:ur}%
+%\end{subequations}
+%which gives the matrix
+%\begin{equation}
+%dsds
+%\end{equation}
+%for the linearized action.
+
+For a braid~$\sigma_{\ip_1}\cdots\sigma_{\ip_k}$ acting on an initial set of
+loop coordinates~$\abv$ (read from left to right), we construct a vector of
+length~$5k$ by concatenation:
 \begin{equation}
-  \Siv(\sigma_{\ip_1}\cdots\sigma_{\ip_k};\abv) =
-  \l(\Siv(\sigma_{\ip_1};\sigma_{\ip_1}\cdots\sigma_{\ip_k}\abv) \,,\,\ldots \,,\,
-  \Siv(\sigma_{\ip_{k-1}};\sigma_{\ip_k}\cdot\abv) \,,\,
-  \Siv(\sigma_{\ip_k};\abv) \r)
+  \Siv_{\ip_1\cdots\ip_k}(\abv) =
+  \l(\Siv_{\ip_k}(\sigma_{\ip_{k-1}}\cdots\sigma_{\ip_1}\cdot\abv) \,,\,\ldots \,,\,
+  \Siv_{\ip_2}(\sigma_1\cdot\abv) \,,\,
+  \Siv_{\ip_1}(\abv) \r).
 \end{equation}
-with~$5k$ components.  The vector~$\Siv(\gamma;\abv)$, together with~$\gamma$
-itself, allows us to reconstruct the net linear action of a braid.
+The vector~$\Siv_{\ip_1\cdots\ip_k}(\abv)$, together with the braid itself,
+allows us to reconstruct the effective linear
+action~$M(\sigma_{\ip_1}\cdots\sigma_{\ip_k},\abv)$ of the braid on an initial
+loop~$\abv$.
+
+In \braidlab, the vector~$\Siv_{\ip_1\cdots\ip_k}(\abv)$ can be obtained as an
+optional second return argument of the action of a braid on a loop:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); l = loop([0 -1]);
+>> [lp,pn] = b*l
+
+lp = (( 1 -1 ))
+pn = -1    0    0   -1    0    0    0    0    0    0
+\end{lstlisting}
+Notice that \lstinline{pn} has length~$10$, corresponding to two sets of~$+/-$
+sequences, one for each generator.
+
+\jlt{As a braid becomes longer, this sequence gets longer but the matrix
+  doesn't get larger.  Why not look for periodic behavior of the matrix
+  itself, and sidestep this discussion?  Is there any benefit to the pattern
+  of signs, other than recording the info on a generator-by-generator basis?
+  Is this really necessary?}
 
 
 \section{An example: Taffy pullers}
