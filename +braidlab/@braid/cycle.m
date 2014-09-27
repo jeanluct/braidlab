@@ -1,9 +1,8 @@
 function [varargout] = cycle(b,varargin)
-%CYCLE   Find limit cycle of effective linear action of a braid.
-%   PN = CYCLE(B) finds a limit cycle for the effective linear action of B.
-%   The output matrix PN has dimension [PERIOD 5*(B.n-1)].  It contains the
-%   signs of the pos/neg operators in the piecewise-linear action given by
-%   BRAID.MTIMES.
+%CYCLE   Limit cycle of effective linear action of a braid.
+%   M = CYCLE(B) finds a limit cycle for the effective linear action of B.
+%   The sparse matrix M is is the product of the matrices in the limit
+%   cycle.
 %
 %   CYCLE(B,L) uses the initial loop L (default loop(B.n)) for the
 %   iteration.
@@ -13,37 +12,58 @@ function [varargout] = cycle(b,varargin)
 %   convergences for the cycle NCONVREQ (default 5).  Either argument can be
 %   replaced by [] to use its default value.
 %
-%   [PN,IT] = CYCLE(B,...) also returns the number of iterations IT that
-%   were required to achieve convergence.
+%   CYCLE(B,'plot',...) makes a plot showing the convergence to the
+%   matrix entries to the limit cycle.
 %
-%   CYCLE(B,'plot',...) makes a plot of the convergence of the signs.
+%   [M,PERIOD,IT] = CYCLE(B,...) also returns the period of the cycle and
+%   the number of iterations IT that were required to achieve convergence.
 %
-%   To reconstruct the matrix for one iterate of the limit cycle, use
-%   BRAID.LINACT.  To reconstruct the matrix of the product of iterates (the
-%   full cycle), use BRAID.CYCLEMAT.
+%   MI = CYCLE(B,...,'iterates') or CYCLE(B,...,'iter') returns a cell array
+%   MI with PERIOD elements, each containing the matrix of an iterate from
+%   the limit cycle.  The matrix M above is MI{PERIOD}*...*MI{1}.
+%
+%   The matrix M represents the asymptotic behavior of the braid action on
+%   an initial loop.  In particular, its largest eigenvalue (in absolute
+%   value), to the power 1/PERIOD, corresponds to the dilatation of the
+%   braid if it contains at least one pseudo-Anosov component.
 %
 %   Example: the braid [1 2] leads to a period-3 cycle:
 %
-%   >> b = braid([1 2]); pn = cycle(b)
-%
-%   pn =
-%       -1     1     1     1     0    -1     0     0     0     1
-%        0     1     1     1     0    -1     0    -1     0     1
-%       -1     1     0     0     0    -1     0    -1     0     1
-%
-%   Matrix corresponding to the first iterate:
-%
-%   >> full(linact(b,pn(1,:)))
+%   >> b = braid([1 2]); [M,period] = cycle(b); full(M), period
 %
 %   ans =
-%
-%        0     0    -1     0
+%   
+%        1     0     0     0
 %        0     1     0     0
-%        1    -1    -1     0
-%        0     1     1     1
+%        1    -1     0     0
+%       -1     3     1     1
+%
+%   period =
+%
+%        3
+%
+%   With 'iterates', we find the individual matrices that make up the
+%   period-3 cycle:
+%
+%   >> MI = cycle(b,'iterates')
+%   
+%   MI = 
+%   
+%       [4x4 double]    [4x4 double]    [4x4 double]
+%
+%   The product of the three matrices gives M:
+%
+%   >> full(MI{3}*MI{2}*MI{1})
+%   
+%   ans =
+%   
+%        1     0     0     0
+%        0     1     0     0
+%        1    -1     0     0
+%       -1     3     1     1
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP, BRAID.MTIMES, BRAID.LINACT, BRAID.CYCLEMAT.
+%   See also BRAID, LOOP, BRAID.MTIMES.
 
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
@@ -71,11 +91,16 @@ import braidlab.util.debugmsg
 
 % Parse options.
 doplot = false;
+doiter = false;
+iarg = [];
 for i = 1:length(varargin)
   if ischar(varargin{i})
     if strcmpi(varargin{i},'plot')
       doplot = true;
-      varargin(i) = []; % delete string element from cell.
+      iarg = [iarg i];
+    elseif any(strcmpi(varargin{i},{'iterates','iter'}))
+      doiter = true;
+      iarg = [iarg i];
     else
       error('BRAIDLAB:braid:cycle:badarg', ...
             'Unknown option ''%s''',varargin{i})
@@ -83,8 +108,12 @@ for i = 1:length(varargin)
   elseif isa(varargin{i},'braidlab.loop')
     % Get the initial loop from arguments.
     l = loop(vpi(varargin{i}.coords));
-    varargin{i} = []; % delete loop element from cell.
+    iarg = [iarg i];
   end
+end
+% Erase the arguments that were parsed.
+for i = length(iarg):-1:1
+  varargin{iarg(i)} = [];
 end
 
 % Assign default initial loop if it wasn't specified as an argument.
@@ -182,16 +211,36 @@ end
 if doplot
   % Plot Ml.
   imagesc(Ml.'), colormap bone
-  xlabel('iteration'), ylabel('pos / neg')
+  xlabel('iteration'), ylabel('effective linear action')
 end
 
 if it == maxit
   error('BRAIDLAB:braid:cycle:noconv', ...
         ['Failed to achieve convergence after %d iterations.' ...
          '  Try to increase MAXIT.'],it)
-else
-  % Save the cycle.
-  varargout{1} = Ml(end-p+1:end,:);
 end
 
-if nargout > 1, varargout{2} = it; end
+nn = sqrt(size(Ml,2));
+if floor(nn) ~= nn
+  error('BRAIDLAB:braid:cycle:badsize','Bad column size for iterates.');
+end
+
+% Reconstruct matrices of the linear action.
+M = cell(1,p);
+for i = 1:p
+  M{i} = sparse(reshape(Ml(end-p+i,:),[nn nn]));
+end
+
+if ~doiter
+  % Take their product.
+  MM = M{1};
+  for i = 2:p
+    MM = M{i} * MM;
+  end
+  M = MM;
+end
+
+varargout{1} = M;
+
+if nargout > 1, varargout{2} = p; end
+if nargout > 2, varargout{3} = it; end

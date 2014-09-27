@@ -42,7 +42,7 @@ end
 % Use random initial loop if not specified.
 if nargin < 2, l0 = loop(randi(5,1,2*n-2)-3); end
 
-[M,period] = b.cyclemat('iter',l0);
+[M,period] = b.cycle('iter',l0);
 
 Q = [];
 
