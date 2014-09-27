@@ -40,4 +40,8 @@ end
 
 lc = unique(lc,'rows');
 
-l = braidlab.loop(lc);
+if ~isempty(lc)
+  l = braidlab.loop(lc);
+else
+  l = [];
+end
