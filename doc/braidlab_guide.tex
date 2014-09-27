@@ -1145,9 +1145,6 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \section{The effective linear action and cycles}
 \label{sec:elacycles}
 
-%\mathnotation{\Siv}{\bm{s}}
-\mathnotation{\Siv}{\mathbf{pn}}
-
 \subsection{Effective linear action}
 \label{sec:linact}
 
@@ -1256,73 +1253,6 @@ it can achieve periodic limit cycles.
 
 \subsection{Limit cycles of the effective linear action}
 \label{sec:cycles}
-
-On a computer, the effective linear action of a single generator, defined in
-Section~\ref{sec:linact}, is not most compactly stored as a matrix.  The
-reason is that it only depends on the `choices' made by the~${}^{+/-}$
-operations in \eqref{eq:ur}.  We thus define the vector
-\begin{equation}
-  \Siv_\ip(\abv) =
-  \sign\l(\bc_{\ip} \,,\, \bc_{\ip-1} \,,\, \cc_{\ip-1} \,,\,
-  \pos{\bc_\ip} + \cc_{\ip-1} \,,\, \neg{\bc_{\ip-1}} - \cc_{\ip-1}\r),
-\end{equation}
-that is, the vector~$\Siv_\ip(\abv)$ contains five numbers corresponding to
-the sign of each quantity, which can take the value~$-1$, $0$, or~$1$.  These
-quantities appear on the right-hand side of~\eqref{eq:ur} with a~$+$ or~$-$
-superscript.  If we know the vector~$\Siv_\ip(\abv)$, we can uniquely
-reconstruct the linear action of~$\sigma_\ip$ on a given set of coordinates.
-A similar vector~$\Siv_{-\ip}(\abv)$ can be defined for the inverse
-generators, though we do not give its form here.
-
-%For example, if~$\Siv_\ip(\abv) = (1,1,1,1,1,1)$, \jlt{Finish example.}
-%\begin{subequations}
-%\begin{align}
-%  \acnew_{\ip-1} &= \ac_{\ip-1} - \pos{\bc_{\ip-1}}
-%    - \pos{\l(\pos{\bc_\ip} + \cc_{\ip-1}\r)}\,,\\
-%  \bcnew_{\ip-1} &= \bc_\ip + \neg{\cc_{\ip-1}}\,,\\
-%  \acnew_\ip &= \ac_\ip - \neg{\bc_\ip}
-%    - \neg{\l(\neg{\bc_{\ip-1}} - \cc_{\ip-1}\r)}\,,\\
-%  \bcnew_\ip &= \bc_{\ip-1} - \neg{\cc_{\ip-1}}\,,
-%\end{align}
-%%\label{eq:ur}%
-%\end{subequations}
-%which gives the matrix
-%\begin{equation}
-%dsds
-%\end{equation}
-%for the linearized action.
-
-For a braid~$\sigma_{\ip_1}\cdots\sigma_{\ip_k}$ acting on an initial set of
-loop coordinates~$\abv$ (read from left to right), we construct a vector of
-length~$5k$ by concatenation:
-\begin{equation}
-  \Siv_{\ip_1\cdots\ip_k}(\abv) =
-  \l(\Siv_{\ip_k}(\sigma_{\ip_{k-1}}\cdots\sigma_{\ip_1}\cdot\abv) \,,\,\ldots \,,\,
-  \Siv_{\ip_2}(\sigma_1\cdot\abv) \,,\,
-  \Siv_{\ip_1}(\abv) \r).
-\end{equation}
-The vector~$\Siv_{\ip_1\cdots\ip_k}(\abv)$, together with the braid itself,
-allows us to reconstruct the effective linear
-action~$M(\sigma_{\ip_1}\cdots\sigma_{\ip_k},\abv)$ of the braid on an initial
-loop~$\abv$.
-
-In \braidlab, the vector~$\Siv_{\ip_1\cdots\ip_k}(\abv)$ can be obtained as an
-optional second return argument of the action of a braid on a loop:
-\begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2]); l = loop([0 -1]);
->> [lp,pn] = b*l
-
-lp = (( 1 -1 ))
-pn = -1    0    0   -1    0    0    0    0    0    0
-\end{lstlisting}
-Notice that \lstinline{pn} has length~$10$, corresponding to two sets of~$+/-$
-sequences, one for each generator.
-
-\jlt{As a braid becomes longer, this sequence gets longer but the matrix
-  doesn't get larger.  Why not look for periodic behavior of the matrix
-  itself, and sidestep this discussion?  Is there any benefit to the pattern
-  of signs, other than recording the info on a generator-by-generator basis?
-  Is this really necessary?}
 
 
 \section{An example: Taffy pullers}
