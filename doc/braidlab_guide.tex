@@ -1209,18 +1209,19 @@ $\bc_1=-1$.  The action is
 
 lp = (( 1 -1 ))
 \end{lstlisting}
-The effective linear action can be obtained with the \lstinline{linact}
-method:
+The effective linear action can be obtained by requesting a second output
+argument from the result of~\lstinline{*}:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> M = full(b.linact(l))
+>> [lp,M] = b*l; full(M)
 
 ans = 1 -1
       0  1
 \end{lstlisting}
-Note that \lstinline{linact} by default returns a sparse matrix, since the
-effective linear action is often sparse.  We can then verify that the matrix
-product of \lstinline{M} and the column vector of coordinates
-\lstinline{l.coords'} is the same as the action \lstinline{lp=b*l}:
+Note that the effective linear action \lstinline{M} is by default returned as
+a sparse matrix, which it often is when dealing with many strands.  We can
+then verify that the matrix product of \lstinline{M} and the column vector of
+coordinates \lstinline{l.coords'} is the same as the action
+\lstinline{lp=b*l}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> M*l.coords'
 
@@ -1235,10 +1236,10 @@ The difference is that \lstinline{M} may only be applied \emph{to this
   speficic loop} (or a loop that happens to share the same effective linear
 action).
 
-If no loop is specified, then \lstinline{linact} assumes braid is acting on
-the canonical set \lstinline{loop(b.n)} (see Section~\ref{sec:loopcoords}):
+A common thing to do is to find the effective linear action on the canonical
+set \lstinline{loop(b.n)} (see Section~\ref{sec:loopcoords}):
 \begin{lstlisting}[frame=single,framerule=0pt]
->> full(linact(b))
+>> [~,M] = b*loop(b.n); full(M)
 
 ans = 0     0    -1     0
       0     1     0     1
