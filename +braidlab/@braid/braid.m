@@ -338,6 +338,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
       if isa(b2,'braidlab.braid')
+        % If b2 is also a braid, the product is simple concatenation.
         varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
       elseif isa(b2,'braidlab.loop')
         % Action of braid on a loop.
@@ -351,8 +352,8 @@ classdef braid < matlab.mixin.CustomDisplay
         end
         [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
         varargout{1} = reshape(braidlab.loop(varargout{1}),size(b2));
-        % Actuallly, return the matrix of the linear action instead of pn.
         if nargout > 1
+          % Actually, return the matrix of the linear action instead of pn.
           varargout{2} = linact(b1,varargout{2},size(b2(1).coords,2));
         end
       else
