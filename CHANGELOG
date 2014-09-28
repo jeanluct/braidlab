@@ -1,6 +1,13 @@
 ------------------------------------------------------------------------
 2.x [2014-xx-xx]
 
+* Simplify the linear action code: instead of braid.linact use an
+  optional return argument for braid.mtimes.  braid.cycle now does
+  what braid.cyclemat did.  The nitty-gritty pos/neg operators are
+  invisible to the user (see issue #65).  None of this should change
+  anything, since these were not documented in the guide (but now they
+  are).
+
 * Fix detection of some limit cycles (issue #52).  Also allow
   specification of an initial loop when looking for cycles.
 
