@@ -345,6 +345,7 @@ $\sigma_5\sigma_6^{-1}$ after re-indexing so they appear to the right of
 
 
 \subsubsection{Topological entropy and complexity}
+\label{sec:entropy}
 
 There are a few methods that exploit the connection between braids and
 homeomorphisms \index{homeomorphism} of the punctured disk. %
@@ -363,6 +364,7 @@ to a braid:
 
 ans = 0.8314
 \end{lstlisting}
+\index{action!of braid on loop}%
 The entropy is computed by iterated action on a loop~\citep{Moussafir2006}.
 This can fail if the braid is finite-order %
 \index{braid!finite-order|(}%
@@ -374,7 +376,7 @@ Warning: Failed to converge to requested tolerance; braid is likely finite-order
 ans = 0
 \end{lstlisting}
 To force the entropy to be computed using the Bestvina--Handel train track
-algorithm~\cite{Bestvina1995}, %
+algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm|(}%
 we add an optional parameter:
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -1142,22 +1144,28 @@ ans = (( 0  0  3 -1 -1 -1 -4  3 ))
 \jlt{Next section: Braid from random walks?  Compute runs of same gen.}
 
 
-\section{The effective linear action and cycles}
+\section{The effective linear action and its cycles}
 \label{sec:elacycles}
-
-\jlt{This section is not indexed yet.}
 
 \subsection{Effective linear action}
 \label{sec:linact}
 
+\index{effective linear action|(}%
+\index{linear action|see{effective linear action}}%
+\index{action!effective linear|(}%
+\index{action!of braid on loop|(}%
+
 In Section~\ref{sec:actingonloops} we introduced the action of a
 braid~$\gamma$ on a loop~$\abv$.
 Here~$\abv=(\ac_1,\ldots,\ac_{\nn-2},\bc_1,\ldots,\bc_{\nn-2})$ is a vector of
-coordinates for the loop, defined in Section~\ref{sec:loopc}.  We write~$\abv'
-= \gamma\cdot\abv$ for the new, updated coordinates after the action.  These
-updated coordinates are given by composing the action of individual
-generators.
+coordinates for the loop, %
+\index{loop!coordinates}%
+defined in Section~\ref{sec:loopc}.  We write~$\abv' = \gamma\cdot\abv$ for
+the new, updated coordinates after the action.  These updated coordinates are
+given by composing the action of individual generators.
 
+\index{update rules|see{action}}
+\index{action!update rules|(}
 For~$1 < \ip < \nn-1$, we can express the update rules for the braid group
 generator~$\sigma_\ip$ acting on~$\abv$ as
 \begin{subequations}
@@ -1187,6 +1195,7 @@ generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.)
 % By update rules we mean that the coordinates are updated to reflect the
 % action of the generator~$\sigma_\ip$ on a loop expressed in terms of
 % coordinates.
+\index{action!update rules|)}
 
 Notice that the action~\eqref{eq:ur} is \emph{piecewise-linear} in the loop
 coordinates: once the~${}^{+/-}$ operators are resolved, what is left is a
@@ -1199,6 +1208,7 @@ linear operation on the vector~$\abv$.  We can thus write
 Here~$M(\gamma,\abv)$ is the \emph{effective linear action} of the
 braid~$\gamma$ on the loop~$\abv$.
 
+\index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
 Let's show an example using \braidlab.  We take the
 braid~$\sigma_1\sigma_2^{-1}$ and the loop with coordinates~$\ac_1=0$,
 $\bc_1=-1$.  The action is
@@ -1217,10 +1227,13 @@ ans = 1 -1
       0  1
 \end{lstlisting}
 Note that the effective linear action \lstinline{M} is by default returned as
-a sparse matrix, which it often is when dealing with many strands.  We can
-then verify that the matrix product of \lstinline{M} and the column vector of
-coordinates \lstinline{l.coords'} is the same as the action
-\lstinline{lp=b*l}:
+a sparse matrix, %
+\index{sparse matrix}%
+which it often is when dealing with many strands.  We use \lstinline{full} %
+\index{full@\lstinline{full}}%
+to convert it back into a regular full matrix.  We can then verify that the
+matrix product of \lstinline{M} and the column vector of coordinates
+\lstinline{l.coords'} is the same as the action \lstinline{lp = b*l}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> M*l.coords'
 
@@ -1252,35 +1265,20 @@ The effective linear action doesn't seem to offer much at this point.  Its
 real advantage will become apparent in Section~\ref{sec:cycles}, when we find
 that it can achieve periodic limit cycles.
 
+\index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|)}%
+\index{action!of braid on loop|)}%
+
 
 \subsection{Limit cycles of the effective linear action}
 \label{sec:cycles}
 
-%
-\begin{figure}
-\begin{center}
-\subfigure[]{
-  \includegraphics[height=.37\textheight]{efflinact1}
-  \label{fig:efflinact1}
-}\hspace{.5em}
-\subfigure[]{
-  \includegraphics[height=.37\textheight]{efflinact2}
-  \label{fig:efflinact2}
-}\hspace{.5em}
-\subfigure[]{
-  \includegraphics[height=.37\textheight]{efflinact3}
-  \label{fig:efflinact3}
-}
-\end{center}
-\caption{The plot produced by \lstinline{cycle(b,'plot')} for (a) \lstinline{b
-    = braid([1 -2])}; (b) \lstinline{b = braid([1 2 3])}; (c) \lstinline{b =
-    braid('psi',11)}.}
-\end{figure}
-%
+\index{cycle!of effective linear action|(}
+\index{effective linear action!cycle|(}
 
 The effective linear action has a very interesting behavior when a braid is
-iterated on some initial curve.  
+iterated on some initial loop.  Consider the following example:
 \begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([1 -2]); l = loop([1 1]);
 >> [l,M] = b*l; l, full(M)
 
 l = (( 3 -1 ))
@@ -1290,7 +1288,6 @@ M = 2   1
 \end{lstlisting}
 Now repeat this last command:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2]); l = loop([1 1]);
 >> [l,M] = b*l; l, full(M)
 
 l = (( 7 -4 ))
@@ -1309,10 +1306,36 @@ M = 2  -1
    -1   1
 \end{lstlisting}
 The effective linear action \lstinline{M} has not changed.  In fact it has
-achieved a fixed point: running the same command again will change the loop,
-but the linear action will remain the same forever.  \braidlab\ can automate
-the iteration with the command \lstinline{cycle}.  Figure~\ref{fig:efflinact1}
-shows the output of
+achieved a fixed point: %
+\index{fixed point|see{cycle}}%
+running the same command again will change the loop, but the linear action
+will remain the same forever.  \braidlab\ can automate the iteration with the
+method \lstinline{cycle}. %
+\index{braid class@\braid\ class!cycle@\lstinline{cycle}|(}%
+Figure~\ref{fig:efflinact1} shows the output of
+%
+\begin{figure}
+\begin{center}
+\subfigure[]{
+  \includegraphics[height=.35\textheight]{efflinact1}
+  \label{fig:efflinact1}
+}\hspace{.5em}
+\subfigure[]{
+  \includegraphics[height=.35\textheight]{efflinact2}
+  \label{fig:efflinact2}
+}\hspace{.5em}
+\subfigure[]{
+  \includegraphics[height=.35\textheight]{efflinact3}
+  \label{fig:efflinact3}
+}
+\end{center}
+\caption{The plot produced by \lstinline{cycle(b,'plot')} %
+  for (a) \lstinline{b = braid([1 -2])}; (b) \lstinline{b = braid([1 2 3])};
+  (c) \lstinline{b = braid('psi',11)}.}
+\index{braid class@\braid\ class!cycle@\lstinline{cycle}}%
+\label{fig:efflinact}
+\end{figure}
+%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 -2]); M = cycle(b,'plot');
 \end{lstlisting}
@@ -1325,8 +1348,9 @@ into a vector of length~$4^2$, where~$4$ is the dimension the initial loop
 since the `stripes' stop changing.
 
 Perhaps the existence of this fixed point is not surprising, since the braid
-$\sigma_1\sigma_2^{-1}$ corresponds to a pseudo-Anosov isotopy class.  In
-general, instead of a fixed point we may find a \emph{limit cycle} of some
+$\sigma_1\sigma_2^{-1}$ corresponds to a pseudo-Anosov isotopy class. %
+\index{braid!pseudo-Anosov}%
+In general, instead of a fixed point we may find a \emph{limit cycle} of some
 period.  Figure~\ref{fig:efflinact2} is produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3]); [~,period] = cycle(b,'plot')
@@ -1336,39 +1360,89 @@ period = 4
 Indeed, staring at the pattern in Fig.~\ref{fig:efflinact2} it is easy to see
 that the effective action does achieve a limit cycle of period~$4$.  This
 braid is definitely not pseudo-Anosov: it is finite-order.
+\index{braid!finite-order}%
 
-pseudo-Anosov braids can also achieve cycles: Figure~\ref{fig:efflinact2} is
-the plot produced by
+Pseudo-Anosov braids %
+\index{braid!pseudo-Anosov}%
+can also achieve cycles: Figure~\ref{fig:efflinact3} is the plot produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid('psi',11); [M,period] = cycle(b,'plot');
 \end{lstlisting}
-The period here is~$5$.  The matrix~$M$ is~$20$ by~$20$.  The braid
+The period here is~$5$.  The matrix~$M$ is~$20$ by~$20$.  The braid %
+\index{psi braids@$\psi$ braids}%
+\index{braid!entropy!minimum}%
 \lstinline{braid('psi',11)} is the braid~$\psi_{11}$ in the notation of
-\citet{Venzke_thesis}.  It is a pseudo-Anosov braid with low
+\citet{Venzke_thesis}.  It is a pseudo-Anosov braid with low %
+\index{braid!pseudo-Anosov}%
+\index{dilatation}%
 dilatation~\citep{Hironaka2006,Thiffeault2006}, conjectured to be the lowest
-possible for~$11$ strings.
+possible for~$11$ strings.%
+%
+\footnote{The dilatation of a braid is the exponential of its entropy.}
+%
+The braids~$\psi_\nn$ are known to have to lowest dilatation for~$\nn$ string
+for $\nn\le8$~\citep{LanneauThiffeault2011_braids}.
 
-The largest eigenvalue of the matrix \lstinline{M} gives us the dilatation of
-the braid, which in itself is not a real improvement over our earlier entropy
-iterative algorithm.  However, with the matrix in hand we can find the
-characteristic polynomial:
+The largest eigenvalue of the matrix \lstinline{M} gives us the
+\index{dilatation}%
+dilatation of the braid, which in itself is not a real improvement over our
+earlier entropy iterative algorithm (Section~\ref{sec:entropy}).  However,
+with the matrix in hand we can find the characteristic polynomial:%
+\footnote{The symbolic toolbox %
+\index{Matlab!symbolic toolbox}%
+is needed for \lstinline{poly2sym} and \lstinline{factor}.}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid('psi',7); [M,period] = cycle(b);
->> factor(poly2sym(charpoly(M)))
+>> factor(poly2sym(charpoly(M)))  % convert to symbolic form
 
-ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2 
+ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2
 \end{lstlisting}
+\index{braid class@\braid\ class!cycle@\lstinline{cycle}|)}%
 Compare this to the known polynomial that gives the dilation:
+\index{psiroots@\lstinline{psiroots}}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> factor(poly2sym(psiroots(7,'poly')))
 
 ans = (x + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)
 \end{lstlisting}
 (The function \lstinline{psiroots} returns the roots and characteristic
-polynomials of the~$\psi$ braids, for testing purposes.)  Note that the factor
-carrying the dilatation, \lstinline{x^3 - x^2 - 1}, appears in both
-polynomials.  This is not always the case, though the dilatation has to be a
-root of both polynomials.
+polynomial of a~$\psi$ braid; this is useful for testing purposes.)  Note that
+the factor whose largest root is the dilatation, %
+\index{dilatation}%
+\lstinline{x^3 - x^2 - 1}, appears in both polynomials.  This is not always
+the case, though the dilatation has to be a root of both polynomials.
+
+To our knowledge, the existence of these limit cycles has not been fully
+explained.  They seem to occur for \emph{any} braid, regardless of its %
+\index{homeomorphism!isotopy classes}%
+isotopy class.  In that sense they could provide an alternative to the the
+Bestvina--Handel train track algorithm~\citep{Bestvina1995}, %
+\index{Bestvina--Handel algorithm}%
+which is used to compute the isotopy class of a braid.  \braidlab\ has some
+experimental support for this in the form of the method \lstinline{reducing}: %
+\index{braid class@\braid\ class!reducing@\lstinline{reducing}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([-3  1 -4  2 -3 -1 -2  3 -2  4  3  4]);
+>> l = b.reducing
+Warning: This function is experimental!  Use with caution!
+
+ans = (( 0 -1  0  0  0  0 ))
+
+>> b*l   % check that it is indeed a reducing curve
+
+ans = (( 0 -1  0  0  0  0 ))
+\end{lstlisting}
+\lstinline{reducing} found a reducing curve for the braid and returned it as a
+set of loop coordinates.  However, note that at this point
+\lstinline{reducing} can return too many curves, or none even when one exists.
+\index{braid class@\braid\ class!reducing@\lstinline{reducing}|)}%
+
+
+\index{cycle!of effective linear action|)}%
+\index{effective linear action|)}%
+\index{effective linear action!cycle|)}
+\index{action!effective linear|)}%
+\index{limit cycle|see{cycle}}
 
 
 \section{An example: Taffy pullers}
