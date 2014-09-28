@@ -6,19 +6,19 @@
 
 [Michael Allshouse][3] and [Marko Budisic][4] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; Markus Buehren's [assignmentoptimal][9]; and Jakob Progsch's [ThreadPool][10].
+*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; Markus Buehren's [assignmentoptimal][9]; Jakob Progsch's [ThreadPool][10]; and John R. Gilbert's function for computing the [Smith Normal Form of a matrix][11].
 
 ### license
 
-*braidlab* is released under the [GNU General Public License v3][11].  See [COPYING][12] and [LICENSE][13].
+*braidlab* is released under the [GNU General Public License v3][12].  See [COPYING][13] and [LICENSE][14].
 
 ### documentation
 
-See the [*braidlab* user's guide][14].
+See the [*braidlab* user's guide][15].
 
 ### support
 
-The development of *braidlab* was supported by the [US National Science Foundation][15], under grants [DMS-0806821][16] and [CMMI-1233935][17].
+The development of *braidlab* was supported by the [US National Science Foundation][16], under grants [DMS-0806821][17] and [CMMI-1233935][18].
 
 [1]: http://www.math.wisc.edu/~jeanluc/
 [2]: http://www.mathworks.com/products/matlab/
@@ -30,10 +30,11 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [8]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
 [9]: http://www.mathworks.com/matlabcentral/fileexchange/6543
 [10]: https://github.com/progschj/ThreadPool
-[11]: http://www.gnu.org/licenses/gpl-3.0.html
-[12]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
-[13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
-[14]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
-[15]: http://www.nsf.gov
-[16]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
-[17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
+[11]: http://www.mathworks.com/matlabcentral/newsreader/view_thread/13728
+[12]: http://www.gnu.org/licenses/gpl-3.0.html
+[13]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
+[14]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
+[15]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
+[16]: http://www.nsf.gov
+[17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
+[18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
