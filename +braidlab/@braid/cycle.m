@@ -106,6 +106,7 @@ for i = 1:length(varargin)
             'Unknown option ''%s''',varargin{i})
     end
   elseif isa(varargin{i},'braidlab.loop')
+    braidlab.util.checkvpi
     % Get the initial loop from arguments.
     l = loop(vpi(varargin{i}.coords));
     iarg = [iarg i];
@@ -118,6 +119,7 @@ end
 
 % Assign default initial loop if it wasn't specified as an argument.
 if ~exist('l','var')
+  braidlab.util.checkvpi
   l = loop(b.n,'vpi');
 end
 
