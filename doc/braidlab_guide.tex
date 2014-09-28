@@ -1356,11 +1356,54 @@ into a vector of length~$4^2$, where~$4$ is the dimension the initial loop
 \lstinline{loop(b.n)}.  It is evident that the fixed point is reached rapidly,
 since the `stripes' stop changing.
 
-Perhaps the existence of this fixed point is not surprising, since the braid
-$\sigma_1\sigma_2^{-1}$ corresponds to a pseudo-Anosov isotopy class. %
-\index{braid!pseudo-Anosov}%
+\index{braid!pseudo-Anosov|(}%
+Such fixed points of the effective linear action are ubiquitous for braids
+corresponding to a pseudo-Anosov isotopy class, such
+as~$\sigma_1\sigma_2^{-1}$. %
 In general, instead of a fixed point we may find a \emph{limit cycle} of some
-period.  Figure~\ref{fig:efflinact2} is produced by
+period.  \citet{Yurttas2014_preprint} discussed these limit cycles for
+pseudo-Anosov braids: they occur when the unstable foliation falls on the
+boundary of the linear regions of the update rules.  We can reproduce her
+example with the following:%
+\footnote{To get exactly the same matrices, we use the
+  braid~$\sigma_1^{-1}\sigma_2^{-1}\sigma_3^{-1}\sigma_4$ rather than
+  her~$\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$, since her generators rotate the
+  punctures counterclockwise.}
+%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = braid([-1 -2 -3 4]);
+>> M = b.cycle(loop(b.n-1),'iter')
+
+M = [6x6 double]    [6x6 double]
+\end{lstlisting}
+The option \lstinline{'iter'} tells \lstinline{cycle} to compute an individual
+matrix for each iterate of the cycle, rather than the net product of all the
+matrices in the cycle.  The output is a cell array of two~$6$ by~$6$ matrices,
+corresponding to the period-2 cycle:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> full(M{1}), full(M{2})
+
+ans = -1     1     0     0     0     0
+       0     0     0     1     1     0
+       0     0     2    -1    -1     1
+       0     0     0     0     1     0
+      -1     0     1    -1    -1     1
+       0     0     1     0     0     1
+
+ans =  0     0     0     1     0     0
+       0     0     0     1     1     0
+       0     0     2    -1    -1     1
+      -1     1     0    -1     1     0
+       0    -1     1     0    -1     1
+       0     0     1     0     0     1
+\end{lstlisting}
+as given by \citet{Yurttas2014_preprint}.  Note that we use an initial loop
+for~$\nn$ punctures (\lstinline{loop(b.n-1)}), rather than the
+default~$\nn+1$, to reproduce her example exactly.  For the pseudo-Anosov
+case, any initial loop will give the same matrices.
+
+What is more surprising is that these limit cycles occur for finite-order
+braids as well.  Figure~\ref{fig:efflinact2} is produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3]); [~,period] = cycle(b,'plot')
 
@@ -1370,14 +1413,17 @@ Indeed, staring at the pattern in Fig.~\ref{fig:efflinact2} it is easy to see
 that the effective action does achieve a limit cycle of period~$4$.  This
 braid is definitely not pseudo-Anosov: it is finite-order.
 \index{braid!finite-order}%
+However, we do not expect such limit cycles to be unique in the
+non-pseudo-Anosov case.
 
 Pseudo-Anosov braids %
 \index{braid!pseudo-Anosov}%
-can also achieve cycles: Figure~\ref{fig:efflinact3} is the plot produced by
+can achieve longer cycles, which \braidlab\ can find:
+Figure~\ref{fig:efflinact3} is the plot produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid('psi',11); [M,period] = cycle(b,'plot');
 \end{lstlisting}
-The period here is~$5$.  The matrix~$M$ is~$20$ by~$20$.  The braid %
+The period here is~$5$, and the matrix~$M$ is~$20$ by~$20$.  The braid %
 \index{psi braids@$\psi$ braids}%
 \index{braid!entropy!minimum}%
 \lstinline{braid('psi',11)} is the braid~$\psi_{11}$ in the notation of
@@ -1420,15 +1466,18 @@ the factor whose largest root is the dilatation, %
 \index{dilatation}%
 \lstinline{x^3 - x^2 - 1}, appears in both polynomials.  This is not always
 the case, though the dilatation has to be a root of both polynomials.
+\index{braid!pseudo-Anosov|)}%
 
 To our knowledge, the existence of these limit cycles has not been fully
-explained.  They seem to occur for \emph{any} braid, regardless of its %
+explained (except in the pseudo-Anosov case by \citet{Yurttas2014_preprint}).
+They seem to occur for \emph{any} braid, regardless of its %
 \index{homeomorphism!isotopy classes}%
 isotopy class.  In that sense they could provide an alternative to the the
 Bestvina--Handel train track algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm}%
 which is used to compute the isotopy class of a braid.  \braidlab\ has some
-experimental support for this in the form of the method \lstinline{reducing}: %
+experimental support for this in the form of the method
+\lstinline{reducing}: %
 \index{braid class@\braid\ class!reducing@\lstinline{reducing}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([-3  1 -4  2 -3 -1 -2  3 -2  4  3  4]);
@@ -1446,7 +1495,6 @@ set of loop coordinates.  However, note that at this point
 \lstinline{reducing} can return too many curves, or none even when one exists.
 \index{braid class@\braid\ class!reducing@\lstinline{reducing}|)}%
 
-
 \index{cycle!of effective linear action|)}%
 \index{effective linear action|)}%
 \index{effective linear action!cycle|)}
@@ -1459,7 +1507,7 @@ set of loop coordinates.  However, note that at this point
 
 \index{taffy pullers|(}
 
-Taffy pullers are a class of devices designed to strech and fold soft candy
+Taffy pullers are a class of devices designed to stretch and fold soft candy
 repeatedly \citep{MattFinn2011_silver}.  The goal is to aerate the taffy.
 Since many folds are required, the process has been mechanized using fixed and
 moving rods.  The two most typical designs are shown in
