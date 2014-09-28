@@ -6,7 +6,7 @@
 
 [Michael Allshouse][3] and [Marko Budisic][4] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; Markus Buehren's [assignmentoptimal][9]; Jakob Progsch's [ThreadPool][10]; and John R. Gilbert's function for computing the [Smith Normal Form of a matrix][11].
+*braidlab* uses Toby Hall's [Train][5]; Jae Choon Cha's [CBraid][6]; Juan Gonzalez-Meneses's [Braiding][7]; John D'Errico's [Variable Precision Integer Arithmetic][8]; Markus Buehren's [assignmentoptimal][9]; Jakob Progsch's [ThreadPool][10]; and John R. Gilbert's [function][11] for computing the Smith Normal Form of a matrix.
 
 ### license
 
