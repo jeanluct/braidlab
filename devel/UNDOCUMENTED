@@ -1,7 +1,10 @@
 Methods and features that are not yet in the guide:
 
+randomwalk
 braid.gencount
 loop.nested
 loop.components
 loop.plot('components')
 loop.getgraph
+debugmsg & BRAIDLAB_debuglvl
+@cfbraid class
