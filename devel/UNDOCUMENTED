@@ -1,0 +1,7 @@
+Methods and features that are not yet in the guide:
+
+braid.gencount
+loop.nested
+loop.components
+loop.plot('components')
+loop.getgraph
