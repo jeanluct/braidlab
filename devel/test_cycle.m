@@ -1,7 +1,11 @@
+function test_cycle
+
+import braidlab.*
+
 rng('default')
 
-n = 5;
-k = 5;
+n = 10;
+k = 10;
 Nreal = 100;
 maxit = 0;
 maxperiod = 0;
@@ -23,18 +27,17 @@ for r = 1:Nreal
 
   % Doublecheck effective linear action.
   if true
-    l = loop(b.n);
-    % Make sure we've converged to the periodic cycle.
-    l = b^it*l;
-    [l1,M2] = b^period*l;
-    if any(M ~= M2)
-      BRAIDLAB_debuglvl = BRAIDLAB_debuglvl_save;
-      error('Something went wrong (1).')
-    end
-    l2 = loop(M2*l.coords.');
-    if l1 ~= l2
-      BRAIDLAB_debuglvl = BRAIDLAB_debuglvl_save;
-      error('Something went wrong (2).')
+    try
+      verify_cycle(b,M,period,it,@double);
+    catch err
+      if (strcmp(err.identifier,'BRAIDLAB:test_cycle:wrong2'))
+        fprintf('retrying with VPI...')
+        verify_cycle(b,M,period,it,@vpi);
+        fprintf(' ok.\n')
+      else
+        BRAIDLAB_debuglvl = BRAIDLAB_debuglvl_save;
+        rethrow(err)
+      end
     end
   end
 end
@@ -42,3 +45,22 @@ end
 fprintf('Max iterations: %d     Max period: %d\n',maxit,maxperiod)
 
 BRAIDLAB_debuglvl = BRAIDLAB_debuglvl_save;
+
+%=================================================================
+function verify_cycle(b,M,period,it,typ)
+
+l = braidlab.loop(b.n,typ);
+
+% Make sure we've converged to the periodic cycle.
+l = b^it*l;
+[l1,M2] = b^period*l;
+
+if any(M ~= M2)
+  error('BRAIDLAB:test_cycle:wrong1','Something went wrong (1).')
+end
+
+l2 = braidlab.loop(typ(M2*l.coords.'));
+
+if l1 ~= l2
+  error('BRAIDLAB:test_cycle:wrong2','Something went wrong (2).')
+end
