@@ -172,10 +172,19 @@ while 1
   % If nothing was changed, we're done.
   if ~incr, break; end
 
+  % Make sure the loops is actually invariant before adding to the list.
   l = loop(Q*Z);
   if b*l == l
+    % Don't add to the list if all coordinates are zero, or if its nested.
     if ~all(l.coords == 0) && ~nested(l)
       linv = [linv ; l];
+    end
+  else
+    if exist('BRAIDLAB_debuglvl','var')
+      if BRAIDLAB_debuglvl >= 1
+        warning('BRAIDLAB:braid:find_reducing_curves:falsepos', ...
+                'False positive.')
+      end
     end
   end
 end
@@ -183,7 +192,8 @@ end
 if exist('BRAIDLAB_debuglvl','var')
   if BRAIDLAB_debuglvl >= 1
     if ~strcmp(tn,'reducible') && ~isempty(linv)
-      warning('Braid is not reducible, yet we found a reducing curve.')
+      warning('BRAIDLAB:braid:find_reducing_curves:notreducible', ...
+              'Braid is not reducible, yet we found a reducing curve.')
     end
   end
 end
@@ -191,8 +201,10 @@ end
 if exist('BRAIDLAB_debuglvl','var')
   if BRAIDLAB_debuglvl >= 1
     if strcmp(tn,'reducible') && isempty(linv)
-      % Example: < -3  1 -4  2 -3 -1 -2  3 -2  4  3  4 >  Why?
-      warning('Braid is reducible, but we didn''t find a reducing curve.')
+      % Example: < -3  1 -4  2 -3 -1 -2  3 -2  4  3  4 >.
+      % This is because of the dependence on initial loop.
+      warning('BRAIDLAB:braid:find_reducing_curves:isreducible', ...
+              'Braid is reducible, but we didn''t find a reducing curve.')
     end
   end
 end
