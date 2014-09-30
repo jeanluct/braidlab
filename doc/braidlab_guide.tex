@@ -1199,7 +1199,8 @@ are unchanged.  The superscripts~${}^{+/-}$ are defined as
   \neg\fc \ldef \min(\fc,0).
 \end{equation}
 (See~\citet{Thiffeault2010} for the update rules for the
-generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.)
+generators~$\sigma_1$, $\sigma_{\nn-1}$, and the inverse generators.  The
+update rules are in several other papers but use different conventions.)
 % By update rules we mean that the coordinates are updated to reflect the
 % action of the generator~$\sigma_\ip$ on a loop expressed in terms of
 % coordinates.
@@ -1211,10 +1212,11 @@ linear operation on the vector~$\abv$.  We can thus write
 \begin{equation}
   \abv' = M(\gamma,\abv)\cdot\abv,
   \qquad
-  M(\gamma,\abv) \in \mathrm{SL}_{2\nn-4}(\mathbb{Z}).
+  M(\gamma,\abv) \in \mathrm{SL}_{2\nn-4}(\mathbb{Z}),
 \end{equation}
-Here~$M(\gamma,\abv)$ is the \emph{effective linear action} of the
-braid~$\gamma$ on the loop~$\abv$.
+where the dot now denotes the standard matrix product.  Here~$M(\gamma,\abv)$
+is the \emph{effective linear action} of the braid~$\gamma$ on the
+loop~$\abv$.
 
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
 Let's show an example using \braidlab.  We take the
