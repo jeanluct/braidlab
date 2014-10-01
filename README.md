@@ -2,6 +2,10 @@
 
 *braidlab* is a [Matlab][2] package for analyzing data using braids.  It was originally created and is maintained by [Jean-Luc Thiffeault][1].
 
+### documentation and installation
+
+See the [*braidlab* user's guide][15].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.
+
 ### contributors
 
 [Michael Allshouse][3] and [Marko Budisic][4] contributed extensive testing, comments, and some of the code.
@@ -11,10 +15,6 @@
 ### license
 
 *braidlab* is released under the [GNU General Public License v3][12].  See [COPYING][13] and [LICENSE][14].
-
-### documentation
-
-See the [*braidlab* user's guide][15].
 
 ### support
 
