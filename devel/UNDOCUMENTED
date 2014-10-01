@@ -7,4 +7,5 @@ loop.components
 loop.plot('components')
 loop.getgraph
 debugmsg & BRAIDLAB_debuglvl
+BRAIDLAB_threads
 @cfbraid class
