@@ -1888,6 +1888,8 @@ Section~\ref{sec:cloning} above, replacing the \lstinline{make} command with
   language=bash,backgroundcolor=\color{white}]
 $ make CC=gcc-4.7 CXX=g++-4.7
 \end{lstlisting}
+Note that this only works with Matlab R2014a or later.  Earlier versions of
+Matlab also require editing of a file called \lstinline{mexopts.sh}.
 
 If the \lstinline{which} command above didn't return anything, you can try to
 install an older version of GCC:
