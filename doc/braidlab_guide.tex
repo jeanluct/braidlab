@@ -1781,6 +1781,12 @@ computing the Smith Normal Form of a matrix \citep{snf}.
 \label{sec:install}
 \index{installing \braidlab}
 
+\braidlab\ consists of Matlab files together with C and C++ auxiliary files,
+so-called MEX files.  The MEX files are used to greatly speed up calculations.
+Many commands will work even if the MEX files are unavailable, but much more
+slowly.  (A few commands won't work at all.)  However, MEX files need to be
+first compiled with Matlab's \lstinline{mex} compiler.
+
 \subsection{Precompiled packages}
 
 Some zip and tar files of the precompiled latest released version are
@@ -1789,26 +1795,31 @@ those suits your system, then download and untar/unzip.
 
 
 \subsection{Cloning the repository}
+\label{sec:cloning}
 
 \index{Mercurial} If you prefer to have the latest (possibly unstable)
 development version, and know how to compile Matlab MEX %
-\index{Matlab!MEX files} files on your system, then you can clone the
+\index{Matlab!MEX files|(} files on your system, then you can clone the
 Mercurial source repository with the terminal command
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
-# hg clone https://bitbucket.org/jeanluc/braidlab
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ hg clone https://bitbucket.org/jeanluc/braidlab
 \end{lstlisting}
 assuming Mercurial is installed on your system.  After this finishes, type
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
-# cd braidlab; make
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ cd braidlab; make
 \end{lstlisting}
 to compile the MEX files.  Note that you can still use \braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly.
+\index{Matlab!MEX files|)}
 
 \index{GMP} If you receive error messages because GMP (the GNU MultiPrecision
 library) is not installed on your system, instead of the above use
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*]
-# cd braidlab; make BRAIDLAB_USE_GMP=0
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ cd braidlab; make BRAIDLAB_USE_GMP=0
 \end{lstlisting}
 This will slow down some functions, in particular testing for equality of
 large braids.
@@ -1816,6 +1827,10 @@ large braids.
 
 \subsection{Setting Matlab's path}
 \label{sec:path}
+
+\lstset{language=Matlab}
+\lstset{breaklines=true}
+\lstset{backgroundcolor=\color{beige}}
 
 The package \braidlab\ is defined inside a Matlab namespace,
 \index{Matlab!namespace} which are specified as subfolders beginning with a
@@ -1849,6 +1864,81 @@ Matlab, change to the \lstinline{testsuite} folder, and run
 making sure the path is set properly (Section~\ref{sec:path}).
 Note that running the testsuite requires Matlab version 2013a or later.
 
+
+\subsection{Troubleshooting}
+\label{sec:trouble}
+\index{installing \braidlab!troubleshooting|(}
+
+Here are some common problems that can occur when installing braidlab.
+
+\subsubsection{Unsupported compiler}
+
+Linux distributions often use very recent C/C++ compilers that are not yet
+supported by Matlab.  If you get such an error from MEX, it will tell you
+which version of GCC it wants.  For example, if it claims it needs GCC 4.7 or
+earlier, you can try
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ which gcc-4.7
+\end{lstlisting}
+to see if a path to the command exists.  If it does, you have an earlier
+compiler installed and you can proceed to build \braidlab\ as described in
+Section~\ref{sec:cloning} above, replacing the \lstinline{make} command with
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ make CC=gcc-4.7 CXX=g++-4.7
+\end{lstlisting}
+
+If the \lstinline{which} command above didn't return anything, you can try to
+install an older version of GCC:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo apt-get install gcc-4.7 g++4.7
+\end{lstlisting}
+This last line is for Ubuntu and Debian Linux distributions.  Note that this
+will \emph{not} overwrite the default compiler.
+
+If your Linux distribution doesn't allow you to easily install the required
+compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
+  and install it from scratch!}  That's fairly tedious, though.
+
+
+\subsubsection{Polish \LaTeX\ gets in the way}
+
+This is a strange one.  If on compilation you see an error like this:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+mex: unrecognized option `-largeArrayDims'
+mex: unrecognized option `-O'
+mex: unrecognized option `-DBRAIDLAB_USE_GMP'
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013)
+ restricted \write18 enabled.
+entering extended mode
+! I can't find file `"CFLAGS=-O -DMATLAB_MEX_FILE"'.
+\end{lstlisting}
+This is due to the command \lstinline{mex} --- part of the Polish \LaTeX\
+package --- shadowing Matlab's \lstinline{mex} compiler.  A simple solution,
+if you don't use the Polish language often, is to simply remove the package:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo apt-get remove texlive-lang-polish
+\end{lstlisting}
+Or you can make sure that the Matlab executable directory appears early in
+bash's path variable.
+
+
+\subsubsection{\lstinline{largeArraydims} warning}
+
+You might get this warning:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+Warning: Legacy MEX infrastructure is provided for compatibility; it will be removed in a future version of MATLAB.
+\end{lstlisting}
+This can be safely ignored.  Matlab is transitioning from a shorter to a
+longer type of internal array indexing.  Eventually the
+\lstinline{-largeArraydims} flag will be removed from \braidlab.
+
+\index{installing \braidlab!troubleshooting|)}
 
 \bibliographystyle{jfm}
 {\small
