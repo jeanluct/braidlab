@@ -4,8 +4,8 @@
 * Simplify the linear action code: instead of braid.linact use an
   optional return argument for braid.mtimes.  braid.cycle now does
   what braid.cyclemat did.  The nitty-gritty pos/neg operators are
-  invisible to the user (see issue #65).  None of this should change
-  anything, since these were not documented in the guide (but now they
+  invisible to the user (see issue #65).  None of this should affect
+  users, since these were not documented in the guide (but now they
   are).
 
 * Fix detection of some limit cycles (issue #52).  Also allow
@@ -13,6 +13,9 @@
 
 * Move some utility functions to namespace +util, to make them less
   visible to user.
+
+* Moved installation instructions to an appendix in the guide.  Added
+  a troubleshooting section.
 
 ------------------------------------------------------------------------
 2.0 [2014-09-24]
