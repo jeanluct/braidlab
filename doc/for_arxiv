@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#
+# Prepare files for posting on arXiv.
+#
+# Post to math.GT, xref to nlin.CD.
+#
+# MSC 2010 classification:
+#
+# Primary: 20F36 (Braid groups; Artin groups)
+#
+# Secondary:
+# 37E30 (Homeomorphisms and diffeomorphisms of planes and surfaces)
+# 37D40 (Dynamical systems of geometric origin and hyperbolicity
+#                  (geodesic and horocycle flows, etc.))
+#
+
+# Overwrite getrelease.tex with actual version number.
+hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g' \
+   >| getrelease.tex
+make -W braidlab_guide.tex braidlab_guide.pdf 
+tar cvzf braidlab_guide.tar.gz \
+    braidlab_guide.tex braidlab_guide.bbl braidlab_guide.toc \
+    braidlab_guide.ind \
+    getrelease.tex figs figs_lo
+
+# Restore getrelease.tex
+hg revert -C getrelease.tex
