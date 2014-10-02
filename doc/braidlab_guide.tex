@@ -1925,8 +1925,18 @@ if you don't use the Polish language often, is to simply remove the package:
   language=bash,backgroundcolor=\color{white}]
 $ sudo apt-get remove texlive-lang-polish
 \end{lstlisting}
-Or you can make sure that the Matlab executable directory appears early in
-bash's path variable.
+This last line is for Ubuntu and Debian Linux distributions.  You can also
+manually rename the Polish \lstinline{mex} command to something like
+\lstinline{mex.polish}, and then make sure Matlab's \lstinline{mex} is in your
+path.
+
+Another solution is to make sure that the Matlab executable directory appears
+early in bash's path variable.  On Mac OSX this reads
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+>> export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
+\end{lstlisting}
+for Matlab R2014a.
 
 
 \subsubsection{\lstinline{largeArraydims} warning}
