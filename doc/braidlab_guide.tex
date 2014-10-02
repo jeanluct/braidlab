@@ -410,8 +410,17 @@ we can use actual Laurent polynomials as the entries:
      |                            |
      |   - 1        + 1 - z^(-1)  |
 \end{lstlisting}
-but the matrix is now given as a cell array, each entry containing a
-\lstinline{laurpoly} object:
+but the matrix is now given as a cell array%
+\index{Matlab!cell array}%
+\index{cell array|see{Matlab cell array}}%
+\footnote{%
+  \index{Matlab!cell array}%
+  A Matlab cell array is similar to a numeric array, except that its entries
+  can hold any data, not just numeric.  The entries are indexed as
+  \lstinline{a\{1,2\}} rather than \lstinline{a(1,2)}, and matrix operations
+  like multiplication are not defined.} %
+, %
+each entry containing a \lstinline{laurpoly} object:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> B{2,2}
 
@@ -1311,8 +1320,9 @@ M = [6x6 double]    [6x6 double]
 \end{lstlisting}
 The option \lstinline{'iter'} tells \lstinline{cycle} to compute an individual
 matrix for each iterate of the cycle, rather than the net product of all the
-matrices in the cycle.  The output is a cell array of two~$6$ by~$6$ matrices,
-corresponding to the period-2 cycle:
+matrices in the cycle.  The output is a cell array %
+\index{Matlab!cell array}%
+of two~$6$ by~$6$ matrices, corresponding to the period-2 cycle:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> full(M{1}), full(M{2})
 
