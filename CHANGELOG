@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
-2.x [2014-xx-xx]
+2.1 [2014-10-02]
 
 * Simplify the linear action code: instead of braid.linact use an
   optional return argument for braid.mtimes.  braid.cycle now does
@@ -16,6 +16,8 @@
 
 * Moved installation instructions to an appendix in the guide.  Added
   a troubleshooting section.
+
+* Renamed the guide and posted on arXiv.
 
 ------------------------------------------------------------------------
 2.0 [2014-09-24]
