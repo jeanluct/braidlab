@@ -106,13 +106,14 @@ showstringspaces=false}
 \begin{abstract}
   \braidlab\ is a Matlab package for analyzing data using braids.  It was
   designed to be fast, so it can be used on relatively large problems.  It
-  uses the object-oriented facilities of Matlab to provide classes for braids
-  on punctured disks and for equivalence classes of simple closed loops on
-  disks.  The growth of loops under iterated action by braids is used to
-  compute the topological entropy of braids, as well as for determining the
-  equality of braids.  This guide is a survey of the main capabilities of
-  \braidlab, with many examples; the help messages of the various commands
-  provide more details.
+  uses the object-oriented features of Matlab to provide a class for braids on
+  punctured disks and a class for equivalence classes of simple closed loops.
+  The growth of loops under iterated action by braids is used to compute the
+  topological entropy of braids, as well as for determining the equality of
+  braids.  This guide is a survey of the main capabilities of \braidlab, with
+  many examples; the help messages of the various commands provide more
+  details.  Some of the examples contain novel observations, such as the
+  existence of cycles of the linear effective action for arbitrary braids.
 \end{abstract}
 
 \tableofcontents
@@ -1773,16 +1774,17 @@ string being removed will have returned to its initial position many times. %
 
 The development of \braidlab\ was supported by the US National Science
 Foundation, under grants DMS-0806821 and CMMI-1233935.  The author thanks
-Michael Allshouse and Marko Budi\v{s}i\'{c} for extensive testing, comments,
-and for contributing some of the code.  James Puckett and Karen Daniels
-provided the test data from their granular medium
-experiments~\citep{Puckett2012}.  \braidlab\ uses Toby Hall's \emph{Train}
-\citep{HallTrain}; Jae Choon Cha's \emph{CBraid} \citep{CBraid}; Juan
-Gonz\'{a}lez-Meneses's \emph{Braiding} \citep{Braiding}; John D'Errico's
-\emph{Variable Precision Integer Arithmetic} \citep{vpi}; Markus Buehren's
-\emph{assignmentoptimal} \citep{assignmentoptimal}; Jakob Progsch's
-\emph{ThreadPool} \citep{ThreadPool}; and John R.\ Gilbert's function for
-computing the Smith Normal Form of a matrix \citep{snf}.
+Michael Allshouse, Marko Budi\v{s}i\'{c}, and Margaux Filippi for extensive
+testing and comments.  Michael Allshouse and Marko Budi\v{s}i\'{c} also
+contributed some of the code.  James Puckett and Karen Daniels provided the
+test data from their granular medium experiments~\citep{Puckett2012}.
+\braidlab\ uses Toby Hall's \emph{Train} \citep{HallTrain}; Jae Choon Cha's
+\emph{CBraid} \citep{CBraid}; Juan Gonz\'{a}lez-Meneses's \emph{Braiding}
+\citep{Braiding}; John D'Errico's \emph{Variable Precision Integer Arithmetic}
+\citep{vpi}; Markus Buehren's \emph{assignmentoptimal}
+\citep{assignmentoptimal}; Jakob Progsch's \emph{ThreadPool}
+\citep{ThreadPool}; and John R.\ Gilbert's function for computing the Smith
+Normal Form of a matrix \citep{snf}.
 
 
 \appendix
