@@ -4,7 +4,7 @@
 
 ### documentation and installation
 
-See the [*braidlab* user's guide][15].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.
+See the [*braidlab* user's guide][15].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.  The guide is also posted on [arXiv][19].
 
 ### contributors
 
@@ -38,3 +38,4 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [16]: http://www.nsf.gov
 [17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
 [18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
+[19]: http://arxiv.org/abs/1410.0849
