@@ -469,7 +469,7 @@ crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
     }
     std::stringstream report;
     report << crossingErrors.begin()->what();
-    report << " (NOTE: This is error 1/" << count << " errors detected).";
+    report << "\n[Error 1/" << count << " in threads.]";
     // first error is invoked as a MATLAB error
     mexErrMsgIdAndTxt(crossingErrors.begin()->id(), report.str().c_str() );
   }
@@ -924,15 +924,18 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
 
   if ( code == 0 ) return; // no error
 
-  // Construct error message
+  // Construct error message.  Make sure to use Matlab 1-indexing.
   std::stringstream report;
-  if (code == 2 )
-    report << "Projection ";
+  report << "Particles " << I+1 << " and " << J+1 << " have coincident ";
+  if (code == 2)
+    report << "projection ";
   else
-    report << "Particle ";
-
-  report << "overlap error for crossing at time-index " << ti;
-  report << " between trajectories " << I << " and " << J;
+    report << "particle ";
+  report << "at time index " << ti+1 << ": ";
+  if (code == 2)
+    report << "change projection angle (type help braid.braid).";
+  else
+    report << "braid not defined.";
 
   PWXexception e(report.str());
   e.code = code;
