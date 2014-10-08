@@ -4,6 +4,7 @@ N = 2000;
 n = 10;
 
 % The bad way: no pre-allocation.
+% Completely awful running time.
 if N <= 2000
   tic
   l1 = [];
@@ -28,5 +29,14 @@ l = loop(n);
 l3 = zeros(N,1,'like',l);
 for i = 1:N
   l3(i) = loop(n);
+end
+toc
+
+% The old way: pre-allocation with by creating the last element.
+% This works as well as the other two ways.
+tic
+l4(N) = loop(n);
+for i = 1:N
+  l4(i) = loop(n);
 end
 toc
