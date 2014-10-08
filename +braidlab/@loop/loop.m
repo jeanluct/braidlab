@@ -186,8 +186,8 @@ classdef loop < matlab.mixin.CustomDisplay
     %   See also LOOP.
 
       % Note that this has undesirable behavior on an array of loops.
-      a = vertcat(obj.a);
-      b = vertcat(obj.b);
+      a = obj.a;
+      b = obj.b;
     end
 
     function value = n(obj)
@@ -222,6 +222,64 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.EQ.
       ee = ~(l1 == l2);
+    end
+
+    function [varargout] = subsref(obj,s)
+    %SUBSREF   Subscript indexing for loops.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+      switch s(1).type
+       case '.'
+        % Use the built-in subsref for dot notation
+        [varargout{1:nargout}] = builtin('subsref',obj,s);
+       case '()'
+        if length(s) < 2
+          if length(s(1).subs) > 1
+            error('BRAIDLAB:loop:subsref','Cannot use more than one index.')
+          end
+          % Note that obj.coords is passed to subsref
+          idx = s(1).subs{1};
+          varargout{1} = braidlab.loop(obj.coords(idx,:));
+          return
+        else
+          [varargout{1:nargout}] = builtin('subsref',obj,s);
+        end
+       case '{}'
+        % No support for indexing using '{}'
+        error('BRAIDLAB:loop:subsref', ...
+              'Not a supported subscripted reference')
+      end
+    end
+
+    function obj = subsasgn(obj,s,val)
+    %SUBSASGN   Subscript indexing with assignment for loops.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+      if isempty(s) && strcmp(class(val),'braidlab.loop')
+        obj = val;
+      end  
+      switch s(1).type
+       case '.'
+        % Use the built-in subsref for dot notation
+        obj = builtin('subsasgn',obj,s,val);
+       case '()'
+        if length(s) < 2
+          if length(s(1).subs) > 1
+            error('BRAIDLAB:loop:subsasgn','Cannot use more than one index.')
+          end
+          idx = s(1).subs{1};
+          obj.coords(idx,:) = val.coords(:);
+          return
+        else
+          sref = builtin('subsasgn',obj,s);
+        end
+       case '{}'
+        % No support for indexing using '{}'
+        error('BRAIDLAB:loop:subsasgn', ...
+              'Not a supported subscripted reference')
+      end
     end
 
     function l = minlength(obj)
