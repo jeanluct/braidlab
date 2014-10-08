@@ -36,7 +36,7 @@ fprintf(' (%f seconds)\n',t3)
 fprintf('\nVerify equality... ')
 tic
 % Convert back to array of coordinates.
-l4c = cell(size(l4)); [l4c{:}] = l4.coords; l4c = cell2mat(l4c);
+l4c = vertcat(l4.coords);
 if any(l2(:) ~= l4c(:))
   error('Coordinates don''t match.')
 end
