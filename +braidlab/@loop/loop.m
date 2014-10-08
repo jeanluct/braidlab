@@ -145,7 +145,7 @@ classdef loop < matlab.mixin.CustomDisplay
             error('BRAIDLAB:loop:loop:oddlength', ...
                   'Loop coordinate array must have even number of columns.')
           end
-          l(size(c,1),1) = braidlab.loop;  % pre-allocate
+          l = zeros(size(c,1),1,'braidlab.loop');  % pre-allocate
           for k = 1:size(c,1)
             l(k,1).coords = c(k,:);
           end
@@ -156,7 +156,7 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:badsize', ...
                 'Loop coordinate vectors must have the same size.')
         end
-        l(size(c,1)) = braidlab.loop;  % pre-allocate
+        l = zeros(size(c,1),1,'braidlab.loop');  % pre-allocate
         for k = 1:size(c,1)
           l(k).coords = [c(k,:) b(k,:)];
         end
@@ -347,6 +347,59 @@ classdef loop < matlab.mixin.CustomDisplay
       end
     end
 
+  end % methods block
+
+  % Support for class name syntax of zeros function.
+  % e.g. L = zeros(m,n,'braidlab.loop')
+  methods (Static)
+    function z = zeros(varargin)
+    %ZEROS   Zero array of loops.
+    %   Z = ZEROS(M,N,'braidlab.loop') returns an array of zero loops of
+    %   size M by N.
+    %
+    %   Z = ZEROS(M,N,'like',L) returns an array of zero loops of size M by
+    %   N.  Each loop has the same number of punctures as L.
+    %
+    %   Note: do NOT call this as loop.braidlab.zeros.  Call it as zeros
+    %   with no prefix.  Matlab delegates to this function automatically.
+    %
+    %   This is a static method for the LOOP class.
+    %   See also LOOP, LOOP.LOOP, ZEROS.
+      if (nargin == 0)
+        % For zeros('loop')
+        z = braidlab.loop;
+        z.coords = zeros(size(z.coords));
+      elseif any([varargin{:}] <= 0)
+        % For zeros with any dimension <= 0
+        z = braidlab.loop.empty(varargin{:});
+      else
+        % For zeros(m,n,...,'loop')
+        l = zeros('braidlab.loop');
+        z = repmat(l,varargin{:});
+      end
+    end
+  end % methods block
+
+  % Support for prototype object method implementation of zero function.
+  % e.g. L = zeros(m,n,'like',braidlab.loop([1 2 3 4]))
+  methods (Hidden)
+    function z = zerosLike(obj,varargin)
+      if nargin == 1
+        % For zeros('like',obj)
+        z = braidlab.loop(zeros(size(obj.coords)));
+      elseif any([varargin{:}] <= 0)
+        % For zeros with any dimension <= 0
+        z = braidlab.loop.empty(varargin{:});
+      else
+        % For zeros(m,n,...,'like',obj)
+        if ~isscalar(obj)
+          error('BRAIDLAB:loop:zerosLike:badarg', ...
+                'Prototype object must be scalar')
+        end
+        obj = braidlab.loop(zeros(size(obj.coords)));
+        z = repmat(obj,varargin{:});
+      end
+    end
   end % methods block
 
 end % loop classdef
