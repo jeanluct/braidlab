@@ -102,26 +102,26 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:braid:mtimes:badobject')
 
       % Column vector of loops.
-      l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...
-            braidlab.loop(testCase.l2.coords(2,:))];
-      b = testCase.b;
-      l = b*l0;
-      testCase.verifyEqual(size(l),[2 1]);
+      %l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...
+      %      braidlab.loop(testCase.l2.coords(2,:))];
+      %b = testCase.b;
+      %l = b*l0;
+      %testCase.verifyEqual(size(l),[2 1]);
 
       % Row vector of loops.
-      l0 = l0.';
-      ll = b*l0;
-      testCase.verifyEqual(size(ll),[1 2]);
+      %l0 = l0.';
+      %ll = b*l0;
+      %testCase.verifyEqual(size(ll),[1 2]);
 
-      testCase.verifyEqual(l,ll.');
-      
+      %testCase.verifyEqual(l,ll.');
+
       % Matrix of loops.
-      lmat = [l,l];
-      testCase.verifyEqual(size(lmat),[2 2]);
+      %lmat = [l,l];
+      %testCase.verifyEqual(size(lmat),[2 2]);
       % Can't act on matrix of loops with a braid.
       % Could be done but would be kludgy.
-      testCase.verifyError(@()mtimes(b,lmat), ...
-                           'BRAIDLAB:braid:mtimes:badsize')
+      %testCase.verifyError(@()mtimes(b,lmat), ...
+      %                     'BRAIDLAB:braid:mtimes:badsize')
     end
 
     function test_loopcoords(testCase)
