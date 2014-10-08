@@ -228,6 +228,9 @@ pgap = min(space_between_loop_lines)/2+zeros(n,1);
 
 if isempty(options.PunctureSize);
   options.PunctureSize = .15*min(space_between_loop_lines);
+  if isinf(options.PunctureSize)
+    options.PunctureSize = .05;
+  end
 end
 
 prad = options.PunctureSize;
