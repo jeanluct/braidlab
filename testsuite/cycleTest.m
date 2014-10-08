@@ -110,7 +110,7 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyEqual(full(M1it{1}),testCase.M11);
 
       % Explicitly verify the matrix for the full cycle.
-      M2it = cycle(testCase.b2,'iter','plot');
+      M2it = cycle(testCase.b2,'iter');
       testCase.verifyEqual(full(M2it{4}*M2it{3}*M2it{2}*M2it{1}),testCase.M2);
       testCase.verifyEqual(full(M2),testCase.M2);
 
