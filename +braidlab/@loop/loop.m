@@ -164,14 +164,16 @@ classdef loop < matlab.mixin.CustomDisplay
     function value = get.a(obj)
       % Note that this has undesirable behavior on an array of loops.
       value = obj.coords(:,1:size(obj.coords,2)/2);
-      assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
+      assert(~any(isoverflowed(value)), ...
+             'BRAIDLAB:loop:loop:overflow',...
              'Dynnikov "a" coordinate has overflowed.');
     end
 
     function value = get.b(obj)
       % Note that this has undesirable behavior on an array of loops.
       value = obj.coords(:,size(obj.coords,2)/2+1:end);
-      assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
+      assert(~any(isoverflowed(value)), ...
+             'BRAIDLAB:loop:loop:overflow',...
              'Dynnikov "b" coordinate has overflowed.');
     end
 
@@ -222,38 +224,6 @@ classdef loop < matlab.mixin.CustomDisplay
       ee = ~(l1 == l2);
     end
 
-    function str = char(obj)
-    %CHAR   Convert loop to string.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.DISP.
-      if isscalar(obj)
-        if ~isa(obj(1).coords,'vpi')
-          objstr = num2str(obj.coords);
-        else
-          % The VPI num2str command is buggy on arrays.
-          objstr = num2str(obj.coords(1));
-          if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
-          for i = 2:length(obj.coords)
-            oo = num2str(obj.coords(i)); oo(1:2) = '';
-            objstr = [objstr oo]; %#ok<AGROW>
-          end
-        end
-        str = ['(( ' objstr ' ))'];
-      else
-        str = '';
-        if size(obj,1) > size(obj,2)
-          for i = 1:size(obj,1)
-            str = [str ; char(obj(i,:))]; %#ok<AGROW>
-          end
-        else
-          for i = 1:size(obj,2)
-            str = [str '  ' char(obj(:,i))]; %#ok<AGROW>
-          end
-        end
-      end
-    end
-
     function l = minlength(obj)
     %MINLENGTH   The minimum length of a loop.
     %   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
@@ -283,13 +253,13 @@ classdef loop < matlab.mixin.CustomDisplay
 
         % The number of intersections before/after the first and last punctures.
         % See Hall & Yurttas (2009).
-        cumb = [0 cumsum(b,2)];
-        b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
-        bn1 = -b0 - sum(b);
+        cumb = [zeros(size(b,1),1) cumsum(b,2)];
+        b0 = -max(abs(a) + max(b,0) + cumb(:,1:end-1),[],2);
+        bn1 = -b0 - sum(b,2);
 
         % The number of intersections with the real axis.
-        l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
-            + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
+        l = sum(abs(b),2) + sum(abs(a(:,2:end)-a(:,1:end-1)),2) ...
+            + abs(a(:,1)) + abs(a(:,end)) + abs(b0) + abs(bn1);
       end
     end
 
@@ -302,11 +272,11 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP.
 
-      lvl = zeros(size(obj,1),1);
-      for j = 1:size(obj,1)
-        lvl(j) = gcd(obj(j).coords(1),obj(j).coords(2));
-        for i = 3:length(obj(j).coords)
-          lvl(j) = gcd(lvl(j),obj(j).coords(i));
+      lvl = zeros(size(obj.coords,1),1);
+      for j = 1:size(obj.coords,1)
+        lvl(j) = gcd(obj.coords(j,1),obj.coords(j,2));
+        for i = 3:length(obj.coords(j,:))
+          lvl(j) = gcd(lvl(j),obj.coords(j,i));
         end
         lvl(j) = lvl(j)-1;
       end
@@ -334,19 +304,12 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     function displayNonScalarObject(obj)
-      return
       for j = 1:size(obj,1)
-        sz = get(0, 'CommandWindowSize');
-        wc = textwrap({char(obj(j,:))},sz(1)-6);
-        for i = 1:length(wc)
-          % Indent rows.
-          if i > 1, wc{i} = ['      ' wc{i}]; else wc{i} = ['   ' wc{i}]; end
-          % If the format is loose rather than compact, add a line break.
-          if strcmp(get(0,'FormatSpacing'),'loose')
-            wc{i} = sprintf('%s\n',wc{i});
-          end
-        end
+        wc = display_row(obj(j,:));
         disp(char(wc))
+        if j ~= size(obj,1)
+          fprintf('\n')  % skip line between elements.
+        end
       end
     end
 
