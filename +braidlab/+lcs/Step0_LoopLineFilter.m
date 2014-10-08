@@ -18,7 +18,7 @@ end
 %% Create the list of loops connecting pairs of trajectories and 
 
 % Preallocate arrays.
-arrSize = size(xInitial,1)*(size(xInitial,1)-1)
+arrSize = size(xInitial,1)*(size(xInitial,1)-1);
 loopIndex = zeros(arrSize,2);
 loopList = zeros(arrSize,1,'braidlab.loop');
 k = 1;
