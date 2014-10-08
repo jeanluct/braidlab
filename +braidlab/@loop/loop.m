@@ -236,52 +236,6 @@ classdef loop < matlab.mixin.CustomDisplay
       l = sum(nu,2);
     end
 
-    function l = intaxis(obj)
-    %INTAXIS   The number of intersections of a loop with the real axis.
-    %   I = INTAXIS(L) computes the minimum number of intersections of a
-    %   loop L with the real axis.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
-      if ~isscalar(obj)
-        l = zeros(length(obj),1);
-        for k = 1:length(obj)
-          l(k) = intaxis(obj(k));
-        end
-      else
-        [a,b] = obj.ab;
-
-        % The number of intersections before/after the first and last punctures.
-        % See Hall & Yurttas (2009).
-        cumb = [zeros(size(b,1),1) cumsum(b,2)];
-        b0 = -max(abs(a) + max(b,0) + cumb(:,1:end-1),[],2);
-        bn1 = -b0 - sum(b,2);
-
-        % The number of intersections with the real axis.
-        l = sum(abs(b),2) + sum(abs(a(:,2:end)-a(:,1:end-1)),2) ...
-            + abs(a(:,1)) + abs(a(:,end)) + abs(b0) + abs(bn1);
-      end
-    end
-
-    function lvl = nested(obj)
-    %NESTED   Nesting level of loop.
-    %   LVL = NESTED(L) returns the nesting level of a loop.  This is the
-    %   GCD of all the loop coordinate entries, minus one.  If the loop is
-    %   not nested, then LVL=0.  If the loop is doubled, LVL=1, etc.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP.
-
-      lvl = zeros(size(obj.coords,1),1);
-      for j = 1:size(obj.coords,1)
-        lvl(j) = gcd(obj.coords(j,1),obj.coords(j,2));
-        for i = 3:length(obj.coords(j,:))
-          lvl(j) = gcd(lvl(j),obj.coords(j,i));
-        end
-        lvl(j) = lvl(j)-1;
-      end
-    end
-
     function Nc = components(obj)
     %COMPONENTS   Number of connected components of a loop.
     %   NC = COMPONENTS(L) returns the number of connected components NC of
