@@ -52,17 +52,21 @@ classdef loopTest < matlab.unittest.TestCase
 
       % A column vector of loops.
       l = testCase.l2;
-      [c1,c2] = l.coords;
-      testCase.verifyEqual(c1,[1 -1 2 3]);
-      testCase.verifyEqual(c2,[2 3 -1 2]);
+      c12 = l.coords;
+      testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
+      testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
 
       % A row vector of loops.
       l = testCase.l2.';
-      [c1,c2] = l.coords;
-      testCase.verifyEqual(c1,[1 -1 2 3]);
-      testCase.verifyEqual(c2,[2 3 -1 2]);
+      c12 = l.coords;
+      testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
+      testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
 
-      % The basis of loops used to build loop coordinates.
+      % Can't make more dimensions than a matrix.
+      testCase.verifyError(@()braidlab.loop(zeros(3,3,3)), ...
+                           'BRAIDLAB:loop:loop:badarg')
+
+      % The generating set of loops used to build loop coordinates.
       l = braidlab.loop(4);
       testCase.verifyEqual(l.coords,[0 0 0 -1 -1 -1]);
 
@@ -98,17 +102,26 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:braid:mtimes:badobject')
 
       % Column vector of loops.
-      l0 = testCase.l2;
+      l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...
+            braidlab.loop(testCase.l2.coords(2,:))];
       b = testCase.b;
       l = b*l0;
       testCase.verifyEqual(size(l),[2 1]);
 
       % Row vector of loops.
-      l0 = testCase.l2.';
+      l0 = l0.';
       ll = b*l0;
       testCase.verifyEqual(size(ll),[1 2]);
 
       testCase.verifyEqual(l,ll.');
+      
+      % Matrix of loops.
+      lmat = [l,l];
+      testCase.verifyEqual(size(lmat),[2 2]);
+      % Can't act on matrix of loops with a braid.
+      % Could be done but would be kludgy.
+      testCase.verifyError(@()mtimes(b,lmat), ...
+                           'BRAIDLAB:braid:mtimes:badsize')
     end
 
     function test_loopcoords(testCase)

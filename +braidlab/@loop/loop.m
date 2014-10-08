@@ -141,14 +141,15 @@ classdef loop < matlab.mixin.CustomDisplay
           l.coords = c;
         else
           % Create from an array with an even number of columns.
+          if ndims(c) > 2
+            error('BRAIDLAB:loop:loop:badarg', ...
+                  'Array of coordinates must have 1 or 2 dimensions.')
+          end
           if mod(size(c,2),2)
             error('BRAIDLAB:loop:loop:oddlength', ...
                   'Loop coordinate array must have even number of columns.')
           end
-          l = zeros(size(c,1),1,'braidlab.loop');  % pre-allocate
-          for k = 1:size(c,1)
-            l(k,1).coords = c(k,:);
-          end
+          l.coords = c;
         end
       else
         % Create a,b separately from two vectors of the same length.
@@ -156,21 +157,20 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:badsize', ...
                 'Loop coordinate vectors must have the same size.')
         end
-        l = zeros(size(c,1),1,'braidlab.loop');  % pre-allocate
-        for k = 1:size(c,1)
-          l(k).coords = [c(k,:) b(k,:)];
-        end
+        l.coords = [c b];
       end
     end % function loop
 
     function value = get.a(obj)
-      value = obj.coords(1:length(obj.coords)/2);
+      % Note that this has undesirable behavior on an array of loops.
+      value = obj.coords(:,1:size(obj.coords,2)/2);
       assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
              'Dynnikov "a" coordinate has overflowed.');
     end
 
     function value = get.b(obj)
-      value = obj.coords(length(obj.coords)/2+1:end);
+      % Note that this has undesirable behavior on an array of loops.
+      value = obj.coords(:,size(obj.coords,2)/2+1:end);
       assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
              'Dynnikov "b" coordinate has overflowed.');
     end
@@ -182,6 +182,8 @@ classdef loop < matlab.mixin.CustomDisplay
     %
     %   This is a method for the LOOP class.
     %   See also LOOP.
+
+      % Note that this has undesirable behavior on an array of loops.
       a = vertcat(obj.a);
       b = vertcat(obj.b);
     end
@@ -196,11 +198,11 @@ classdef loop < matlab.mixin.CustomDisplay
     % we support arrays of loops, there is an undesirable behavior:
     % when calling obj.n with n a derived property, the function get.n
     % is called for each object.  Thus, what is returned is a
-    % comma-separated of the same value n.  Better to define n as a
+    % comma-separated list of the same value n.  Better to define n as a
     % function, then.
 
       % Length of coords is 2n-4, where n is the number of punctures.
-      value = length(obj(1).coords)/2 + 2;
+      value = size(obj(1).coords,2)/2 + 2;
     end
 
     function ee = eq(l1,l2)
@@ -332,6 +334,7 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     function displayNonScalarObject(obj)
+      return
       for j = 1:size(obj,1)
         sz = get(0, 'CommandWindowSize');
         wc = textwrap({char(obj(j,:))},sz(1)-6);
@@ -374,6 +377,7 @@ classdef loop < matlab.mixin.CustomDisplay
         z = braidlab.loop.empty(varargin{:});
       else
         % For zeros(m,n,...,'loop')
+        % Undesirable to have array here?
         l = zeros('braidlab.loop');
         z = repmat(l,varargin{:});
       end
@@ -392,6 +396,7 @@ classdef loop < matlab.mixin.CustomDisplay
         z = braidlab.loop.empty(varargin{:});
       else
         % For zeros(m,n,...,'like',obj)
+        % Undesirable to have array here?
         if ~isscalar(obj)
           error('BRAIDLAB:loop:zerosLike:badarg', ...
                 'Prototype object must be scalar')
