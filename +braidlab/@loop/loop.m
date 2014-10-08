@@ -263,10 +263,17 @@ classdef loop < matlab.mixin.CustomDisplay
       
       global BRAIDLAB_loop_minlength_nomex
       if BRAIDLAB_loop_minlength_nomex
-        [~,nu] = obj.intersec;
+        
+        % compute intersection numbers
+        [~,nu] = obj.intersec; 
+        % sum intersection numbers along rows
         l = sum(nu,2);
       else
-        l = minlength_helper(obj.coords);
+        % compute lengths using MEX
+        l = nan( size(obj) );
+        for k = 1:numel(l)
+          l(k) = minlength_helper(obj(k).coords);
+        end
       end
     end
 
