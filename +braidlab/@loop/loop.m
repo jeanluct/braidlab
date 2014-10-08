@@ -260,8 +260,14 @@ classdef loop < matlab.mixin.CustomDisplay
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
-      [~,nu] = obj.intersec;
-      l = sum(nu,2);
+      
+      global BRAIDLAB_loop_minlength_nomex
+      if BRAIDLAB_loop_minlength_nomex
+        [~,nu] = obj.intersec;
+        l = sum(nu,2);
+      else
+        l = minlength_helper(obj.coords);
+      end
     end
 
     function l = intaxis(obj)
