@@ -162,18 +162,20 @@ for I = 1:n
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
 
-    % uses relative precision to test equality (same as C++ code)
+    % Use relative precision to test equality (same as C++ code).
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
 
     if ~isempty(nearcoinc)
-      % uses relative precision to test equality (same as C++ code)
+      msg = sprintf([ 'Particles %g and %g have coincident %%s ' ... 
+                      'at time index %g: ' ],I,J,nearcoinc(1));
+      % Use relative precision to test equality (same as C++ code).
       if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
-              'Coincident particles: braid not defined.')
+              [ msg 'braid not defined.' ],'coordinate')
       else
-        error('BRAIDLAB:braid:colorbraiding:coincidentproj', ...
-              [ 'Coincident projection coordinate; change ' ...
-                'projection angle (type help braid.braid).' ])
+        error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
+              [ msg 'change projection angle ' ...
+                '(type help braid.braid).' ],'projection')
       end
     end
 
