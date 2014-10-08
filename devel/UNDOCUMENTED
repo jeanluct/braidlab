@@ -9,3 +9,4 @@ loop.getgraph
 debugmsg & BRAIDLAB_debuglvl
 BRAIDLAB_threads
 @cfbraid class
+loop.zeros
