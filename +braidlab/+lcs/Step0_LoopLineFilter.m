@@ -20,7 +20,7 @@ end
 % Preallocate arrays.
 arrSize = size(xInitial,1)*(size(xInitial,1)-1);
 loopIndex = zeros(arrSize,2);
-loopList = zeros(arrSize,1,'braidlab.loop');
+loopList = braidlab.loop(zeros(arrSize,2*system_braid.n-4));
 k = 1;
 
 for i = 1:size(xInitial,1)
