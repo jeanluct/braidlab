@@ -213,7 +213,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID.EQ.
       ee = [l1.n] == [l2.n];
-      if ee, ee = all([l1.coords] == [l2.coords]); end
+      if ee, ee = all([l1.coords] == [l2.coords],2); end
     end
 
     function ee = ne(l1,l2)
@@ -244,6 +244,7 @@ classdef loop < matlab.mixin.CustomDisplay
           if ~isempty(s)
             % If there is stuff left over, continue evaluating.
             [varargout{1:nargout}] = builtin('subsref',objrow,s);
+            return
           end
           % Output something anyways if no output args specified.
           if nargout == 0, varargout{1} = objrow; end
@@ -278,10 +279,9 @@ classdef loop < matlab.mixin.CustomDisplay
            if isempty(obj)
              % Create the object, since it's empty.
              obj = braidlab.loop(zeros(idx,size(val.coords,2)));
-           else
-             % Overwrite an existing row.
-             obj.coords(idx,:) = val.coords(:);
            end
+           % Overwrite an existing row.
+           obj.coords(idx,:) = val.coords(:);
            return
          elseif length(s) < 4
            if isempty(obj)
