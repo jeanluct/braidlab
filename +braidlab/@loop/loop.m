@@ -97,7 +97,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
-      % Default loop around first two of three punctures.
+    % Default loop around first two of three punctures.
       if nargin == 0, return; end
       if isscalar(c) && ~isa(c,'braidlab.loop')
         % Nested generators of the fundamental group of a sphere with c
@@ -163,177 +163,187 @@ classdef loop < matlab.mixin.CustomDisplay
       end
     end % function loop
 
-    function value = get.a(obj)
-      value = obj.coords(1:length(obj.coords)/2);
-      assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
-             'Dynnikov "a" coordinate has overflowed.');
-    end
+      function value = get.a(obj)
+        value = obj.coords(1:length(obj.coords)/2);
+        assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
+               'Dynnikov "a" coordinate has overflowed.');
+      end
 
-    function value = get.b(obj)
-      value = obj.coords(length(obj.coords)/2+1:end);
-      assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
-             'Dynnikov "b" coordinate has overflowed.');
-    end
+      function value = get.b(obj)
+        value = obj.coords(length(obj.coords)/2+1:end);
+        assert(~isoverflowed(value), 'BRAIDLAB:loop:loop:overflow',...
+               'Dynnikov "b" coordinate has overflowed.');
+      end
 
-    function [a,b] = ab(obj)
-    %AB   Return the A and B vectors of Dynnikov coordinates.
-    %   [A,B] = AB(L) returns the A and B Dynnikov coordinate vectors of
-    %   a loop L.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP.
-      a = vertcat(obj.a);
-      b = vertcat(obj.b);
-    end
+      function [a,b] = ab(obj)
+      %AB   Return the A and B vectors of Dynnikov coordinates.
+      %   [A,B] = AB(L) returns the A and B Dynnikov coordinate vectors of
+      %   a loop L.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP.
+        a = vertcat(obj.a);
+        b = vertcat(obj.b);
+      end
 
-    function value = n(obj)
-    %N   Number of punctures.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP.
+      function value = n(obj)
+      %N   Number of punctures.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP.
 
-    % Note that this used to be a derived property.  However, now that
-    % we support arrays of loops, there is an undesirable behavior:
-    % when calling obj.n with n a derived property, the function get.n
-    % is called for each object.  Thus, what is returned is a
-    % comma-separated of the same value n.  Better to define n as a
-    % function, then.
+      % Note that this used to be a derived property.  However, now that
+      % we support arrays of loops, there is an undesirable behavior:
+      % when calling obj.n with n a derived property, the function get.n
+      % is called for each object.  Thus, what is returned is a
+      % comma-separated of the same value n.  Better to define n as a
+      % function, then.
 
       % Length of coords is 2n-4, where n is the number of punctures.
-      value = length(obj(1).coords)/2 + 2;
-    end
+        value = length(obj(1).coords)/2 + 2;
+      end
 
-    function ee = eq(l1,l2)
-    %EQ   Test loops for equality.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, BRAID.EQ.
-      ee = [l1.n] == [l2.n];
-      if ee, ee = all([l1.coords] == [l2.coords]); end
-    end
+      function ee = eq(l1,l2)
+      %EQ   Test loops for equality.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, BRAID.EQ.
+        ee = [l1.n] == [l2.n];
+        if ee, ee = all([l1.coords] == [l2.coords]); end
+      end
 
-    function ee = ne(l1,l2)
-    %NE   Test loops for inequality.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.EQ.
-      ee = ~(l1 == l2);
-    end
+      function ee = ne(l1,l2)
+      %NE   Test loops for inequality.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, LOOP.EQ.
+        ee = ~(l1 == l2);
+      end
 
-    function str = char(obj)
-    %CHAR   Convert loop to string.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.DISP.
-      if isscalar(obj)
-        if ~isa(obj(1).coords,'vpi')
-          objstr = num2str(obj.coords);
-        else
-          % The VPI num2str command is buggy on arrays.
-          objstr = num2str(obj.coords(1));
-          if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
-          for i = 2:length(obj.coords)
-            oo = num2str(obj.coords(i)); oo(1:2) = '';
-            objstr = [objstr oo]; %#ok<AGROW>
+      function str = char(obj)
+      %CHAR   Convert loop to string.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, LOOP.DISP.
+        if isscalar(obj)
+          if ~isa(obj(1).coords,'vpi')
+            objstr = num2str(obj.coords);
+          else
+            % The VPI num2str command is buggy on arrays.
+            objstr = num2str(obj.coords(1));
+            if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
+            for i = 2:length(obj.coords)
+              oo = num2str(obj.coords(i)); oo(1:2) = '';
+              objstr = [objstr oo]; %#ok<AGROW>
+            end
           end
-        end
-        str = ['(( ' objstr ' ))'];
-      else
-        str = '';
-        if size(obj,1) > size(obj,2)
-          for i = 1:size(obj,1)
-            str = [str ; char(obj(i,:))]; %#ok<AGROW>
-          end
+          str = ['(( ' objstr ' ))'];
         else
-          for i = 1:size(obj,2)
-            str = [str '  ' char(obj(:,i))]; %#ok<AGROW>
+          str = '';
+          if size(obj,1) > size(obj,2)
+            for i = 1:size(obj,1)
+              str = [str ; char(obj(i,:))]; %#ok<AGROW>
+            end
+          else
+            for i = 1:size(obj,2)
+              str = [str '  ' char(obj(:,i))]; %#ok<AGROW>
+            end
           end
         end
       end
-    end
 
-    function l = minlength(obj)
-    %MINLENGTH   The minimum length of a loop.
-    %   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
-    %   the loop has zero thickness, and the punctures have zero size and
-    %   are one unit apart.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
-      
-      global BRAIDLAB_loop_minlength_nomex
-      if BRAIDLAB_loop_minlength_nomex
+      function l = minlength(obj)
+      %MINLENGTH   The minimum length of a loop.
+      %   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
+      %   the loop has zero thickness, and the punctures have zero size and
+      %   are one unit apart.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
         
-        % compute intersection numbers
-        [~,nu] = obj.intersec; 
-        % sum intersection numbers along rows
-        l = sum(nu,2);
-      else
-        % compute lengths using MEX
-        l = nan( size(obj) );
-        for k = 1:numel(l)
-          l(k) = minlength_helper(obj(k).coords);
+        global BRAIDLAB_loop_minlength_nomex
+        
+        % use MEX computation
+        if ~BRAIDLAB_loop_minlength_nomex
+          try
+            l = nan( size(obj) );
+            for k = 1:numel(l)
+              l(k) = minlength_helper(obj(k).coords);
+            end
+            mexsuccess = true;
+          catch me
+            warning(me.identifier, me.message);            
+            mexsuccess = false;
+          end
+        end
+        
+        % use Matlab code if MEX is off or if Matlab code fails
+        if BRAIDLAB_loop_minlength_nomex || ~mexsuccess
+          % compute intersection numbers
+          [~,nu] = obj.intersec; 
+          % sum intersection numbers along rows
+          l = sum(nu,2);
+        end
+        
+      end
+
+      function l = intaxis(obj)
+      %INTAXIS   The number of intersections of a loop with the real axis.
+      %   I = INTAXIS(L) computes the minimum number of intersections of a
+      %   loop L with the real axis.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
+        if ~isscalar(obj)
+          l = zeros(length(obj),1);
+          for k = 1:length(obj)
+            l(k) = intaxis(obj(k));
+          end
+        else
+          [a,b] = obj.ab;
+
+          % The number of intersections before/after the first and last punctures.
+          % See Hall & Yurttas (2009).
+          cumb = [0 cumsum(b,2)];
+          b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
+          bn1 = -b0 - sum(b);
+
+          % The number of intersections with the real axis.
+          l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
+              + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
         end
       end
-    end
 
-    function l = intaxis(obj)
-    %INTAXIS   The number of intersections of a loop with the real axis.
-    %   I = INTAXIS(L) computes the minimum number of intersections of a
-    %   loop L with the real axis.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
-      if ~isscalar(obj)
-        l = zeros(length(obj),1);
-        for k = 1:length(obj)
-          l(k) = intaxis(obj(k));
+      function lvl = nested(obj)
+      %NESTED   Nesting level of loop.
+      %   LVL = NESTED(L) returns the nesting level of a loop.  This is the
+      %   GCD of all the loop coordinate entries, minus one.  If the loop is
+      %   not nested, then LVL=0.  If the loop is doubled, LVL=1, etc.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP.
+
+        lvl = zeros(size(obj,1),1);
+        for j = 1:size(obj,1)
+          lvl(j) = gcd(obj(j).coords(1),obj(j).coords(2));
+          for i = 3:length(obj(j).coords)
+            lvl(j) = gcd(lvl(j),obj(j).coords(i));
+          end
+          lvl(j) = lvl(j)-1;
         end
-      else
-        [a,b] = obj.ab;
-
-        % The number of intersections before/after the first and last punctures.
-        % See Hall & Yurttas (2009).
-        cumb = [0 cumsum(b,2)];
-        b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
-        bn1 = -b0 - sum(b);
-
-        % The number of intersections with the real axis.
-        l = sum(abs(b)) + sum(abs(a(2:end)-a(1:end-1))) ...
-            + abs(a(1)) + abs(a(end)) + abs(b0) + abs(bn1);
       end
-    end
 
-    function lvl = nested(obj)
-    %NESTED   Nesting level of loop.
-    %   LVL = NESTED(L) returns the nesting level of a loop.  This is the
-    %   GCD of all the loop coordinate entries, minus one.  If the loop is
-    %   not nested, then LVL=0.  If the loop is doubled, LVL=1, etc.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP.
+      function Nc = components(obj)
+      %COMPONENTS   Number of connected components of a loop.
+      %   NC = COMPONENTS(L) returns the number of connected components NC of
+      %   a loop L.
+      %
+      %   This is a method for the LOOP class.
+      %   See also LOOP, LOOP.GETGRAPH.
 
-      lvl = zeros(size(obj,1),1);
-      for j = 1:size(obj,1)
-        lvl(j) = gcd(obj(j).coords(1),obj(j).coords(2));
-        for i = 3:length(obj(j).coords)
-          lvl(j) = gcd(lvl(j),obj(j).coords(i));
-        end
-        lvl(j) = lvl(j)-1;
+        [~,Lp] = obj.getgraph;
+        [~,Nc] = laplaceToComponents(Lp);
       end
-    end
-
-    function Nc = components(obj)
-    %COMPONENTS   Number of connected components of a loop.
-    %   NC = COMPONENTS(L) returns the number of connected components NC of
-    %   a loop L.
-    %
-    %   This is a method for the LOOP class.
-    %   See also LOOP, LOOP.GETGRAPH.
-
-      [~,Lp] = obj.getgraph;
-      [~,Nc] = laplaceToComponents(Lp);
-    end
 
   end % methods block
 
