@@ -47,28 +47,26 @@ else
 
   % The number of intersections before/after the first and last punctures.
   % See Hall & Yurttas (2009).
-  cumb = [0 cumsum(b,2)];
-  b0 = -max(abs(a) + max(b,0) + cumb(1:end-1));
-  bn1 = -b0 - sum(b);
+  cumb = [zeros(size(b,1),1) cumsum(b,2)];
+  b0 = -max(abs(a) + max(b,0) + cumb(:,1:end-1),[],2);
+  bn1 = -b0 - sum(b,2);
 
   % Extend the coordinates.
   B = [b0 b bn1];
-  A = [0 a 0];
+  A = [zeros(size(a,1),1) a zeros(size(a,1),1)];
 
   % Find nu, mu (intersection numbers).
-  mu = zeros(1,2*n-4); nu = zeros(1,n-1);
-  nu(1) = -2*b0;
+  mu = zeros(size(a,1),2*n-4); nu = zeros(size(a,1),n-1);
+  nu(:,1) = -2*b0;
   for i = 2:n-1
-    nu(i) = nu(i-1) - 2*B(i-1 + 1);
+    nu(:,i) = nu(:,i-1) - 2*B(:,i-1 + 1);
   end
   for i = 1:2*n-4
     ic = ceil(i/2);
-    mu(i) = (-1)^i * A(ic + 1);
-    if B(ic + 1) >= 0
-      mu(i) = mu(i) + nu(ic)/2;
-    else
-      mu(i) = mu(i) + nu(ic+1)/2;
-    end
+    mu(:,i) = (-1)^i * A(:,ic + 1);
+    ii = (B(ic + 1) >= 0);
+    mu(ii,i) = mu(ii,i) + nu(ii,ic)/2;
+    mu(~ii,i) = mu(~ii,i) + nu(~ii,ic+1)/2;
   end
 end
 

@@ -350,8 +350,16 @@ classdef braid < matlab.mixin.CustomDisplay
           error('BRAIDLAB:braid:mtimes:badgen', ...
                 'Braid has too many strings for the loop.')
         end
-        [varargout{1:nargout}] = loopsigma(b1.word,vertcat(b2.coords));
-        varargout{1} = reshape(braidlab.loop(varargout{1}),size(b2));
+        if ~isscalar(b2)
+          % Can't act on array of loops with a braid.
+          % Could be done but would be kludgy.
+          error('BRAIDLAB:braid:mtimes:nonscalar', ...
+                ['Action of braid on nonscalar loop array not supported.' ...
+                 '  Instead use matrix of loop.coords.  ' ...
+                 'Try ''help loop.loop''.'])
+        end
+        [varargout{1:nargout}] = loopsigma(b1.word,b2.coords);
+        varargout{1} = braidlab.loop(varargout{1});
         if nargout > 1
           % Actually, return the matrix of the linear action instead of pn.
           varargout{2} = linact(b1,varargout{2},size(b2(1).coords,2));
