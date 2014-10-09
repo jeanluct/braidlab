@@ -1,0 +1,13 @@
+Methods and features that are not yet in the guide:
+
+randomwalk
+braid.gencount
+loop.nested
+loop.components
+loop.plot('components')
+loop.getgraph
+debugmsg & BRAIDLAB_debuglvl
+BRAIDLAB_threads
+@cfbraid class
+loop.zeros (now obsolete, but could mention pre-allocation in guide)
+format loose/compact
