@@ -245,6 +245,8 @@ classdef loop < matlab.mixin.CustomDisplay
             % If there is stuff left over, continue evaluating.
             [varargout{1:nargout}] = builtin('subsref',objrow,s);
           end
+          % Output something anyways if no output args specified.
+          if nargout == 0, varargout{1} = objrow; end
         case '{}'
            % No support for indexing using '{}'
           error('BRAIDLAB:loop:subsref', ...
@@ -259,26 +261,67 @@ classdef loop < matlab.mixin.CustomDisplay
     %   See also LOOP.
       if isempty(s) && strcmp(class(val),'braidlab.loop')
         obj = val;
-      end  
+      end
       switch s(1).type
        case '.'
         % Use the built-in subsref for dot notation
         obj = builtin('subsasgn',obj,s,val);
        case '()'
-        if length(s) < 2
-          if length(s(1).subs) > 1
-            error('BRAIDLAB:loop:subsasgn','Cannot use more than one index.')
-          end
-          idx = s(1).subs{1};
-          obj.coords(idx,:) = val.coords(:);
-          return
-        else
-          sref = builtin('subsasgn',obj,s);
+        if length(s(1).subs) > 1
+          error('BRAIDLAB:loop:subsasgn','Cannot use more than one index.')
         end
+         if length(s) < 2
+           if ~strcmp(class(val),'braidlab.loop')
+             error('BRAIDLAB:loop:subsasgn','Can only assign a scalar loop.')
+           end
+           idx = s(1).subs{1};
+           if isempty(obj)
+             % Create the object, since it's empty.
+             obj = braidlab.loop(zeros(idx,size(val.coords,2)));
+           else
+             % Overwrite an existing row.
+             obj.coords(idx,:) = val.coords(:);
+           end
+           return
+         elseif length(s) < 4
+           if isempty(obj)
+             error('BRAIDLAB:loop:subsasgn:emptyobj', ...
+                   'Object is empty... not sure this should happen.')
+           end
+           if ~strcmp(class(obj.coords),class(val))
+             error('BRAIDLAB:loop:subsasgn:badtype', ...
+                   'Array must be of same type.')
+           end
+           idx = s(1).subs{:};
+           if ~(s(2).type == '.' && strcmp(s(2).subs,'coords'))
+             error('BRAIDLAB:loop:subsasgn:badref', ...
+                   'Not a supported subscripted reference.')
+           end
+           if length(s) > 2
+             if ~strcmp(s(3).type,'()')
+               error('BRAIDLAB:loop:subsasgn:badref', ...
+                     'Not a supported subscripted reference.')
+             end
+             if length(s(3).subs) > 1
+               error('BRAIDLAB:loop:subsasgn:badindex', ...
+                     'Too many indices on coords.')
+             end
+             idx2 = s(3).subs{:};
+           else
+             idx2 = ':';
+           end
+           obj.coords(idx,idx2) = val;
+           return
+         else
+           % Maybe should error here?
+           warning('BRAIDLAB:loop:subsasgn:unsure', ...
+                   'Not sure if we should ever get here...')
+           sref = builtin('subsasgn',obj,s,val);
+         end
        case '{}'
-        % No support for indexing using '{}'
-        error('BRAIDLAB:loop:subsasgn', ...
-              'Not a supported subscripted reference')
+         % No support for indexing using '{}'
+         error('BRAIDLAB:loop:subsasgn:badref', ...
+               'Not a supported subscripted reference.')
       end
     end
 
