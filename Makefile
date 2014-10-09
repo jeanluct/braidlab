@@ -51,6 +51,7 @@ MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 all: check-env
 	cd +braidlab/private; $(MAKE) all
 	cd +braidlab/@braid/private; $(MAKE) all
+	cd +braidlab/@loop/private; $(MAKE) all
 	cd +braidlab/@cfbraid/private; $(MAKE) all
 	cd +braidlab/+lcs/private; $(MAKE) all
 	cd extern/assignmentoptimal; \
@@ -71,6 +72,7 @@ clean:
 	cd extern/cbraid/lib; $(MAKE) clean
 	cd extern/trains; $(MAKE) clean
 	cd +braidlab/@braid/private; $(MAKE) clean
+	cd +braidlab/@loop/private; $(MAKE) clean
 	cd +braidlab/@cfbraid/private; $(MAKE) clean
 	cd +braidlab/+lcs/private; $(MAKE) clean
 	cd +braidlab/private; $(MAKE) clean
