@@ -83,6 +83,31 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:loop:loop:badsize')
     end
 
+    function test_loop_subscripts(testCase)
+      l = braidlab.loop(zeros(2,4));
+      l(2) = braidlab.loop(3);
+      testCase.verifyEqual(l.coords(:),[0 0 0 0 0 -1 0 -1]');
+      testCase.verifyEqual(l.n,4);
+      testCase.verifyEqual(l(2).n,4);
+      testCase.verifyEqual(l(2),braidlab.loop(3));
+
+      % Create multiple loops by accessing an index.
+      l2(2) = braidlab.loop(3);
+      testCase.verifyEqual(l,l2);
+      % Assign coordinates directly for one row.
+      l2(2).coords = [1 2 3 4];
+      testCase.verifyEqual(l2(2),braidlab.loop([1 2 3 4]));
+      % Grow by one loop.
+      l2(3).coords = -[1 2 3 4];
+      testCase.verifyEqual(l2(3),braidlab.loop(-[1 2 3 4]));
+      % Change one coordinate in 3rd loop.
+      l2(3).coords(1) = 1;
+      testCase.verifyEqual(l2(3),braidlab.loop(-[-1 2 3 4]));
+      % Change two coordinates in 2nd loop.
+      l2(2).coords(3:end) = [-6 -7];
+      testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7]));
+    end
+
     function test_braid_on_loop_action(testCase)
       % An empty braid (was issue #50).
       l0 = braidlab.loop(3);
