@@ -25,7 +25,6 @@ toc
 % The old way: pre-allocation with by creating the last element.
 % This works as well as the other two ways.
 tic
-l4 = loop(n); % Have to do this first.  Is this a bug?
 l4(N) = loop(n);
 for i = 1:N
   l4(i) = loop(n);
