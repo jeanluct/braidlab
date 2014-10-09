@@ -162,7 +162,7 @@ classdef loopTest < matlab.unittest.TestCase
 
       tol = 1e-2; % Let's be generous.
 
-      loopEntropy = @(N)log(minlength(mybraid^N*l)/minlength(l)) / N;
+      loopEntropy = @(N)(log( double(minlength(mybraid^N*l)) ) - log( double(minlength(l)) ) ) / N;
 
       % This test case is just to ensure that the tolerance set is
       % reasonable.
