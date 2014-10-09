@@ -876,7 +876,7 @@ methods \lstinline{a}, \lstinline{b}, and \lstinline{ab}: %
 \index{loop class@\loopc\ class!%
   abab@\lstinline{a}, \lstinline{b}, \lstinline{ab}}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> l = loop ([ -1 1 -2 0 -1 0]);
+>> l = loop ([-1 1 -2 0 -1 0]);
 >> l.a
 
 ans = -1     1    -2
@@ -971,7 +971,7 @@ constructor vectorizes:
 >> ll = loop([-1 1 -2 0; 1 -2 3 4])
 
 ll = (( -1  1 -2  0 ))
-     (( 1 -2  3  4 ))
+     ((  1 -2  3  4 ))
 \end{lstlisting}
 \index{loop class@\loopc\ class!constructor|)}
 \index{loop class@\loopc\ class!minlength@\lstinline{minlength}|(}
@@ -990,7 +990,7 @@ or even act on all the loops with the same braid:
 >> b = braid([1 -2]);
 >> b*ll
 
-ans = (( 2  1 -2  1 ))
+ans = (( 2   1  -2   1 ))
       (( 5  -2  -3  11 ))
 \end{lstlisting}
 \index{braid class@\braid\ class!multiplication (\lstinline{*})|)}

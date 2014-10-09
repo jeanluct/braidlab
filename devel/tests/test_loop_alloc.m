@@ -14,27 +14,18 @@ if N <= 2000
   toc
 end
 
-% The good way (1): pre-allocation.
+% The good way: pre-allocation.
 tic
-l2 = zeros(N,1,'braidlab.loop');
+l2 = loop(zeros(N,2*n-2));
 for i = 1:N
   l2(i) = loop(n);
-end
-toc
-
-% The good way (2): pre-allocation with 'like' size.
-% I thought this would be better, but same speed as (1).
-tic
-l = loop(n);
-l3 = zeros(N,1,'like',l);
-for i = 1:N
-  l3(i) = loop(n);
 end
 toc
 
 % The old way: pre-allocation with by creating the last element.
 % This works as well as the other two ways.
 tic
+l4 = loop(n); % Have to do this first.  Is this a bug?
 l4(N) = loop(n);
 for i = 1:N
   l4(i) = loop(n);
