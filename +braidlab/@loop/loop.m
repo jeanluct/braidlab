@@ -244,6 +244,7 @@ classdef loop < matlab.mixin.CustomDisplay
           if ~isempty(s)
             % If there is stuff left over, continue evaluating.
             [varargout{1:nargout}] = builtin('subsref',objrow,s);
+            return
           end
           % Output something anyways if no output args specified.
           if nargout == 0, varargout{1} = objrow; end
