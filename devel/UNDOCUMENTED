@@ -9,5 +9,5 @@ loop.getgraph
 debugmsg & BRAIDLAB_debuglvl
 BRAIDLAB_threads
 @cfbraid class
-loop.zeros
+loop.zeros (now obsolete, but could mention pre-allocation in guide)
 format loose/compact
