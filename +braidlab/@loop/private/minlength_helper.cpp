@@ -50,9 +50,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   //   BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   // }
 
-  mexWarnMsgIdAndTxt("BRAIDLAB:loop:minlength_helper",
-                     "Using MEX to compute minlength");
-
   if (nrhs != 1) 
     mexErrMsgIdAndTxt("BRAIDLAB:loop:minlength_helper:badinput",
                       "Single argument (coordinate vector) is required.");
