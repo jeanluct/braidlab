@@ -291,24 +291,40 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
 
+      
+    %% determine if mex should be attempted
       global BRAIDLAB_loop_minlength_nomex
-
-      % use MEX computation
-      if ~BRAIDLAB_loop_minlength_nomex
+      if ~exist('BRAIDLAB_loop_minlength_nomex') || ...
+            isempty(BRAIDLAB_loop_minlength_nomex) || ...
+            BRAIDLAB_loop_minlength_nomex == false
+        usematlab = false;
+      else
+        usematlab = true;
+      end
+      
+      %% use MEX computation
+      if ~usematlab
         try
-          l = nan( size(obj) );
-          for k = 1:numel(l)
-            l(k) = minlength_helper(obj(k).coords);
+          
+          if numel(obj) > 1
+            l = nan( size(obj) );
+            for k = 1:numel(l)
+              l(k) = minlength_helper(obj(k).coords);
+            end
+          else
+            % transpose coordinates for minlength_helper
+            l = minlength_helper( obj.coords.' );
           end
-          mexsuccess = true;
+          usematlab = false;
         catch me
-          warning(me.identifier, me.message);
-          mexsuccess = false;
+          warning(me.identifier, [ me.message ...
+                              ' Reverting to Matlab minlength'] );
+          usematlab = true;
         end
       end
 
-      % use Matlab code if MEX is off or if Matlab code fails
-      if BRAIDLAB_loop_minlength_nomex || ~mexsuccess
+      %% use Matlab code if MEX is off or if MEX code fails
+      if usematlab == true
         % compute intersection numbers
         [~,nu] = obj.intersec;
         % sum intersection numbers along rows
