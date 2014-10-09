@@ -230,25 +230,25 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP.
       switch s(1).type
-       case '.'
-        % Use the built-in subsref for dot notation
-        [varargout{1:nargout}] = builtin('subsref',obj,s);
-       case '()'
-        if length(s) < 2
+        case '.'
+          % Use the built-in subsref for dot notation
+          [varargout{1:nargout}] = builtin('subsref',obj,s);
+        case '()'
           if length(s(1).subs) > 1
             error('BRAIDLAB:loop:subsref','Cannot use more than one index.')
           end
-          % Note that obj.coords is passed to subsref
           idx = s(1).subs{1};
-          varargout{1} = braidlab.loop(obj.coords(idx,:));
-          return
-        else
-          [varargout{1:nargout}] = builtin('subsref',obj,s);
-        end
-       case '{}'
-        % No support for indexing using '{}'
-        error('BRAIDLAB:loop:subsref', ...
-              'Not a supported subscripted reference')
+          objrow = braidlab.loop(obj.coords(idx,:));
+          if nargout > 0, varargout{1} = objrow; end
+          s(1) = [];
+          if ~isempty(s)
+            % If there is stuff left over, continue evaluating.
+            [varargout{1:nargout}] = builtin('subsref',objrow,s);
+          end
+        case '{}'
+           % No support for indexing using '{}'
+          error('BRAIDLAB:loop:subsref', ...
+                'Not a supported subscripted reference')
       end
     end
 
