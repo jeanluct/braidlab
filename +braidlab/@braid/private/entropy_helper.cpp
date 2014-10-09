@@ -26,6 +26,8 @@
 // LICENSE>
 
 
+// expects a,b to be 1-indexed arrays
+// N is the sum of lengths of a and b
 template <class T>
 inline T l2norm(const int N, const T *a, const T *b)
 {
