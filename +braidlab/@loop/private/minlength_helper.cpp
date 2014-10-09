@@ -3,6 +3,20 @@
 //
 // MINLENGTH Compute topological length of the loop.
 //
+// As input it takes NCOORDINATES x NLOOPS matrix of Dynnikov coordinates.
+// For each column, it computes minlength by formula derived by summing 
+// intersection numbers (see [1]).
+//
+// WARNING: This convention is currently chosen to accommodate both
+// the way loops are stored and processed elsewhere, and an efficient
+// implementation of minlength in loop_helper.hpp. Please transpose
+// the coordinate matrix externally if needed.
+//
+// [1] Hall, Toby, and S. Öykü Yurttaş. “On the Topological Entropy of
+// Families of Braids.” Topology and Its Applications 156, no. 8
+// (April 15, 2009): 1554–64. 
+// doi:10.1016/j.topol.2009.01.005.
+//
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 //
@@ -38,7 +52,8 @@
 // type-dependent retrieval of coordinates and computation of 
 // loop length
 template<class T>
-void retrieveLength( const mxArray* input, mxArray *outval );
+void retrieveLength( const mxArray* input, mxArray *output, 
+                     mwSize nLoops, mwSize nCoordinates);
 
 // INPUT: single row vector of Dynnikov coordinates (a,b) (double, int32, or int64)
 // OUTPUT: sum of nu/ \mu{beta} intersection numbers
@@ -54,13 +69,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgIdAndTxt("BRAIDLAB:loop:minlength_helper:badinput",
                       "Single argument (coordinate vector) is required.");
 
-  if ( !(mxGetM(prhs[0]) == 1) ) 
-    mexErrMsgIdAndTxt( "BRAIDLAB:braid:minlength_helper:badinput",
-                       "Input has to be a single 1x(2n-4) row "
-                       "vector (n - number of punctures).");
+  // assumes each COLUMN is a loop
+  mwSize nCoordinates = mxGetM(prhs[0]);
+  mwSize nLoops = mxGetN(prhs[0]); 
 
   // create output
-  mxArray* outval = mxCreateNumericMatrix(1,1, mxGetClassID(prhs[0]), mxREAL);
+  mxArray* outval = mxCreateNumericMatrix(nLoops,1, 
+                                          mxGetClassID(prhs[0]), 
+                                          mxREAL);
 
   if (nlhs >= 1)
     plhs[0] = outval;
@@ -69,15 +85,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   switch( mxGetClassID( prhs[0] ) ) {
 
   case mxDOUBLE_CLASS:
-    retrieveLength<double>( prhs[0], outval );
+    retrieveLength<double>( prhs[0], outval, nLoops, nCoordinates );
     break;
 
   case mxINT32_CLASS:
-    retrieveLength<int32_T>( prhs[0], outval );
+    retrieveLength<int32_T>( prhs[0], outval, nLoops, nCoordinates );
     break;
 
   case mxINT64_CLASS:
-    retrieveLength<int64_T>( prhs[0], outval );
+    retrieveLength<int64_T>( prhs[0], outval, nLoops, nCoordinates );
     break;
 
   default:
@@ -87,19 +103,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 }
 
 template<class T>
-void retrieveLength( const mxArray* input, mxArray *output ) {
-
-  mwSize N = mxGetNumberOfElements( input );
-
-  // get pointers to sub-vectors
-  const T *a = static_cast<T *>(mxGetData( input )) + OFFSET;
-  const T *b = static_cast<T *>(mxGetData( input )) + N/2 + OFFSET;
+void retrieveLength( const mxArray* input, mxArray *output, 
+                     mwSize nLoops, mwSize nCoordinates) {
 
   // get pointer to output
   T * data = (T *) mxGetData(output);
 
-  // use loop_helper/length to compute
-  *data = length<T>(N, a, b);
+  // pointers to input
+  const T *a = static_cast<T *>(mxGetData( input )) + OFFSET;
+  const T *b = static_cast<T *>(mxGetData( input )) + nCoordinates/2 + OFFSET;
+
+  for ( mwSize l = 0; l < nLoops; ++l ) {
+  
+    // use loop_helper/length to compute
+    *data = length<T>(nCoordinates, a, b);
+
+    // move to the next column
+    data++;
+    a += nCoordinates;
+    b += nCoordinates;
+
+  }
 
   return;
 
