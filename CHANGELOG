@@ -1,4 +1,24 @@
 ------------------------------------------------------------------------
+2.x [2014-??-??]
+
+* Discourage arrays of loop objects.  Instead, multiple loops live
+  inside of a single loop object, but subscripting has been overloaded
+  for loops.  Externally, a user should see very little difference to
+  the interface (and the guide required no changes), but the speedup
+  for a braid acting on a large array of loops is of order 50.
+
+* Loop constructor can now return am array of canonical loops.  This
+  is useful for pre-allocating memory, among other things.
+
+* Loop constructor can take an option 'nobasepoint' when creating
+  canonical loops, to suppress the addition of an extra puncture.  To
+  make this work, the loop constructor form loop(a,b) has been removed
+  (use loop([a b]) instead).  This shouldn't affect things much as
+  that form was hardly used and was not documented in the guide.
+
+* loop.minlength is now a C++ MEX file (written by Marko Budisic).
+
+------------------------------------------------------------------------
 2.1 [2014-10-02]
 
 * Simplify the linear action code: instead of braid.linact use an
