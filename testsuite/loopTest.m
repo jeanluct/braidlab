@@ -52,7 +52,7 @@ classdef loopTest < matlab.unittest.TestCase
       c12 = l.coords;
       testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
       testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
-      % All loops the same dimension, so only one puncture size.
+      % All loops the same dimension, so only one puncture size for all loops.
       testCase.verifyEqual(l.n,4);
       testCase.verifyEqual(l(2).n,4);
 
@@ -60,9 +60,54 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyError(@()braidlab.loop(zeros(3,3,3)), ...
                            'BRAIDLAB:loop:loop:badarg')
 
+      % Too many arguments.
+      testCase.verifyError(@() braidlab.loop(3,2,3), ...
+                           'BRAIDLAB:loop:loop:badarg')
+      testCase.verifyError(@() braidlab.loop(3,2,3,'int','nobasepoint'), ...
+                           'BRAIDLAB:loop:loop:badarg')
+      testCase.verifyError(@() braidlab.loop([1 3],[2 3],'nobasepoint'), ...
+                           'BRAIDLAB:loop:loop:badarg')
+      % Vector following a scalar errors.
+      testCase.verifyError(@() braidlab.loop(3,[2 3],'nobasepoint'), ...
+                           'BRAIDLAB:loop:loop:badarg')
+      % Too few punctures.
+      testCase.verifyError(@() braidlab.loop(1), ...
+                           'BRAIDLAB:loop:loop:toofewpunc')
+
       % The generating set of loops used to build loop coordinates.
+      % ("canonical set of loops")
       l = braidlab.loop(4);
       testCase.verifyEqual(l.coords,[0 0 0 -1 -1 -1]);
+      % Try with different type.
+      l = braidlab.loop(4,@int32);
+      testCase.verifyEqual(l.coords,int32([0 0 0 -1 -1 -1]));
+
+      % Canonical set of loops, no extra puncture.
+      l = braidlab.loop(4,'nobasepoint');
+      testCase.verifyEqual(l.coords,[0 0 -1 -1]);
+      % Try with different type.
+      l = braidlab.loop(4,'nobasepoint',@single);
+      testCase.verifyEqual(l.coords,single([0 0 -1 -1]));
+
+      % Vector of canonical loops.
+      l = braidlab.loop(4,5);
+      testCase.verifyEqual(l.coords,repmat([0 0 0 -1 -1 -1],5,1));
+
+      % Vector of canonical loops, no extra puncture.
+      l = braidlab.loop(4,5,'nobase');
+      testCase.verifyEqual(l.coords,repmat([0 0 -1 -1],5,1));
+      % Try with different types.
+      l = braidlab.loop(4,5,'nobase','int32');
+      testCase.verifyEqual(l.coords,repmat(int32([0 0 -1 -1]),5,1));
+      l = braidlab.loop(4,5,'int64','nobase');
+      testCase.verifyEqual(l.coords,repmat(int64([0 0 -1 -1]),5,1));
+
+      % Copy a loop, convert to int32.
+      l = braidlab.loop([1 2 3 4]);
+      l2 = braidlab.loop(l,'int32');
+      testCase.verifyEqual(l2.coords,int32([1 2 3 4]));
+      l2 = braidlab.loop(l,@int32);
+      testCase.verifyEqual(l2.coords,int32([1 2 3 4]));
 
       % Trying to create from odd number of columns should error.
       testCase.verifyError(@()braidlab.loop([1 2 3]), ...

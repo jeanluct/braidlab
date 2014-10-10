@@ -147,7 +147,14 @@ classdef loop < matlab.mixin.CustomDisplay
                 'Need at least two punctures.');
         end
         if nobase, n1 = c-2; else n1 = c-1; end
-        if length(varargin) > 1, m = varargin{2}; else m = 1; end
+	m = 1;
+        if length(varargin) > 1
+	  if ~isscalar(varargin{2})
+	    error('BRAIDLAB:loop:loop:badarg', ...
+		  'Second numerical argument must be a scalar.')
+	  end
+	  if ~isempty(varargin{2}), m = varargin{2}; end
+	end
         l.coords = htyp(zeros(m,2*n1));
         l.coords(:,(n1+1):end) = htyp(-1);
         return
@@ -176,6 +183,8 @@ classdef loop < matlab.mixin.CustomDisplay
           % Store coordinates as row vector.
           if size(c,1) > size(c,2), c = c.'; end
         end
+      else
+	error('BRAIDLAB:loop:loop:badarg','Too many arguments.')
       end
     end % function loop
 
