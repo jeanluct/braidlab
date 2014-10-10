@@ -81,6 +81,14 @@ classdef loopTest < matlab.unittest.TestCase
       % Trying to create from different sizes of a,b should error.
       testCase.verifyError(@()braidlab.loop([1 2 3; 1 2 3],[4 5; 4 5]), ...
                            'BRAIDLAB:loop:loop:badsize')
+
+      % Column vector of loops (bad idea, but no error).
+      l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...
+            braidlab.loop(testCase.l2.coords(2,:))];
+      % Subscripting is not allowed on vector... create scalar with
+      % multiple loops instead.
+      testCase.verifyError(@() l0(1), ...
+                           'BRAIDLAB:loop:subsref:notscalar');
     end
 
     function test_loop_subscripts(testCase)
@@ -125,28 +133,6 @@ classdef loopTest < matlab.unittest.TestCase
       % Trying to act with a braid on unsupported object.
       testCase.verifyError(@() braidlab.braid([],7)*3, ...
                            'BRAIDLAB:braid:mtimes:badobject')
-
-      % Column vector of loops.
-      %l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...
-      %      braidlab.loop(testCase.l2.coords(2,:))];
-      %b = testCase.b;
-      %l = b*l0;
-      %testCase.verifyEqual(size(l),[2 1]);
-
-      % Row vector of loops.
-      %l0 = l0.';
-      %ll = b*l0;
-      %testCase.verifyEqual(size(ll),[1 2]);
-
-      %testCase.verifyEqual(l,ll.');
-
-      % Matrix of loops.
-      %lmat = [l,l];
-      %testCase.verifyEqual(size(lmat),[2 2]);
-      % Can't act on matrix of loops with a braid.
-      % Could be done but would be kludgy.
-      %testCase.verifyError(@()mtimes(b,lmat), ...
-      %                     'BRAIDLAB:braid:mtimes:badsize')
     end
 
     function test_loopcoords(testCase)
@@ -187,7 +173,8 @@ classdef loopTest < matlab.unittest.TestCase
 
       tol = 1e-2; % Let's be generous.
 
-      loopEntropy = @(N)(log( double(minlength(mybraid^N*l)) ) - log( double(minlength(l)) ) ) / N;
+      loopEntropy = @(N)(log( double(minlength(mybraid^N*l)) ) ...
+                         - log( double(minlength(l)) ) ) / N;
 
       % This test case is just to ensure that the tolerance set is
       % reasonable.

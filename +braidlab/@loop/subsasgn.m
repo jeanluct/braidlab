@@ -23,6 +23,12 @@ function obj = subsasgn(obj,s,val)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+if ~isscalar(obj)
+  error('BRAIDLAB:loop:subsasgn:notscalar', ...
+        ['Loop object must be a scalar... see ''help loop.loop''' ...
+         ' for how to create multiple loops.'])
+end
+
 if isempty(s) && strcmp(class(val),'braidlab.loop')
   obj = val;
 end

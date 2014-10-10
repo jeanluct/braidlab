@@ -11,3 +11,4 @@ BRAIDLAB_threads
 @cfbraid class
 loop.zeros (now obsolete, but could mention pre-allocation in guide)
 format loose/compact
+databraid.trunc
