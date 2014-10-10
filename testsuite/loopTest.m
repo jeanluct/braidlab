@@ -148,6 +148,11 @@ classdef loopTest < matlab.unittest.TestCase
       l2(2).coords(3:end) = [-6 -7];
       testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7]));
 
+      % Extend a loop array by another.
+      l = braidlab.loop(4,3); l2 = braidlab.loop(4,2);
+      l(4:5) = l2;  % l has 3 rows initially.
+      testCase.verifyEqual(l,braidlab.loop(repmat([0 0 0 -1 -1 -1],5,1)));
+
       % Verify minlength/intaxis vector functions.
       l = testCase.l2;
       testCase.verifyEqual(l.minlength,[22;24]);
