@@ -26,7 +26,7 @@ end
 
 import matlab.unittest.*
 
-suite = TestSuite.fromFolder(pwd);
+suite = TestSuite.fromFolder([pwd '/testcases']);
 %suite = TestSuite.fromClass(?braidTest);
 %suite = TestSuite.fromClass(?loopTest);
 %suite = TestSuite.fromClass(?conjtestTest);
