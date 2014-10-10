@@ -46,9 +46,6 @@ classdef loopTest < matlab.unittest.TestCase
       [a,b] = l.ab; %#ok<*PROP>
       testCase.verifyEqual(a,[1 -1]);
       testCase.verifyEqual(b,[2 3]);
-      % Create the same loop by specifying a,b.
-      testCase.verifyEqual(l.a,braidlab.loop([1 -1],[2 3]).a);
-      testCase.verifyEqual(l.b,braidlab.loop([1 -1],[2 3]).b);
 
       % A column vector of loops.
       l = testCase.l2;
@@ -72,12 +69,6 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:loop:loop:oddlength');
       testCase.verifyError(@()braidlab.loop([1 2 3; 4 5 6]), ...
                            'BRAIDLAB:loop:loop:oddlength');
-      % Trying to create from different sizes of a,b should error.
-      testCase.verifyError(@()braidlab.loop([1 2 3],[4 5]), ...
-                           'BRAIDLAB:loop:loop:badsize')
-      % Trying to create from different sizes of a,b should error.
-      testCase.verifyError(@()braidlab.loop([1 2 3; 1 2 3],[4 5; 4 5]), ...
-                           'BRAIDLAB:loop:loop:badsize')
 
       % Column vector of loops (bad idea, but no error).
       l0 = [braidlab.loop(testCase.l2.coords(1,:)) ; ...

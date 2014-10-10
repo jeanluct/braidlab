@@ -70,20 +70,13 @@ classdef loop < matlab.mixin.CustomDisplay
     %   coordinates D.  D must have 2*N-4 elements, where N is the number of
     %   punctures.  Here, loop means a "topological loop", or more precisely
     %   an equivalence class of simple closed multicurves under isotopy.
-    %   The coordinate entries loop.coords have the same type as D.
     %
     %   L = LOOP(D), where D is a matrix with 2*N-4 columns, creates a
     %   scalar loop object containing a vector of loops, with loop.coords =
     %   D.
     %
-    %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
-    %   coordinates, each of length N-2, where N is the number of punctures.
-    %   If A and B are matrices of equal dimension and with N-2 columns,
-    %   then a loop object containing a vector of loops is created, with
-    %   loop.coords = [A,B].
-    %
     %   Note that the coordinates of the loop are of the same type as the
-    %   vectors used in its construction (usually double by default).  For
+    %   array used in its construction (usually double by default).  For
     %   example, to construct a loop of 64-bit integers, use LOOP(int64(D)).
     %
     %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
@@ -93,15 +86,18 @@ classdef loop < matlab.mixin.CustomDisplay
     %   convenient when looking for growth of loops under braid action, or
     %   for testing for braid equality.
     %
-    %   L = LOOP(N,'TYPE') or LOOP(N,...,@TYPE) creates a loop with
+    %   L = LOOP(N,M) where N and M are integers creates a loop object L
+    %   with M identical loops.  This can be used to pre-allocate memory for
+    %   a large number of loops.
+    %
+    %   L = LOOP(N,'noboundary') or LOOP(N,M,'noboundary') is the same as
+    %   LOOP(N,M), but an additional boundary puncture is not added so the
+    %   resulting loops have N punctures.  Note that, topologically
+    %   speaking, this boundary puncture is still present implicitly.
+    %
+    %   L = LOOP(...,'TYPE') or LOOP(...,@TYPE) creates a loop L with
     %   coordinates of type TYPE.  The default is TYPE=double.  Other useful
     %   values are int32, int64, and vpi (variable precision integers).
-    %
-    %   L = LOOP(N,'TYPE','noboundary') or LOOP(N,[],'noboundary') is the
-    %   same as LOOP(N,'TYPE'), but an additional boundary puncture is not
-    %   added so the resulting loop has N punctures.  Note that,
-    %   topologically speaking, this boundary puncture is still present
-    %   implicitly.
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
@@ -171,6 +167,7 @@ classdef loop < matlab.mixin.CustomDisplay
           l.coords = c;
         end
       else
+	error('Deprecating this.')
         % Create a,b separately from two vectors of the same length.
         if any(size(c) ~= size(b))
           error('BRAIDLAB:loop:loop:badsize', ...
