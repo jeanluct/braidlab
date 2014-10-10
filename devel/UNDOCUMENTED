@@ -2,6 +2,7 @@ Methods and features that are not yet in the guide:
 
 randomwalk
 braid.gencount
+loop(...,'noboundary')
 loop.nested
 loop.components
 loop.plot('components')

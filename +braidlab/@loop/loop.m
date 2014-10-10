@@ -64,12 +64,13 @@ classdef loop < matlab.mixin.CustomDisplay
 
   methods
 
-    function l = loop(c,b)
+    function l = loop(c,b,third)
     %LOOP   Construct a loop object.
     %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
     %   coordinates D.  D must have 2*N-4 elements, where N is the number of
     %   punctures.  Here, loop means a "topological loop", or more precisely
     %   an equivalence class of simple closed multicurves under isotopy.
+    %   The coordinate entries loop.coords have the same type as D.
     %
     %   L = LOOP(D), where D is a matrix with 2*N-4 columns, creates a
     %   scalar loop object containing a vector of loops, with loop.coords =
@@ -92,9 +93,15 @@ classdef loop < matlab.mixin.CustomDisplay
     %   convenient when looking for growth of loops under braid action, or
     %   for testing for braid equality.
     %
-    %   L = LOOP(N,'TYPE') or LOOP(N,@TYPE) creates a loop with coordinates
-    %   of type TYPE.  The default is TYPE=double.  Other useful values are
-    %   int32, int64, and vpi (variable precision integers).
+    %   L = LOOP(N,'TYPE') or LOOP(N,...,@TYPE) creates a loop with
+    %   coordinates of type TYPE.  The default is TYPE=double.  Other useful
+    %   values are int32, int64, and vpi (variable precision integers).
+    %
+    %   L = LOOP(N,'TYPE','noboundary') or LOOP(N,[],'noboundary') is the
+    %   same as LOOP(N,'TYPE'), but an additional boundary puncture is not
+    %   added so the resulting loop has N punctures.  Note that,
+    %   topologically speaking, this boundary puncture is still present
+    %   implicitly.
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
@@ -108,19 +115,29 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:toofewpunc', ...
                 'Need at least two punctures.');
         end
-        n1 = c-1;
-        if nargin > 1
-          if ischar(b)
-            htyp = str2func(b);
-          elseif isa(b,'function_handle')
-            htyp = b;
+        if nargin > 2
+          if strcmpi(third,'noboundary') || strcmpi(third,'nobound')
+            n1 = c-2;
           else
             error('BRAIDLAB:loop:loop:badarg', ...
-                  ['Second argument should be a type ' ...
-                   'string or function handle.']);
+                  'Bad argument.');
           end
         else
-          htyp = @double;
+          n1 = c-1;
+        end
+        htyp = @double;
+        if nargin > 1
+          if ~isempty(b)
+            if ischar(b)
+              htyp = str2func(b);
+            elseif isa(b,'function_handle')
+              htyp = b;
+            else
+              error('BRAIDLAB:loop:loop:badarg', ...
+                    ['Second argument should be a type ' ...
+                     'string or function handle.']);
+            end
+          end
         end
         if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
         l.coords = htyp(zeros(1,2*n1));
