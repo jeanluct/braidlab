@@ -55,12 +55,9 @@ classdef loopTest < matlab.unittest.TestCase
       c12 = l.coords;
       testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
       testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
-
-      % A row vector of loops.
-      l = testCase.l2.';
-      c12 = l.coords;
-      testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
-      testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
+      % All loops the same dimension, so only one puncture size.
+      testCase.verifyEqual(l.n,4);
+      testCase.verifyEqual(l(2).n,4);
 
       % Can't make more dimensions than a matrix.
       testCase.verifyError(@()braidlab.loop(zeros(3,3,3)), ...
@@ -114,6 +111,32 @@ classdef loopTest < matlab.unittest.TestCase
       % Change two coordinates in 2nd loop.
       l2(2).coords(3:end) = [-6 -7];
       testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7]));
+
+      % Verify minlength/intaxis vector functions.
+      keyboard
+      l = testCase.l2;
+      testCase.verifyEqual(l.minlength,[22;24]);
+      testCase.verifyEqual(l(1).minlength,22);
+      testCase.verifyEqual(l(2).minlength,24);
+      testCase.verifyEqual(minlength(l),[22;24]);
+      testCase.verifyEqual(minlength(l(1)),22);
+      testCase.verifyEqual(minlength(l(2)),24);
+
+      testCase.verifyEqual(l.intaxis,[16;16]);
+      testCase.verifyEqual(l(1).intaxis,16);
+      testCase.verifyEqual(l(2).intaxis,16);
+      testCase.verifyEqual(intaxis(l),[16;16]);
+      testCase.verifyEqual(intaxis(l(1)),16);
+      testCase.verifyEqual(intaxis(l(2)),16);
+
+      inters = [3 5 5 3 12 8 2;-2 2 -3 3 8 10 6];
+      testCase.verifyEqual(intersec(l),inters);
+      testCase.verifyEqual(l.intersec,inters);
+      % These fail!!!  See issue #74.
+      testCase.verifyEqual(l(1).intersec,inters(1,:));
+      testCase.verifyEqual(l(2).intersec,inters(2,:));
+      testCase.verifyEqual(intersec(l(1)),inters(1,:));
+      testCase.verifyEqual(intersec(l(2)),inters(2,:));
     end
 
     function test_braid_on_loop_action(testCase)
