@@ -113,7 +113,6 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7]));
 
       % Verify minlength/intaxis vector functions.
-      keyboard
       l = testCase.l2;
       testCase.verifyEqual(l.minlength,[22;24]);
       testCase.verifyEqual(l(1).minlength,22);
@@ -129,11 +128,10 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(intaxis(l(1)),16);
       testCase.verifyEqual(intaxis(l(2)),16);
 
-      inters = [3 5 5 3 12 8 2;-2 2 -3 3 8 10 6];
-      % These are wrong:  See issue #74.
+      % Check intersection numbers.
+      inters = [5 7 5 3 12 8 2; 3 7 2 8 8 10 6];
       testCase.verifyEqual(intersec(l),inters);
       testCase.verifyEqual(l.intersec,inters);
-      % These are probably right.
       testCase.verifyEqual(l(1).intersec,inters(1,:));
       testCase.verifyEqual(l(2).intersec,inters(2,:));
       testCase.verifyEqual(intersec(l(1)),inters(1,:));
