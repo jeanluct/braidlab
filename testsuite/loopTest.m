@@ -47,6 +47,10 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(a,[1 -1]);
       testCase.verifyEqual(b,[2 3]);
 
+      % Calling loop with a column vector should transpose.
+      l = braidlab.loop(testCase.l1.coords.');
+      testCase.verifyEqual(l.coords,[1 -1 2 3]);
+
       % A column vector of loops.
       l = testCase.l2;
       c12 = l.coords;
