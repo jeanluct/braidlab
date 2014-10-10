@@ -23,7 +23,7 @@ function [varargout] = subsref(obj,s)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if ~isscalar(obj)
+if ~isempty(obj) && ~isscalar(obj)
   error('BRAIDLAB:loop:subsref:notscalar', ...
         ['Loop object must be a scalar... see ''help loop.loop''' ...
          ' for how to create multiple loops.'])
