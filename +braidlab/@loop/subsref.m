@@ -23,13 +23,20 @@ function [varargout] = subsref(obj,s)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+if ~isscalar(obj)
+  error('BRAIDLAB:loop:subsref:notscalar', ...
+        ['Loop object must be a scalar... see ''help loop.loop''' ...
+         ' for how to create multiple loops.'])
+end
+
 switch s(1).type
   case '.'
     % Use the built-in subsref for dot notation
     [varargout{1:nargout}] = builtin('subsref',obj,s);
   case '()'
     if length(s(1).subs) > 1
-      error('BRAIDLAB:loop:subsref','Cannot use more than one index.')
+      error('BRAIDLAB:loop:subsref:toomanyind', ...
+            'Cannot use more than one index.')
     end
     idx = s(1).subs{1};
     objrow = braidlab.loop(obj.coords(idx,:));
@@ -44,6 +51,6 @@ switch s(1).type
     if nargout == 0, varargout{1} = objrow; end
   case '{}'
     % No support for indexing using '{}'
-    error('BRAIDLAB:loop:subsref', ...
+    error('BRAIDLAB:loop:subsref:badref', ...
           'Not a supported subscripted reference')
 end

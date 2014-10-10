@@ -346,17 +346,18 @@ classdef braid < matlab.mixin.CustomDisplay
         % Have to define this here, rather than in the loop class, since the
         % braid goes on the left, and Matlab determines which overloaded
         % function to call by looking at the first argument.
-        if b1.n > b2(1).n
-          error('BRAIDLAB:braid:mtimes:badgen', ...
-                'Braid has too many strings for the loop.')
-        end
         if ~isscalar(b2)
           % Can't act on array of loops with a braid.
-          % Could be done but would be kludgy.
-          error('BRAIDLAB:braid:mtimes:nonscalar', ...
+          % This is very inefficient, and can be done instead with a
+          % scalar containing an array of loop coordinates.
+          error('BRAIDLAB:braid:mtimes:notscalar', ...
                 ['Action of braid on nonscalar loop array not supported.' ...
                  '  Instead use matrix of loop.coords.  ' ...
                  'Try ''help loop.loop''.'])
+        end
+        if b1.n > b2.n
+          error('BRAIDLAB:braid:mtimes:badgen', ...
+                'Braid has too many strings for the loop.')
         end
         [varargout{1:nargout}] = loopsigma(b1.word,b2.coords);
         varargout{1} = braidlab.loop(varargout{1});

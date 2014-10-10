@@ -234,7 +234,6 @@ classdef databraid < braidlab.braid
 
     function bt = trunc(b,interval)
     %TRUNC   Truncate databraid by choosing crossings from a time subinterval.
-    %
     %   BT = TRUNC(B,INTERVAL) Truncates the braid generators to those
     %   whose crossing times TCROSS lie in the interval
     %   INTERVAL(1) <= TCROSS <= INTERVAL(2).

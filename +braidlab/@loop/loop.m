@@ -72,12 +72,14 @@ classdef loop < matlab.mixin.CustomDisplay
     %   an equivalence class of simple closed multicurves under isotopy.
     %
     %   L = LOOP(D), where D is a matrix with 2*N-4 columns, creates a
-    %   vector of loop objects, one for each row.
+    %   scalar loop object containing a vector of loops, with loop.coords =
+    %   D.
     %
     %   L = LOOP(A,B) creates a loop object L from (A,B) vectors of Dynnikov
     %   coordinates, each of length N-2, where N is the number of punctures.
     %   If A and B are matrices of equal dimension and with N-2 columns,
-    %   then a vector of several loop objects is created, one for each row.
+    %   then a loop object containing a vector of loops is created, with
+    %   loop.coords = [A,B].
     %
     %   Note that the coordinates of the loop are of the same type as the
     %   vectors used in its construction (usually double by default).  For
