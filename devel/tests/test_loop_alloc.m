@@ -3,7 +3,7 @@
 N = 2000;
 n = 10;
 
-% The bad way: no pre-allocation.
+% Very bad: no pre-allocation.
 % Completely awful running time.
 if N <= 2000
   tic
@@ -14,7 +14,7 @@ if N <= 2000
   toc
 end
 
-% The good way: pre-allocation.
+% Good: pre-allocation directly on the coordinates.
 tic
 l2 = loop(zeros(N,2*n-2));
 for i = 1:N
@@ -22,11 +22,26 @@ for i = 1:N
 end
 toc
 
-% The old way: pre-allocation with by creating the last element.
-% This works as well as the other two ways.
+% Good: pre-allocation using default loop.
 tic
-l4(N) = loop(n);
+l3 = loop(n,N);
 for i = 1:N
-  l4(i) = loop(n);
+  l3(i) = loop(n);
+end
+toc
+
+% Good: pre-allocation using default loop.  No boundary puncture.
+tic
+l4 = loop(n,N,'nobasepoint');
+for i = 1:N
+  l4(i) = loop(n,'nobasepoint');
+end
+toc
+
+% Good: pre-allocation with by creating the last element.
+tic
+l5(N) = loop(n);
+for i = 1:N
+  l5(i) = loop(n);
 end
 toc
