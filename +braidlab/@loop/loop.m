@@ -90,10 +90,9 @@ classdef loop < matlab.mixin.CustomDisplay
     %   with M identical loops.  This can be used to pre-allocate memory for
     %   a large number of loops.
     %
-    %   L = LOOP(N,'noboundary') or LOOP(N,M,'noboundary') is the same as
-    %   LOOP(N,M), but an additional boundary puncture is not added so the
-    %   resulting loops have N punctures.  Note that, topologically
-    %   speaking, this boundary puncture is still present implicitly.
+    %   L = LOOP(N,'nobasepoint') or LOOP(N,M,'nobasepoint') is the same as
+    %   LOOP(N,M), but an additional basepoint puncture is not added so the
+    %   resulting loops have N punctures.
     %
     %   L = LOOP(...,'TYPE') or LOOP(...,@TYPE) creates a loop L with
     %   coordinates of type TYPE.  The default is TYPE=double.  Other useful
@@ -103,13 +102,14 @@ classdef loop < matlab.mixin.CustomDisplay
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
       % Parse options.
-      nobound = false;
+      nobase = false;
       htyp = @(x) x;  % By default, htyp does nothing.
       iarg = [];
       for i = 1:length(varargin)
         if ischar(varargin{i})
-          if any(strcmpi(varargin{i},{'noboundary','nobound'}))
-            nobound = true;
+          if any(strcmpi(varargin{i}, ...
+                         {'nobasepoint','nobase','noboundary','nobound'}))
+            nobase = true;
             iarg = [iarg i];
           else
             htyp = str2func(varargin{i});
@@ -146,14 +146,14 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:toofewpunc', ...
                 'Need at least two punctures.');
         end
-        if nobound, n1 = c-2; else n1 = c-1; end
+        if nobase, n1 = c-2; else n1 = c-1; end
         if length(varargin) > 1, m = varargin{2}; else m = 1; end
         l.coords = htyp(zeros(m,2*n1));
         l.coords(:,(n1+1):end) = htyp(-1);
         return
       end
 
-      % nobound is ignored from here on.  Later might get set as an
+      % nobase is ignored from here on.  Later might get set as an
       % internal property.
 
       if isa(c,'braidlab.loop')
