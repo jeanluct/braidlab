@@ -31,7 +31,7 @@ classdef loopTest < matlab.unittest.TestCase
       import braidlab.braid
       import braidlab.loop
       testCase.l1 = loop([1 -1 2 3]);
-      testCase.l2 = loop([1 -1 2 3; 2 3 -1 2]);  % two loops (column)
+      testCase.l2 = loop([1 -1 2 3; 2 3 -1 2]);  % two loops
       testCase.b = braid([1 -2 1 -2 1 -2]);
     end
   end
@@ -130,9 +130,10 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(intaxis(l(2)),16);
 
       inters = [3 5 5 3 12 8 2;-2 2 -3 3 8 10 6];
+      % These are wrong:  See issue #74.
       testCase.verifyEqual(intersec(l),inters);
       testCase.verifyEqual(l.intersec,inters);
-      % These fail!!!  See issue #74.
+      % These are probably right.
       testCase.verifyEqual(l(1).intersec,inters(1,:));
       testCase.verifyEqual(l(2).intersec,inters(2,:));
       testCase.verifyEqual(intersec(l(1)),inters(1,:));
