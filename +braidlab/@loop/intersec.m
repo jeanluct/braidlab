@@ -64,7 +64,7 @@ else
   for i = 1:2*n-4
     ic = ceil(i/2);
     mu(:,i) = (-1)^i * A(:,ic + 1);
-    ii = (B(ic + 1) >= 0);
+    ii = (B(:,ic + 1) >= 0);
     mu(ii,i) = mu(ii,i) + nu(ii,ic)/2;
     mu(~ii,i) = mu(~ii,i) + nu(~ii,ic+1)/2;
   end
