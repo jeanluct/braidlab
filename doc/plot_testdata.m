@@ -17,7 +17,7 @@
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-load ../testsuite/testdata
+load ../testsuite/testcases/testdata
 
 cl = {'r' 'g' 'b' 'm'};
 
