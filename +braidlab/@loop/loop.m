@@ -64,7 +64,7 @@ classdef loop < matlab.mixin.CustomDisplay
 
   methods
 
-    function l = loop(c,b,third)
+    function l = loop(varargin)
     %LOOP   Construct a loop object.
     %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
     %   coordinates D.  D must have 2*N-4 elements, where N is the number of
@@ -102,8 +102,43 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
+      % Parse options.
+      nobound = false;
+      htyp = @(x) x;  % By default, htyp does nothing.
+      iarg = [];
+      for i = 1:length(varargin)
+        if ischar(varargin{i})
+          if any(strcmpi(varargin{i},{'noboundary','nobound'}))
+            nobound = true;
+            iarg = [iarg i];
+          else
+            htyp = str2func(varargin{i});
+            iarg = [iarg i];
+          end
+        elseif isa(varargin{i},'function_handle')
+          htyp = varargin{i};
+          iarg = [iarg i];
+        end
+      end
+      % Erase the arguments that were parsed.
+      % Note that we use () rather than {} here, so the element is removed.
+      for i = length(iarg):-1:1
+        varargin(iarg(i)) = [];
+      end
+      if length(varargin) > 2
+        error('BRAIDLAB:loop:loop:badarg','Too many arguments.')
+      end
+
+      if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
+
       % Default loop around first two of three punctures.
-      if nargin == 0, return; end
+      if length(varargin) == 0
+        l.coords = htyp(l.coords);
+        return
+      end
+
+      c = varargin{1};
+
       if isscalar(c) && ~isa(c,'braidlab.loop')
         % Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
@@ -111,69 +146,36 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:toofewpunc', ...
                 'Need at least two punctures.');
         end
-        if nargin > 2
-          if strcmpi(third,'noboundary') || strcmpi(third,'nobound')
-            n1 = c-2;
-          else
-            error('BRAIDLAB:loop:loop:badarg', ...
-                  'Bad argument.');
-          end
-        else
-          n1 = c-1;
-        end
-        htyp = @double;
-        if nargin > 1
-          if ~isempty(b)
-            if ischar(b)
-              htyp = str2func(b);
-            elseif isa(b,'function_handle')
-              htyp = b;
-            else
-              error('BRAIDLAB:loop:loop:badarg', ...
-                    ['Second argument should be a type ' ...
-                     'string or function handle.']);
-            end
-          end
-        end
-        if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
-        l.coords = htyp(zeros(1,2*n1));
-        l.coords(n1+1:end) = htyp(-1);
+        if nobound, n1 = c-2; else n1 = c-1; end
+        if length(varargin) > 1, m = varargin{2}; else m = 1; end
+        l.coords = htyp(zeros(m,2*n1));
+        l.coords(:,(n1+1):end) = htyp(-1);
         return
       end
+
+      % nobound is ignored from here on.  Later might get set as an
+      % internal property.
+
       if isa(c,'braidlab.loop')
-        l.coords = c.coords;
+        l.coords = htyp(c.coords);
         return
       end
-      if nargin == 1
+
+      if length(varargin) == 1
+        % Create from an array with an even number of columns.
+        if ndims(c) > 2
+          error('BRAIDLAB:loop:loop:badarg', ...
+                'Array of coordinates must have 1 or 2 dimensions.')
+        end
+        if mod(size(c,2),2)
+          error('BRAIDLAB:loop:loop:oddlength', ...
+                'Loop coordinate array must have even number of columns.')
+        end
+        l.coords = htyp(c);
         if isvector(c)
-          % Create from a single vector of even length.
-          if mod(length(c),2)
-            error('BRAIDLAB:loop:loop:oddlength', ...
-                  'Loop coordinate vector must have even length.')
-          end
           % Store coordinates as row vector.
           if size(c,1) > size(c,2), c = c.'; end
-          l.coords = c;
-        else
-          % Create from an array with an even number of columns.
-          if ndims(c) > 2
-            error('BRAIDLAB:loop:loop:badarg', ...
-                  'Array of coordinates must have 1 or 2 dimensions.')
-          end
-          if mod(size(c,2),2)
-            error('BRAIDLAB:loop:loop:oddlength', ...
-                  'Loop coordinate array must have even number of columns.')
-          end
-          l.coords = c;
         end
-      else
-	error('Deprecating this.')
-        % Create a,b separately from two vectors of the same length.
-        if any(size(c) ~= size(b))
-          error('BRAIDLAB:loop:loop:badsize', ...
-                'Loop coordinate vectors must have the same size.')
-        end
-        l.coords = [c b];
       end
     end % function loop
 
