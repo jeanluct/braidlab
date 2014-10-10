@@ -51,7 +51,7 @@ switch s(1).type
         obj = braidlab.loop(zeros(idx,size(val.coords,2)));
       end
       % Overwrite an existing row.
-      obj.coords(idx,:) = val.coords(:);
+      obj.coords(idx,:) = val.coords;
       return
     elseif length(s) < 4
       if isempty(obj)
