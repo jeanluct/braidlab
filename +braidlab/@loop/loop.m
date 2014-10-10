@@ -110,7 +110,7 @@ classdef loop < matlab.mixin.CustomDisplay
           if any(strcmpi(varargin{i}, ...
                          {'nobasepoint','nobase','noboundary','nobound'}))
             nobase = true;
-            iarg = [iarg i];
+            iarg = [iarg i]; %#ok<*AGROW>
           else
             htyp = str2func(varargin{i});
             iarg = [iarg i];
@@ -132,7 +132,7 @@ classdef loop < matlab.mixin.CustomDisplay
       if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
 
       % Default loop around first two of three punctures.
-      if length(varargin) == 0
+      if length(varargin) == 0 %#ok<ISMT>
         l.coords = htyp(l.coords);
         return
       end
@@ -170,19 +170,19 @@ classdef loop < matlab.mixin.CustomDisplay
 
       if length(varargin) == 1
         % Create from an array with an even number of columns.
-        if ndims(c) > 2
+        if ndims(c) > 2 %#ok<ISMAT>
           error('BRAIDLAB:loop:loop:badarg', ...
                 'Array of coordinates must have 1 or 2 dimensions.')
+        end
+        if isvector(c)
+          % Store coordinates as row vector.
+          if size(c,1) > size(c,2), c = c.'; end
         end
         if mod(size(c,2),2)
           error('BRAIDLAB:loop:loop:oddlength', ...
                 'Loop coordinate array must have even number of columns.')
         end
         l.coords = htyp(c);
-        if isvector(c)
-          % Store coordinates as row vector.
-          if size(c,1) > size(c,2), c = c.'; end
-        end
       else
         error('BRAIDLAB:loop:loop:badarg','Too many arguments.')
       end
