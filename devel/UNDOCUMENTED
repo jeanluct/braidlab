@@ -7,6 +7,7 @@ loop.nested
 loop.components
 loop.plot('components')
 loop.getgraph
+loop.loop('enum')
 debugmsg & BRAIDLAB_debuglvl
 BRAIDLAB_threads
 @cfbraid class
