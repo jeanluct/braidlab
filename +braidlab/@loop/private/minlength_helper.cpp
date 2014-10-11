@@ -16,7 +16,7 @@
 // Families of Braids.” Topology and Its Applications 156, no. 8
 // (April 15, 2009): 1554–64. 
 // doi:10.1016/j.topol.2009.01.005.
-//
+
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 //
@@ -35,9 +35,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
-// Use the group relations to shorten a braid word as much as
-// possible.
 
 #include "loop_helper.hpp"
 #include "mex.h"
@@ -126,6 +123,4 @@ void retrieveLength( const mxArray* input, mxArray *output,
   }
 
   return;
-
 }
-
