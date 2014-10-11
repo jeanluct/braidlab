@@ -4,7 +4,7 @@ n = 8;
 k = 10;
 dynnmax = 1;  % Careful!  Increasing this even by 1 can cause Matlab to lock.
 
-% Make loops as row-vectors of an array.
+% Make loops as row-vectors of an array (not loop objects).
 l = looplist(2*n-4,-dynnmax,dynnmax);
 
 fprintf('Number of loops = %g\n',size(l,1));

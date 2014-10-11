@@ -7,7 +7,7 @@
   the interface (and the guide required no changes), but the speedup
   for a braid acting on a large array of loops is of order 50.
 
-* Loop constructor can now return am array of canonical loops.  This
+* Loop constructor can now return an array of canonical loops.  This
   is useful for pre-allocating memory, among other things.
 
 * Loop constructor can take an option 'nobasepoint' when creating
@@ -15,6 +15,9 @@
   make this work, the loop constructor form loop(a,b) has been removed
   (use loop([a b]) instead).  This shouldn't affect things much as
   that form was hardly used and was not documented in the guide.
+
+* Loop constructor has an option 'enum' to enumerate a list of loops
+  with coordinate values between specified bounds.
 
 * loop.minlength is now a C++ MEX file (written by Marko Budisic).
 
