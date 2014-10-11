@@ -94,15 +94,27 @@ classdef loop < matlab.mixin.CustomDisplay
     %   LOOP(N,M), but an additional basepoint puncture is not added so the
     %   resulting loops have N punctures.
     %
+    %   L = LOOP('enum',VMIN,VMAX) returns a loop object containing all
+    %   loops with indices bounded from below by the vector VMIN, and from
+    %   above by the vector VMAX.  Both VMIN and VMAX are of size 2N-4,
+    %   where N is the number of punctures.  There are PROD(VMAX-VMIN+1)
+    %   such loops.
+    %
+    %   L = LOOP('enum',N,IMIN,IMAX) returns a loop object containing all
+    %   loops with N punctures and with entries bounded by the scalars IMIN
+    %   and IMAX.  There are (IMAX-IMIN+1)^(2N-4) such loops.
+    %
     %   L = LOOP(...,'TYPE') or LOOP(...,@TYPE) creates a loop L with
     %   coordinates of type TYPE.  The default is TYPE=double.  Other useful
     %   values are int32, int64, and vpi (variable precision integers).
     %
     %   This is a method for the LOOP class.
+    %
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
       % Parse options.
       nobase = false;
+      doenum = false;
       htyp = @(x) x;  % By default, htyp does nothing.
       iarg = [];
       for i = 1:length(varargin)
@@ -111,6 +123,9 @@ classdef loop < matlab.mixin.CustomDisplay
                          {'nobasepoint','nobase','noboundary','nobound'}))
             nobase = true;
             iarg = [iarg i]; %#ok<*AGROW>
+          elseif any(strcmpi(varargin{i},{'enum','enumerate'}))
+            doenum = true;
+            iarg = [iarg i];
           else
             htyp = str2func(varargin{i});
             iarg = [iarg i];
@@ -125,6 +140,13 @@ classdef loop < matlab.mixin.CustomDisplay
       for i = length(iarg):-1:1
         varargin(iarg(i)) = [];
       end
+
+      if doenum
+        % Enumerate loops.
+        l.coords = htyp(looplist(varargin{:}));
+        return
+      end
+
       if length(varargin) > 2
         error('BRAIDLAB:loop:loop:badarg','Too many arguments.')
       end

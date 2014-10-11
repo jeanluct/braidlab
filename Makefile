@@ -32,8 +32,8 @@ ifeq ($(SYS), Darwin)
 endif
 
 MEX = mex
-CFLAGS = -O -DMATLAB_MEX_FILE
-CXXFLAGS = $(CFLAGS) -std=c++0x -fPIC
+CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
+CXXFLAGS = $(CFLAGS) -std=c++0x
 MEXFLAGS  = -largeArrayDims -O
 
 # Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
