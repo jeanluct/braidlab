@@ -41,8 +41,8 @@
 
 #include "loop_helper.hpp"
 #include "mex.h"
-
-#ifndef BRAIDLAB_loop_zeroindexed
+ 
+#ifndef BRAIDLAB_LOOP_ZEROINDEXED
 #define OFFSET (-1)
 #else
 #define OFFSET (0)

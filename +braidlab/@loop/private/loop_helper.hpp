@@ -2,7 +2,7 @@
 #define LOOP_HELPER_HPP
 
 // Helper function for loop manipulations, to be used in MEX files.
-// define BRAIDLAB_loop_zeroindexed to enforce 0-indexed arrays.
+// define BRAIDLAB_LOOP_ZEROINDEXED to enforce 0-indexed arrays.
 // Otherwise, arrays are assumed to be 1-indexed.
 
 // <LICENSE
@@ -38,7 +38,7 @@ Compute l2 norm of the Dynnikov coordinates stored in two coordinate vectors
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
-(#define BRAIDLAB_loop_zeroindexed to switch to zero-based indexing)
+(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
 T l2norm2(const int N, const T *a, const T *b);
@@ -52,7 +52,7 @@ single loop.
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
-(#define BRAIDLAB_loop_zeroindexed to switch to zero-based indexing)
+(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
 T length(const int N, const T *a, const T *b);
@@ -63,7 +63,7 @@ T l2norm2(const int N, const T *a, const T *b)
 {
   T l2 = 0;
 
-#ifndef BRAIDLAB_loop_zeroindexed
+#ifndef BRAIDLAB_LOOP_ZEROINDEXED
   for (size_t k = 1; k <= N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
 #else
   for (size_t k = 0; k < N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
@@ -76,7 +76,7 @@ template <class T>
 T length(const int N, const T *a, const T *b) {
 
   size_t offset;
-#ifndef BRAIDLAB_loop_zeroindexed
+#ifndef BRAIDLAB_LOOP_ZEROINDEXED
   offset = 0;
 #else
   offset = 1;
