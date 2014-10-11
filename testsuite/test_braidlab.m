@@ -26,12 +26,14 @@ end
 
 import matlab.unittest.*
 
-suite = TestSuite.fromFolder([pwd '/testcases']);
-%suite = TestSuite.fromClass(?braidTest);
-%suite = TestSuite.fromClass(?loopTest);
-%suite = TestSuite.fromClass(?conjtestTest);
-%suite = TestSuite.fromClass(?compactTest);
-%suite = TestSuite.fromClass(?entropyTest);
-%suite = TestSuite.fromClass(?cycleTest);
+tcfolder = [pwd '/testcases/'];
+
+suite = TestSuite.fromFolder(tcfolder);
+%suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'cycleTest.m']);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite) %#ok<NOPTS>

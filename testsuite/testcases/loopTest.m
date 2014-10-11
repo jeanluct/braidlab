@@ -126,6 +126,15 @@ classdef loopTest < matlab.unittest.TestCase
       % multiple loops instead.
       testCase.verifyError(@() l0(1), ...
                            'BRAIDLAB:loop:subsref:notscalar');
+
+      % Create enumerations of loops.
+      enum = [1 1;1 2;2 1;2 2];
+      lenum = braidlab.loop('enum',3,1,2);
+      testCase.verifyEqual(lenum.coords,enum);
+      lenum = braidlab.loop('enum',[1 1],[2 2]);
+      testCase.verifyEqual(lenum.coords,enum);
+      lenum = braidlab.loop('enum',[1 1],[2 2],@int32);
+      testCase.verifyEqual(lenum.coords,int32(enum));
     end
 
     function test_loop_subscripts(testCase)
