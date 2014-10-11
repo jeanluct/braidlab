@@ -3,7 +3,7 @@ function ul = looplist(n,imin,imax)
 %   U = LOOPLIST(VMIN,VMAX) returns a list of loops with indices bounded
 %   from below by the vector VMIN, and from above by the vector VMAX.
 %
-%   U = LOOPLIST(N,IMIN,IMAX) returns loop with N entries each bounded by
+%   U = LOOPLIST(N,IMIN,IMAX) returns loops with N entries each bounded by
 %   the scalars IMIN and IMAX.
 
 badbounds = 'Lower bounds must be less than or equal to upper.';

@@ -19,14 +19,6 @@
 #   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 # LICENSE>
 
-# CBRAID_LIBDIR     = ../../../extern/cbraid/lib
-# CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
-# CBRAID_LD         = -lcbraid-mex
-
-# TRAINS_LIBDIR     = ../../../extern/trains
-# TRAINS_INCLUDEDIR = ../../../extern
-# TRAINS_LD         = -ltrains
-
 # Need override since variable usually set as command-line argument.
 #
 # Wouldn't need this if we could pass a quoted string inside of
@@ -35,7 +27,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env minlength_helper.$(MEXSUFFIX) 
+all: check-env looplist_helper.$(MEXSUFFIX) minlength_helper.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -44,12 +36,12 @@ ifndef MEX
 endif
 
 %.$(MEXSUFFIX): %.cpp
-	$(MEX) $(MEXFLAGS) $^ 
+	$(MEX) $(MEXFLAGS) $^
 
+%.$(MEXSUFFIX): %.c
+	$(MEX) $(MEXFLAGS) $^
 
-tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
-	$(MEX) $(MEXFLAGS) $^ \
-		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
+looplist_helper.$(MEXSUFFIX): looplist_helper.c
 
 minlength_helper.$(MEXSUFFIX): minlength_helper.cpp loop_helper.hpp
 # $< is the first dependency (the .cpp file).
