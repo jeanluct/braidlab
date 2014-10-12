@@ -1,5 +1,9 @@
-addpath ..
 import braidlab.*
+
+% Try all ways to close a braid of trajectories by drawing straight
+% segments to the initial points.
+
+% Compute TN class and entropy.
 
 n = 6;
 docompact = true;
@@ -7,6 +11,8 @@ dotntype = true;
 permpregen = true;
 paralyze = true;
 
+% Should try a random braid obtained from duffing or something similar,
+% to have a coherent structure.
 rng(0); XY = randomwalk(n,300,.1);
 
 poolobj = gcp('nocreate'); % If no pool, do not create new one.
@@ -34,7 +40,7 @@ cl = {'r' 'g' 'b' 'm' 'c' 'y' 'k'};
 
 figure(1)
 for k = 1:size(XY,3)
-  plot3(XY(:,1,k),XY(:,2,k),1:size(XY,1),cl{k}), hold on
+  plot3(XY(:,1,k),XY(:,2,k),1:size(XY,1),cl{mod(k-1,length(cl))+1}), hold on
 end
 hold off
 
