@@ -9,15 +9,16 @@ paralyze = true;
 
 rng(0); XY = randomwalk(n,300,.1);
 
+poolobj = gcp('nocreate'); % If no pool, do not create new one.
 if paralyze
   % Open pool of workers if it isn't already allocated.
-  if matlabpool('size') == 0
-    matlabpool open
+  if isempty(poolobj)
+    parpool('local');
   end
 else
   % Close pool of workers.
-  if matlabpool('size') > 0
-    matlabpool close
+  if ~isempty(poolobj)
+    delete(poolobj)
   end
 end
 
@@ -97,12 +98,12 @@ axis tight
 ylabel('entropy')
 
 subplot(2,1,2)
-h = bar(tn == 2,'b');
+h = bar(double(tn == 2),'b');
 set(h,'EdgeColor',get(h,'FaceColor'));
 hold on
-h = bar(tn == 1,'r');
+h = bar(double(tn == 1),'r');
 set(h,'EdgeColor',get(h,'FaceColor'));
-h = bar(tn == 0,'w');
+h = bar(double(tn == 0),'w');
 set(h,'EdgeColor',get(h,'FaceColor'));
 hold off
 axis tight
