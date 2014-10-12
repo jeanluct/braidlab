@@ -94,7 +94,7 @@ for i = 1:3
 end
 c = [c1(1:end-1,:);c2];
 caxis([min(min(t_rdiff)) max(max(t_rdiff))]), colormap(c), colorbar
-title('time difference: t_iter - t_trains')
+title('time difference: t_{iter} - t_{trains}')
 
 figure(2)
 imagesc(log10(abs(entr_diff)))
