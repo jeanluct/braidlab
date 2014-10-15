@@ -4,8 +4,8 @@ function [varargout] = cycle(b,varargin)
 %   The sparse matrix M is is the product of the matrices in the limit
 %   cycle.
 %
-%   CYCLE(B,L) uses the initial loop L (default loop(B.n)) for the
-%   iteration.
+%   CYCLE(B,L) uses the initial loop L (default loop(B.n,'basepoint')) for
+%   the iteration.
 %
 %   CYCLE(B,...,MAXIT,NCONVREQ) also specifies the maximum number of
 %   iterations MAXIT (default 1000) and the number of required consecutive
@@ -108,7 +108,7 @@ for i = 1:length(varargin)
   elseif isa(varargin{i},'braidlab.loop')
     braidlab.util.checkvpi
     % Get the initial loop from arguments.
-    l = loop(vpi(varargin{i}.coords));
+    l = loop(vpi(varargin{i}.coords),'bp',varargin{i}.basepoint);
     iarg = [iarg i];
   end
 end
@@ -120,7 +120,7 @@ end
 % Assign default initial loop if it wasn't specified as an argument.
 if ~exist('l','var')
   braidlab.util.checkvpi
-  l = loop(b.n,'vpi');
+  l = loop(b.n,'vpi','bp');  % include a basepoint by default
 end
 
 % Turn false convergence warning off by default.

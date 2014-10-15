@@ -43,7 +43,7 @@ end
 
 %% Get the coordinates of the loop, convert to crossing numbers.
 % Convert to double, since some scaling is done.
-n = L.n;
+n = L.totaln;
 
 % Get the b coordinates.
 b_coord = double(L.b);

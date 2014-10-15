@@ -23,6 +23,7 @@ classdef loopTest < matlab.unittest.TestCase
     % Names of some predefined test cases.
     l1
     l2
+    l2b
     b
   end
 
@@ -32,6 +33,7 @@ classdef loopTest < matlab.unittest.TestCase
       import braidlab.loop
       testCase.l1 = loop([1 -1 2 3]);
       testCase.l2 = loop([1 -1 2 3; 2 3 -1 2]);  % two loops
+      testCase.l2b = loop([1 -1 2 3; 2 3 -1 2],'bp');  % loops with basepoint
       testCase.b = braid([1 -2 1 -2 1 -2]);
     end
   end
@@ -60,6 +62,18 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l.n,4);
       testCase.verifyEqual(l(2).n,4);
 
+      % A column vector of loops, with default basepoint.
+      l = testCase.l2b;
+      c12 = l.coords;
+      testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
+      testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
+      % All loops the same dimension, so only one puncture size for all loops.
+      % Since they have a basepoint, the # of moving punctures is 3.
+      testCase.verifyEqual(l.n,3);
+      testCase.verifyEqual(l(2).n,3);
+      testCase.verifyEqual(l.totaln,4);
+      testCase.verifyEqual(l(2).totaln,4);
+
       % Can't make more dimensions than a matrix.
       testCase.verifyError(@()braidlab.loop(zeros(3,3,3)), ...
                            'BRAIDLAB:loop:loop:badarg')
@@ -80,10 +94,10 @@ classdef loopTest < matlab.unittest.TestCase
 
       % The generating set of loops used to build loop coordinates.
       % ("canonical set of loops")
-      l = braidlab.loop(4);
+      l = braidlab.loop(4,'bp');
       testCase.verifyEqual(l.coords,[0 0 0 -1 -1 -1]);
       % Try with different type.
-      l = braidlab.loop(4,@int32);
+      l = braidlab.loop(4,@int32,'bp');
       testCase.verifyEqual(l.coords,int32([0 0 0 -1 -1 -1]));
 
       % Canonical set of loops, no extra puncture.
@@ -94,7 +108,7 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(l.coords,single([0 0 -1 -1]));
 
       % Vector of canonical loops.
-      l = braidlab.loop(4,5);
+      l = braidlab.loop(4,5,'bp');
       testCase.verifyEqual(l.coords,repmat([0 0 0 -1 -1 -1],5,1));
 
       % Vector of canonical loops, no extra puncture.
@@ -138,36 +152,61 @@ classdef loopTest < matlab.unittest.TestCase
     end
 
     function test_loop_subscripts(testCase)
-      l = braidlab.loop(zeros(2,4));
-      l(2) = braidlab.loop(3);
+      l = braidlab.loop(zeros(2,4),'bp');
+      l(2) = braidlab.loop(3,'bp');
       testCase.verifyEqual(l.coords(:),[0 0 0 0 0 -1 0 -1]');
-      testCase.verifyEqual(l.n,4);
-      testCase.verifyEqual(l(2).n,4);
-      testCase.verifyEqual(l(2),braidlab.loop(3));
+      testCase.verifyEqual(l.n,3);
+      testCase.verifyEqual(l(2).n,3);
+      testCase.verifyEqual(l(2),braidlab.loop(3,'bp'));
 
       % Create multiple loops by accessing an index.
-      l2(2) = braidlab.loop(3);
+      l2(2) = braidlab.loop(3,'bp');
       testCase.verifyEqual(l,l2);
       % Assign coordinates directly for one row.
       l2(2).coords = [1 2 3 4];
-      testCase.verifyEqual(l2(2),braidlab.loop([1 2 3 4]));
+      testCase.verifyEqual(l2(2),braidlab.loop([1 2 3 4],'bp'));
       % Grow by one loop.
       l2(3).coords = -[1 2 3 4];
-      testCase.verifyEqual(l2(3),braidlab.loop(-[1 2 3 4]));
+      testCase.verifyEqual(l2(3),braidlab.loop(-[1 2 3 4],'bp'));
       % Change one coordinate in 3rd loop.
       l2(3).coords(1) = 1;
-      testCase.verifyEqual(l2(3),braidlab.loop(-[-1 2 3 4]));
+      testCase.verifyEqual(l2(3),braidlab.loop(-[-1 2 3 4],'bp'));
       % Change two coordinates in 2nd loop.
       l2(2).coords(3:end) = [-6 -7];
-      testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7]));
+      testCase.verifyEqual(l2(2),braidlab.loop([1 2 -6 -7],'bp'));
 
       % Extend a loop array by another.
-      l = braidlab.loop(4,3); l2 = braidlab.loop(4,2);
+      l = braidlab.loop(4,3,'bp'); l2 = braidlab.loop(4,2,'bp');
       l(4:5) = l2;  % l has 3 rows initially.
-      testCase.verifyEqual(l,braidlab.loop(repmat([0 0 0 -1 -1 -1],5,1)));
+      testCase.verifyEqual(l,braidlab.loop(repmat([0 0 0 -1 -1 -1],5,1),'bp'));
 
       % Verify minlength/intaxis vector functions.
       l = testCase.l2;
+      testCase.verifyEqual(l.minlength,[22;24]);
+      testCase.verifyEqual(l(1).minlength,22);
+      testCase.verifyEqual(l(2).minlength,24);
+      testCase.verifyEqual(minlength(l),[22;24]);
+      testCase.verifyEqual(minlength(l(1)),22);
+      testCase.verifyEqual(minlength(l(2)),24);
+
+      testCase.verifyEqual(l.intaxis,[16;16]);
+      testCase.verifyEqual(l(1).intaxis,16);
+      testCase.verifyEqual(l(2).intaxis,16);
+      testCase.verifyEqual(intaxis(l),[16;16]);
+      testCase.verifyEqual(intaxis(l(1)),16);
+      testCase.verifyEqual(intaxis(l(2)),16);
+
+      % Check intersection numbers.
+      inters = [5 7 5 3 12 8 2; 3 7 2 8 8 10 6];
+      testCase.verifyEqual(intersec(l),inters);
+      testCase.verifyEqual(l.intersec,inters);
+      testCase.verifyEqual(l(1).intersec,inters(1,:));
+      testCase.verifyEqual(l(2).intersec,inters(2,:));
+      testCase.verifyEqual(intersec(l(1)),inters(1,:));
+      testCase.verifyEqual(intersec(l(2)),inters(2,:));
+
+      % Verify minlength/intaxis vector functions, for loops with basepoint.
+      l = testCase.l2b;
       testCase.verifyEqual(l.minlength,[22;24]);
       testCase.verifyEqual(l(1).minlength,22);
       testCase.verifyEqual(l(2).minlength,24);
@@ -198,7 +237,27 @@ classdef loopTest < matlab.unittest.TestCase
       l = braidlab.braid([],3)*l0;
       testCase.verifyEqual(l,l0);
 
+      % An empty braid with basepoint.
+      l0 = braidlab.loop(3,'bp');
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+
+      % An empty braid with basepoint.
+      l0 = braidlab.loop(3,'bp',1);
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+
       l0 = braidlab.loop(5);
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+
+      % With basepoint.
+      l0 = braidlab.loop(5,'bp');
+      l = braidlab.braid([],3)*l0;
+      testCase.verifyEqual(l,l0);
+
+      % With basepoint.
+      l0 = braidlab.loop(5,'bp',1);
       l = braidlab.braid([],3)*l0;
       testCase.verifyEqual(l,l0);
 
