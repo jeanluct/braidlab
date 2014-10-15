@@ -1031,22 +1031,29 @@ iterations accordingly. %
 \index{loop!coordinates|(}
 \index{loop class@\loopc\ class!constructor|(}
 
-The command \lstinline{loop(n)} returns a \emph{canonical set of loops}
-for~$n$ punctures:%
+The command \lstinline{loop(n,'basepoint')} returns a \emph{canonical set of
+  loops} for~$n$ punctures:%
 \index{punctures|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> loop(5)
+>> l = loop(5,'bp')    % 'bp' is short for 'basepoint'
 
-ans = (( 0  0  0  0 -1 -1 -1 -1 ))
+ans = (( 0  0  0  0 -1 -1 -1 -1 ))*
 \end{lstlisting}
 \index{loop!multi-|(} This multiloop is depicted in
-Figure~\ref{fig:fundloops}.  Note that the multiloop returned by
-\hbox{\lstinline{loop(5)}} actually has 6 punctures!  The rightmost puncture
-is meant to represent the boundary of a disk, %
+Figure~\ref{fig:fundloops}, with basepoint puncture shown in green.  The
+\lstinline{*} indicates that this loop has a basepoint.  Note that the
+multiloop returned by \hbox{\lstinline{loop(5,'bp')}} actually has 6
+punctures!  The rightmost puncture is meant to represent the boundary of a
+disk, %
 \index{disk, punctured}%
 or a base point for the fundamental group on a sphere with $n$ punctures.  The
-loops form a generating set for the fundamental group of the disk with $n$
-punctures.  \index{loop class@\loopc\ class!constructor|)}
+loops form a (nonoriented) generating set for the fundamental group of the
+disk with $n$ punctures.  The extra puncture thus plays no role dynamically,
+and \lstinline{l.n} returns~5.  If you want the true total number of
+punctures, including the base point, use \lstinline{l.totaln}. %
+\index{loop class@\loopc\ class!totaln@\lstinline{totaln}}
+%
+\index{loop class@\loopc\ class!constructor|)}
 \index{punctures|)}%
 \index{loop!multi-|)}
 
@@ -1064,31 +1071,33 @@ which is a unique normal form.
   \label{fig:fundloops_act}
 }
 \end{center}
-\caption{(a) The multiloop created by \lstinline{loop(5)}.  (b) The multiloop
-  \lstinline{b*loop(5)}, where \lstinline{b} is the braid
+\caption{(a) The multiloop created by \lstinline{loop(5,'bp')}, with basepoint
+  puncture in green.  (b) The multiloop \lstinline{b*loop(5,'bp')}, where
+  \lstinline{b} is the braid
   $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$. \index{loop!multi-}}
 \end{figure}
 %
 The canonical loop coordinates for braids exploit the fact that two braids are
 equal if and only if they act the same way on the fundamental group of the
 disk \citep{Dehornoy2008}.  Hence, if we take a braid and act on
-\lstinline{loop(5)},
+\lstinline{loop(5,'bp')},
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3 -4]);
->> b*loop(5)
+>> b*loop(5,'bp')
 
-ans = (( 0  0  3 -1 -1 -1 -4  3 ))
+ans = (( 0  0  3 -1 -1 -1 -4  3 ))*
 \end{lstlisting}
-then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))} can be thought
+then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))*} can be thought
 of as \emph{uniquely} characterizing the braid.  It is this property that is
-used to rapidly determine equality of braids.  (The loop \lstinline{b*loop(5)}
-is plotted in Figure~\ref{fig:fundloops_act}.)  The same loop coordinates for
-the braid can be obtained without creating an intermediate loop with %
+used to rapidly determine equality of braids.  (The loop
+\lstinline{b*loop(5,'bp')} is plotted in Figure~\ref{fig:fundloops_act}.)  The
+same loop coordinates for the braid can be obtained without creating an
+intermediate loop with %
 \index{braid class@\braid\ class!loopcoords@\lstinline{loopcoords}}
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> loopcoords(b)
 
-ans = (( 0  0  3 -1 -1 -1 -4  3 ))
+ans = (( 0  0  3 -1 -1 -1 -4  3 ))*
 \end{lstlisting}
 
 \index{loop class@\loopc\ class|)}
@@ -1205,9 +1214,9 @@ The difference is that \lstinline{M} may only be applied \emph{to this
 action).
 
 A common thing to do is to find the effective linear action on the canonical
-set \lstinline{loop(b.n)} (see Section~\ref{sec:loopcoords}):
+set \lstinline{loop(b.n,'bp')} (see Section~\ref{sec:loopcoords}):
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [~,M] = b*loop(b.n); full(M)
+>> [~,M] = b*loop(b.n,'bp'); full(M)
 
 ans = 0     0    -1     0
       0     1     0     1
@@ -1296,12 +1305,12 @@ Figure~\ref{fig:efflinact1} shows the output of
 >> b = braid([1 -2]); M = cycle(b,'plot');
 \end{lstlisting}
 The member function \lstinline{cycle} iterates the braid on an initial loop,
-taken to be the canonical set \lstinline{loop(b.n)}.  The vertical axis in
-Fig.~\ref{fig:efflinact1} shows the elements of the effective linear action as
-a function of iterates of the braid.  The matrix of the action is flattened
+taken to be the canonical set \lstinline{loop(b.n,'bp')}.  The vertical axis
+in Fig.~\ref{fig:efflinact1} shows the elements of the effective linear action
+as a function of iterates of the braid.  The matrix of the action is flattened
 into a vector of length~$4^2$, where~$4$ is the dimension the initial loop
-\lstinline{loop(b.n)}.  It is evident that the fixed point is reached rapidly,
-since the `stripes' stop changing.
+\lstinline{loop(b.n,'bp')}.  It is evident that the fixed point is reached
+rapidly, since the `stripes' stop changing.
 
 \index{braid!pseudo-Anosov|(}%
 Such fixed points of the effective linear action are ubiquitous for braids
@@ -1319,7 +1328,7 @@ example with the following:%
 %
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([-1 -2 -3 4]);
->> M = b.cycle(loop(b.n-1),'iter')
+>> M = b.cycle(loop(b.n),'iter')
 
 M = [6x6 double]    [6x6 double]
 \end{lstlisting}
@@ -1346,9 +1355,9 @@ ans =  0     0     0     1     0     0
        0     0     1     0     0     1
 \end{lstlisting}
 as given by \citet{Yurttas2014_preprint}.  Note that we use an initial loop
-for~$\nn$ punctures (\lstinline{loop(b.n-1)}), rather than the
-default~$\nn+1$, to reproduce her example exactly.  For the pseudo-Anosov
-case, any initial loop will give the same matrices.
+for~$\nn$ punctures (\lstinline{loop(b.n)}) without base point, rather than
+the default, to reproduce her example exactly.  For the pseudo-Anosov case,
+any initial loop will give the same matrices.
 
 What is more surprising is that these limit cycles occur for finite-order
 braids as well.  Figure~\ref{fig:efflinact2} is produced by
