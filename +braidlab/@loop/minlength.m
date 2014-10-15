@@ -1,0 +1,65 @@
+function l = minlength(obj)
+%MINLENGTH   The minimum length of a loop.
+%   LEN = MINLENGTH(L) computes the minimum length of a loop, assuming
+%   the loop has zero thickness, and the punctures have zero size and
+%   are one unit apart.
+%
+%   This is a method for the LOOP class.
+%   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
+      
+% <LICENSE
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
+%
+%   This file is part of Braidlab.
+%
+%   Braidlab is free software: you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation, either version 3 of the License, or
+%   (at your option) any later version.
+%
+%   Braidlab is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+% LICENSE>
+
+%% determine if mex should be attempted
+global BRAIDLAB_loop_minlength_nomex
+if ~exist('BRAIDLAB_loop_minlength_nomex') || ...
+      isempty(BRAIDLAB_loop_minlength_nomex) || ...
+      BRAIDLAB_loop_minlength_nomex == false
+  usematlab = false;
+else
+  usematlab = true;
+end
+      
+%% use MEX computation
+if ~usematlab
+  try
+    if numel(obj) > 1
+      l = nan( size(obj) );
+      for k = 1:numel(l)
+        l(k) = minlength_helper(obj(k).coords);
+      end
+    else
+      % transpose coordinates for minlength_helper
+      l = minlength_helper( obj.coords.' );
+    end
+    usematlab = false;
+  catch me
+    warning(me.identifier, [ me.message ...
+                    ' Reverting to Matlab minlength'] );
+    usematlab = true;
+  end
+end
+
+%% use Matlab code if MEX is off or if MEX code fails
+if usematlab == true
+  % compute intersection numbers
+  [~,nu] = obj.intersec;
+  % sum intersection numbers along rows
+  l = sum(nu,2);
+end
