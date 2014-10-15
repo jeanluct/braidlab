@@ -39,7 +39,7 @@ switch s(1).type
             'Cannot use more than one index.')
     end
     idx = s(1).subs{1};
-    objrow = braidlab.loop(obj.coords(idx,:));
+    objrow = braidlab.loop(obj.coords(idx,:),'bp',obj.basepoint);
     if nargout > 0, varargout{1} = objrow; end
     s(1) = [];
     if ~isempty(s)

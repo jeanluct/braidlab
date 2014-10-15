@@ -43,12 +43,20 @@ switch s(1).type
     end
     if length(s) < 2
       if ~strcmp(class(val),'braidlab.loop')
-        error('BRAIDLAB:loop:subsasgn','Can only assign a scalar loop.')
+        error('BRAIDLAB:loop:subsasgn:needscalar', ...
+              'Can only assign a scalar loop.')
       end
       idx = s(1).subs{1};
       if isempty(obj)
         % Create the object, since it's empty.
-        obj = braidlab.loop(zeros(idx,size(val.coords,2)));
+        obj = braidlab.loop(zeros(idx,size(val.coords,2)),'bp',val.basepoint);
+      else
+        % Make sure loops have same basepoint.
+        if obj.basepoint ~= val.basepoint
+          error('BRAIDLAB:loop:subsasgn:basepoint', ...
+                'Loops must have same basepoint (%g ~= %g).', ...
+                obj.basepoint,val.basepoint)
+        end
       end
       % Overwrite an existing row.
       obj.coords(idx,:) = val.coords;

@@ -36,7 +36,16 @@ if isscalar(obj)
     end
   end
   nr = size(objstr,1); % number of rows
-  str = [repmat('(( ',nr,1) objstr repmat(' ))',nr,1)];
+  if obj.basepoint
+    if obj.basepoint == obj.totaln
+      bp = '*';  % for standard basepoint (last puncture)
+    else
+      bp = ['*' num2str(obj.basepoint)];  % nonstandard basepoint
+    end
+  else
+    bp = '';
+  end
+  str = [repmat('(( ',nr,1) objstr repmat([' ))' bp],nr,1)];
 else
   str = [];
   if size(obj,1) > size(obj,2)

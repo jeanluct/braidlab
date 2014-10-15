@@ -360,7 +360,7 @@ classdef braid < matlab.mixin.CustomDisplay
                 'Braid has too many strings for the loop.')
         end
         [varargout{1:nargout}] = loopsigma(b1.word,b2.coords);
-        varargout{1} = braidlab.loop(varargout{1});
+        varargout{1} = braidlab.loop(varargout{1},'bp',b2.basepoint);
         if nargout > 1
           % Actually, return the matrix of the linear action instead of pn.
           varargout{2} = linact(b1,varargout{2},size(b2(1).coords,2));

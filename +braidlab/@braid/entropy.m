@@ -116,7 +116,7 @@ end
 if nargin < 4, nconvreq = 3; end
 
 % Use a fundamental group generating set as the initial multiloop.
-u = braidlab.loop(b.n,@double);
+u = braidlab.loop(b.n,@double,'bp');
 
 if exist('entropy_helper','file') == 3
   % If MEX file is available, use that.
@@ -129,7 +129,7 @@ else
     u = b*u;
     entr = log(norm(u.coords));
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
-		     i,entr,entr-entr0),2)
+                     i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;

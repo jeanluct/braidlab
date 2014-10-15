@@ -35,14 +35,14 @@ function [varargout] = intersec(obj)
 % LICENSE>
 
 if ~isscalar(obj)
-  n = obj(1).n;
+  n = obj(1).totaln;
   mu = zeros(length(obj),2*n-4);
   nu = zeros(length(obj),n-1);
   for k = 1:length(obj)
     [mu(k,:),nu(k,:)] = intersec(obj(k));
   end
 else
-  n = obj.n;
+  n = obj.totaln;
   [a,b] = obj.ab;
 
   % The number of intersections before/after the first and last punctures.
