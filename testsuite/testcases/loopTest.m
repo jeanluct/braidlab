@@ -268,6 +268,13 @@ classdef loopTest < matlab.unittest.TestCase
       % Trying to act with a braid on unsupported object.
       testCase.verifyError(@() braidlab.braid([],7)*3, ...
                            'BRAIDLAB:braid:mtimes:badobject')
+
+      % Not allowed to move the basepoint (puncture 1).
+      testCase.verifyError(@() braidlab.braid(1)*l0, ...
+                           'BRAIDLAB:braid:mtimes:fixbp')
+      % However [1 1] is ok, since puncture 1 not permuted.
+      testCase.verifyEqual(braidlab.braid([1 1])*l0, ...
+                           braidlab.loop([1  0  0  0  1 -1 -1 -1],'bp',1))
     end
 
     function test_loopcoords(testCase)
