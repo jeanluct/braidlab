@@ -49,7 +49,7 @@ BRAIDLAB_debuglvl = BRAIDLAB_debuglvl_save;
 %=================================================================
 function verify_cycle(b,M,period,it,typ)
 
-l = braidlab.loop(b.n,typ);
+l = braidlab.loop(b.n,typ,'bp');
 
 % Make sure we've converged to the periodic cycle.
 l = b^it*l;
@@ -59,7 +59,7 @@ if any(M ~= M2)
   error('BRAIDLAB:test_cycle:wrong1','Something went wrong (1).')
 end
 
-l2 = braidlab.loop(typ(M2*l.coords.'));
+l2 = braidlab.loop(typ(M2*l.coords.'),'bp');
 
 if l1 ~= l2
   error('BRAIDLAB:test_cycle:wrong2','Something went wrong (2).')
