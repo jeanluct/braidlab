@@ -355,6 +355,14 @@ classdef braid < matlab.mixin.CustomDisplay
                  '  Instead use matrix of loop.coords.  ' ...
                  'Try ''help loop.loop''.'])
         end
+        if b2.basepoint
+          p = b1.perm;
+          p = [p (length(p)+1):b2.totaln];
+          if p(b2.basepoint) ~= b2.basepoint
+            error('BRAIDLAB:braid:mtimes:fixbp', ...
+                  'Braid cannot move the basepoint.')
+          end
+        end
         if b1.n > b2.n
           error('BRAIDLAB:braid:mtimes:badgen', ...
                 'Braid has too many strings for the loop.')
