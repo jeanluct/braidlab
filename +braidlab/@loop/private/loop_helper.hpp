@@ -31,6 +31,12 @@
 #include <algorithm> // std::max
 #include <iostream>
 
+#ifndef BRAIDLAB_LOOP_ZEROINDEXED
+#define OFFSET (-1)
+#else
+#define OFFSET (0)
+#endif
+
 ////////////////// DECLARATIONS  /////////////////////////
 
 /*
@@ -44,7 +50,8 @@ template <class T>
 T l2norm2(const int N, const T *a, const T *b);
 
 /* 
-Compute loop length of a loop represented by Dynnikov coordinate vectors.
+Compute minimal topological length of a loop represented by Dynnikov
+coordinate vectors.
 
 Length is a sum of intersection numbers nu. Here, we don't explicitly
 construct nu, rather, the computation of length was compounded into a
@@ -57,17 +64,47 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 template <class T>
 T minlength(const int N, const T *a, const T *b);
 
+/* 
+Compute number of intersections with real axis for a loop represented
+by Dynnikov coordinate vectors.
+
+Length is computed by formula (5) in Thiffeault, Chaos, 2010.
+
+T - numerical type that has to allow additions and multiplications.
+N - sum of lengths of coordinate vectors a,b - one-indexed vectors
+(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
+*/
+template <class T>
+T intaxis(const int N, const T *a, const T *b);
+
+/* 
+Convert a Dynnikov coordinate pair (a,b) into 
+intersection number pair (mu, nu).
+
+See Lemma 1 in:
+Hall, Toby, and S. Öykü Yurttaş. “On the Topological Entropy of
+Families of Braids.” Topology and Its Applications 156, no. 8
+(April 15, 2009): 1554–64. 
+doi:10.1016/j.topol.2009.01.005.
+
+T - numerical type that has to allow additions and multiplications.
+n - number of punctures
+*a, *b - Dynnikov vectors 
+*mu, *nu - Preallocated intersection vectors
+         - mu has 2n - 4 elements
+         - nu has n-1 elements
+*/
+template <class T>
+void intersec(const int n, const T *a, const T *b, T* mu, T* nu);
+
 ////////////////// IMPLEMENTATIONS  /////////////////////////
 template <class T>
 T l2norm2(const int N, const T *a, const T *b)
 {
   T l2 = 0;
 
-#ifndef BRAIDLAB_LOOP_ZEROINDEXED
-  for (size_t k = 1; k <= N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
-#else
-  for (size_t k = 0; k < N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
-#endif
+  for (size_t k = OFFSET; k < N/2+OFFSET; ++k) 
+    l2 += a[k]*a[k] + b[k]*b[k];
 
   return l2;
 }
@@ -75,12 +112,7 @@ T l2norm2(const int N, const T *a, const T *b)
 template <class T>
 T minlength(const int N, const T *a, const T *b) {
 
-  size_t offset;
-#ifndef BRAIDLAB_LOOP_ZEROINDEXED
-  offset = 0;
-#else
-  offset = 1;
-#endif
+  size_t OFFSET;
 
   // keeps the last term of running sum of b-coordinates
   T sumB;
@@ -95,21 +127,28 @@ T minlength(const int N, const T *a, const T *b) {
 
   // INITIALIZATION (corresponds to k = 1 in 1-based index)
   sumB = static_cast<T>( 0 );
-  maxTerm = std::abs( a[1 - offset] ) 
-    + std::max<T>( b[1-offset], 0  ) + sumB;
-  scaledSum = (n-2) * b[1-offset];
+  maxTerm = std::abs( a[1 - OFFSET] ) 
+    + std::max<T>( b[1-OFFSET], 0  ) + sumB;
+  scaledSum = (n-2) * b[1-OFFSET];
 
   // MAIN LOOP
-  for ( size_t k = 2-offset; k <= n-2-offset; ++k ) {
-    sumB += b[k-1-offset];
+  for ( size_t k = 2-OFFSET; k <= n-2-OFFSET; ++k ) {
+    sumB += b[k-1-OFFSET];
     maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k - offset] ) 
-                           + std::max<T>( b[k - offset], 0  ) 
+                           std::abs( a[k - OFFSET] ) 
+                           + std::max<T>( b[k - OFFSET], 0  ) 
                            + sumB );
-    scaledSum += (n-1-(k-offset)) * b[k-offset];
+    scaledSum += (n-1-(k-OFFSET)) * b[k-OFFSET];
   }
 
   return 2*(n-1)*maxTerm - 2*scaledSum;
+}
+
+template <class T>
+void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
+
+  return;
+
 }
 
 
