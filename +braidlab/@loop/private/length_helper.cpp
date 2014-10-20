@@ -1,21 +1,37 @@
 //
 // Matlab MEX file
 //
-// MINLENGTH Compute topological length of the loop.
+// LENGTH_HELPER Compute different loop lengths.
 //
-// As input it takes NCOORDINATES x NLOOPS matrix of Dynnikov coordinates.
-// For each column, it computes minlength by formula derived by summing 
-// intersection numbers (see [1]).
-//
+// First input is NCOORDINATES x NLOOPS matrix of Dynnikov coordinates.
 // WARNING: This convention is currently chosen to accommodate both
 // the way loops are stored and processed elsewhere, and an efficient
 // implementation of minlength in loop_helper.hpp. Please transpose
 // the coordinate matrix externally if needed.
 //
+// Second input LFLAG selects the type of length computed.
+// 
+// LFLAG == 1
+// Compute the number of intersections of a loop with horizontal axis. 
+// [2,3]
+//
+// LFLAG == 2
+// For each column, it computes minlength by formula derived by summing 
+// intersection numbers (see [1]).
+//
+// References:
 // [1] Hall, Toby, and S. Öykü Yurttaş. “On the Topological Entropy of
-// Families of Braids.” Topology and Its Applications 156, no. 8
-// (April 15, 2009): 1554–64. 
-// doi:10.1016/j.topol.2009.01.005.
+//     Families of Braids.” Topology and Its Applications 156, no. 8
+//     (April 15, 2009): 1554–64. 
+//     doi:10.1016/j.topol.2009.01.005.
+//
+// [2] Dynnikov, Ivan, and Bert Wiest. “On the Complexity of Braids.” 
+//     Journal of the European Mathematical Society, 2007, 801–40.
+//     doi:10.4171/JEMS/98.
+//
+// [3] Thiffeault, Jean-Luc. “Braids of Entangled Particle Trajectories.” 
+//     Chaos (20), no. 1 (2010) 017516–017514. 
+//     doi:10.1063/1.3262494.
 
 // <LICENSE
 //   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
@@ -50,10 +66,18 @@
 // loop length
 template<class T>
 void retrieveLength( const mxArray* input, mxArray *output, 
-                     mwSize nLoops, mwSize nCoordinates);
+                     mwSize nLoops, mwSize nCoordinates, 
+                     unsigned int lFlag);
 
-// INPUT: single row vector of Dynnikov coordinates (a,b) (double, int32, or int64)
-// OUTPUT: sum of nu/ \mu{beta} intersection numbers
+// INPUT: 
+// (1) matrix N x L where columns are Dynnikov coordinate vectors (a,b)
+// (2) flag that selects the type of distance
+//     == 1 : number of axis intersections (default)
+//     == 2 : sum of nu/ \mu{beta} intersection numbers
+//
+// OUTPUT:
+//     L x 1 column of lengths of loops
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // // read off global debug level
@@ -62,10 +86,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   //   BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   // }
 
-  if (nrhs != 1) 
-    mexErrMsgIdAndTxt("BRAIDLAB:loop:minlength_helper:badinput",
-                      "Single argument (coordinate vector) is required.");
+  if (nrhs != 2) 
+    mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:badinput",
+                      "Two arguments required: "
+                      "coordinate matrix and "
+                      "flag that selects the distance");
 
+  // retrieve the flag
+  unsigned int lengthFlag = static_cast<unsigned int>( mxGetScalar(prhs[1]) );
+
+  if ( lengthFlag == 1 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:notimplemented",
+                      "Intersection with horizontal axis not implemented.");
+  }
+  
   // assumes each COLUMN is a loop
   mwSize nCoordinates = mxGetM(prhs[0]);
   mwSize nLoops = mxGetN(prhs[0]); 
@@ -82,26 +116,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   switch( mxGetClassID( prhs[0] ) ) {
 
   case mxDOUBLE_CLASS:
-    retrieveLength<double>( prhs[0], outval, nLoops, nCoordinates );
+    retrieveLength<double>( prhs[0], outval, 
+                            nLoops, nCoordinates, lengthFlag );
     break;
 
   case mxINT32_CLASS:
-    retrieveLength<int32_T>( prhs[0], outval, nLoops, nCoordinates );
+    retrieveLength<int32_T>( prhs[0], outval, 
+                             nLoops, nCoordinates, lengthFlag );
     break;
 
   case mxINT64_CLASS:
-    retrieveLength<int64_T>( prhs[0], outval, nLoops, nCoordinates );
+    retrieveLength<int64_T>( prhs[0], outval, 
+                             nLoops, nCoordinates, lengthFlag );
     break;
 
   default:
-    mexErrMsgIdAndTxt( "BRAIDLAB:loop:minlength_helper:unsupportedtype",
+    mexErrMsgIdAndTxt( "BRAIDLAB:loop:length_helper:unsupportedtype",
                        "Input has to be double, int32 or int64 type");
   }
 }
 
 template<class T>
 void retrieveLength( const mxArray* input, mxArray *output, 
-                     mwSize nLoops, mwSize nCoordinates) {
+                     mwSize nLoops, mwSize nCoordinates, 
+                     unsigned int lFlag) {
 
   // get pointer to output
   T * data = (T *) mxGetData(output);
@@ -113,7 +151,14 @@ void retrieveLength( const mxArray* input, mxArray *output,
   for ( mwSize l = 0; l < nLoops; ++l ) {
   
     // use loop_helper/length to compute
-    *data = length<T>(nCoordinates, a, b);
+    switch (lFlag) {
+    case 2:
+      *data = minlength<T>(nCoordinates, a, b);
+      break;
+    default:
+      mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:unsupportedflag",
+                        "Distance flag invalid.");
+    }
 
     // move to the next column
     data++;

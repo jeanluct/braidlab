@@ -55,7 +55,7 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 (#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
-T length(const int N, const T *a, const T *b);
+T minlength(const int N, const T *a, const T *b);
 
 ////////////////// IMPLEMENTATIONS  /////////////////////////
 template <class T>
@@ -73,7 +73,7 @@ T l2norm2(const int N, const T *a, const T *b)
 }
 
 template <class T>
-T length(const int N, const T *a, const T *b) {
+T minlength(const int N, const T *a, const T *b) {
 
   size_t offset;
 #ifndef BRAIDLAB_LOOP_ZEROINDEXED

@@ -13,7 +13,7 @@ loops = braidlab.loop(C);
 
 global BRAIDLAB_loop_minlength_nomex
 
-% mex calculatio
+% mex calculation
 tic
 BRAIDLAB_loop_minlength_nomex = 0;
 l_cpp = loops.minlength.';

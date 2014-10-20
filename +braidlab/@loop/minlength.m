@@ -42,11 +42,13 @@ if ~usematlab
     if numel(obj) > 1
       l = nan( size(obj) );
       for k = 1:numel(l)
-        l(k) = minlength_helper(obj(k).coords);
+        % flag = 2 -- minlength
+        l(k) = length_helper(obj(k).coords, 2);
       end
     else
       % transpose coordinates for minlength_helper
-      l = minlength_helper( obj.coords.' );
+      % flag = 2 -- minlength
+      l = length_helper( obj.coords.', 2 );
     end
     usematlab = false;
   catch me
