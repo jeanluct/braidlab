@@ -2,8 +2,7 @@
 #define LOOP_HELPER_HPP
 
 // Helper function for loop manipulations, to be used in MEX files.
-// define BRAIDLAB_LOOP_ZEROINDEXED to enforce 0-indexed arrays.
-// Otherwise, arrays are assumed to be 1-indexed.
+// ALL ALGORITHMS ARE 1-INDEX BASED: a[1] is the first element of the array
 
 // <LICENSE
 //   Copyright (c) 2014 Jean-Luc Thiffeault, Marko Budisic
@@ -24,12 +23,20 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+#include "mex.h"
 #include <cmath>
 #include <cstdlib>
 #include <vector>
 #include <utility>
 #include <algorithm> // std::max
 #include <iostream>
+
+// // a[OFFSET] is always the first element in array
+// #ifndef BRAIDLAB_LOOP_ZEROINDEXED
+// #define OFFSET (0)
+// #else
+// #define OFFSET (1)
+// #endif
 
 ////////////////// DECLARATIONS  /////////////////////////
 
@@ -43,8 +50,9 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 template <class T>
 T l2norm2(const int N, const T *a, const T *b);
 
-/* 
-Compute loop length of a loop represented by Dynnikov coordinate vectors.
+/*
+Compute minimal topological length of a loop represented by Dynnikov
+coordinate vectors.
 
 Length is a sum of intersection numbers nu. Here, we don't explicitly
 construct nu, rather, the computation of length was compounded into a
@@ -55,32 +63,58 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 (#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
-T length(const int N, const T *a, const T *b);
+T minlength(const int N, const T *a, const T *b);
+
+/*
+Compute number of intersections with real axis for a loop represented
+by Dynnikov coordinate vectors.
+
+Length is computed by formula (5) in Thiffeault, Chaos, 2010.
+
+T - numerical type that has to allow additions and multiplications.
+N - sum of lengths of coordinate vectors a,b - one-indexed vectors
+(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
+*/
+template <class T>
+T intaxis(const int N, const T *a, const T *b);
+
+/*
+Convert a Dynnikov coordinate pair (a,b) into
+intersection number pair (mu, nu).
+
+See Lemma 1 in:
+Hall, Toby, and S. Öykü Yurttaş. “On the Topological Entropy of
+Families of Braids.” Topology and Its Applications 156, no. 8
+(April 15, 2009): 1554–64.
+doi:10.1016/j.topol.2009.01.005.
+
+T - numerical type that has to allow additions and multiplications.
+n - number of punctures
+*a, *b - Dynnikov vectors
+*mu, *nu - Preallocated intersection vectors
+         - mu has 2n - 4 elements
+         - nu has n-1 elements
+*/
+template <class T>
+void intersec(const int n, const T *a, const T *b, T* mu, T* nu);
 
 ////////////////// IMPLEMENTATIONS  /////////////////////////
+
+// algorithm as written is 1-indexed
 template <class T>
 T l2norm2(const int N, const T *a, const T *b)
 {
   T l2 = 0;
 
-#ifndef BRAIDLAB_LOOP_ZEROINDEXED
-  for (size_t k = 1; k <= N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
-#else
-  for (size_t k = 0; k < N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
-#endif
+  for (size_t k = 1; k <= N/2; ++k)
+    l2 += a[k]*a[k] + b[k]*b[k];
 
   return l2;
 }
 
+// algorithm as written is 1-indexed
 template <class T>
-T length(const int N, const T *a, const T *b) {
-
-  size_t offset;
-#ifndef BRAIDLAB_LOOP_ZEROINDEXED
-  offset = 0;
-#else
-  offset = 1;
-#endif
+T minlength(const int N, const T *a, const T *b) {
 
   // keeps the last term of running sum of b-coordinates
   T sumB;
@@ -88,29 +122,76 @@ T length(const int N, const T *a, const T *b) {
   // updates the max term
   T maxTerm;
 
-  // computes the sum-of-sum term 
+  // computes the sum-of-sum term
   T scaledSum;
 
   size_t n = N/2 + 2; // number of punctures
 
-  // INITIALIZATION (corresponds to k = 1 in 1-based index)
+  // INITIALIZATION
   sumB = static_cast<T>( 0 );
-  maxTerm = std::abs( a[1 - offset] ) 
-    + std::max<T>( b[1-offset], 0  ) + sumB;
-  scaledSum = (n-2) * b[1-offset];
+  maxTerm = std::abs( a[1] )
+    + std::max<T>( b[1], 0  ) + sumB;
+  scaledSum = (n-2) * b[1];
 
   // MAIN LOOP
-  for ( size_t k = 2-offset; k <= n-2-offset; ++k ) {
-    sumB += b[k-1-offset];
-    maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k - offset] ) 
-                           + std::max<T>( b[k - offset], 0  ) 
+  for ( size_t k = 2; k <= n-2; ++k ) {
+    sumB += b[k-1];
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
                            + sumB );
-    scaledSum += (n-1-(k-offset)) * b[k-offset];
+    scaledSum += (n-1-(k)) * b[k];
   }
 
   return 2*(n-1)*maxTerm - 2*scaledSum;
 }
 
+// algorithm as written is 1-indexed
+template <class T>
+void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
+  // n - number of punctures
+  // nu - 1 x (n-1)
+  // mu - 1 x (2n - 4)
+  // a  - 1 x (n-2)
+  // b  - 1 x (n-2)
+
+  // nu doubles as a cumulative storage of b so we don't have to
+  // allocate another array
+  T* sumB = nu;
+
+  // First pass - cumulative sum and max
+  sumB[1] = 0;
+  T maxTerm = std::abs( a[1] ) + std::max<T>( b[1], 0  ) + sumB[1];
+
+  for ( size_t k = 2 ; k <= (n-2) ; k++ ){
+    sumB[k] = sumB[k-1] + b[k-1];
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
+                           + sumB[k] );
+  }
+  // last term is not used to compute maxTerm but we need it for later
+  sumB[n-1] = sumB[n-2] + b[n-2];
+
+  // Second pass
+  nu[1] = 2*(maxTerm - sumB[1]);
+  size_t i;
+  for ( size_t k = 1 ; k <= (n-2) ; k++ ){
+
+    // update next nu to be able to use the formula below
+    nu[k+1] = 2*(maxTerm - sumB[k+1]);
+
+    // two-element loop 2k-1 and 2k
+    for ( i = 2*k-1; i <= 2*k ; i++ ) {
+      mu[i] = std::pow(-1,i) * a[k] + (
+                                       ( b[k] >= 0 ) ?
+                                       nu[k]/2 :
+                                       nu[k+1]/2
+                                        );
+    }
+  }
+  return;
+
+}
 
 #endif
