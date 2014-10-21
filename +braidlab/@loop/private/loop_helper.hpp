@@ -99,6 +99,8 @@ template <class T>
 void intersec(const int n, const T *a, const T *b, T* mu, T* nu);
 
 ////////////////// IMPLEMENTATIONS  /////////////////////////
+
+// algorithm as written is 1-indexed
 template <class T>
 T l2norm2(const int N, const T *a, const T *b)
 {
@@ -110,6 +112,7 @@ T l2norm2(const int N, const T *a, const T *b)
   return l2;
 }
 
+// algorithm as written is 1-indexed
 template <class T>
 T minlength(const int N, const T *a, const T *b) {
 
@@ -123,16 +126,6 @@ T minlength(const int N, const T *a, const T *b) {
   T scaledSum;
 
   size_t n = N/2 + 2; // number of punctures
-
-  // printf("a:");
-  // for (size_t k = 1; k <= n-2; ++k )
-  //   printf(" %d ", static_cast<int>(a[k]));
-  // printf(" \n");
-
-  // printf("b:");
-  // for (size_t k = 1; k <= n-2; ++k )
-  //   printf(" %d ", static_cast<int>(b[k]));
-  // printf(" \n");
 
   // INITIALIZATION 
   sumB = static_cast<T>( 0 );
@@ -153,6 +146,7 @@ T minlength(const int N, const T *a, const T *b) {
   return 2*(n-1)*maxTerm - 2*scaledSum;
 }
 
+// algorithm as written is 1-indexed
 template <class T>
 void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
   // n - number of punctures
@@ -161,19 +155,43 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
   // a  - 1 x (n-2)
   // b  - 1 x (n-2)
 
-  // algorithm as written is 1-based
-  
-  // nu as cumulative storage of b
-  T* C = nu;
+  // nu doubles as a cumulative storage of b so we don't have to
+  // allocate another array
+  T* sumB = nu;
 
-  C[1] = 0;
-  for ( size_t k = 1 ; k < (n-1) ; k++ ){
-    C[k] = C[k-1] + b[k];
+  // First pass - cumulative sum and max
+  sumB[1] = 0;
+  T maxTerm = std::abs( a[1] ) + std::max<T>( b[1], 0  ) + sumB[1];
+
+  for ( size_t k = 2 ; k <= (n-2) ; k++ ){
+    sumB[k] = sumB[k-1] + b[k-1];
+    maxTerm = std::max<T>( maxTerm, 
+                           std::abs( a[k] ) 
+                           + std::max<T>( b[k], 0  ) 
+                           + sumB[k] );
   }
+  // last term is not used to compute maxTerm but we need it for later
+  sumB[n-1] = sumB[n-2] + b[n-2];
 
+  // Second pass
+  nu[1] = 2*(maxTerm - sumB[1]);
+  size_t i;
+  for ( size_t k = 1 ; k <= (n-2) ; k++ ){
+
+    // update next nu to be able to use the formula below
+    nu[k+1] = 2*(maxTerm - sumB[k+1]);
+
+    // two-element loop 2k-1 and 2k
+    for ( i = 2*k-1; i <= 2*k ; i++ ) {
+      mu[i] = std::pow(-1,i) * a[k] + ( 
+                                       ( b[k] >= 0 ) ? 
+                                       nu[k]/2 : 
+                                       nu[k+1]/2
+                                        );
+    }
+  }
   return;
 
 }
-
 
 #endif
