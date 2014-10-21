@@ -288,17 +288,17 @@ classdef loop < matlab.mixin.CustomDisplay
     
     %% Currently, concatenation is not allowed
     function varargout = horzcat(varargin)
-      error('BRAIDLAB:loop:horzcat:noarrays',...
+      error('BRAIDLAB:loop:noarrays',...
             'Loop arrays not allowed.')
     end
     
     function varargout = vertcat(varargin)
-      error('BRAIDLAB:loop:horzcat:noarrays',...
+      error('BRAIDLAB:loop:noarrays',...
             'Loop arrays not allowed.')      
     end
 
     function varargout = cat(varargin)
-      error('BRAIDLAB:loop:horzcat:noarrays',...
+      error('BRAIDLAB:loop:noarrays',...
             'Loop arrays not allowed.')            
     end
 
