@@ -27,7 +27,8 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env looplist_helper.$(MEXSUFFIX) minlength_helper.$(MEXSUFFIX)
+all: check-env looplist_helper.$(MEXSUFFIX) \
+	length_helper.$(MEXSUFFIX)  intersec_helper.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -43,7 +44,9 @@ endif
 
 looplist_helper.$(MEXSUFFIX): looplist_helper.c
 
-minlength_helper.$(MEXSUFFIX): minlength_helper.cpp loop_helper.hpp
+intersec_helper.$(MEXSUFFIX): intersec_helper.cpp
+
+length_helper.$(MEXSUFFIX): length_helper.cpp loop_helper.hpp
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
