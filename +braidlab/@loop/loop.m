@@ -351,6 +351,24 @@ classdef loop < matlab.mixin.CustomDisplay
       [~,Nc] = laplaceToComponents(Lp);
     end
 
+
+    %% Currently, concatenation is not allowed
+    function varargout = horzcat(varargin)
+      error('BRAIDLAB:loop:noarrays',...
+            'Loop arrays not allowed.')
+    end
+
+    function varargout = vertcat(varargin)
+      error('BRAIDLAB:loop:noarrays',...
+            'Loop arrays not allowed.')
+    end
+
+    function varargout = cat(varargin)
+      error('BRAIDLAB:loop:noarrays',...
+            'Loop arrays not allowed.')
+    end
+
+
   end % methods block
 
 
@@ -371,5 +389,9 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
   end % methods block
+
+  methods (Access = private)
+
+  end
 
 end % loop classdef

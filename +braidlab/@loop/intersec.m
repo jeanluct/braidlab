@@ -16,7 +16,7 @@ function [varargout] = intersec(obj)
 %   See also LOOP, LOOP.INTAXIS.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -34,14 +34,38 @@ function [varargout] = intersec(obj)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if ~isscalar(obj)
-  n = obj(1).totaln;
-  mu = zeros(length(obj),2*n-4);
-  nu = zeros(length(obj),n-1);
-  for k = 1:length(obj)
-    [mu(k,:),nu(k,:)] = intersec(obj(k));
-  end
+validateattributes(obj, {'braidlab.loop'},{'scalar'},'intersec');
+
+%% determine if mex should be attempted
+global BRAIDLAB_loop_nomex
+if ~exist('BRAIDLAB_loop_nomex') || ...
+      isempty(BRAIDLAB_loop_nomex) || ...
+      BRAIDLAB_loop_nomex == false
+  usematlab = false;
 else
+  usematlab = true;
+end
+
+if ~usematlab
+  try
+    % transpose coordinates for intersec_helper
+    intcoords = intersec_helper( obj.coords.' );
+    usematlab = false;
+
+    % form output vectors
+    mu = intcoords(1:2*obj.n-4, :).';
+    nu = intcoords(2*obj.n-3:end, :).';
+  catch me
+    warning(me.identifier, [ me.message ...
+                    ' Reverting to Matlab intersec'] );
+    usematlab = true;
+  end
+
+end
+
+% do not change this to "else" of the above as the above if-then
+% changes usematlab internally
+if usematlab
   n = obj.totaln;
   [a,b] = obj.ab;
 
