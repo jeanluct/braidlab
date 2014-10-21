@@ -2,8 +2,7 @@
 #define LOOP_HELPER_HPP
 
 // Helper function for loop manipulations, to be used in MEX files.
-// define BRAIDLAB_LOOP_ZEROINDEXED to enforce 0-indexed arrays.
-// Otherwise, arrays are assumed to be 1-indexed.
+// ALL ALGORITHMS ARE 1-INDEX BASED: a[1] is the first element of the array
 
 // <LICENSE
 //   Copyright (c) 2014 Jean-Luc Thiffeault, Marko Budisic
@@ -24,6 +23,7 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+#include "mex.h"
 #include <cmath>
 #include <cstdlib>
 #include <vector>
@@ -31,11 +31,12 @@
 #include <algorithm> // std::max
 #include <iostream>
 
-#ifndef BRAIDLAB_LOOP_ZEROINDEXED
-#define OFFSET (-1)
-#else
-#define OFFSET (0)
-#endif
+// // a[OFFSET] is always the first element in array
+// #ifndef BRAIDLAB_LOOP_ZEROINDEXED
+// #define OFFSET (0)
+// #else
+// #define OFFSET (1)
+// #endif
 
 ////////////////// DECLARATIONS  /////////////////////////
 
@@ -103,7 +104,7 @@ T l2norm2(const int N, const T *a, const T *b)
 {
   T l2 = 0;
 
-  for (size_t k = OFFSET; k < N/2+OFFSET; ++k) 
+  for (size_t k = 1; k <= N/2; ++k) 
     l2 += a[k]*a[k] + b[k]*b[k];
 
   return l2;
@@ -111,8 +112,6 @@ T l2norm2(const int N, const T *a, const T *b)
 
 template <class T>
 T minlength(const int N, const T *a, const T *b) {
-
-  size_t OFFSET;
 
   // keeps the last term of running sum of b-coordinates
   T sumB;
@@ -125,20 +124,30 @@ T minlength(const int N, const T *a, const T *b) {
 
   size_t n = N/2 + 2; // number of punctures
 
-  // INITIALIZATION (corresponds to k = 1 in 1-based index)
+  // printf("a:");
+  // for (size_t k = 1; k <= n-2; ++k )
+  //   printf(" %d ", static_cast<int>(a[k]));
+  // printf(" \n");
+
+  // printf("b:");
+  // for (size_t k = 1; k <= n-2; ++k )
+  //   printf(" %d ", static_cast<int>(b[k]));
+  // printf(" \n");
+
+  // INITIALIZATION 
   sumB = static_cast<T>( 0 );
-  maxTerm = std::abs( a[1 - OFFSET] ) 
-    + std::max<T>( b[1-OFFSET], 0  ) + sumB;
-  scaledSum = (n-2) * b[1-OFFSET];
+  maxTerm = std::abs( a[1] ) 
+    + std::max<T>( b[1], 0  ) + sumB;
+  scaledSum = (n-2) * b[1];
 
   // MAIN LOOP
-  for ( size_t k = 2-OFFSET; k <= n-2-OFFSET; ++k ) {
-    sumB += b[k-1-OFFSET];
+  for ( size_t k = 2; k <= n-2; ++k ) {
+    sumB += b[k-1];
     maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k - OFFSET] ) 
-                           + std::max<T>( b[k - OFFSET], 0  ) 
+                           std::abs( a[k] ) 
+                           + std::max<T>( b[k], 0  ) 
                            + sumB );
-    scaledSum += (n-1-(k-OFFSET)) * b[k-OFFSET];
+    scaledSum += (n-1-(k)) * b[k];
   }
 
   return 2*(n-1)*maxTerm - 2*scaledSum;
@@ -146,6 +155,21 @@ T minlength(const int N, const T *a, const T *b) {
 
 template <class T>
 void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
+  // n - number of punctures
+  // nu - 1 x (n-1)
+  // mu - 1 x (2n - 4)
+  // a  - 1 x (n-2)
+  // b  - 1 x (n-2)
+
+  // algorithm as written is 1-based
+  
+  // nu as cumulative storage of b
+  T* C = nu;
+
+  C[1] = 0;
+  for ( size_t k = 1 ; k < (n-1) ; k++ ){
+    C[k] = C[k-1] + b[k];
+  }
 
   return;
 

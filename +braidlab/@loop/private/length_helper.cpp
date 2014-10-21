@@ -52,13 +52,15 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+#include <iostream>
 #include "loop_helper.hpp"
 #include "mex.h"
  
+// a[OFFSET] is always the first element in array
 #ifndef BRAIDLAB_LOOP_ZEROINDEXED
-#define OFFSET (-1)
+#define OFFSET (1) // 1-based indexing
 #else
-#define OFFSET (0)
+#define OFFSET (0) // 0-based indexing
 #endif
 
 
@@ -94,6 +96,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // retrieve the flag
   unsigned int lengthFlag = static_cast<unsigned int>( mxGetScalar(prhs[1]) );
+
+  //printf("Lengthflag: %d\n", lengthFlag);
 
   if ( lengthFlag == 1 ) {
     mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:notimplemented",
@@ -132,7 +136,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   default:
     mexErrMsgIdAndTxt( "BRAIDLAB:loop:length_helper:unsupportedtype",
-                       "Input has to be double, int32 or int64 type");
+                       "Type of the coordinate matrix has to be "
+                       "double, int32 or int64.");
   }
 }
 
@@ -145,8 +150,10 @@ void retrieveLength( const mxArray* input, mxArray *output,
   T * data = (T *) mxGetData(output);
 
   // pointers to input
-  const T *a = static_cast<T *>(mxGetData( input )) + OFFSET;
-  const T *b = static_cast<T *>(mxGetData( input )) + nCoordinates/2 + OFFSET;
+  const T *a = static_cast<T *>(mxGetData( input )) 
+    - OFFSET;
+  const T *b = static_cast<T *>(mxGetData( input )) + (nCoordinates/2) 
+    - OFFSET;
 
   for ( mwSize l = 0; l < nLoops; ++l ) {
   
