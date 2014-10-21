@@ -98,11 +98,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   unsigned int lengthFlag = static_cast<unsigned int>( mxGetScalar(prhs[1]) );
 
   //printf("Lengthflag: %d\n", lengthFlag);
-
-  if ( lengthFlag == 1 ) {
-    mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:notimplemented",
-                      "Intersection with horizontal axis not implemented.");
-  }
   
   // assumes each COLUMN is a loop
   mwSize nCoordinates = mxGetM(prhs[0]);
@@ -159,12 +154,16 @@ void retrieveLength( const mxArray* input, mxArray *output,
   
     // use loop_helper/length to compute
     switch (lFlag) {
+    case 1:
+      *data = intaxis<T>(nCoordinates, a, b);
+      break;
     case 2:
       *data = minlength<T>(nCoordinates, a, b);
       break;
     default:
       mexErrMsgIdAndTxt("BRAIDLAB:loop:length_helper:unsupportedflag",
-                        "Distance flag invalid.");
+                        "Only flags 1 (intaxis) and "
+                        "2 (minlength) implemented.");
     }
 
     // move to the next column
