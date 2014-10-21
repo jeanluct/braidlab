@@ -26,11 +26,13 @@ function l = minlength(obj)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+validateattributes(obj, {'braidlab.loop'},{'scalar'},'intersec');
+
 %% determine if mex should be attempted
-global BRAIDLAB_loop_minlength_nomex
-if ~exist('BRAIDLAB_loop_minlength_nomex') || ...
-      isempty(BRAIDLAB_loop_minlength_nomex) || ...
-      BRAIDLAB_loop_minlength_nomex == false
+global BRAIDLAB_loop_nomex
+if ~exist('BRAIDLAB_loop_nomex') || ...
+      isempty(BRAIDLAB_loop_nomex) || ...
+      BRAIDLAB_loop_nomex == false
   usematlab = false;
 else
   usematlab = true;
@@ -39,17 +41,7 @@ end
 %% use MEX computation
 if ~usematlab
   try
-    if numel(obj) > 1
-      l = nan( size(obj) );
-      for k = 1:numel(l)
-        % flag = 2 -- minlength
-        l(k) = length_helper(obj(k).coords, 2);
-      end
-    else
-      % transpose coordinates for minlength_helper
-      % flag = 2 -- minlength
-      l = length_helper( obj.coords.', 2 );
-    end
+    l = length_helper(obj.coords.', 2);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
