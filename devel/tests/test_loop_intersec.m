@@ -2,11 +2,6 @@ n = 200; % number of strands
 nLoops = 200000; % number of loops
 maxN = 30;
 
-n = 20; % number of strands
-nLoops = 20; % number of loops
-maxN = 6;
-
-
 fprintf(['Computing %d loops of %d punctures with coordinate numbers ' ...
          'between +-%d\n'], nLoops, n, round(maxN/2));
 
@@ -21,18 +16,18 @@ global BRAIDLAB_loop_nomex
 % mex calculation
 tic
 BRAIDLAB_loop_nomex = 0;
-l_cpp = loops.minlength.';
+intersec_cpp = loops.intersec;
 mextime = toc;
 fprintf('MEX computation completed in %f sec\n', mextime);
 % matlab calculation
 tic
 BRAIDLAB_loop_nomex = 1;
-l_mat = loops.minlength.';
+intersec_mat = loops.intersec;
 mattime = toc;
 fprintf('MATLAB computation completed in %f sec\n', mattime);
 
 % assert they are the same
 
-assert( all(l_cpp == l_mat) )
+assert( all(intersec_cpp(:) == intersec_mat(:)) )
 fprintf(['Results of Matlab and MEX computation of loop lengths ' ...
          'match. \nSpeedup factor: %f\n'], mattime/mextime);
