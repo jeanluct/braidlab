@@ -162,6 +162,11 @@ braidlab.util.debugmsg( params, 1);
 if ~usematlab
   try
     % Only works on double precision numbers.
+    %
+    % Limited argument checking with
+    % BRAIDLAB:entropy_helper:badlengthflag and
+    % BRAIDLAB:entropy_helper:badarg
+    % errors.
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
                                        tol,looplength);
