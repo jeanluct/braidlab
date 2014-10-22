@@ -31,13 +31,6 @@
 #include <algorithm> // std::max
 #include <iostream>
 
-// // a[OFFSET] is always the first element in array
-// #ifndef BRAIDLAB_LOOP_ZEROINDEXED
-// #define OFFSET (0)
-// #else
-// #define OFFSET (1)
-// #endif
-
 ////////////////// DECLARATIONS  /////////////////////////
 
 /*
