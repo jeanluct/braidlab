@@ -231,6 +231,7 @@ classdef braid < matlab.mixin.CustomDisplay
     end % function braid
 
     function obj = set.n(obj,value)
+      if isempty(value), return; end
       if value < 1
         error('BRAIDLAB:braid:setn:badarg','Need at least one string.')
       end
