@@ -185,7 +185,7 @@ for I = 1:n
 
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0,1))
-      error('BRAIDLAB:braid:colorbraiding:coincidentproj', ...
+      error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
             'Somehow there are still coincident projection coordinates...')
     end
 
