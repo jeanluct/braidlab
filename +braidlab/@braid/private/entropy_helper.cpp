@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "mex.h"
 #include "update_rules.hpp"
+#include "../../@loop/private/loop_helper.hpp"
 
 // Helper function for entropy method
 
@@ -24,19 +25,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
-
-// expects a,b to be 1-indexed arrays
-// N is the sum of lengths of a and b
-template <class T>
-inline T l2norm(const int N, const T *a, const T *b)
-{
-  T l2 = 0;
-
-  for (mwIndex k = 1; k <= N/2; ++k) l2 += a[k]*a[k] + b[k]*b[k];
-
-  return sqrt(l2);
-}
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -83,13 +71,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (it = 1; it <= maxit; ++it)
     {
       // Normalize coordinates.
-      double l2 = l2norm(N,a,b);
+      double l2 = sqrt(l2norm2(N,a,b));
       for (mwIndex k = 1; k <= N/2; ++k) { a[k] /= l2; b[k] /= l2; }
 
       // Act with the braid sequence in ii onto the coordinates a,b.
       update_rules(Ngen, n, ii, a, b);
 
-      entr = log(l2norm(N,a,b));
+      entr = log(l2norm2(N,a,b))/2; // /2 comes from sqrt
 
       if (dbglvl >= 2)
         mexPrintf("  iteration %d  entr=%.10e  diff=%.4e\n",it,entr,entr-entr0);
