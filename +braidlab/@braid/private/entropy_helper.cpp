@@ -45,6 +45,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int nconvreq = (int)mxGetScalar(prhs[3]);
   const double tol = mxGetScalar(prhs[4]);
 
+  const unsigned int lengthFlag = 
+    static_cast<unsigned int>( mxGetScalar(prhs[5]) );
+
   const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
 
   const mwSize N = mxGetN(uA);
