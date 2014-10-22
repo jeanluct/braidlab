@@ -26,6 +26,10 @@ end
 
 import matlab.unittest.*
 
+% disable MEX algorithms
+global BRAIDLAB_loop_nomex; global BRAIDLAB_braid_nomex;
+BRAIDLAB_braid_nomex = true; BRAIDLAB_loop_nomex = true;
+
 tcfolder = [pwd '/testcases/'];
 
 suite = TestSuite.fromFolder(tcfolder);

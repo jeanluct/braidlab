@@ -19,7 +19,7 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   ** Implementation: ** By default, the function invokes a C++
 %   implementation of the algorithm from file colorbraiding_helper.cpp. To
 %   use a slower, MATLAB implementation, set a global MATLAB variable
-%   BRAIDLAB_colorbraiding_nomex to true. A comparison between MATLAB and
+%   BRAIDLAB_braid_nomex to true. A comparison between MATLAB and
 %   C++ versions of the algorithm can be run by executing
 %   braidlab/devel/test_colorbraid.m
 %
@@ -56,10 +56,10 @@ function [varargout] = colorbraiding(XY,t,proj)
 import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_colorbraiding_nomex
-useMatlabVersion = (exist('BRAIDLAB_colorbraiding_nomex','var') && ...
-                    ~isempty(BRAIDLAB_colorbraiding_nomex) && ...
-                    all(BRAIDLAB_colorbraiding_nomex));
+global BRAIDLAB_braid_nomex
+useMatlabVersion = (exist('BRAIDLAB_braid_nomex','var') && ...
+                    ~isempty(BRAIDLAB_braid_nomex) && ...
+                    all(BRAIDLAB_braid_nomex));
 
 if any(isnan(XY) | isinf(XY))
   error('BRAIDLAB:braid:colorbraiding:badarg',...
@@ -185,7 +185,7 @@ for I = 1:n
 
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0,1))
-      error('BRAIDLAB:braid:colorbraiding:coincidentproj', ...
+      error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
             'Somehow there are still coincident projection coordinates...')
     end
 

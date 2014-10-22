@@ -3,6 +3,9 @@ function l = intaxis(obj)
 %   I = INTAXIS(L) computes the minimum number of intersections of a
 %   loop L with the real axis.
 %
+%   Intaxis is computed by formula (5) in Thiffeault, Chaos, 2010.
+%
+%
 %   This is a method for the LOOP class.
 %   See also LOOP, LOOP.MINLENGTH, LOOP.INTERSEC.
 
@@ -25,12 +28,32 @@ function l = intaxis(obj)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if ~isscalar(obj)
-  l = zeros(length(obj),1);
-  for k = 1:length(obj)
-    l(k) = intaxis(obj(k));
-  end
+validateattributes(obj, {'braidlab.loop'},{'scalar'},'intersec');
+
+%% determine if mex should be attempted
+global BRAIDLAB_loop_nomex
+if ~exist('BRAIDLAB_loop_nomex') || ...
+      isempty(BRAIDLAB_loop_nomex) || ...
+      BRAIDLAB_loop_nomex == false
+  usematlab = false;
 else
+  usematlab = true;
+end
+
+%% use MEX computation
+if ~usematlab
+  try
+    l = length_helper(obj.coords.', 1);
+    usematlab = false;
+  catch me
+    warning(me.identifier, [ me.message ...
+                    ' Reverting to Matlab intaxis'] );
+    usematlab = true;
+  end
+end
+
+%% use Matlab code if MEX is off or if MEX code fails
+if usematlab == true
   [a,b] = obj.ab;
 
   % The number of intersections before/after the first and last punctures.
