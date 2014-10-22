@@ -238,6 +238,19 @@ classdef loop < matlab.mixin.CustomDisplay
       a = obj.a;
       b = obj.b;
     end
+    
+    function value = l2norm(obj)
+    %L2NORM 2-norm of Dynnikov coordinate vector (A,B).  
+    %   [L2NORM] = L2NORM(L) returns the norm of vector (A,B) of
+    %   Dynnikov coordinates.
+    %          
+    %   In case L contains a set of loops, L2NORM is a column vector.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+      
+      value = sqrt( sum( obj.coords.^2, 2 ) );
+    end
 
     function value = n(obj)
     %N   Number of punctures.
