@@ -142,7 +142,7 @@ end
 %% ITERATIVE ALGORITHM
 
 % Use a fundamental group generating set as the initial multiloop.
-u = braidlab.loop(b.n,@double);
+u = braidlab.loop(b.n,@double,'bp');
 
 %% determine if mex should be attempted
 global BRAIDLAB_braid_nomex

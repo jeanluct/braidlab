@@ -23,11 +23,12 @@ function l = loopcoords(b,conv,typ)
 %
 %   ans =
 %
-%   (( 1 -6  1 -7  4 -1 ))
+%   (( 1 -6  1 -7  4 -1 ))*1
 %
 %   This is the same as Dehornoy's (1,-7,-6,4,1,-1,0,8), since the last two
 %   numbers can be dropped, and his notation is (a1,b1,a2,b2,a3,b3) compared
-%   to our (a1,a2,a3,b1,b2,b3).
+%   to our (a1,a2,a3,b1,b2,b3).  The '*1' at the end indicates that puncture
+%   1 is used as a basepoint (see LOOP.LOOP).
 %
 %   L = LOOPCOORDS(B,CONV,'TYPE') or LOOPCOORDS(B,CONV,@TYPE) creates a loop
 %   with coordinates of type TYPE.  The default is TYPE=int64.  Other useful
@@ -86,27 +87,27 @@ switch lower(conv)
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the left.
   n1 = b.n-1;
-  l = braidlab.loop([zeros(1,n1) ones(1,n1)]);
+  l = braidlab.loop([zeros(1,n1) ones(1,n1)],'bp',1);
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
   if strcmpi(conv,'dehornoy'), w = -w; end % Dehornoy uses anticlockwise conv.
  case 'right'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the right.
-  l = braidlab.loop(b.n);
+  l = braidlab.loop(b.n,'bp');
   % No need to convert sigmas.
   w = b.word;
 end
 
 try
-  l = braidlab.loop(loopsigma(w,htyp(l.coords)));
+  l = braidlab.loop(loopsigma(w,htyp(l.coords)),'bp',l.basepoint);
 catch err
   if notypespec  % Only try VPI if type wasn't explicitly specified.
     if strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
       warning('BRAIDLAB:braid:loopcoords:overflow',...
               'loopcoords overflowed... using VPI.')
       braidlab.util.checkvpi
-      l = braidlab.loop(loopsigma(w,vpi(l.coords)));
+      l = braidlab.loop(loopsigma(w,vpi(l.coords)),'bp',l.basepoint);
     end
   else
     rethrow(err)

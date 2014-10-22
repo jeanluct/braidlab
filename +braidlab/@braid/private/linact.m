@@ -5,7 +5,7 @@ function [varargout] = linact(b,l,N)
 %   piecewise-linear action B*L is equal to the matrix-vector multiplication
 %   M*L.coords' for this particular loop L.
 %
-%   M = LINACT(B) uses L = LOOP(B.n).
+%   M = LINACT(B) uses L = LOOP(B.n,'basepoint').
 %
 %   [M,L2] = LINACT(B,L) also returns the loop L2 = B*L.
 %
@@ -37,7 +37,7 @@ function [varargout] = linact(b,l,N)
 
 maxpn = 5;
 
-if nargin < 2, l = braidlab.loop(b.n); end
+if nargin < 2, l = braidlab.loop(b.n,'bp'); end
 
 if isa(l,'braidlab.loop')
   if isscalar(l)
