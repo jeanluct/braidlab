@@ -219,7 +219,7 @@ public:
     case 1:
       return "BRAIDLAB:braid:colorbraiding:interpolationerror";
     case 2:
-      return "BRAIDLAB:braid:colorbraiding:coincidentproj";
+      return "BRAIDLAB:braid:colorbraiding:coincidentprojection";
     case 3:
       return "BRAIDLAB:braid:colorbraiding:coincidentparticles";
     default:
