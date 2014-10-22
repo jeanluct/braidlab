@@ -39,12 +39,12 @@ all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy
 
 check-env:
 ifndef MEX
-	# Variables not defined properly if run from local folder.
+# Variables not defined properly if run from local folder.
 	$(error Run make from braidlab root folder)
 endif
 
 %.$(MEXSUFFIX): %.cpp
-	# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
+# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
 	cd $(CBRAID_LIBDIR); \
 		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
@@ -58,8 +58,14 @@ tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
 	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp
-	# $< is the first dependency (the .cpp file).
+# $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
+
+entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
+	update_rules.hpp ../../@loop/private/loop_helper.hpp
+# $< is the first dependency (the .cpp file).
+	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
+
 
 clean:
 	rm -f *.$(MEXSUFFIX) *.o
