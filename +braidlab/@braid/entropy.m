@@ -1,4 +1,4 @@
-function [varargout] = entropy(b,tol,maxit,nconvreq)
+function [varargout] = entropy(b,tol,maxit,nconvreq,looplength)
 %ENTROPY   Topological entropy of a braid.
 %   ENTR = ENTROPY(B) returns the topological entropy of the braid B.  More
 %   precisely, ENTR is the maximum growth rate of a loop under iteration of
@@ -31,6 +31,12 @@ function [varargout] = entropy(b,tol,maxit,nconvreq)
 %   that the tolerance TOL be achieved NCONV consecutive times (default 3).
 %   For low-entropy braids, achieving TOL a few times does not guarantee TOL
 %   digits, so increasing NCONV is required for extreme accuracy.
+%
+%   ENTR = ENTROPY(B,TOL,MAXIT,NCONV,LOOPLENGTH) specifies how loop
+%   length is computed in entropy
+%   0 - L2 norm of Dynnikov coordinates (default),
+%   1 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
+%   2 - minlength - minimal topological length 
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -115,21 +121,47 @@ end
 % for low-entropy braids.
 if nargin < 4, nconvreq = 3; end
 
+% choice of length - default is 0 (l2 norm)
+if nargin < 5, looplength = 0; end
+validateattributes(looplength, {'numeric'}, ...
+                   {'integer', '>=',0,'<=',2} );
+
+
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n,@double);
 
-if exist('entropy_helper','file') == 3
-  % If MEX file is available, use that.
-  % Only works on double precision numbers.
-  [entr,i,u.coords] = entropy_helper(b.word,u.coords,maxit,nconvreq,tol);
+%% determine if mex should be attempted
+global BRAIDLAB_braid_nomex
+if ~exist('BRAIDLAB_braid_nomex') || ...
+      isempty(BRAIDLAB_braid_nomex) || ...
+      BRAIDLAB_braid_nomex == false
+  usematlab = false;
 else
+  usematlab = true;
+end
+
+if ~usematlab
+  try
+    % Only works on double precision numbers.
+    [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
+                                       maxit,nconvreq,...
+                                       tol,looplength);
+    usematlab = false;
+  catch me
+    warning(me.identifier, [ me.message ...
+                        ' Reverting to Matlab entropy'] );
+    usematlab = true;
+  end
+end
+
+if usematlab 
   nconv = 0; entr0 = -1;
   for i = 1:maxit
-    u.coords = u.coords/norm(u.coords);  % normalize to avoid overflow
+    u.coords = u.coords/u.l2norm;  % normalize to avoid overflow
     u = b*u;
-    entr = log(norm(u.coords));
+    entr = log(u.l2norm);
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
-		     i,entr,entr-entr0),2)
+                     i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;
@@ -162,6 +194,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  u.coords = u.coords/norm(u.coords);
+  u.coords = u.coords/u.l2norm;
   varargout{2} = u;
 end
