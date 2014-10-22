@@ -16,7 +16,7 @@ end
 
 % Good: pre-allocation directly on the coordinates.
 tic
-l2 = loop(zeros(N,2*n-2));
+l2 = loop(zeros(N,2*n-4));
 for i = 1:N
   l2(i) = loop(n);
 end
@@ -30,18 +30,10 @@ for i = 1:N
 end
 toc
 
-% Good: pre-allocation using default loop.  No boundary puncture.
-tic
-l4 = loop(n,N,'nobasepoint');
-for i = 1:N
-  l4(i) = loop(n,'nobasepoint');
-end
-toc
-
 % Good: pre-allocation with by creating the last element.
 tic
-l5(N) = loop(n);
+l4(N) = loop(n);
 for i = 1:N
-  l5(i) = loop(n);
+  l4(i) = loop(n);
 end
 toc

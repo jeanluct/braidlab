@@ -16,7 +16,7 @@ function [varargout] = intersec(obj)
 %   See also LOOP, LOOP.INTAXIS.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
 %   This file is part of Braidlab.
 %
@@ -51,10 +51,10 @@ if ~usematlab
     % transpose coordinates for intersec_helper
     intcoords = intersec_helper( obj.coords.' );
     usematlab = false;
-    
+
     % form output vectors
     mu = intcoords(1:2*obj.n-4, :).';
-    nu = intcoords(2*obj.n-3:end, :).';  
+    nu = intcoords(2*obj.n-3:end, :).';
   catch me
     warning(me.identifier, [ me.message ...
                     ' Reverting to Matlab intersec'] );
@@ -66,7 +66,7 @@ end
 % do not change this to "else" of the above as the above if-then
 % changes usematlab internally
 if usematlab
-  n = obj.n;
+  n = obj.totaln;
   [a,b] = obj.ab;
 
   % The number of intersections before/after the first and last punctures.

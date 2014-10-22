@@ -35,6 +35,6 @@ function c = complexity(b)
 % LICENSE>
 
 % Canonical set of loops, with extra boundary puncture (n+1).
-E = braidlab.loop(b.n);
+E = braidlab.loop(b.n,'bp');
 % Subtract b.n-1 to remove extra crossings due to boundary (n+1) puncture.
 c = log2(intaxis(b*E)-b.n+1) - log2(intaxis(E)-b.n+1);

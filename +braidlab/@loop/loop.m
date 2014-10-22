@@ -56,6 +56,7 @@
 classdef loop < matlab.mixin.CustomDisplay
   properties
     coords = [0 -1]; % Dynnikov coordinates
+    basepoint = 0;   % Puncture that serves as a basepoint (0=none)
   end
   properties (Dependent = true)
     a                % 'a' Dynnikov coord vector
@@ -90,9 +91,15 @@ classdef loop < matlab.mixin.CustomDisplay
     %   with M identical loops.  This can be used to pre-allocate memory for
     %   a large number of loops.
     %
-    %   L = LOOP(N,'nobasepoint') or LOOP(N,M,'nobasepoint') is the same as
-    %   LOOP(N,M), but an additional basepoint puncture is not added so the
-    %   resulting loops have N punctures.
+    %   L = LOOP(N,'basepoint') or LOOP(N,M,'basepoint') adds a basepoint
+    %   puncture so the resulting loop has N+1 punctures.  The loop L is a
+    %   (nonoriented) generating set for the fundamental group of the sphere
+    %   with N punctures, with the extra puncture serving as the basepoint.
+    %   This sort of object is convenient when looking for growth of loops
+    %   under braid action, or for testing for braid equality.
+    %
+    %   L = LOOP(...,'basepoint',B) specifies the basepoint to be puncture
+    %   B, with 0 <= B <= N.  B=0 means no basepoint.
     %
     %   L = LOOP('enum',VMIN,VMAX) returns a loop object containing all
     %   loops with indices bounded from below by the vector VMIN, and from
@@ -113,16 +120,31 @@ classdef loop < matlab.mixin.CustomDisplay
     %   See also LOOP, BRAID, BRAID.LOOPCOORDS, BRAID.EQ.
 
       % Parse options.
-      nobase = false;
+      nobase = true;
+      defbp = 0;
       doenum = false;
       htyp = @(x) x;  % By default, htyp does nothing.
       iarg = [];
       for i = 1:length(varargin)
         if ischar(varargin{i})
           if any(strcmpi(varargin{i}, ...
-                         {'nobasepoint','nobase','noboundary','nobound'}))
+                         {'nobp','nobasepoint','nobase'}))
             nobase = true;
             iarg = [iarg i]; %#ok<*AGROW>
+          elseif any(strcmpi(varargin{i}, ...
+                         {'bp','basepoint','base','boundary','bound'}))
+            nobase = false;
+            iarg = [iarg i];
+            % Is the next argument numeric?
+            if i+1 <= nargin
+              if isnumeric(varargin{i+1}) && isscalar(varargin{i+1})
+                defbp = varargin{i+1};
+                iarg = [iarg i+1];
+                if defbp == 0
+                  nobase = true;
+                end
+              end
+            end
           elseif any(strcmpi(varargin{i},{'enum','enumerate'}))
             doenum = true;
             iarg = [iarg i];
@@ -156,6 +178,17 @@ classdef loop < matlab.mixin.CustomDisplay
       % Default loop around first two of three punctures.
       if length(varargin) == 0 %#ok<ISMT>
         l.coords = htyp(l.coords);
+        if ~nobase
+          if ~defbp
+            l.basepoint = 3;
+          else
+            if defbp > 3 || defbp < 1
+              error('BRAIDLAB:loop:loop:badbp', ...
+                    'Bad basepoint value.')
+            end
+            l.basepoint = defbp;
+          end
+        end
         return
       end
 
@@ -168,7 +201,20 @@ classdef loop < matlab.mixin.CustomDisplay
           error('BRAIDLAB:loop:loop:toofewpunc', ...
                 'Need at least two punctures.');
         end
-        if nobase, n1 = c-2; else n1 = c-1; end
+        if nobase
+          n1 = c-2;
+        else
+          n1 = c-1;
+          if ~defbp
+            defbp = c+1;
+          else
+            if defbp > c-1 || defbp < 1
+              error('BRAIDLAB:loop:loop:badbp', ...
+                    'Bad basepoint value.')
+            end
+          end
+          l.basepoint = defbp;
+        end
         m = 1;
         if length(varargin) > 1
           if ~isscalar(varargin{2})
@@ -182,11 +228,9 @@ classdef loop < matlab.mixin.CustomDisplay
         return
       end
 
-      % nobase is ignored from here on.  Later might get set as an
-      % internal property.
-
       if isa(c,'braidlab.loop')
         l.coords = htyp(c.coords);
+        l.basepoint = c.basepoint;
         return
       end
 
@@ -205,6 +249,17 @@ classdef loop < matlab.mixin.CustomDisplay
                 'Loop coordinate array must have even number of columns.')
         end
         l.coords = htyp(c);
+        if ~nobase
+          if ~defbp
+            defbp = l.totaln;
+          else
+            if defbp > l.totaln || defbp < 1
+              error('BRAIDLAB:loop:loop:badbp', ...
+                    'Bad basepoint value.')
+            end
+          end
+          l.basepoint = defbp;
+        end
       else
         error('BRAIDLAB:loop:loop:badarg','Too many arguments.')
       end
@@ -267,6 +322,17 @@ classdef loop < matlab.mixin.CustomDisplay
 
       % Length of coords is 2n-4, where n is the number of punctures.
       value = size(obj(1).coords,2)/2 + 2;
+      if obj.basepoint, value = value - 1; end
+    end
+
+    function value = totaln(obj)
+    %TOTALN   Total number of punctures, including base point if any.
+    %
+    %   This is a method for the LOOP class.
+    %   See also LOOP.
+
+      % Length of coords is 2n-4, where n is the number of punctures.
+      value = size(obj(1).coords,2)/2 + 2;
     end
 
     function ee = eq(l1,l2)
@@ -274,7 +340,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID.EQ.
-      ee = [l1.n] == [l2.n];
+      ee = [l1.n] == [l2.n] && [l1.basepoint] == [l2.basepoint];
       if ee, ee = all([l1.coords] == [l2.coords],2); end
     end
 
@@ -297,49 +363,9 @@ classdef loop < matlab.mixin.CustomDisplay
       [~,Lp] = obj.getgraph;
       [~,Nc] = laplaceToComponents(Lp);
     end
-    
-    
-    function L = vertcat(varargin)
-    %VERTCAT Vertical concatenation.
-    %   [L1; L2] creates a loop object whose coordinates are formed
-    %   by as [L1.coords; L2.coords]. It is only allowed when all
-    %   loop objects have the same number of punctures, and 
-    %   when their internal datatypes match.
-    % 
-    %   This is a method for the LOOP class.
-    %   See also LOOP.
-      
-    % TODO: if basepoint is somehow treated as a distinguished
-    % puncture, then vertcat should test for this as well
-      
-      try
-        
-        % The line below does as follows:
-        % cellfun - extracts coords matrices into a cell array
-        % cell2mat - converts the cell array into a matrix of
-        % coordinates
-        % braidlab.loop - creates a new loop
-        L = braidlab.loop( cell2mat( ...
-            cellfun( @(x)x.coords, varargin(:), ...
-                     'uniformoutput',false ) ...
-            ) );
-        
-      catch me
-        switch me.identifier
-          case 'MATLAB:cell2mat:MixedDataTypes',
-            error('BRAIDLAB:loop:vertcat:mixeddatatypes',...
-                  ['Only loops of the matching data type'...
-                   ' can be stacked']);
-          case 'MATLAB:catenate:dimensionMismatch',
-            error('BRAIDLAB:loop:vertcat:mixedpuncturecount',...
-                  ['Only loops with matching number '...
-                   'of punctures can be stacked']);
-          otherwise
-            rethrow(me)
-        end
-      end
-    end
-    
+
+
+    %% Currently, concatenation is not allowed
     function varargout = horzcat(varargin)
       error('BRAIDLAB:loop:noarrays',...
             'Only vertical concatenation of loops is allowed.')      
@@ -371,9 +397,9 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
   end % methods block
-  
-  methods (Access = private) 
-    
+
+  methods (Access = private)
+
   end
 
 end % loop classdef

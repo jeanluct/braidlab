@@ -43,7 +43,7 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 template <class T>
 T l2norm2(const int N, const T *a, const T *b);
 
-/* 
+/*
 Compute minimal topological length of a loop represented by Dynnikov
 coordinate vectors.
 
@@ -58,7 +58,7 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 template <class T>
 T minlength(const int N, const T *a, const T *b);
 
-/* 
+/*
 Compute number of intersections with real axis for a loop represented
 by Dynnikov coordinate vectors.
 
@@ -71,19 +71,19 @@ N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 template <class T>
 T intaxis(const int N, const T *a, const T *b);
 
-/* 
-Convert a Dynnikov coordinate pair (a,b) into 
+/*
+Convert a Dynnikov coordinate pair (a,b) into
 intersection number pair (mu, nu).
 
 See Lemma 1 in:
 Hall, Toby, and S. Öykü Yurttaş. “On the Topological Entropy of
 Families of Braids.” Topology and Its Applications 156, no. 8
-(April 15, 2009): 1554–64. 
+(April 15, 2009): 1554–64.
 doi:10.1016/j.topol.2009.01.005.
 
 T - numerical type that has to allow additions and multiplications.
 n - number of punctures
-*a, *b - Dynnikov vectors 
+*a, *b - Dynnikov vectors
 *mu, *nu - Preallocated intersection vectors
          - mu has 2n - 4 elements
          - nu has n-1 elements
@@ -99,7 +99,7 @@ T l2norm2(const int N, const T *a, const T *b)
 {
   T l2 = 0;
 
-  for (size_t k = 1; k <= N/2; ++k) 
+  for (size_t k = 1; k <= N/2; ++k)
     l2 += a[k]*a[k] + b[k]*b[k];
 
   return l2;
@@ -115,23 +115,23 @@ T minlength(const int N, const T *a, const T *b) {
   // updates the max term
   T maxTerm;
 
-  // computes the sum-of-sum term 
+  // computes the sum-of-sum term
   T scaledSum;
 
   size_t n = N/2 + 2; // number of punctures
 
-  // INITIALIZATION 
+  // INITIALIZATION
   sumB = static_cast<T>( 0 );
-  maxTerm = std::abs( a[1] ) 
+  maxTerm = std::abs( a[1] )
     + std::max<T>( b[1], 0  ) + sumB;
   scaledSum = (n-2) * b[1];
 
   // MAIN LOOP
   for ( size_t k = 2; k <= n-2; ++k ) {
     sumB += b[k-1];
-    maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k] ) 
-                           + std::max<T>( b[k], 0  ) 
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
                            + sumB );
     scaledSum += (n-1-(k)) * b[k];
   }
@@ -200,9 +200,9 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
 
   for ( size_t k = 2 ; k <= (n-2) ; k++ ){
     sumB[k] = sumB[k-1] + b[k-1];
-    maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k] ) 
-                           + std::max<T>( b[k], 0  ) 
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
                            + sumB[k] );
   }
   // last term is not used to compute maxTerm but we need it for later
@@ -218,9 +218,9 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
 
     // two-element loop 2k-1 and 2k
     for ( i = 2*k-1; i <= 2*k ; i++ ) {
-      mu[i] = std::pow(-1,i) * a[k] + ( 
-                                       ( b[k] >= 0 ) ? 
-                                       nu[k]/2 : 
+      mu[i] = std::pow(-1,i) * a[k] + (
+                                       ( b[k] >= 0 ) ?
+                                       nu[k]/2 :
                                        nu[k+1]/2
                                         );
     }

@@ -6,7 +6,7 @@ function l = minlength(obj)
 %
 %   This is a method for the LOOP class.
 %   See also LOOP, LOOP.INTAXIS, BRAID.COMPLEXITY.
-      
+
 % <LICENSE
 %   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
 %
@@ -37,7 +37,7 @@ if ~exist('BRAIDLAB_loop_nomex') || ...
 else
   usematlab = true;
 end
-      
+
 %% use MEX computation
 if ~usematlab
   try

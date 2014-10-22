@@ -134,12 +134,13 @@ if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
 if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 if isempty(options.Components); options.Components = false; end
 
+options.PunctureBasepointColor = 'g';
 
 %% Get the coordinates of the loop, convert to crossing numbers.
 
 % Convert to double, since some scaling is done.
 
-n = L.n;
+n = L.totaln;
 
 % Get the b coordinates.
 b_coord = double(L.b);
@@ -266,11 +267,16 @@ if prad > 0
   puncture_boundary_y_bottom = -sqrt(prad^2 - puncture_boundary_x(end:-1:1).^2);
 
   for p = 1:n
+    if p == L.basepoint
+      pc = options.PunctureBasepointColor;
+    else
+      pc = options.PunctureColor;
+    end
     patch(puncture_position(p,1) + ...
           [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
           puncture_position(p,2) + ...
           [puncture_boundary_y_top puncture_boundary_y_bottom], ...
-          options.PunctureColor,'EdgeColor',options.PunctureEdgeColor)
+          pc,'EdgeColor',options.PunctureEdgeColor)
   end
 end
 
