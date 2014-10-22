@@ -293,17 +293,17 @@ classdef loop < matlab.mixin.CustomDisplay
       a = obj.a;
       b = obj.b;
     end
-    
+
     function value = l2norm(obj)
-    %L2NORM 2-norm of Dynnikov coordinate vector (A,B).  
-    %   [L2NORM] = L2NORM(L) returns the norm of vector (A,B) of
-    %   Dynnikov coordinates.
-    %          
-    %   In case L contains a set of loops, L2NORM is a column vector.
+    %L2NORM   2-norm of Dynnikov coordinate vector.
+    %   L2 = L2NORM(L) returns the norm of vector of
+    %   Dynnikov coordinates, L.coords.
+    %
+    %   If L contains a set of loops, L2 is a column vector.
     %
     %   This is a method for the LOOP class.
     %   See also LOOP.
-      
+
       value = sqrt( sum( obj.coords.^2, 2 ) );
     end
 
@@ -364,22 +364,21 @@ classdef loop < matlab.mixin.CustomDisplay
       [~,Nc] = laplaceToComponents(Lp);
     end
 
-
     function L = vertcat(varargin)
-    %VERTCAT Vertical concatenation.
-    %   [L1; L2] creates a loop object whose coordinates are formed
-    %   by as [L1.coords; L2.coords]. It is only allowed when all
-    %   loop objects have the same number of punctures, and 
-    %   when their internal datatypes match.
-    % 
+    %VERTCAT   Vertical concatenation of loops.
+    %   [L1; L2] creates a loop object whose coordinates are formed by
+    %   [L1.coords; L2.coords].  It is only allowed when all loop objects
+    %   have the same number of punctures, and when their coordinate
+    %   datatypes match.
+    %
     %   This is a method for the LOOP class.
     %   See also LOOP.
-      
+
     % TODO: if basepoint is somehow treated as a distinguished
     % puncture, then vertcat should test for this as well
-      
+
       try
-        
+
         % The line below does as follows:
         % cellfun - extracts coords matrices into a cell array
         % cell2mat - converts the cell array into a matrix of
@@ -389,7 +388,7 @@ classdef loop < matlab.mixin.CustomDisplay
             cellfun( @(x)x.coords, varargin(:), ...
                      'uniformoutput',false ) ...
             ) );
-        
+
       catch me
         switch me.identifier
           case 'MATLAB:cell2mat:MixedDataTypes',
@@ -406,16 +405,15 @@ classdef loop < matlab.mixin.CustomDisplay
       end
     end
 
-
-    %% Currently, concatenation is not allowed
+    % Currently, concatenation other than vertical is not allowed
     function varargout = horzcat(varargin)
       error('BRAIDLAB:loop:noarrays',...
-            'Only vertical concatenation of loops is allowed.')      
+            'Only vertical concatenation of loops is allowed.')
     end
-    
+
     function varargout = cat(varargin)
       error('BRAIDLAB:loop:noarrays',...
-            'Only vertical concatenation of loops is allowed.')            
+            'Only vertical concatenation of loops is allowed.')
     end
 
 
