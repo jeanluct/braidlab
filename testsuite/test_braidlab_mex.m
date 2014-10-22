@@ -28,6 +28,9 @@ import matlab.unittest.*
 
 tcfolder = [pwd '/testcases/'];
 
+clear global BRAIDLAB_loop_nomex
+clear global BRAIDLAB_braid_nomex
+
 suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
