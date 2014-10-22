@@ -1,4 +1,4 @@
-function [varargout] = entropy(b,tol,maxit,nconvreq,looplength)
+function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
 %ENTROPY   Topological entropy of a braid.
 %   ENTR = ENTROPY(B) returns the topological entropy of the braid B.  More
 %   precisely, ENTR is the maximum growth rate of a loop under iteration of
@@ -16,16 +16,10 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength)
 %   iterations MAXIT to try before giving up.  The default is computed based
 %   on TOL and the extreme case given by the small-dilatation psi braids.
 %
-%   ENTR = ENTROPY(B,[],MAXIT) or ENTROPY(B,0,MAXIT) uses a tolerance of
-%   zero, which means that exactly MAXIT iterations are performed and
-%   convergence is not checked for.  The final value of the entropy at
-%   the end of iteration is returned.
-%
-%   Note that the "length" of the loop is not computed using LOOP.MINLENGTH
-%   or LOOP.INTAXIS.  Rather, the L^2 norm of the Dynnikov coordinates is
-%   used.  This is more expedient and doesn't change the growth rate, but
-%   may lead to differences between BRAID.ENTROPY and the normalized output
-%   of BRAID.COMPLEXITY when a small number of iterations is used.
+%   ENTR = ENTROPY(B,0,MAXIT) uses a tolerance of zero, which means
+%   that exactly MAXIT iterations are performed and convergence is not
+%   checked for.  The final value of the entropy at the end of
+%   iteration is returned.
 %
 %   ENTR = ENTROPY(B,TOL,MAXIT,NCONV) or ENTROPY(B,TOL,[],NCONV) demands
 %   that the tolerance TOL be achieved NCONV consecutive times (default 3).
@@ -37,6 +31,13 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength)
 %   0 - L2 norm of Dynnikov coordinates (default),
 %   1 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
 %   2 - minlength - minimal topological length 
+%
+%   Note that the choice of lengths should affect the result only
+%   over a finite number of iterations. If computation with
+%   small TOL (e.g., 1e-6) and unspecified MAXINT, then the
+%   L2-length (LOOPLENGTH = 0) should be used as it is the
+%   fastest. But if only a small number of iterations is used, then
+%   one choice of loop length might be preferred over another.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -71,6 +72,7 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength)
 
 import braidlab.util.debugmsg
 
+%% PROCESS SECOND ARGUMENT - either tolerance or char
 if isempty(b.word) || b.n < 3
   varargout{1} = 0;
   if nargout > 1, varargout{2} = []; end
@@ -78,9 +80,10 @@ if isempty(b.word) || b.n < 3
 end
 
 toldef = 1e-6;
-if nargin < 2, tol = toldef; end
+if nargin < 2 || isempty(tol), tol = toldef; end
 
-if ischar(tol)
+%% TRAIN-TRACKS ALGORITHM
+if ~isempty(tol) && ischar(tol)
   if any(strcmpi(tol,{'trains','train','train-tracks','bh'}))
     if nargout > 1
       error('BRAIDLAB:braid:entropy:nargout',...
@@ -95,13 +98,15 @@ if ischar(tol)
       return
     end
   elseif any(strcmpi(tol,{'iterative','iter','dynn','dynnikov'}))
+    % default to train tracks algorithm
+    tol = toldef;
   else
     error('BRAIDLAB:braid:entropy:badarg','Unknown input option ''%s''.',tol)
   end
 end
 
-if isempty(tol), tol = 0; end
 
+%% PROCESS SECOND ARGUMENT - either tolerance or char
 if nargin < 3 || isempty(maxit)
   if tol == 0
     error('BRAIDLAB:braid:entropy:badarg', ...
@@ -113,19 +118,28 @@ if nargin < 3 || isempty(maxit)
   % spectral gap.  Roughly, each iteration yields spgap decimal digits.
   spgap = 19 * b.n^-3;
   maxit = ceil(-log10(tol) / spgap) + 30;
-  debugmsg(sprintf('maxit = %d',maxit))
 end
 
 % Number of convergence criteria required to be satisfied.
 % Consecutive convergence is more desirable, but becomes hard to achieve
 % for low-entropy braids.
-if nargin < 4, nconvreq = 3; end
+if nargin < 4 || isempty(nconvreq), nconvreq = 3; end
 
 % choice of length - default is 0 (l2 norm)
 if nargin < 5, looplength = 0; end
 validateattributes(looplength, {'numeric'}, ...
                    {'integer', '>=',0,'<=',2} );
 
+switch(looplength)
+  case 0,
+    lenfun = @l2norm;
+  case 1,
+    lenfun = @intaxis;
+  case 2,
+    lenfun = @minlength;  
+end
+
+%% ITERATIVE ALGORITHM
 
 % Use a fundamental group generating set as the initial multiloop.
 u = braidlab.loop(b.n,@double);
@@ -139,6 +153,11 @@ if ~exist('BRAIDLAB_braid_nomex') || ...
 else
   usematlab = true;
 end
+
+params = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t LOOPLENGTH ' ...
+                  '= %d'], tol,maxit,nconvreq,looplength);
+
+braidlab.util.debugmsg( params, 1);
 
 if ~usematlab
   try
@@ -155,11 +174,12 @@ if ~usematlab
 end
 
 if usematlab 
+    
   nconv = 0; entr0 = -1;
   for i = 1:maxit
-    u.coords = u.coords/u.l2norm;  % normalize to avoid overflow
+    u.coords = u.coords/lenfun(u);  % normalize to avoid overflow
     u = b*u;
-    entr = log(u.l2norm);
+    entr = log(lenfun(u));
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.
@@ -181,6 +201,7 @@ end
 
 if tol > 0 % If tolerance is 0, we never expected convergence.
   if i >= maxit
+    tol
     warning('BRAIDLAB:braid:entropy:noconv', ...
             ['Failed to converge to requested tolerance; braid is likely' ...
              ' finite-order or has low entropy.  Returning zero entropy.'])
@@ -194,6 +215,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  u.coords = u.coords/u.l2norm;
+  u.coords = u.coords/lenfun(u);
   varargout{2} = u;
 end

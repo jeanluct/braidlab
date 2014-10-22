@@ -100,7 +100,6 @@ classdef entropyTest < matlab.unittest.TestCase
       % Specify 0 tolerance: should not issue a warning about lack of
       % convergence.
       testCase.verifyWarningFree(@() entropy(testCase.b5,0,10));
-      testCase.verifyWarningFree(@() entropy(testCase.b5,[],10));
     end
 
     function test_entropy_iter_conv(testCase)
