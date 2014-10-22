@@ -94,7 +94,7 @@ classdef braidTest < matlab.unittest.TestCase
       % Now they only coincide in the default projection.
       XY(:,2,2) = 2;
       testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:colorbraiding:coincidentproj');
+                           'BRAIDLAB:braid:colorbraiding:coincidentprojection');
       % Changing the projection gets rid of the error.
       testCase.verifyTrue(braidlab.braid(XY,.1) == braidlab.braid([],2));
     end

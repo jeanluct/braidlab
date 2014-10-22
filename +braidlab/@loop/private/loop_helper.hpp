@@ -31,13 +31,6 @@
 #include <algorithm> // std::max
 #include <iostream>
 
-// // a[OFFSET] is always the first element in array
-// #ifndef BRAIDLAB_LOOP_ZEROINDEXED
-// #define OFFSET (0)
-// #else
-// #define OFFSET (1)
-// #endif
-
 ////////////////// DECLARATIONS  /////////////////////////
 
 /*
@@ -148,6 +141,48 @@ T minlength(const int N, const T *a, const T *b) {
 
 // algorithm as written is 1-indexed
 template <class T>
+T intaxis(const int N, const T *a, const T *b) {
+  // N - length(a) + length(b)
+  // n - number of punctures =  N/2 + 2 
+  // a  - 1 x (n-2) == 1 x (N/2)
+  // b  - 1 x (n-2) == 1 x (N/2)
+
+  size_t n = N/2 + 2; // number of punctures
+
+  // INITIALIZATION -- holders for running sums/maxes
+  T sumDelA = static_cast<T>( 0 );
+  T sumAbsB = static_cast<T>( 0 );
+  T sumB = static_cast<T>( 0 );
+  T maxTerm = std::abs( a[1] ) 
+    + std::max<T>( b[1], 0  ) + sumB;
+
+  // MAIN LOOP
+  for ( size_t k = 1; k <= n-2; ++k ) {
+
+    if ( k > 1 )
+      sumB += b[k-1];
+    
+    if (k <= n-3)
+      sumDelA += std::abs( a[k+1] - a[k] );
+
+    sumAbsB += std::abs( b[k] );
+
+    maxTerm = std::max<T>( maxTerm, 
+                           std::abs( a[k] ) 
+                           + std::max<T>( b[k], 0  ) 
+                           + sumB );
+  }
+  // last term in sumB is not used to maxTerm, but it is for total sum
+  sumB += b[n-2];
+
+  return std::abs( a[1] ) + std::abs( a[n-2] ) + 
+    sumAbsB + sumDelA + maxTerm + 
+    std::abs( maxTerm - sumB  );
+
+}
+
+// algorithm as written is 1-indexed
+template <class T>
 void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
   // n - number of punctures
   // nu - 1 x (n-1)
@@ -160,7 +195,7 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
   T* sumB = nu;
 
   // First pass - cumulative sum and max
-  sumB[1] = 0;
+  sumB[1] = static_cast<T>( 0 );
   T maxTerm = std::abs( a[1] ) + std::max<T>( b[1], 0  ) + sumB[1];
 
   for ( size_t k = 2 ; k <= (n-2) ; k++ ){
