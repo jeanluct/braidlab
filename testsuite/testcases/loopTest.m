@@ -1,5 +1,10 @@
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -138,8 +143,8 @@ classdef loopTest < matlab.unittest.TestCase
           braidlab.loop([1,2,3,4], @double) ; ...
           braidlab.loop([1,2,3,4], @int32) ], ...
           'BRAIDLAB:loop:vertcat:mixeddatatypes');
-      
-      % Column-vector of loops of different numbers of punctures 
+
+      % Column-vector of loops of different numbers of punctures
       % is not allowed
       testCase.verifyError( @()[...
           braidlab.loop([1,2,3,4,5,6], @double) ; ...
@@ -151,7 +156,7 @@ classdef loopTest < matlab.unittest.TestCase
           braidlab.loop(testCase.l2.coords(1,:)) , ...
           braidlab.loop(testCase.l2.coords(2,:))], ...
           'BRAIDLAB:loop:noarrays');
-      
+
       % Create enumerations of loops.
       enum = [1 1;1 2;2 1;2 2];
       lenum = braidlab.loop('enum',3,1,2);

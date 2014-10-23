@@ -13,7 +13,12 @@ function [varargout] = tntype(b)
 %   See also BRAID, BRAID.ENTROPY.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %

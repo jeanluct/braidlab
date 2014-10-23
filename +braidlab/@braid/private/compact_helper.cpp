@@ -5,7 +5,12 @@
 //
 
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
+//   Braidlab: a Matlab package for analyzing data using braids
+//
+//   http://bitbucket.org/jeanluc/braidlab/
+//
+//   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                             Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -205,13 +210,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 #endif
 
   if ( nrhs < 1 )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument", 
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument",
                       "Not enough arguments");
 
   const mxArray *wA = prhs[0];
 
   if ( !mxIsInt32(wA) && !mxIsEmpty(wA) )
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument", 
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:compact:badargument",
                       "Argument should be a non-empty vector of int32");
 
 #ifdef BRAIDLAB_COMPACT_DEBUG

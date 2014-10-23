@@ -22,8 +22,13 @@ function plot(varargin)
 %   See also LOOP.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse
-%                            Marko Budisic
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
+%                             Michael Allshouse <mallshouse@chaos.utexas.edu>
 %
 %   This file is part of Braidlab.
 %
