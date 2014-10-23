@@ -34,8 +34,13 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Michael Allshouse,
-%                            Marko Budisic
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
+%                             Michael Allshouse <mallshouse@chaos.utexas.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -166,7 +171,7 @@ for I = 1:n
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
 
     if ~isempty(nearcoinc)
-      msg = sprintf([ 'Particles %g and %g have coincident %%s ' ... 
+      msg = sprintf([ 'Particles %g and %g have coincident %%s ' ...
                       'at time index %g: ' ],I,J,nearcoinc(1));
       % Use relative precision to test equality (same as C++ code).
       if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))

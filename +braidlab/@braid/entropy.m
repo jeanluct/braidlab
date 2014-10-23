@@ -30,7 +30,7 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
 %   length is computed in entropy
 %   0 - L2 norm of Dynnikov coordinates (default),
 %   1 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
-%   2 - minlength - minimal topological length 
+%   2 - minlength - minimal topological length
 %
 %   Note that the choice of lengths should affect the result only
 %   over a finite number of iterations. If computation with
@@ -52,7 +52,12 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
 %   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -136,7 +141,7 @@ switch(looplength)
   case 1,
     lenfun = @intaxis;
   case 2,
-    lenfun = @minlength;  
+    lenfun = @minlength;
 end
 
 %% ITERATIVE ALGORITHM
@@ -178,8 +183,8 @@ if ~usematlab
   end
 end
 
-if usematlab 
-    
+if usematlab
+
   nconv = 0; entr0 = -1;
   for i = 1:maxit
     u.coords = u.coords/lenfun(u);  % normalize to avoid overflow

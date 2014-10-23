@@ -1,14 +1,14 @@
 # braidlab
 
-*braidlab* is a [Matlab][1] package for analyzing data using braids.  It was originally created and is maintained by [Jean-Luc Thiffeault][2].
+*braidlab* is a [Matlab][1] package for analyzing data using braids, written by [Jean-Luc Thiffeault][2] and [Marko Budisic][3].
 
 ### documentation and installation
 
-See the [*braidlab* user's guide][3].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.  The guide is also posted on [arXiv][4].
+See the [*braidlab* user's guide][4].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.  The guide is also posted on [arXiv][5].
 
 ### contributors
 
-[Michael Allshouse][5] and [Marko Budisic][6] contributed extensive testing, comments, and some of the code.
+[Michael Allshouse][6] contributed extensive testing, comments, and some of the code.
 
 *braidlab* uses Toby Hall's [Train][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; Jakob Progsch's [ThreadPool][12]; and John R. Gilbert's [function][13] for computing the Smith Normal Form of a matrix.
 
@@ -22,10 +22,10 @@ The development of *braidlab* was supported by the [US National Science Foundati
 
 [1]: http://www.mathworks.com/products/matlab/
 [2]: http://www.math.wisc.edu/~jeanluc/
-[3]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
-[4]: http://arxiv.org/abs/1410.0849
-[5]: http://chaos.utexas.edu/people/post-docs/michael-allshouse
-[6]: http://mbudisic.wordpress.com/
+[3]: http://mbudisic.wordpress.com/
+[4]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
+[5]: http://arxiv.org/abs/1410.0849
+[6]: http://chaos.utexas.edu/people/post-docs/michael-allshouse
 [7]: http://www.liv.ac.uk/~tobyhall/T_Hall.html
 [8]: http://code.google.com/p/cbraid
 [9]: http://personal.us.es/meneses/index2.swf

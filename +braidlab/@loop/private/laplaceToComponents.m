@@ -11,19 +11,19 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp )
 % boundaries. For different eigenvectors partitions will be different,
 % so we can take mutual intersections of such partitions to recover
 % all components.
-% 
+%
 % Numerically, this is done by treating + and - signs as binary
 % digits and the list of + and - corresponding to each vertex gives
 % a binary representation of the component to which the vertex belongs.
-% 
+%
 % *** Inputs: ***
 % Lp - graph Laplacian (square, real, symmetric, sparse matrix)
 %
 % *** Outputs: ***
 %
 % vertexComponent - each element corresponds to a vertex in the graph
-% and elements store component numbers 
-% 
+% and elements store component numbers
+%
 % Nc - number of components; dimension of the kernel of the laplacian
 % is the number of components
 %
@@ -32,7 +32,12 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp )
 %   See also LOOP.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -51,10 +56,10 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp )
 % LICENSE>
 
 opts.issym = true; opts.isreal=true;
-[vc,ev] = eigs(Lp,size(Lp,1)/2,'SA'); 
+[vc,ev] = eigs(Lp,size(Lp,1)/2,'SA');
 ev = diag(ev);
 
-% signs of eigenvectors on nodal domains form 
+% signs of eigenvectors on nodal domains form
 % binary coordinates for the components
 comp = double(vc(:,ev < 1e-12) > 0);
 

@@ -9,7 +9,12 @@
 // Helper function for entropy method
 
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+//   Braidlab: a Matlab package for analyzing data using braids
+//
+//   http://bitbucket.org/jeanluc/braidlab/
+//
+//   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                             Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -50,7 +55,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int nconvreq = (int)mxGetScalar(prhs[3]);
   const double tol = mxGetScalar(prhs[4]);
 
-  const char lengthFlag = 
+  const char lengthFlag =
     static_cast<char>( mxGetScalar(prhs[5]) );
 
   const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
@@ -88,7 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       entr = log(looplength(N,a,b,lengthFlag));
 
       if (dbglvl >= 2)
-        printf("  iteration %d  entr=%.10e  diff=%.4e\n", 
+        printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 
       if (fabs(entr - entr0) < tol)
@@ -140,7 +145,7 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag ) {
   case 0:
     retval = sqrt(l2norm2(N,a,b));
     break;
-    
+
   case 1:
     retval = intaxis<double>(N,a,b);
     break;
@@ -158,4 +163,3 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag ) {
   return retval;
 
 }
-

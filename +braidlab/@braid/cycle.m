@@ -32,7 +32,7 @@ function [varargout] = cycle(b,varargin)
 %   >> b = braid([1 2]); [M,period] = cycle(b); full(M), period
 %
 %   ans =
-%   
+%
 %        1     0     0     0
 %        0     1     0     0
 %        1    -1     0     0
@@ -46,17 +46,17 @@ function [varargout] = cycle(b,varargin)
 %   period-3 cycle:
 %
 %   >> MI = cycle(b,'iterates')
-%   
-%   MI = 
-%   
+%
+%   MI =
+%
 %       [4x4 double]    [4x4 double]    [4x4 double]
 %
 %   The product of the three matrices gives M:
 %
 %   >> full(MI{3}*MI{2}*MI{1})
-%   
+%
 %   ans =
-%   
+%
 %        1     0     0     0
 %        0     1     0     0
 %        1    -1     0     0
@@ -66,7 +66,12 @@ function [varargout] = cycle(b,varargin)
 %   See also BRAID, LOOP, BRAID.MTIMES.
 
 % <LICENSE
-%   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+%   Braidlab: a Matlab package for analyzing data using braids
+%
+%   http://bitbucket.org/jeanluc/braidlab/
+%
+%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                             Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
