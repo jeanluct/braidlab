@@ -137,14 +137,11 @@ validateattributes(looplength, {'numeric'}, ...
 
 switch(looplength)
   case 0,
-    disp('Using intaxis')    
     % (b.n - 1) accounts for the boundary in the fundamental loop
     lenfun = @(l)( l.intaxis - (b.n-1) );
   case 1,
-    disp('Using minlength')        
     lenfun = @minlength;
   case 2,
-    disp('Using l2')
     lenfun = @l2norm;
 end
 

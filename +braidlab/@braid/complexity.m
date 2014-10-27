@@ -69,12 +69,8 @@ switch lengthtype
     % Subtract b.n-1 to remove extra crossings due to boundary (n+1)
     % puncture: (n-1) arcs going to it never cross the horizontal so
     % they should be accounted for.
-    disp('intaxis')
-    b.n-1
     c = log(intaxis(bE)-b.n+1) - log(intaxis(E)-b.n+1);
   case 1
-    disp('minlength')
-    b*E
     c = log( minlength(bE) ) - log( minlength(E) );
   otherwise
     error('BRAIDLAB:braid:complexity:unknownlength', ...

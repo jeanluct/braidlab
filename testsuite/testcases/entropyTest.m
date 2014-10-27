@@ -143,18 +143,20 @@ classdef entropyTest < matlab.unittest.TestCase
     
     function test_entropy_complexity(testCase)
       % Test that complexity and one-iterate entropy are the same.
-        len = 10;
-        for n = 4:10
+        len = 4;
+        for n = 3:6
           b = braidlab.braid('random',n,len);
+          
+          diagnostic = sprintf('len = %d, n = %d, word = %s', ...
+                        len,n,mat2str(b.word) );
 
           % minlength computation
-          testCase.verifyEqual(b.complexity(1), b.entropy(0,1,0,1), ...
-                               'minlength entropy!=minlength complexity'); 
+          testCase.verifyEqual(b.entropy(0,1,0,1), b.complexity(1), ...
+                               'AbsTol',1e-12,  ['minlength: ' diagnostic]); 
           
           % intaxis computation
-          testCase.verifyEqual(b.complexity(0), b.entropy(0,1,0,0), ...
-                               'intaxis entropy!=intaxis complexity'); ...
-          
+          testCase.verifyEqual(b.entropy(0,1,0,0), b.complexity(0), ...
+                               'AbsTol',1e-12, ['intaxis: ' diagnostic]);
         end
     end
   end
