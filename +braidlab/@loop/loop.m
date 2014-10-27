@@ -133,7 +133,7 @@ classdef loop < matlab.mixin.CustomDisplay
       for i = 1:length(varargin)
         if ischar(varargin{i})
           if any(strcmpi(varargin{i}, ...
-                         {'nobp','nobasepoint','nobase'}))
+                         {'nobp','nobasepoint','nobase','noboundary'}))
             nobase = true;
             iarg = [iarg i]; %#ok<*AGROW>
           elseif any(strcmpi(varargin{i}, ...
@@ -379,11 +379,20 @@ classdef loop < matlab.mixin.CustomDisplay
     %   This is a method for the LOOP class.
     %   See also LOOP.
 
-    % TODO: if basepoint is somehow treated as a distinguished
-    % puncture, then vertcat should test for this as well
+      % check that all inputs are loops
+      assert( all(cellfun( @(x)isa(x,'braidlab.loop'), varargin )),...
+             'BRAIDLAB:loop:vertcat:nonloops',...
+             ['Only braidlab/loops can be stacked'] );
+
+      % all loops have to have the same basepoint      
+      basepoints = cellfun( @(x)x.basepoint, varargin );
+      assert( all(basepoints(:) == basepoints(1)),...
+             'BRAIDLAB:loop:vertcat:mixedbasepoints',...
+             ['Only loops with matching '...
+                   'basepoints can be stacked'] );
 
       try
-
+          
         % The line below does as follows:
         % cellfun - extracts coords matrices into a cell array
         % cell2mat - converts the cell array into a matrix of
@@ -392,7 +401,7 @@ classdef loop < matlab.mixin.CustomDisplay
         L = braidlab.loop( cell2mat( ...
             cellfun( @(x)x.coords, varargin(:), ...
                      'uniformoutput',false ) ...
-            ) );
+            ), 'basepoint', varargin{1}.basepoint );
 
       catch me
         switch me.identifier
