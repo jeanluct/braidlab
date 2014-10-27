@@ -313,7 +313,8 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     function value = n(obj)
-    %N   Number of punctures.
+    %N   Number of punctures of the braid that the loop corresponds to.
+    %    This value does not include the base point in the punctures.
     %
     %   This is a method for the LOOP class.
     %   See also LOOP.
