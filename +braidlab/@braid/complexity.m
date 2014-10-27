@@ -1,11 +1,23 @@
-function c = complexity(b)
+function [c,bE] = complexity(b, lengthtype)
 %COMPLEXITY   Dynnikov-Wiest geometric complexity of a braid.
 %   C = COMPLEXITY(B) returns the Dynnikov-Wiest complexity of a braid:
 %
-%     C(B) = log2|B.E| - log2|E|
+%     C(B) = log|B.E| - log|E|
 %
 %   where E is a canonical curve diagram, and |L| gives the number of
-%   intersections of the curve diagram L with the real axis.
+%   intersections of the curve diagram L with the real axis. 
+%
+%   C = COMPLEXITY(B, LENGTHTYPE) performs the same calculation,
+%   but modifies how |L| is computed:
+%   For LENGTHTYPE = 
+%   0 : using intaxis (default, as originally by Dynnikov and Wiest)
+%   1 : using minlength.
+%
+%   Note: Dynnikov and Wiest originally stated the complexity in
+%   base-2 logarithm.
+%
+%   [C,BE] = COMPLEXITY(...)
+%   Additionally returns loop b.E 
 %
 %   References:
 %
@@ -41,5 +53,34 @@ function c = complexity(b)
 
 % Canonical set of loops, with extra boundary puncture (n+1).
 E = braidlab.loop(b.n,'bp');
-% Subtract b.n-1 to remove extra crossings due to boundary (n+1) puncture.
-c = log2(intaxis(b*E)-b.n+1) - log2(intaxis(E)-b.n+1);
+
+if nargin < 2
+  lengthtype = 0;
+end
+
+validateattributes(lengthtype, {'numeric'}, ...
+                   {'integer', '>=',0, '<=',1}, ...
+                   'braid/complexity','lengthtype',2);
+
+bE = b*E;
+
+switch lengthtype
+  case 0
+    % Subtract b.n-1 to remove extra crossings due to boundary (n+1)
+    % puncture: (n-1) arcs going to it never cross the horizontal so
+    % they should be accounted for.
+    disp('intaxis')
+    b.n-1
+    c = log(intaxis(bE)-b.n+1) - log(intaxis(E)-b.n+1);
+  case 1
+    disp('minlength')
+    b*E
+    c = log( minlength(bE) ) - log( minlength(E) );
+  otherwise
+    error('BRAIDLAB:braid:complexity:unknownlength', ...
+          'Specified length computation is not supported');
+end
+
+end
+
+
