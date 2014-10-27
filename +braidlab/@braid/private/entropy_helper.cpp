@@ -7,7 +7,17 @@
 #include "../../@loop/private/loop_helper.hpp"
 
 // Helper function for entropy method
+// Arguments:
+// 0 - braid word
+// 1 - loop Dynnikov coordinate vector
+// 2 - maximum number of iterations
+// 3 - number of consecutive time tolerance should be achieved
+// 4 - tolerance
+// 5 - flag signaling loop length type (0 - intaxis, 1-minlength, 2-l2)
+// 6 - true if passed loop is a fundamental loop 
+//     (loop length is computed differently in this case)
 
+//
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
@@ -35,7 +45,8 @@
 // function that switches the type of length computation
 // throws BRAIDLAB:entropy_helper:badlengthflag if
 // passed length flag is unsupported
-double looplength( mwSize N, double *a, double *b, char lengthFlag );
+double looplength( mwSize N, double *a, double *b, 
+                   char lengthFlag, bool isfund );
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -57,6 +68,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   const char lengthFlag =
     static_cast<char>( mxGetScalar(prhs[5]) );
+
+  const bool isFundamental = ( mxGetScalar(prhs[6]) > 0 );
 
   const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
 
@@ -84,13 +97,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (it = 1; it <= maxit; ++it)
     {
       // Normalize coordinates.
-      double l2 = looplength(N,a,b,lengthFlag);
-      for (mwIndex k = 1; k <= N/2; ++k) { a[k] /= l2; b[k] /= l2; }
+      double looplen = looplength(N,a,b,lengthFlag, isFundamental);
+      for (mwIndex k = 1; k <= N/2; ++k) 
+        { 
+          a[k] /= looplen; 
+          b[k] /= looplen; 
+        }
 
       // Act with the braid sequence in ii onto the coordinates a,b.
       update_rules(Ngen, n, ii, a, b);
 
-      entr = log(looplength(N,a,b,lengthFlag));
+      entr = log(looplength(N,a,b,lengthFlag, isFundamental));
 
       if (dbglvl >= 2)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
@@ -136,22 +153,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   return;
 }
 
-double looplength( mwSize N, double *a, double *b, char lengthFlag ) {
+double looplength( mwSize N, double *a, double *b, 
+                   char lengthFlag, bool isfund ) {
 
+  // number of loop punctures
+  const int n = (int)(N/2 + 2);
   double retval = -1;
 
   switch( lengthFlag ) {
 
   case 0:
-    retval = sqrt(l2norm2(N,a,b));
+    // if the fundamental loop is passed, it has an extra puncture
+    // so number of braid punctures is nb = n-1
+    // to account for nb-1 arcs going around the boundary puncture
+    // but never crossing the horizontal line, we
+    // subtract nb-1 = n-2
+    retval = intaxis<double>(N,a,b) - ( isfund ? (n-2) : 0 );
     break;
 
   case 1:
-    retval = intaxis<double>(N,a,b);
+    retval = minlength<double>(N,a,b);
     break;
 
   case 2:
-    retval = minlength<double>(N,a,b);
+    retval = sqrt(l2norm2(N,a,b));
     break;
 
   default:

@@ -28,9 +28,9 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
 %
 %   ENTR = ENTROPY(B,TOL,MAXIT,NCONV,LOOPLENGTH) specifies how loop
 %   length is computed in entropy
-%   0 - L2 norm of Dynnikov coordinates (default),
-%   1 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
-%   2 - minlength - minimal topological length
+%   0 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
+%   1 - minlength - minimal topological length
+%   2 - L2 norm of Dynnikov coordinates (default)
 %
 %   Note that the choice of lengths should affect the result only
 %   over a finite number of iterations. If computation with
@@ -130,18 +130,22 @@ end
 % for low-entropy braids.
 if nargin < 4 || isempty(nconvreq), nconvreq = 3; end
 
-% choice of length - default is 0 (l2 norm)
-if nargin < 5, looplength = 0; end
+% choice of length - default is 2 (l2 norm)
+if nargin < 5, looplength = 2; end
 validateattributes(looplength, {'numeric'}, ...
                    {'integer', '>=',0,'<=',2} );
 
 switch(looplength)
   case 0,
-    lenfun = @l2norm;
+    disp('Using intaxis')    
+    % (b.n - 1) accounts for the boundary in the fundamental loop
+    lenfun = @(l)( l.intaxis - (b.n-1) );
   case 1,
-    lenfun = @intaxis;
-  case 2,
+    disp('Using minlength')        
     lenfun = @minlength;
+  case 2,
+    disp('Using l2')
+    lenfun = @l2norm;
 end
 
 %% ITERATIVE ALGORITHM
@@ -174,7 +178,7 @@ if ~usematlab
     % errors.
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
-                                       tol,looplength);
+                                       tol,looplength, true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
