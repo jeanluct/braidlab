@@ -138,6 +138,9 @@ validateattributes(looplength, {'numeric'}, ...
 switch(looplength)
   case 0,
     % (b.n - 1) accounts for the boundary in the fundamental loop
+    error('BRAIDLAB:braid:entropy:notimplemented', ['In projectivized ' ...
+                        'coordinates, b.n-1 has to be rescaled along ' ...
+                        'with braid coordinates.'] );
     lenfun = @(l)( l.intaxis - (b.n-1) );
   case 1,
     lenfun = @minlength;
