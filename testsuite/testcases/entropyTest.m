@@ -140,5 +140,22 @@ classdef entropyTest < matlab.unittest.TestCase
         testCase.verifyTrue(abs(etr - ee) < 1e-9);
       end
     end
+    
+    function test_entropy_complexity(testCase)
+      % Test that complexity and one-iterate entropy are the same.
+        len = 10;
+        for n = 4:10
+          b = braidlab.braid('random',n,len);
+
+          % minlength computation
+          testCase.verifyEqual(b.complexity(1), b.entropy(0,1,0,1), ...
+                               'minlength entropy!=minlength complexity'); 
+          
+          % intaxis computation
+          testCase.verifyEqual(b.complexity(0), b.entropy(0,1,0,0), ...
+                               'intaxis entropy!=intaxis complexity'); ...
+          
+        end
+    end
   end
 end
