@@ -33,12 +33,19 @@
 
 ////////////////// DECLARATIONS  /////////////////////////
 
+/* print loop 
+
+T - numerical type that has to allow additions and multiplications.
+N - sum of lengths of coordinate vectors a,b - one-indexed vectors
+*/
+template <class T>
+void printloop( const size_t N, T *a, T *b );
+
 /*
 Compute l2 norm of the Dynnikov coordinates stored in two coordinate vectors
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
-(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
 T l2norm2(const int N, const T *a, const T *b);
@@ -53,7 +60,6 @@ single loop.
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
-(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
 T minlength(const int N, const T *a, const T *b);
@@ -66,7 +72,6 @@ Length is computed by formula (5) in Thiffeault, Chaos, 2010.
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
-(#define BRAIDLAB_LOOP_ZEROINDEXED to switch to zero-based indexing)
 */
 template <class T>
 T intaxis(const int N, const T *a, const T *b);
@@ -175,9 +180,11 @@ T intaxis(const int N, const T *a, const T *b) {
   // last term in sumB is not used to maxTerm, but it is for total sum
   sumB += b[n-2];
 
-  return std::abs( a[1] ) + std::abs( a[n-2] ) + 
+  T retval = std::abs( a[1] ) + std::abs( a[n-2] ) + 
     sumAbsB + sumDelA + maxTerm + 
     std::abs( maxTerm - sumB  );
+
+  return retval;
 
 }
 
@@ -228,5 +235,19 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
   return;
 
 }
+
+template <class T>
+void printloop( const size_t N, T *a, T *b ) {
+  printf("a: ");
+  for (size_t k = 1; k <= N/2; k++)
+    printf("%.2f ", a[k]);
+  printf("\n");
+  printf("b: ");
+  for (size_t k = 1; k <= N/2; k++)
+    printf("%.2f ", b[k]);
+  printf("\n");
+
+}
+
 
 #endif
