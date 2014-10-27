@@ -57,8 +57,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetM(dbglvl_ptr) != 0)
       dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
 
-  const mxArray *iiA = prhs[0];
-  const int *ii = (int *)mxGetData(iiA); // iiA contains int32's.
+  const mxArray *braidwordA = prhs[0];
+  const int *braidword = (int *)mxGetData(braidwordA); // braidwordA contains int32's.
   const mxArray *uA = prhs[1];
   const double *u = mxGetPr(uA);
 
@@ -70,8 +70,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     static_cast<char>( mxGetScalar(prhs[5]) );
 
   const bool isFundamental = ( mxGetScalar(prhs[6]) > 0 );
-
-  const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
+  
+  const mwSize Ngen = std::max(mxGetM(braidwordA),mxGetN(braidwordA));
 
   const mwSize N = mxGetN(uA);
   if (mxGetM(uA) != 1)
@@ -85,13 +85,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                         "u argument should have even number of columns.");
     }
   // Refers to generators, so don't need to be mwIndex/mwSize.
+
+  // number of loop punctures (including boundary point)
   const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
   double *a = new double[N/2] - 1;
   double *b = new double[N/2] - 1;
 
-  for (mwIndex k = 1; k <= N/2; ++k) { a[k] = u[k-1]; b[k] = u[k-1+N/2]; }
+  for (mwIndex k = 1; k <= N/2; ++k) 
+    { 
+      a[k] = u[k-1]; 
+      b[k] = u[k-1+N/2]; 
+    }
 
   int it, nconv = 0; double entr, entr0 = -1;
   for (it = 1; it <= maxit; ++it)
@@ -104,10 +110,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           b[k] /= looplen; 
         }
 
-      // Act with the braid sequence in ii onto the coordinates a,b.
-      update_rules(Ngen, n, ii, a, b);
+      // Act with the braid sequence in braidword onto the coordinates a,b.
+      update_rules(Ngen, n, braidword, a, b);
 
-      entr = log(looplength(N,a,b,lengthFlag, isFundamental));
+      entr = std::log(looplength(N,a,b,lengthFlag, isFundamental));
 
       if (dbglvl >= 2)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
@@ -156,19 +162,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 double looplength( mwSize N, double *a, double *b, 
                    char lengthFlag, bool isfund ) {
 
-  // number of loop punctures
+  // number of loop punctures (including boundary)
   const int n = (int)(N/2 + 2);
+
+
+  // if the fundamental loop is passed, it has an extra puncture
+  // so number of braid punctures is nb = n-1
+  const int nb = n - ( isfund ? 1 : 0 );
+
   double retval = -1;
 
   switch( lengthFlag ) {
 
   case 0:
-    // if the fundamental loop is passed, it has an extra puncture
-    // so number of braid punctures is nb = n-1
     // to account for nb-1 arcs going around the boundary puncture
     // but never crossing the horizontal line, we
     // subtract nb-1 = n-2
-    retval = intaxis<double>(N,a,b) - ( isfund ? (n-2) : 0 );
+
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy:notimplemented", 
+                      "In projectivized coordinates, b.n-1 has "
+                      "to be rescaled along with "
+                      "braid coordinates.");
+
+    retval = intaxis<double>(N,a,b) - ( isfund ? (nb-1) : 0 );
     break;
 
   case 1:
@@ -185,6 +201,11 @@ double looplength( mwSize N, double *a, double *b,
     break;
   }
 
+  if (retval < 0) 
+    mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlength",
+                      "Loop length must never be negative.");
+
   return retval;
 
 }
+

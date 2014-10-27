@@ -62,3 +62,6 @@ if usematlab == true
   % sum intersection numbers along rows
   l = sum(nu,2);
 end
+
+assert( all( l >= 0 ), 'BRAIDLAB:loop:minlength:negativeresult', ...
+        'Loop minlength must never be negative');

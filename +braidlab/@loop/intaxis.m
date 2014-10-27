@@ -71,3 +71,7 @@ if usematlab == true
   l = sum(abs(b),2) + sum(abs(a(:,2:end)-a(:,1:end-1)),2) ...
       + abs(a(:,1)) + abs(a(:,end)) + abs(b0) + abs(bn1);
 end
+
+assert( all( l >= 0 ), 'BRAIDLAB:loop:intaxis:negativeresult', ...
+        'Loop intaxis must never be negative');
+
