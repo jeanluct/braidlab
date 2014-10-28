@@ -137,15 +137,17 @@ validateattributes(looplength, {'numeric'}, ...
 
 switch(looplength)
   case 0,
-    % (b.n - 1) accounts for the boundary in the fundamental loop
-    error('BRAIDLAB:braid:entropy:notimplemented', ['In projectivized ' ...
-                        'coordinates, b.n-1 has to be rescaled along ' ...
-                        'with braid coordinates.'] );
-    lenfun = @(l)( l.intaxis - (b.n-1) );
+    lenfun = @(l)l.intaxis;
+    usediscount = true;
   case 1,
     lenfun = @minlength;
+    usediscount = false;
   case 2,
     lenfun = @l2norm;
+    usediscount = false;
+  otherwise,
+    error('BRAIDLAB:braid:entropy:unknownlength', ['Supported loop ' ...
+                        'length flags are 0,1,2.'] )
 end
 
 %% ITERATIVE ALGORITHM
@@ -188,12 +190,35 @@ if ~usematlab
 end
 
 if usematlab
-
-  nconv = 0; entr0 = -1;
+  
+  nconv = 0; 
+  entr0 = -1; 
+  
+  % discount extra arcs if intaxis is used
+  switch(looplength)
+    case 0,
+      discount = b.n - 1;
+    otherwise,
+      discount = 0;
+  end
+  
+  currentLoopLength = lenfun(u) - discount;
   for i = 1:maxit
-    u.coords = u.coords/lenfun(u);  % normalize to avoid overflow
+    
+    % normalize discounting factor
+    discount = discount/currentLoopLength;
+    
+    % normalize braid coordinates to avoid overflow
+    u.coords = u.coords/currentLoopLength;  
+    
+    % apply braid to loop
     u = b*u;
-    entr = log(lenfun(u));
+    
+    % update loop length
+    currentLoopLength = lenfun(u) - discount;
+    
+    entr = log(currentLoopLength);
+    
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.
@@ -229,6 +254,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  u.coords = u.coords/lenfun(u);
+  u.coords = u.coords/currentLoopLength;
   varargout{2} = u;
 end
