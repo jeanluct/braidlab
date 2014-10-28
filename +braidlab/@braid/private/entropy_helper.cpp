@@ -179,10 +179,10 @@ double looplength( mwSize N, double *a, double *b,
     // but never crossing the horizontal line, we
     // subtract nb-1 = n-2
 
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy:notimplemented", 
-                      "In projectivized coordinates, b.n-1 has "
-                      "to be rescaled along with "
-                      "braid coordinates.");
+    mexWarnMsgIdAndTxt("BRAIDLAB:braid:entropy:notimplemented", 
+                       "In projectivized coordinates, b.n-1 has "
+                       "to be rescaled along with "
+                       "braid coordinates.");
 
     retval = intaxis<double>(N,a,b) - ( isfund ? (nb-1) : 0 );
     break;
