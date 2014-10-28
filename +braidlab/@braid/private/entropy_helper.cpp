@@ -45,8 +45,7 @@
 // function that switches the type of length computation
 // throws BRAIDLAB:entropy_helper:badlengthflag if
 // passed length flag is unsupported
-double looplength( mwSize N, double *a, double *b, 
-                   char lengthFlag, bool isfund );
+double looplength( mwSize N, double *a, double *b, char lengthFlag);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -99,21 +98,42 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       b[k] = u[k-1+N/2]; 
     }
 
-  int it, nconv = 0; double entr, entr0 = -1;
+  int it;
+  int nconv = 0; 
+  double entr;
+  double entr0 = -1;
+  double discount;
+
+  switch(lengthFlag) {
+  case 0:
+    // intaxis discount is # braid punctures - 1
+    // if a fundamental loop is passed, it has an extra puncture
+    // so to get # braid punctures, we have to first subtract 1
+    discount = n - ( isFundamental ? 1. : 0. ) - 1.;
+    break;
+  default:
+    discount = 0.;
+    break;
+  }
+
+  double currentLength = looplength(N,a,b,lengthFlag) - discount;
+
   for (it = 1; it <= maxit; ++it)
     {
-      // Normalize coordinates.
-      double looplen = looplength(N,a,b,lengthFlag, isFundamental);
+      // Normalize coordinates and the discount factor by the loop length
       for (mwIndex k = 1; k <= N/2; ++k) 
         { 
-          a[k] /= looplen; 
-          b[k] /= looplen; 
+          a[k] /= currentLength; 
+          b[k] /= currentLength; 
         }
+      discount /= currentLength;
 
       // Act with the braid sequence in braidword onto the coordinates a,b.
       update_rules(Ngen, n, braidword, a, b);
 
-      entr = std::log(looplength(N,a,b,lengthFlag, isFundamental));
+      currentLength = looplength(N,a,b,lengthFlag) - discount;
+
+      entr = std::log(currentLength);
 
       if (dbglvl >= 2)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
@@ -159,32 +179,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   return;
 }
 
-double looplength( mwSize N, double *a, double *b, 
-                   char lengthFlag, bool isfund ) {
-
-  // number of loop punctures (including boundary)
-  const int n = (int)(N/2 + 2);
-
-
-  // if the fundamental loop is passed, it has an extra puncture
-  // so number of braid punctures is nb = n-1
-  const int nb = n - ( isfund ? 1 : 0 );
+double looplength( mwSize N, double *a, double *b, char lengthFlag) {
 
   double retval = -1;
 
   switch( lengthFlag ) {
 
   case 0:
-    // to account for nb-1 arcs going around the boundary puncture
-    // but never crossing the horizontal line, we
-    // subtract nb-1 = n-2
-
-    mexWarnMsgIdAndTxt("BRAIDLAB:braid:entropy:notimplemented", 
-                       "In projectivized coordinates, b.n-1 has "
-                       "to be rescaled along with "
-                       "braid coordinates.");
-
-    retval = intaxis<double>(N,a,b) - ( isfund ? (nb-1) : 0 );
+    retval = intaxis<double>(N,a,b);
     break;
 
   case 1:
