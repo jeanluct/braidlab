@@ -144,7 +144,7 @@ classdef entropyTest < matlab.unittest.TestCase
     function test_entropy_complexity(testCase)
       % Test that complexity and one-iterate entropy are the same.
         len = 40;
-        for n = 3:10
+        for n = 3:20
           b = braidlab.braid('random',n,len);
           
           diagnostic = sprintf('len = %d, n = %d, word = %s', ...
