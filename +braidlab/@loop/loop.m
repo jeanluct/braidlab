@@ -313,11 +313,13 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     function value = n(obj)
-    %N   Number of punctures of the braid that the loop corresponds to.
-    %    This value does not include the base point in the punctures.
+    %N   Number of punctures of a loop, without the base point.
+    %   N(L) returns the number of punctures for a loop, not including the
+    %   base point, if any.  Use TOTALN if you want to include the
+    %   basepoint.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP.
+    %   See also LOOP, LOOP.TOTALN.
 
     % Note that this used to be a derived property.  However, now that
     % we support arrays of loops, there is an undesirable behavior:
@@ -335,7 +337,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %TOTALN   Total number of punctures, including base point if any.
     %
     %   This is a method for the LOOP class.
-    %   See also LOOP.
+    %   See also LOOP, LOOP.N.
 
       % Length of coords is 2n-4, where n is the number of punctures.
       value = size(obj(1).coords,2)/2 + 2;
