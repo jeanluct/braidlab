@@ -1,4 +1,4 @@
-function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
+function [varargout] = entropy(b,varargin)
 %ENTROPY   Topological entropy of a braid.
 %   ENTR = ENTROPY(B) returns the topological entropy of the braid B.  More
 %   precisely, ENTR is the maximum growth rate of a loop under iteration of
@@ -77,46 +77,70 @@ function [varargout] = entropy(b,tol,maxit,nconvreq,looplength,varargin)
 
 import braidlab.util.debugmsg
 
-%% PROCESS SECOND ARGUMENT - either tolerance or char
+%% Process inputs 
+import braidlab.util.validateflag
+
+parser = inputParser;
+
+parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
+parser.addParameter('tol', 1e-6, @isnumeric );
+parser.addParameter('maxit', nan, @isnumeric );
+parser.addParameter('nconv', nan, @isnumeric );
+parser.addParameter('type','l2',@ischar);
+parser.addParameter('finite',false,@islogical);
+
+parser.parse( b, varargin );
+
+params = parser.Results;
+
+b = params.b;
+
+%% 2-POINT and ZERO BRAIDS HAVE ENTROPY ZERO
 if isempty(b.word) || b.n < 3
   varargout{1} = 0;
   if nargout > 1, varargout{2} = []; end
   return
 end
 
-toldef = 1e-6;
-if nargin < 2 || isempty(tol), tol = toldef; end
+% determine type of algorithm
+algtype = validateflag(parser.type, 'intaxis','minlength','l2',...
+                       {'trains','train-tracks','bh'});
 
 %% TRAIN-TRACKS ALGORITHM
-if ~isempty(tol) && ischar(tol)
-  if any(strcmpi(tol,{'trains','train','train-tracks','bh'}))
-    if nargout > 1
-      error('BRAIDLAB:braid:entropy:nargout',...
-            'Too many output arguments for ''trains'' option.')
-    end
-    [TN,varargout{1}] = tntype_helper(b.word,b.n);
-    if strcmpi(TN,'reducible1')
-      warning('BRAIDLAB:braid:entropy:reducible',...
-              'Reducible braid... falling back on iterative method.')
-      tol = toldef;
-    else
-      return
-    end
-  elseif any(strcmpi(tol,{'iterative','iter','dynn','dynnikov'}))
-    % default to train tracks algorithm
+if strcmpi( algtype, 'trains')
+  if nargout > 1
+    error('BRAIDLAB:braid:entropy:nargout',...
+          'Too many output arguments for ''trains'' option.')
+  end
+  [TN,varargout{1}] = tntype_helper(b.word,b.n);
+  if strcmpi(TN,'reducible1')
+    warning('BRAIDLAB:braid:entropy:reducible',...
+            'Reducible braid... falling back on iterative method.')
     tol = toldef;
   else
-    error('BRAIDLAB:braid:entropy:badarg','Unknown input option ''%s''.',tol)
+    return
   end
 end
 
+%% ITERATIVE ALGORITHM
+
+% finite computation 
+if params.finite 
+  params.tol = 0;
+end
+
+if ( params.tol == 0 ) && ( isnan(maxit) || maxit <= 0 )
+  error('BRAIDLAB:braid:entropy:badarg', ...
+        'Must specify either tolerance>0 or maximum iterations.')
+end
+
+%% STOPPED HERE %%
+maxit = params.maxit;
+nconv = params.nconv;
+
 
 %% PROCESS SECOND ARGUMENT - either tolerance or char
-if nargin < 3 || isempty(maxit)
-  if tol == 0
-    error('BRAIDLAB:braid:entropy:badarg', ...
-          'Must specify tolerance>0 or maximum iterations.')
-  end
+if isnan(maxit)
   % Use the spectral gap of the lowest-entropy braid to compute the
   % maximum number of iterations.
   % The maximum number of iterations is chosen based on the tolerance and
