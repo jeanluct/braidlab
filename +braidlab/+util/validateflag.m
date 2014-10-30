@@ -4,10 +4,15 @@ function outname = validateflag( requestedname, varargin )
 % V = VALIDATEFLAG( REQUESTEDNAME, FLAGNAME1, FLAGNAME1, ... )
 %   compares string REQUESTEDNAME to valid flag names. Each FLAGNAMEn
 %   argument is a either a string, or a cell array { FLAGNAME,
-%   ALTNAME1, ALTNAME2, ... }. If REQUESTEDNAME matches FLAGNAME or
+%   ALTNAME1, ALTNAME2, ... }. If REQUESTEDNAME matches a FLAGNAME or
 %   any of the ALTNAME1, ALTNAME2, etc. then the output OUTNAME =
-%   FLAGNAME. If no FLAGNAMEn is matched by REQUESTEDNAME, exception
+%   FLAGNAME. 
+% 
+%   If no FLAGNAMEn is matched by REQUESTEDNAME, exception
 %   BRAIDLAB:validateflag:invalid is generated.
+%
+%   Partial matching is enabled, i.e., "tr" will match "train" and
+%   "train-track". The output will be the first FLAGNAME matched.
 %
 %   This function is used when parsing arguments such that multiple
 %   strings can have the same result.
