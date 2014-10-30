@@ -99,8 +99,6 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 if useMatlabVersion
   %% MATLAB version of the algorithm
-  warning('BRAIDLAB:braid:colorbraiding:matlab', ...
-          'Invoking MATLAB version of colorbraiding.')
   [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
 else
   %% C++ version of the algorithm
