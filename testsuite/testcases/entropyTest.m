@@ -57,54 +57,60 @@ classdef entropyTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_entropy_trains(testCase)
-      e = entropy(testCase.b1,'trains');
+      e = entropy(testCase.b1,'type','trains');
       testCase.verifyTrue(abs(e - testCase.e1ex) < 1e-15);
 
-      e = entropy(testCase.b2,'trains');
+      e = entropy(testCase.b2,'type','trains');
       testCase.verifyTrue(abs(e - testCase.e2ex) < 1e-15);
 
       % A much more difficult case: can only get 9 digits.
-      e = entropy(testCase.b3,'trains');
+      e = entropy(testCase.b3,'type','trains');
       testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
 
-      testCase.verifyWarning(@() entropy(testCase.b4,'trains'), ...
+      testCase.verifyWarning(@() entropy(testCase.b4,'type','trains'), ...
                              'BRAIDLAB:braid:entropy:reducible');
 
       testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
-                           'BRAIDLAB:braid:entropy:badarg');
+                           'MATLAB:InputParser:ParamMissingValue');
     end
 
     function test_entropy_iter(testCase)
       for tol = [1e-6 1e-10 1e-12 1e-14]
-        e = entropy(testCase.b1,tol);
+        e = entropy(testCase.b1,'Tol',tol);
         testCase.verifyTrue(abs(e - testCase.e1ex) < tol);
 
-        e = entropy(testCase.b2,tol);
+        e = entropy(testCase.b2,'Tol',tol);
         testCase.verifyTrue(abs(e - testCase.e2ex) < tol);
 
-        e = entropy(testCase.b4,tol);
+        e = entropy(testCase.b4,'Tol',tol);
         testCase.verifyTrue(abs(e - testCase.e4ex) < tol);
       end
 
       tol = 1e-6;
-      testCase.verifyWarning(@() entropy(testCase.b5,tol), ...
+      testCase.verifyWarning(@() entropy(testCase.b5,'Tol',tol), ...
                              'BRAIDLAB:braid:entropy:noconv');
       % Low-entropy braid with too few iterations.
-      testCase.verifyWarning(@() entropy(testCase.b3,tol,100), ...
+      testCase.verifyWarning(@() entropy(testCase.b3,...
+                                         'Tol',tol, ...
+                                         'MaxIt', 100), ...
                              'BRAIDLAB:braid:entropy:noconv');
       % The default gives enough iterations.
-      e = entropy(testCase.b3,tol);
+      e = entropy(testCase.b3,'Tol',tol);
       testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
 
       % Try a braid with more than 100 strings, so the maximum number of
       % iterations is determined by asymptotic spectral gap.  Have to use
       % higher tolerance, since the entropy converges slowly.
-      e = entropy(testCase.b6,.01*tol);
+      e = entropy(testCase.b6,'Tol',.01*tol);
       testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
 
       % Specify 0 tolerance: should not issue a warning about lack of
       % convergence.
-      testCase.verifyWarningFree(@() entropy(testCase.b5,0,10));
+      testCase.verifyWarningFree(@() entropy(testCase.b5,'Tol',0, ...
+                                             'MaxIt',10));
+      testCase.verifyWarningFree(@() entropy(testCase.b5, ...
+                                             'finite', ...
+                                             true,'MaxIt',10));
     end
 
     function test_entropy_iter_conv(testCase)
@@ -121,7 +127,7 @@ classdef entropyTest < matlab.unittest.TestCase
       for r = 1:Nreal
         for n = 4:10
           b = braidlab.braid('random',n,len);
-          testCase.verifyWarningFree(@() b.entropy(tol));
+          testCase.verifyWarningFree(@() b.entropy('Tol',tol));
         end
       end
     end
@@ -132,8 +138,8 @@ classdef entropyTest < matlab.unittest.TestCase
       tol = 1e-8;
       for n = 5:16
         b = braidlab.braid('psi',n);
-        etr = entropy(b,'trains');
-        e = entropy(b,tol);
+        etr = entropy(b,'type','trains');
+        e = entropy(b,'Tol',tol);
 
         ee = log(max(abs(braidlab.psiroots(n))));
         testCase.verifyTrue(abs(e - ee) < tol);
@@ -151,12 +157,14 @@ classdef entropyTest < matlab.unittest.TestCase
                         len,n,mat2str(b.word) );
 
           % minlength computation
-          testCase.verifyEqual(b.entropy(0,1,0,1), ...
-                               b.complexity('minlength'), ...
-                               'AbsTol',1e-12,  ['minlength: ' diagnostic]); 
+          testCase.verifyEqual(b.entropy('onestep',true,...
+                                         'length','minlength'), ...
+                               b.complexity('minlength'), 'AbsTol',1e-12, ...
+                               ['minlength: ' diagnostic]); 
           
           % intaxis computation
-          testCase.verifyEqual(b.entropy(0,1,0,0), ...
+          testCase.verifyEqual(b.entropy('onestep',true,...
+                                         'length','intaxis'), ...
                                b.complexity('intaxis'), ...
                                'AbsTol',1e-12, ['intaxis: ' diagnostic]);
         end
