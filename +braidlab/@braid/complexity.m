@@ -53,6 +53,7 @@ function [c,bE] = complexity(b, varargin)
 
 %% parse input arguments
 parser = inputParser;
+parser.FunctionName='complexity';
 parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
 parser.addOptional('lengthtype', 'intaxis',...
                    @ischar);
