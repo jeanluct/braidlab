@@ -1,3 +1,4 @@
+function test_braidlab( nomex )
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
@@ -33,8 +34,18 @@ import matlab.unittest.*
 
 tcfolder = [pwd '/testcases/'];
 
-clear global BRAIDLAB_loop_nomex
-clear global BRAIDLAB_braid_nomex
+if nargin < 1 || isempty(nomex)
+  clear global BRAIDLAB_loop_nomex
+  clear global BRAIDLAB_braid_nomex
+  disp('Testing braidlab with MEX algorithms.');
+else
+  % disable MEX algorithms
+  global BRAIDLAB_loop_nomex; 
+  global BRAIDLAB_braid_nomex;
+  BRAIDLAB_braid_nomex = true; 
+  BRAIDLAB_loop_nomex = true;
+  disp('Testing braidlab without MEX algorithms.');
+end  
 
 suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
