@@ -1,4 +1,4 @@
-function [c,bE] = complexity(b, lengthtype)
+function [c,bE] = complexity(b, varargin)
 %COMPLEXITY   Dynnikov-Wiest geometric complexity of a braid.
 %   C = COMPLEXITY(B) returns the Dynnikov-Wiest complexity of a braid:
 %
@@ -51,31 +51,41 @@ function [c,bE] = complexity(b, lengthtype)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+%% parse input arguments
+parser = inputParser;
+parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
+parser.addOptional('lengthtype', 'intaxis',...
+                   @ischar);
+
+parser.parse(b, varargin{:} );
+params = parser.Results;
+
+b = params.b;
+lengthtype = validatestring(params.lengthtype,...
+                            {'intaxis','minlength'}, ...
+                            'complexity','lengthtype',2);
+
+%% Apply braid to the fundamental loop
+
 % Canonical set of loops, with extra boundary puncture (n+1).
 E = braidlab.loop(b.n,'bp');
 
-if nargin < 2
-  lengthtype = 0;
-end
-
-validateattributes(lengthtype, {'numeric'}, ...
-                   {'integer', '>=',0, '<=',1}, ...
-                   'braid/complexity','lengthtype',2);
-
 bE = b*E;
 
+% determine lengths
 switch lengthtype
-  case 0
+  case 'intaxis'
     % Subtract b.n-1 to remove extra crossings due to boundary (n+1)
     % puncture: (n-1) arcs going to it never cross the horizontal so
     % they should be accounted for.
-    c = log(intaxis(bE)-b.n+1) - log(intaxis(E)-b.n+1);
-  case 1
-    c = log( minlength(bE) ) - log( minlength(E) );
-  otherwise
-    error('BRAIDLAB:braid:complexity:unknownlength', ...
-          'Specified length computation is not supported');
+    lengthBefore = intaxis(E)-b.n+1;
+    lengthAfter = intaxis(bE)-b.n+1;
+  case 'minlength'
+    lengthBefore = minlength(E);
+    lengthAfter = minlength(bE);
 end
+
+c = log( lengthAfter ) - log( lengthBefore );
 
 end
 
