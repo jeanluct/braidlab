@@ -8,45 +8,45 @@ function [varargout] = entropy(b,varargin)
 %   the iteration fails to converge, the braid is most likely finite-order
 %   and an entropy of zero is returned.
 %
-%   ENTR = ENTROPY(B,TOL) also specifies the absolute tolerance TOL (default
-%   1e-6) that should be aimed for.  TOL is only approximate: if the
-%   iteration converges slowly it can be off by a small amount.
+%   ENTR = ENTROPY(B, 'Parameter','Value', ... ) takes additional
+%   parameter-value pairs that modify algorithm behavior (defaults
+%   in braces).
 %
-%   ENTR = ENTROPY(B,TOL,MAXIT) also specifies the maximum number of
-%   iterations MAXIT to try before giving up.  The default is computed based
-%   on TOL and the extreme case given by the small-dilatation psi braids.
+%   * Type - Algorithm Choice [ trains | bh | train-tracks | moussafir |
+%   {iter} ] Chooses between Bestvina-Handel Train Tracks or Moussafir
+%   Iterative algorithm. Note that for long braids B-H algorithm
+%   becomes very inefficient. 
 %
-%   ENTR = ENTROPY(B,0,MAXIT) uses a tolerance of zero, which means
-%   that exactly MAXIT iterations are performed and convergence is not
-%   checked for.  The final value of the entropy at the end of
-%   iteration is returned.
+%   The following options apply only to Iterative algorithm:
 %
-%   ENTR = ENTROPY(B,TOL,MAXIT,NCONV) or ENTROPY(B,TOL,[],NCONV) demands
-%   that the tolerance TOL be achieved NCONV consecutive times (default 3).
-%   For low-entropy braids, achieving TOL a few times does not guarantee TOL
-%   digits, so increasing NCONV is required for extreme accuracy.
+%   * Tol - Absolute convergence tolerance [non-negative number, {1e-6}]
+%   Tol is only approximate: if the iteration converges slowly it can
+%   be off by a small amount.
 %
-%   ENTR = ENTROPY(B,TOL,MAXIT,NCONV,LOOPLENGTH) specifies how loop
-%   length is computed in entropy
-%   0 - intaxis - # of intersections with horizontal axis (Dynnikov-Wiest)
-%   1 - minlength - minimal topological length
-%   2 - L2 norm of Dynnikov coordinates (default)
+%   * Finite - Shortcut for Tol = 0 [ true | {false} ]
+% 
+%   * MaxIt - Maximum # of iterations [{varies}]
+%   The default is computed based on Tol and the extreme case given by
+%   the small-dilatation psi braids. If Tol == 0, MaxIt has to be
+%   specified as a positive number
 %
-%   Note that the choice of lengths should affect the result only
-%   over a finite number of iterations. If computation with
-%   small TOL (e.g., 1e-6) and unspecified MAXINT, then the
-%   L2-length (LOOPLENGTH = 0) should be used as it is the
-%   fastest. But if only a small number of iterations is used, then
-%   one choice of loop length might be preferred over another.
+%   * OneStep - Shortcut for Tol = 0 && MaxIt = 1 [ true | {false} ]
+%
+%   * Length - Choice of loop length function [intaxis|minlength|{l2norm}]
+%   See documentation of loop.intaxis, loop.minlength, loop.l2norm
+%   for details. The choice should affect the output only if finite
+%   (small) number of iterations is performed. For large number of
+%   iterations, 'l2norm' should be preferred for speed.
+% 
+%   * NConv - Number of consecutive convergences [ positive {3} ]
+%   Demands that the tolerance TOL be achieved NConv consecutive
+%   times, rounded up to an integer.  For low-entropy braids,
+%   achieving Tol a few times does not guarantee Tol digits, so
+%   increasing NConv is required for extreme accuracy.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
 %   are normalized such that NORM(PLOOP.COORDS)=1.
-%
-%   ENTR = ENTROPY(B,'trains') uses the Bestvina-Handel train-track
-%   algorithm instead of the Moussafir iterative technique.  (The flags 'BH'
-%   and 'train-tracks' can also be used instead of 'trains'.)  Note that
-%   for long braids this algorithm becomes very inefficient.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
@@ -83,18 +83,36 @@ import braidlab.util.validateflag
 parser = inputParser;
 
 parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
-parser.addParameter('tol', 1e-6, @isnumeric );
+parser.addParameter('tol', 1e-6, @(x)isnumeric(x) && x >= 0 );
 parser.addParameter('maxit', nan, @isnumeric );
-parser.addParameter('nconv', nan, @isnumeric );
-parser.addParameter('type','l2',@ischar);
-parser.addParameter('finite',false,@islogical);
 
-parser.parse( b, varargin );
+% Number of convergence criteria required to be satisfied.
+% Consecutive convergence is more desirable, but becomes hard to achieve
+% for low-entropy braids.
+parser.addParameter('nconv', 3, @(n)isnumeric(n) && n > 0 );
+
+% Type of algorithm
+parser.addParameter('type', 'iter', @ischar);
+parser.addParameter('length','l2norm',@ischar);
+
+% Shortcut for tol=0
+parser.addParameter('finite',false,@islogical);
+parser.addParameter('onestep',false,@islogical);
+
+parser.parse( b, varargin{:} );
 
 params = parser.Results;
 
-b = params.b;
+if params.finite 
+  params.tol = 0;
+end
 
+if params.onestep
+  params.tol = 0;
+  params.maxit = 1;
+end
+
+b = params.b;
 %% 2-POINT and ZERO BRAIDS HAVE ENTROPY ZERO
 if isempty(b.word) || b.n < 3
   varargout{1} = 0;
@@ -103,11 +121,14 @@ if isempty(b.word) || b.n < 3
 end
 
 % determine type of algorithm
-algtype = validateflag(parser.type, 'intaxis','minlength','l2',...
-                       {'trains','train-tracks','bh'});
+params.type = validateflag(params.type, {'iter','moussafir'},...
+                           {'trains','train-tracks','bh'});
 
-%% TRAIN-TRACKS ALGORITHM
-if strcmpi( algtype, 'trains')
+params.length = validateflag(params.length, 'intaxis','minlength','l2norm');
+
+
+%% TRAIN-TRACKS ALGORITHM (EXITS AFTER if)
+if strcmpi( params.type, 'trains' )
   if nargout > 1
     error('BRAIDLAB:braid:entropy:nargout',...
           'Too many output arguments for ''trains'' option.')
@@ -116,62 +137,44 @@ if strcmpi( algtype, 'trains')
   if strcmpi(TN,'reducible1')
     warning('BRAIDLAB:braid:entropy:reducible',...
             'Reducible braid... falling back on iterative method.')
-    tol = toldef;
   else
     return
   end
-end
+end 
 
-%% ITERATIVE ALGORITHM
-
-% finite computation 
-if params.finite 
-  params.tol = 0;
-end
-
-if ( params.tol == 0 ) && ( isnan(maxit) || maxit <= 0 )
-  error('BRAIDLAB:braid:entropy:badarg', ...
-        'Must specify either tolerance>0 or maximum iterations.')
-end
-
-%% STOPPED HERE %%
-maxit = params.maxit;
-nconv = params.nconv;
-
-
-%% PROCESS SECOND ARGUMENT - either tolerance or char
-if isnan(maxit)
-  % Use the spectral gap of the lowest-entropy braid to compute the
-  % maximum number of iterations.
-  % The maximum number of iterations is chosen based on the tolerance and
-  % spectral gap.  Roughly, each iteration yields spgap decimal digits.
-  spgap = 19 * b.n^-3;
-  maxit = ceil(-log10(tol) / spgap) + 30;
-end
-
-% Number of convergence criteria required to be satisfied.
-% Consecutive convergence is more desirable, but becomes hard to achieve
-% for low-entropy braids.
-if nargin < 4 || isempty(nconvreq), nconvreq = 3; end
-
-% choice of length - default is 2 (l2 norm)
-if nargin < 5, looplength = 2; end
-validateattributes(looplength, {'numeric'}, ...
-                   {'integer', '>=',0,'<=',2} );
-
-switch(looplength)
-  case 0,
+%% ITERATIVE ALGORITHM LENGTH CHOICE
+switch params.length 
+  case 'intaxis',
     lenfun = @(l)l.intaxis;
     usediscount = true;
-  case 1,
+  case 'minlength',
     lenfun = @minlength;
     usediscount = false;
-  case 2,
+  case 'l2norm',
     lenfun = @l2norm;
     usediscount = false;
-  otherwise,
-    error('BRAIDLAB:braid:entropy:unknownlength', ['Supported loop ' ...
-                        'length flags are 0,1,2.'] )
+end
+
+%% ITERATIVE ALGORITHM: set parameters
+nconvreq = ceil(params.nconv);
+tol = params.tol;
+
+
+% determine maximum iteration number
+if isnan(params.maxit)
+  if tol == 0
+    error('BRAIDLAB:braid:entropy:badarg', ...
+          'Must specify either tolerance>0 or maximum iterations.')
+  else    
+    % Use the spectral gap of the lowest-entropy braid to compute the
+    % maximum number of iterations.
+    % The maximum number of iterations is chosen based on the tolerance and
+    % spectral gap.  Roughly, each iteration yields spgap decimal digits.
+    spgap = 19 * b.n^-3;
+    maxit = ceil(-log10(tol) / spgap) + 30;
+  end
+else
+  maxit = params.maxit;
 end
 
 %% ITERATIVE ALGORITHM
@@ -189,10 +192,10 @@ else
   usematlab = true;
 end
 
-params = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t LOOPLENGTH ' ...
-                  '= %d'], tol,maxit,nconvreq,looplength);
+paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
+                    'LENGTH = %d'], tol,maxit,nconvreq,params.length);
 
-braidlab.util.debugmsg( params, 1);
+braidlab.util.debugmsg( paramstring, 1);
 
 if ~usematlab
   try
@@ -202,9 +205,18 @@ if ~usematlab
     % BRAIDLAB:entropy_helper:badlengthflag and
     % BRAIDLAB:entropy_helper:badarg
     % errors.
+    switch( params.length )
+      case 'intaxis'
+        lengthflag = 0;
+      case 'minlength'
+        lengthflag = 1;
+      case 'l2norm'
+        lengthflag = 2;
+    end
+        
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
-                                       tol,looplength, true);
+                                       tol,lengthflag, true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
@@ -219,8 +231,8 @@ if usematlab
   entr0 = -1; 
   
   % discount extra arcs if intaxis is used
-  switch(looplength)
-    case 0,
+  switch params.length
+    case 'intaxis',
       discount = b.n - 1;
     otherwise,
       discount = 0;
