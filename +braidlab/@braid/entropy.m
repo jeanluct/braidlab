@@ -8,14 +8,14 @@ function [varargout] = entropy(b,varargin)
 %   the iteration fails to converge, the braid is most likely finite-order
 %   and an entropy of zero is returned.
 %
-%   ENTR = ENTROPY(B, 'Parameter','Value', ... ) takes additional
+%   ENTR = ENTROPY(B, 'Parameter',Value, ... ) takes additional
 %   parameter-value pairs that modify algorithm behavior (defaults
 %   in braces).
 %
-%   * Type - Algorithm Choice [ trains | bh | train-tracks | moussafir |
-%   {iter} ] Chooses between Bestvina-Handel Train Tracks or Moussafir
-%   Iterative algorithm. Note that for long braids B-H algorithm
-%   becomes very inefficient. 
+%   * Type - Algorithm Choice [ 'trains' | 'bh' | 'train-tracks' |
+%   'moussafir' | {'iter'} ] Chooses between Bestvina-Handel Train
+%   Tracks or Moussafir Iterative algorithm. Note that for long braids
+%   B-H algorithm becomes very inefficient.
 %
 %   The following options apply only to Iterative algorithm:
 %
@@ -32,11 +32,12 @@ function [varargout] = entropy(b,varargin)
 %
 %   * OneStep - Shortcut for Tol = 0 && MaxIt = 1 [ true | {false} ]
 %
-%   * Length - Choice of loop length function [intaxis|minlength|{l2norm}]
-%   See documentation of loop.intaxis, loop.minlength, loop.l2norm
-%   for details. The choice should affect the output only if finite
-%   (small) number of iterations is performed. For large number of
-%   iterations, 'l2norm' should be preferred for speed.
+%   * Length - Choice of loop length function [ 'intaxis' |
+%   'minlength' | { 'l2norm' } ] See documentation of loop.intaxis,
+%   loop.minlength, loop.l2norm for details. The choice should affect
+%   the output only if finite (small) number of iterations is
+%   performed. For large number of iterations, 'l2norm' should be
+%   preferred for speed.
 % 
 %   * NConv - Number of consecutive convergences [ positive {3} ]
 %   Demands that the tolerance TOL be achieved NConv consecutive
