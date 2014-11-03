@@ -23,14 +23,10 @@ function [varargout] = entropy(b,varargin)
 %   Tol is only approximate: if the iteration converges slowly it can
 %   be off by a small amount.
 %
-%   * Finite - Shortcut for Tol = 0 [ true | {false} ]
-% 
 %   * MaxIt - Maximum # of iterations [{varies}]
 %   The default is computed based on Tol and the extreme case given by
 %   the small-dilatation psi braids. If Tol == 0, MaxIt has to be
 %   specified as a positive number
-%
-%   * OneStep - Shortcut for Tol = 0 && MaxIt = 1 [ true | {false} ]
 %
 %   * Length - Choice of loop length function [ 'intaxis' |
 %   'minlength' | { 'l2norm' } ] See documentation of loop.intaxis,
@@ -44,6 +40,10 @@ function [varargout] = entropy(b,varargin)
 %   times, rounded up to an integer.  For low-entropy braids,
 %   achieving Tol a few times does not guarantee Tol digits, so
 %   increasing NConv is required for extreme accuracy.
+%
+%   ENTR = ENTROPY(B, 'OneStep') Shortcut for Tol = 0 && MaxIt = 1
+%
+%   ENTR = ENTROPY(B, 'Finite') Shortcut for Tol = 0 
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -84,6 +84,10 @@ import braidlab.util.validateflag
 parser = inputParser;
 
 parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
+parser.addOptional('flag', '', @(s)ischar(s) && ...
+                   ( strcmpi(s,'finite') ...
+                     || strcmpi(s,'onestep') )...
+                   );
 parser.addParameter('tol', 1e-6, @(x)isnumeric(x) && x >= 0 );
 parser.addParameter('maxit', nan, @isnumeric );
 
@@ -96,21 +100,19 @@ parser.addParameter('nconv', 3, @(n)isnumeric(n) && n > 0 );
 parser.addParameter('type', 'iter', @ischar);
 parser.addParameter('length','l2norm',@ischar);
 
-% Shortcut for tol=0
-parser.addParameter('finite',false,@islogical);
-parser.addParameter('onestep',false,@islogical);
-
 parser.parse( b, varargin{:} );
 
 params = parser.Results;
 
-if params.finite 
-  params.tol = 0;
-end
-
-if params.onestep
-  params.tol = 0;
-  params.maxit = 1;
+% shortcut flag passed
+switch params.flag
+  case 'finite'
+    params.tol = 0;
+  case 'onestep'
+    params.tol = 0;
+    params.maxit = 1;
+  otherwise
+    [];
 end
 
 b = params.b;
