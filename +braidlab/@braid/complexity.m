@@ -2,19 +2,24 @@ function [c,bE] = complexity(b, varargin)
 %COMPLEXITY   Dynnikov-Wiest geometric complexity of a braid.
 %   C = COMPLEXITY(B) returns the Dynnikov-Wiest complexity of a braid:
 %
-%     C(B) = log|B.E| - log|E|
+%     C(B) = ln|B.E| - ln|E|
 %
 %   where E is a canonical curve diagram, and |L| gives the number of
 %   intersections of the curve diagram L with the real axis. 
 %
-%   C = COMPLEXITY(B, LENGTHTYPE) performs the same calculation,
-%   but modifies how |L| is computed:
-%   For LENGTHTYPE = 
-%   0 : using intaxis (default, as originally by Dynnikov and Wiest)
-%   1 : using minlength.
+%   C = COMPLEXITY(B, 'Parameter', Value,...) takes additional
+%   parameter-value pairs that modify algorithm behavior (defaults
+%   in braces).
+%   
+%   * Length - Choice of loop length |L| [ {'intaxis'} | 'minlength' |
+%   'l2norm' ] See documentation of loop.intaxis, loop.minlength,
+%   loop.l2norm for details.
 %
-%   Note: Dynnikov and Wiest originally stated the complexity in
-%   base-2 logarithm.
+%   * Base - base of logarithm used [ {e} | number > 1 ] Chooses a
+%   different base for the logarithms used in computations.
+%
+%   C = COMPLEXITY(B, 'DW') matches original Dynnikov-Wiest
+%   definition. Shortcut for 'LengthType'='intaxis', 'Base'=2
 %
 %   [C,BE] = COMPLEXITY(...)
 %   Additionally returns loop b.E 
@@ -51,21 +56,34 @@ function [c,bE] = complexity(b, varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+% flag validation
+import braidlab.util.validateflag
+
 %% parse input arguments
 parser = inputParser;
 parser.FunctionName='complexity';
 parser.addRequired('b', @(x)isa(x,'braidlab.braid') );
-parser.addOptional('lengthtype', 'intaxis',...
-                   @ischar);
+parser.addOptional('dwflag', '',...
+                   @(s)ischar(s) && strcmpi(s,'dw') );
+parser.addParameter('base', nan,...
+                   @(n)isnumeric(n) && n > 1);
+parser.addParameter('length','intaxis',@ischar);
 
 parser.parse(b, varargin{:} );
 params = parser.Results;
 
-b = params.b;
-lengthtype = validatestring(params.lengthtype,...
-                            {'intaxis','minlength'}, ...
-                            'complexity','lengthtype',2);
 
+b = params.b;
+
+% set DW defaults
+if ~isempty( params.dwflag )
+  params.length = 'intaxis';
+  params.base = 2;
+else
+  params.length = validateflag(params.length, 'intaxis','minlength', ...
+                               'l2norm');
+end
+  
 %% Apply braid to the fundamental loop
 
 % Canonical set of loops, with extra boundary puncture (n+1).
@@ -74,7 +92,7 @@ E = braidlab.loop(b.n,'bp');
 bE = b*E;
 
 % determine lengths
-switch lengthtype
+switch params.length
   case 'intaxis'
     % Subtract b.n-1 to remove extra crossings due to boundary (n+1)
     % puncture: (n-1) arcs going to it never cross the horizontal so
@@ -84,9 +102,18 @@ switch lengthtype
   case 'minlength'
     lengthBefore = minlength(E);
     lengthAfter = minlength(bE);
+  case 'l2norm'
+    lengthBefore = l2norm(E);
+    lengthAfter = l2norm(bE);
 end
 
-c = log( lengthAfter ) - log( lengthBefore );
+% reallog throws error for non-positive inputs
+c = reallog( lengthAfter ) - reallog( lengthBefore );
+
+% change base if needed
+if ~isnan(params.base)
+  c = c/reallog( params.base );
+end
 
 end
 
