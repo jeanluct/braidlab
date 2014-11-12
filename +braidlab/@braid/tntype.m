@@ -9,6 +9,17 @@ function [varargout] = tntype(b)
 %
 %   TNTYPE uses Toby Hall's implementation of the Bestvina-Handel algorithm.
 %
+%   References:
+%
+%   M. Bestvina and M. Handel, "Train-Tracks for surface homeomorphisms,"
+%   Topology 34 (1995), 109-140.
+%
+%   T. Hall, "Train: A C++ program for computing train tracks of surface
+%   homeomorphisms," http://www.liv.ac.uk/~tobyhall/T_Hall.html
+%
+%   W. P. Thurston, "On the geometry and dynamics of diffeomorphisms of
+%   surfaces," Bull. Am. Math. Soc. 19 (1988), 417-431.
+%
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.ENTROPY.
 
