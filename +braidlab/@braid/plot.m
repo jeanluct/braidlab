@@ -38,7 +38,7 @@ gapX = 100; gapY = 150;
 cutf = .35;
 uselines = false; % If true, use straight line segments.
 npts = 40;
-lat = {'LineWidth',2};
+lat = {'k-','LineWidth',2};
 
 if ~isscalar(b)
   error('BRAIDLAB:braid:plot',['Can only plot scalar braid, not array of' ...
