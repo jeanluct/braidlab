@@ -326,7 +326,7 @@ global BRAIDLAB_threads
 if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
   % use the global variable to set the number of threads
   Nthreads = ceil(BRAIDLAB_threads);
-  debugmsg(sprintf('Number of threads set by BRAIDLAB_threads to: %d.', ...
+  debugmsg(sprintf('colorbraiding: Number of threads set by BRAIDLAB_threads to: %d.', ...
                    Nthreads));
 else
   % try to autodetect the optimal number of threads (== number of cores)
