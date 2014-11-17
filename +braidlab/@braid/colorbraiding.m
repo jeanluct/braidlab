@@ -99,7 +99,7 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 if useMatlabVersion
   %% MATLAB version of the algorithm
-  [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
+  [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
 else
   %% C++ version of the algorithm
   Nthreads = getAvailableThreadNumber(); % defined at the end
@@ -111,7 +111,7 @@ if nargout > 1, varargout{2} = tcr; end
 
 % =========================================================================
 
-function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t)
+function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t,idx)
 %% CROSSINGSTOGENERATORS
 %
 % Helper function that converts a physical braid to the list of braid
@@ -170,11 +170,11 @@ for I = 1:n
 
     if ~isempty(nearcoinc)
       msg = sprintf([ 'Particles %g and %g have coincident %%s ' ...
-                      'at time index %g: ' ],I,J,nearcoinc(1));
+                      'at time index %g: ' ],idx(I),idx(J),nearcoinc(1));
       % Use relative precision to test equality (same as C++ code).
       if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
-              [ msg 'braid not defined.' ],'coordinate')
+              [ msg 'braid not defined.' ],'coordinates')
       else
         error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
               [ msg 'change projection angle ' ...
@@ -307,7 +307,7 @@ end
 function XYr = rotate_data_clockwise(XY,proj)
 
 XYr = zeros(size(XY));
-XYr(:,1,:) = cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
 XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
 
 function Nthreads = getAvailableThreadNumber
