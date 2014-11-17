@@ -331,9 +331,12 @@ if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
 else
   % try to autodetect the optimal number of threads (== number of cores)
   try
-    Nthreads = feature('numcores');
+    import java.lang.Runtime;
+    r=Runtime.getRuntime;
+    Nthreads=r.availableProcessors
+    
     debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
-                      '"feature".'], Nthreads));
+                      'java.lang.Runtime.'], Nthreads));
     % 'feature' fails - auto set number of threads to 1
   catch
     Nthreads = 1;
