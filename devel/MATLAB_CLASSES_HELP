@@ -1,0 +1,32 @@
++braidlab: namespace for braidlab library
+
+ * Adding a + to a subfolder name means that if the parent folder is
+   on Matlab's path, then functions inside the subfolder can be invoked
+   in Matlab as braidlab.<function>.
+
+ * To avoid having to use the braidlab. prefix, a function can import
+   the namespace using 'import braidlab.<function>' 'or import
+   braidlab.*' to import all functions.
+
+ * The private subfolder is only accessible to functions in the
+   containing folder, without needing to include the subfolder on the
+   path.
+
+ * Functions in the +braidlab subfolder do *not* automatically see the
+   other functions in the folder.  They must use the braidlab. prefix
+   or import functions.
+
+ * Subfolders with a + are also allowed.  For instance, the subfolder
+   +lcs contains the Lagrangian coherent structures functions.  The
+   functions therein are invoked with braidlab.lcs.<function>.
+
+ * A subfolder beginning with "@" contains a class, such as @braid.
+   Subversion has trouble with this, so the folder must be refereed to
+   @braid@ within SVN.
+
+ * Classes cannot be private, since the @ folder must be on the path.
+
+See
+http://www.mathworks.com/help/techdoc/matlab_oop/brfynt_-1.html
+http://www.mathworks.com/help/techdoc/matlab_prog/f4-70335.html
+http://stackoverflow.com/questions/2748302/what-is-the-closest-thing-matlab-has-to-namespaces
