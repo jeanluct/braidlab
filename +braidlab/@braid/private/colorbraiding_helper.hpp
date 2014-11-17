@@ -930,7 +930,7 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
   if (code == 2)
     report << "projection ";
   else
-    report << "particle ";
+    report << "coordinates ";
   report << "at time index " << ti+1 << ": ";
   if (code == 2)
     report << "change projection angle (type help braid.braid).";
