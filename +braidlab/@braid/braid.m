@@ -86,6 +86,9 @@ classdef braid < matlab.mixin.CustomDisplay
     %   Artin generators representing the positive half-twist (Delta) for
     %   the braid group with N strings.
     %
+    %   B = BRAID('fulltwist',N) or BRAID('Delta2',N) returns the square
+    %   of the half-twist braid.
+    %
     %   B = BRAID('HironakaKin',M,N) or BRAID('HK',M,N) returns a member of
     %   the Hironaka & Kin family of braids on M+N+1 strings:
     %
@@ -140,6 +143,9 @@ classdef braid < matlab.mixin.CustomDisplay
           D = [];
           for i = 1:br.n-1, D = [D br.n-1:-1:i]; end %#ok<AGROW>
           br.word = D;
+         case {'fulltwist','delta2'}
+          br = braidlab.braid('halftwist',secnd);
+          br.word = [br.word br.word];
          case {'hironakakin','hironaka-kin','hk'}
           m = secnd;
           if nargin < 3
