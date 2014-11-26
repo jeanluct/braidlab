@@ -33,7 +33,7 @@ template <typename T> inline int sign(T x)
 
 
 template <typename T>
-inline void update_rules(const int Ngen, const int n, const int *ii,
+inline void update_rules(const int Ngen, const int n, const int *braidword,
                          T *a, T *b, int* pn = 0)
 {
   const int N = 2*(n-2);
@@ -49,8 +49,8 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
 
   for (int j = 0; j < Ngen; ++j) // Loop over generators.
     {
-      int i = abs(ii[j]);
-      if (ii[j] > 0)
+      int i = abs(braidword[j]);
+      if (braidword[j] > 0)
         {
           if (i == 1)
             {
@@ -92,7 +92,7 @@ inline void update_rules(const int Ngen, const int n, const int *ii,
                 }
             }
         }
-      else if (ii[j] < 0)
+      else if (braidword[j] < 0)
         {
           if (i == 1)
             {

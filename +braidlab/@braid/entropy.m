@@ -41,9 +41,12 @@ function [varargout] = entropy(b,varargin)
 %   achieving Tol a few times does not guarantee Tol digits, so
 %   increasing NConv is required for extreme accuracy.
 %
-%   ENTR = ENTROPY(B, 'OneStep') Shortcut for Tol = 0 && MaxIt = 1
+%   ENTR = ENTROPY(B, 'OneStep', ...) Compute single iteration of
+%   the algorithm. Shortcut for Tol = 0 && MaxIt = 1
 %
-%   ENTR = ENTROPY(B, 'Finite') Shortcut for Tol = 0 
+%   ENTR = ENTROPY(B, 'Finite', 'MaxInt', N, ...) Compute exactly N
+%   many iterations of the algorithm ('MaxInt' parameter has to be
+%   specified). Identical to passing  Tol = 0 and MaxInt = N.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -196,7 +199,7 @@ else
 end
 
 paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
-                    'LENGTH = %d'], tol,maxit,nconvreq,params.length);
+                    'LENGTH = %s\n'], tol,maxit,nconvreq,params.length);
 
 braidlab.util.debugmsg( paramstring, 1);
 
