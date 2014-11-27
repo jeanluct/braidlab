@@ -1,0 +1,15 @@
+#!/bin/sh
+
+FILEMAP=lcs.filemap
+
+cat > ${FILEMAP} << EOF
+include +braidlab/+lcs
+rename +braidlab/+lcs +braidlcs
+include LCS_tutorial
+rename LCS_tutorial doc
+include doc/lcs_guide.tex
+EOF
+
+hg convert --filemap ${FILEMAP} .. ../../braidlcs
+
+rm -f ${FILEMAP}
