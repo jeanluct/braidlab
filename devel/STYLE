@@ -26,7 +26,7 @@ VERSION CONTROL
 * Use a descriptive log message for commits.  If you use more than one
   line, the first line should be a summary.
 * The log message should have proper punctuation and end with a period.
-* When relevant, refer to issues on the bitbucket tracker using #.
+* When relevant, refer to issues on the GitHub tracker using #.
   Example: "Start implementing new feature.  See issue #45."
 * Using "closes issue #45" or "resolves issue #45" will automatically
   resolve an issue.  This is a good thing to add to a log message, but

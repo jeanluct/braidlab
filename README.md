@@ -23,7 +23,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [1]: http://www.mathworks.com/products/matlab/
 [2]: http://www.math.wisc.edu/~jeanluc/
 [3]: http://mbudisic.wordpress.com/
-[4]: http://bitbucket.org/jeanluc/braidlab/src/tip/doc/braidlab_guide.pdf
+[4]: http://github.com/jeanluct/braidlab/raw/master/doc/braidlab_guide.pdf
 [5]: http://arxiv.org/abs/1410.0849
 [6]: http://chaos.utexas.edu/people/post-docs/michael-allshouse
 [7]: http://www.liv.ac.uk/~tobyhall/T_Hall.html
@@ -34,8 +34,8 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [12]: https://github.com/progschj/ThreadPool
 [13]: http://www.mathworks.com/matlabcentral/newsreader/view_thread/13728
 [14]: http://www.gnu.org/licenses/gpl-3.0.html
-[15]: http://bitbucket.org/jeanluc/braidlab/raw/tip/COPYING
-[16]: http://bitbucket.org/jeanluc/braidlab/raw/tip/LICENSE
+[15]: http://github.com/jeanluct/braidlab/raw/master/COPYING
+[16]: http://github.com/jeanluct/braidlab/raw/master/LICENSE
 [17]: http://www.nsf.gov
 [18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
 [19]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
