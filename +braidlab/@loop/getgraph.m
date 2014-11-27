@@ -21,6 +21,7 @@ function [A, Lp] = getgraph(L)
 %
 %   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
+%                        Michael Allshouse <mallshouse@chaos.utexas.edu>
 %
 %   This file is part of Braidlab.
 %
