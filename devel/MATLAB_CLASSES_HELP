@@ -17,8 +17,8 @@
    or import functions.
 
  * Subfolders with a + are also allowed.  For instance, the subfolder
-   +lcs contains the Lagrangian coherent structures functions.  The
-   functions therein are invoked with braidlab.lcs.<function>.
+   +util contains utility functions.  Functions therein are invoked
+   with braidlab.util.<function>.
 
  * A subfolder beginning with "@" contains a class, such as @braid.
    Subversion has trouble with this, so the folder must be refereed to
