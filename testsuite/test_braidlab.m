@@ -2,10 +2,10 @@ function test_braidlab( nomex )
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -40,12 +40,12 @@ if nargin < 1 || isempty(nomex)
   disp('Testing braidlab with MEX algorithms.');
 else
   % disable MEX algorithms
-  global BRAIDLAB_loop_nomex; 
+  global BRAIDLAB_loop_nomex;
   global BRAIDLAB_braid_nomex;
-  BRAIDLAB_braid_nomex = true; 
+  BRAIDLAB_braid_nomex = true;
   BRAIDLAB_loop_nomex = true;
   disp('Testing braidlab without MEX algorithms.');
-end  
+end
 
 suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);

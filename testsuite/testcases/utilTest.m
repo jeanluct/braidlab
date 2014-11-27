@@ -1,10 +1,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -30,9 +30,9 @@ classdef utilTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_validateflag(testCase)
-      
+
       import braidlab.util.validateflag;
-      
+
       % partial matching
       testCase.verifyMatches(validateflag('int', ...
                                           'intaxis', ...
@@ -40,7 +40,7 @@ classdef utilTest < matlab.unittest.TestCase
                                           {'trains','train-tracks','bh'} ...
                                           ),...
                              'intaxis');
-      
+
       % case matching
       testCase.verifyMatches(validateflag('INT', ...
                                           'intaxis', ...
@@ -48,7 +48,7 @@ classdef utilTest < matlab.unittest.TestCase
                                           {'trains','train-tracks','bh'} ...
                                           ),...
                              'intaxis');
-      
+
       % matching alternate name
       testCase.verifyMatches(validateflag('bh', ...
                                           'intaxis', ...
@@ -56,12 +56,12 @@ classdef utilTest < matlab.unittest.TestCase
                                           {'trains','train-tracks','bh'} ...
                                           ),...
                              'trains');
-      
+
       % unmatched string
       testCase.verifyError(@()validateflag('int'),...
                            'BRAIDLAB:validateflag:flaginvalid')
-      
-      
+
+
     end
   end
 end

@@ -1,10 +1,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -145,21 +145,21 @@ classdef entropyTest < matlab.unittest.TestCase
         testCase.verifyTrue(abs(etr - ee) < 1e-9);
       end
     end
-    
+
     function test_entropy_complexity(testCase)
       % Test that complexity and one-iterate entropy are the same.
         len = 40;
         for n = 3:20
           b = braidlab.braid('random',n,len);
-          
+
           diagnostic = sprintf('len = %d, n = %d, word = %s', ...
                         len,n,mat2str(b.word) );
 
           % minlength computation
           testCase.verifyEqual(b.entropy('onestep','length','minlength'), ...
                                b.complexity('length','minlength'), 'AbsTol',1e-12, ...
-                               ['minlength: ' diagnostic]); 
-          
+                               ['minlength: ' diagnostic]);
+
           % intaxis computation
           testCase.verifyEqual(b.entropy('onestep','length','intaxis'), ...
                                b.complexity, ...

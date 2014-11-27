@@ -5,12 +5,12 @@ function [c,bE] = complexity(b, varargin)
 %     C(B) = ln|B.E| - ln|E|
 %
 %   where E is a canonical curve diagram, and |L| gives the number of
-%   intersections of the curve diagram L with the real axis. 
+%   intersections of the curve diagram L with the real axis.
 %
 %   C = COMPLEXITY(B, 'Parameter', Value,...) takes additional
 %   parameter-value pairs that modify algorithm behavior (defaults
 %   in braces).
-%   
+%
 %   * Length - Choice of loop length |L| [ {'intaxis'} | 'minlength' |
 %   'l2norm' ] See documentation of loop.intaxis, loop.minlength,
 %   loop.l2norm for details.
@@ -22,7 +22,7 @@ function [c,bE] = complexity(b, varargin)
 %   definition. Shortcut for 'LengthType'='intaxis', 'Base'=2
 %
 %   [C,BE] = COMPLEXITY(...)
-%   Additionally returns loop b.E 
+%   Additionally returns loop b.E
 %
 %   References:
 %
@@ -35,10 +35,10 @@ function [c,bE] = complexity(b, varargin)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -83,7 +83,7 @@ else
   params.length = validateflag(params.length, 'intaxis','minlength', ...
                                'l2norm');
 end
-  
+
 %% Apply braid to the fundamental loop
 
 % Canonical set of loops, with extra boundary puncture (n+1).
@@ -116,5 +116,3 @@ if ~isnan(params.base)
 end
 
 end
-
-

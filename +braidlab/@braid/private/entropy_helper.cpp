@@ -14,17 +14,17 @@
 // 3 - number of consecutive time tolerance should be achieved
 // 4 - tolerance
 // 5 - flag signaling loop length type (0 - intaxis, 1-minlength, 2-l2)
-// 6 - true if passed loop is a fundamental loop 
+// 6 - true if passed loop is a fundamental loop
 //     (loop length is computed differently in this case)
 
 //
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://bitbucket.org/jeanluc/braidlab/
+//   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                             Marko Budisic         <marko@math.wisc.edu>
+//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -69,7 +69,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     static_cast<char>( mxGetScalar(prhs[5]) );
 
   const bool isFundamental = ( mxGetScalar(prhs[6]) > 0 );
-  
+
   const mwSize Ngen = std::max(mxGetM(braidwordA),mxGetN(braidwordA));
 
   const mwSize N = mxGetN(uA);
@@ -92,14 +92,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   double *a = new double[N/2] - 1;
   double *b = new double[N/2] - 1;
 
-  for (mwIndex k = 1; k <= N/2; ++k) 
-    { 
-      a[k] = u[k-1]; 
-      b[k] = u[k-1+N/2]; 
+  for (mwIndex k = 1; k <= N/2; ++k)
+    {
+      a[k] = u[k-1];
+      b[k] = u[k-1+N/2];
     }
 
   int it;
-  int nconv = 0; 
+  int nconv = 0;
   double entr;
   double entr0 = -1;
   double discount;
@@ -121,10 +121,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (it = 1; it <= maxit; ++it)
     {
       // Normalize coordinates and the discount factor by the loop length
-      for (mwIndex k = 1; k <= N/2; ++k) 
-        { 
-          a[k] /= currentLength; 
-          b[k] /= currentLength; 
+      for (mwIndex k = 1; k <= N/2; ++k)
+        {
+          a[k] /= currentLength;
+          b[k] /= currentLength;
         }
       discount /= currentLength;
 
@@ -203,11 +203,10 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag) {
     break;
   }
 
-  if (retval < 0) 
+  if (retval < 0)
     mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlength",
                       "Loop length must never be negative.");
 
   return retval;
 
 }
-

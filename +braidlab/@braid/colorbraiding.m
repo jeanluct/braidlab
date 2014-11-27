@@ -36,11 +36,10 @@ function [varargout] = colorbraiding(XY,t,proj)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
-%                             Michael Allshouse <mallshouse@chaos.utexas.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -334,7 +333,7 @@ else
     import java.lang.Runtime;
     r=Runtime.getRuntime;
     Nthreads=r.availableProcessors
-    
+
     debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
                       'java.lang.Runtime.'], Nthreads));
     % 'feature' fails - auto set number of threads to 1

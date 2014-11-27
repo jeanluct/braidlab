@@ -37,10 +37,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -387,7 +387,7 @@ classdef loop < matlab.mixin.CustomDisplay
              'BRAIDLAB:loop:vertcat:nonloops',...
              ['Only braidlab/loops can be stacked'] );
 
-      % all loops have to have the same basepoint      
+      % all loops have to have the same basepoint
       basepoints = cellfun( @(x)x.basepoint, varargin );
       assert( all(basepoints(:) == basepoints(1)),...
              'BRAIDLAB:loop:vertcat:mixedbasepoints',...
@@ -395,7 +395,7 @@ classdef loop < matlab.mixin.CustomDisplay
                    'basepoints can be stacked'] );
 
       try
-          
+
         % The line below does as follows:
         % cellfun - extracts coords matrices into a cell array
         % cell2mat - converts the cell array into a matrix of

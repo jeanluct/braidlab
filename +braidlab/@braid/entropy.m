@@ -34,7 +34,7 @@ function [varargout] = entropy(b,varargin)
 %   the output only if finite (small) number of iterations is
 %   performed. For large number of iterations, 'l2norm' should be
 %   preferred for speed.
-% 
+%
 %   * NConv - Number of consecutive convergences [ positive {3} ]
 %   Demands that the tolerance TOL be achieved NConv consecutive
 %   times, rounded up to an integer.  For low-entropy braids,
@@ -58,10 +58,10 @@ function [varargout] = entropy(b,varargin)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -81,7 +81,7 @@ function [varargout] = entropy(b,varargin)
 
 import braidlab.util.debugmsg
 
-%% Process inputs 
+%% Process inputs
 import braidlab.util.validateflag
 
 parser = inputParser;
@@ -146,10 +146,10 @@ if strcmpi( params.type, 'trains' )
   else
     return
   end
-end 
+end
 
 %% ITERATIVE ALGORITHM LENGTH CHOICE
-switch params.length 
+switch params.length
   case 'intaxis',
     lenfun = @(l)l.intaxis;
     usediscount = true;
@@ -171,7 +171,7 @@ if isnan(params.maxit)
   if tol == 0
     error('BRAIDLAB:braid:entropy:badarg', ...
           'Must specify either tolerance>0 or maximum iterations.')
-  else    
+  else
     % Use the spectral gap of the lowest-entropy braid to compute the
     % maximum number of iterations.
     % The maximum number of iterations is chosen based on the tolerance and
@@ -219,7 +219,7 @@ if ~usematlab
       case 'l2norm'
         lengthflag = 2;
     end
-        
+
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
                                        tol,lengthflag, true);
@@ -232,10 +232,10 @@ if ~usematlab
 end
 
 if usematlab
-  
-  nconv = 0; 
-  entr0 = -1; 
-  
+
+  nconv = 0;
+  entr0 = -1;
+
   % discount extra arcs if intaxis is used
   switch params.length
     case 'intaxis',
@@ -243,24 +243,24 @@ if usematlab
     otherwise,
       discount = 0;
   end
-  
+
   currentLoopLength = lenfun(u) - discount;
   for i = 1:maxit
-    
+
     % normalize discounting factor
     discount = discount/currentLoopLength;
-    
+
     % normalize braid coordinates to avoid overflow
-    u.coords = u.coords/currentLoopLength;  
-    
+    u.coords = u.coords/currentLoopLength;
+
     % apply braid to loop
     u = b*u;
-    
+
     % update loop length
     currentLoopLength = lenfun(u) - discount;
-    
+
     entr = log(currentLoopLength);
-    
+
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),2)
     % Check if we've converged to requested tolerance.

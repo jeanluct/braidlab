@@ -1,10 +1,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -160,7 +160,7 @@ classdef loopTest < matlab.unittest.TestCase
       % stacking a loop and a non-loop
       testCase.verifyError( @()[ lb0; lb1.coords ], ['BRAIDLAB:' ...
                           'loop:vertcat:nonloops'] );
-      
+
       % stacking loops with different basepoints
       testCase.verifyError( @()[ lb0; lb1 ], ['BRAIDLAB:loop:' ...
                           'vertcat:mixedbasepoints'] );

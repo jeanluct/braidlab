@@ -6,8 +6,8 @@ function outname = validateflag( requestedname, varargin )
 %   argument is a either a string, or a cell array { FLAGNAME,
 %   ALTNAME1, ALTNAME2, ... }. If REQUESTEDNAME matches a FLAGNAME or
 %   any of the ALTNAME1, ALTNAME2, etc. then the output OUTNAME =
-%   FLAGNAME. 
-% 
+%   FLAGNAME.
+%
 %   If no FLAGNAMEn is matched by REQUESTEDNAME, exception
 %   BRAIDLAB:validateflag:invalid is generated.
 %
@@ -16,14 +16,14 @@ function outname = validateflag( requestedname, varargin )
 %
 %   This function is used when parsing arguments such that multiple
 %   strings can have the same result.
-  
+
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://bitbucket.org/jeanluc/braidlab/
+%   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013--2014  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                             Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -47,14 +47,14 @@ validateattributes( requestedname, {'char'}, {},'validateflag', ...
 outname = [];
 
 for n = 1:length(varargin)
-  
+
   % if elements of varargin are just strings, encapsulate them in cell
   if iscell(varargin{n})
     flagset = varargin{n};
   else
     flagset = {varargin{n}};
   end
-  
+
   try
     validatestring(lower(requestedname),...
                    lower(flagset), 'validateflag','',n);
@@ -70,12 +70,12 @@ for n = 1:length(varargin)
         rethrow(me);
     end
   end
-  
+
   % if multiple strings were matched or no error was reported
   % then set the output to desired value
   outname = flagset{1};
   break;
-  
+
 end
 
 % if nothing was matched, throw the error
