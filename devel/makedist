@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Script to tar up the braidlab distribution files.
-#   exclude LCS toolbox for now
 #
 # Run from braidlab root folder as ./devel/makedist
 
@@ -45,7 +44,6 @@ else
     fi
 fi
 ${TARCMD} cvzf ${BLNAME}.tar.gz "${TARFLAGS[@]}" \
-    --exclude='+braidlab/+lcs' \
     --exclude='*.c' --exclude='*.cpp' --exclude='Makefile' \
     +braidlab \
     README.md \
