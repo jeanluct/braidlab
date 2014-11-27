@@ -102,7 +102,7 @@ stringstyle=\small\ttfamily,
 showstringspaces=false}
 
 
-\title{\href{{https://bitbucket.org/jeanluc/braidlab}}{\braidlab}:
+\title{\href{{http://github.com/jeanluct/braidlab}}{\braidlab}:
   a software package \\ for braids and loops}
 \author{\href{http://www.math.wisc.edu/~jeanluc}{Jean-Luc Thiffeault}}
 \date{{\small Department of Mathematics\\ University of
@@ -1821,21 +1821,22 @@ first compiled with Matlab's \lstinline{mex} compiler.
 
 Some zip and tar files of the precompiled latest released version are
 available at \url{http://bitbucket.org/jeanluc/braidlab/downloads}.  If one of
-those suits your system, then download and untar/unzip.
+those suits your system, then download and untar/unzip.  (For now the
+downloads are still hosted on BitBucket, since GitHub doesn't support this.)
 
 
 \subsection{Cloning the repository}
 \label{sec:cloning}
 
-\index{Mercurial} If you prefer to have the latest (possibly unstable)
-development version, and know how to compile Matlab MEX %
-\index{Matlab!MEX files|(} files on your system, then you can clone the
-Mercurial source repository with the terminal command
+\index{Git} If you prefer to have the latest (possibly unstable) development
+version, and know how to compile Matlab MEX %
+\index{Matlab!MEX files|(} files on your system, then you can clone the GitHub
+source repository with the terminal command
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ hg clone https://bitbucket.org/jeanluc/braidlab
+$ git clone git@github.com:jeanluct/braidlab.git
 \end{lstlisting}
-assuming Mercurial is installed on your system.  After this finishes, type
+assuming Git is installed on your system.  After this finishes, type
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make

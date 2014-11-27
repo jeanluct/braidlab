@@ -16,7 +16,7 @@
 #
 
 # Overwrite getrelease.tex with actual version number.
-hg tags | grep release | cut -b 9-13 | head -1 | sed 's/ *$//g' \
+git tag | grep release | cut -b 9-13 | tail -1 | sed 's/ *$//g' \
    >| getrelease.tex
 make -W braidlab_guide.tex braidlab_guide.pdf 
 tar cvzf braidlab_guide.tar.gz \
@@ -25,4 +25,4 @@ tar cvzf braidlab_guide.tar.gz \
     getrelease.tex figs figs_lo
 
 # Restore getrelease.tex
-hg revert -C getrelease.tex
+git checkout getrelease.tex
