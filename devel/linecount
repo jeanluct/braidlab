@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#   ** This must be run from an hg-git clone **
+
 # Count lines of code in braidlab as a function of revision, for funsies.
 #
 # Run from the root braidlab folder as devel/linecount.
