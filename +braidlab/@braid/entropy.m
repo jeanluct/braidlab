@@ -41,12 +41,12 @@ function [varargout] = entropy(b,varargin)
 %   achieving Tol a few times does not guarantee Tol digits, so
 %   increasing NConv is required for extreme accuracy.
 %
-%   ENTR = ENTROPY(B, 'OneStep', ...) Compute single iteration of
-%   the algorithm. Shortcut for Tol = 0 && MaxIt = 1
+%   ENTR = ENTROPY(B, 'OneStep', ...) computes a single iteration of the
+%   algorithm. Shortcut for Tol = 0 && MaxIt = 1
 %
-%   ENTR = ENTROPY(B, 'Finite', 'MaxInt', N, ...) Compute exactly N
-%   many iterations of the algorithm ('MaxInt' parameter has to be
-%   specified). Identical to passing  Tol = 0 and MaxInt = N.
+%   ENTR = ENTROPY(B, 'Finite', 'MaxInt', N, ...) compute exactly N
+%   iterations of the algorithm ('MaxInt' parameter has to be
+%   specified). Identical to passing Tol = 0 and MaxInt = N.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
