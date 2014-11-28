@@ -1,6 +1,10 @@
 ------------------------------------------------------------------------
 2.x [2014-??-??]
 
+[Up to date until 840d314d77d52c59ad62e91a3131ba7d74473939]
+
+* Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.
+
 * Discourage arrays of loop objects.  Instead, multiple loops live
   inside of a single loop object, but subscripting has been overloaded
   for loops.  Externally, a user should see very little difference to
@@ -8,18 +12,34 @@
   for a braid acting on a large array of loops is of order 50.
 
 * Loop constructor can now return an array of canonical loops.  This
-  is useful for pre-allocating memory, among other things.
+  is useful for pre-allocating memory, among other things.  To make
+  this work, the loop constructor form loop(a,b) has been removed (use
+  loop([a b]) instead).  This shouldn't affect things much as that
+  form was hardly used and was not documented in the guide.
 
-* Loop constructor can take an option 'nobasepoint' when creating
-  canonical loops, to suppress the addition of an extra puncture.  To
-  make this work, the loop constructor form loop(a,b) has been removed
-  (use loop([a b]) instead).  This shouldn't affect things much as
-  that form was hardly used and was not documented in the guide.
+* Loop constructor can take an option 'basepoint' when creating loops,
+  to add an extra puncture.  The basepoint is not allowed to move
+  under braid operations.
+
+* Loop constructor: loop(n) now returns a loop with n punctures,
+  rather than (n+1).  Use loop(n,'basepoint') to add the extra puncture.
+
+* loop.n now returns the number of non-basepoint punctures.  Use
+  loop.totaln to get the total number of punctures, including the
+  basepoint.
 
 * Loop constructor has an option 'enum' to enumerate a list of loops
   with coordinate values between specified bounds.
 
-* loop.minlength is now a C++ MEX file (written by Marko Budisic).
+* Loop constructor takes 'fulltwist' option.
+
+* loop.minlength is now a C++ MEX file.
+
+* Update braid.plot for Matlab 2014b.
+
+* braid.entropy supports different length functions.  The arguments to
+  entropy have change significantly.  In particular, the train-track
+  algorithm is now specified using entropy(b,'method','trains').
 
 ------------------------------------------------------------------------
 2.1 [2014-10-02]
