@@ -333,7 +333,7 @@ else
   try
     import java.lang.Runtime;
     r=Runtime.getRuntime;
-    Nthreads=r.availableProcessors
+    Nthreads=r.availableProcessors;
 
     debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
                       'java.lang.Runtime.'], Nthreads));
