@@ -12,7 +12,7 @@ function [varargout] = entropy(b,varargin)
 %   parameter-value pairs that modify algorithm behavior (defaults
 %   in braces).
 %
-%   * Type - Algorithm Choice [ 'trains' | 'bh' | 'train-tracks' |
+%   * Method - Algorithm Choice [ 'trains' | 'bh' | 'train-tracks' |
 %   'moussafir' | {'iter'} ] Chooses between Bestvina-Handel Train
 %   Tracks or Moussafir Iterative algorithm. Note that for long braids
 %   B-H algorithm becomes very inefficient.
@@ -100,7 +100,7 @@ parser.addParameter('maxit', nan, @isnumeric );
 parser.addParameter('nconv', 3, @(n)isnumeric(n) && n > 0 );
 
 % Type of algorithm
-parser.addParameter('type', 'iter', @ischar);
+parser.addParameter('method', 'iter', @ischar);
 parser.addParameter('length','l2norm',@ischar);
 
 parser.parse( b, varargin{:} );
@@ -127,14 +127,14 @@ if isempty(b.word) || b.n < 3
 end
 
 % determine type of algorithm
-params.type = validateflag(params.type, {'iter','moussafir'},...
+params.method = validateflag(params.method, {'iter','moussafir'},...
                            {'trains','train-tracks','bh'});
 
 params.length = validateflag(params.length, 'intaxis','minlength','l2norm');
 
 
 %% TRAIN-TRACKS ALGORITHM (EXITS AFTER if)
-if strcmpi( params.type, 'trains' )
+if strcmpi( params.method, 'trains' )
   if nargout > 1
     error('BRAIDLAB:braid:entropy:nargout',...
           'Too many output arguments for ''trains'' option.')
@@ -282,7 +282,6 @@ end
 
 if tol > 0 % If tolerance is 0, we never expected convergence.
   if i >= maxit
-    tol
     warning('BRAIDLAB:braid:entropy:noconv', ...
             ['Failed to converge to requested tolerance; braid is likely' ...
              ' finite-order or has low entropy.  Returning zero entropy.'])

@@ -327,9 +327,9 @@ ans = 0
 To force the entropy to be computed using the Bestvina--Handel train track
 algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm|(}%
-we add an optional parameter:
+we add an optional \lstinline{'method'} parameter:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> entropy(braid([1 2]),'trains')
+>> entropy(braid([1 2]),'method','trains')
 
 ans = 0
 \end{lstlisting}

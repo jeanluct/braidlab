@@ -57,17 +57,17 @@ classdef entropyTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_entropy_trains(testCase)
-      e = entropy(testCase.b1,'type','trains');
+      e = entropy(testCase.b1,'method','trains');
       testCase.verifyTrue(abs(e - testCase.e1ex) < 1e-15);
 
-      e = entropy(testCase.b2,'type','trains');
+      e = entropy(testCase.b2,'method','trains');
       testCase.verifyTrue(abs(e - testCase.e2ex) < 1e-15);
 
       % A much more difficult case: can only get 9 digits.
-      e = entropy(testCase.b3,'type','trains');
+      e = entropy(testCase.b3,'method','trains');
       testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
 
-      testCase.verifyWarning(@() entropy(testCase.b4,'type','trains'), ...
+      testCase.verifyWarning(@() entropy(testCase.b4,'method','trains'), ...
                              'BRAIDLAB:braid:entropy:reducible');
 
       testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
@@ -137,7 +137,7 @@ classdef entropyTest < matlab.unittest.TestCase
       tol = 1e-8;
       for n = 5:16
         b = braidlab.braid('psi',n);
-        etr = entropy(b,'type','trains');
+        etr = entropy(b,'method','trains');
         e = entropy(b,'Tol',tol);
 
         ee = log(max(abs(braidlab.psiroots(n))));
