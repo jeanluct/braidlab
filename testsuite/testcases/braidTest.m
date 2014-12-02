@@ -30,6 +30,7 @@ classdef braidTest < matlab.unittest.TestCase
     b3
     id
     pure
+    dbr
   end
 
   %methods (TestClassSetup)
@@ -46,6 +47,10 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.b3 = braid([1 -2 3 5 2 1 2 -1 -2 -1],7);
       testCase.id = braid([],7);
       testCase.pure = braid([1 -2 1 -2 1 -2]);
+
+      import braidlab.databraid      
+      data = load('testdata','XY','ti');
+      testCase.dbr = databraid( data.XY, data.ti );
     end
   end
 
@@ -170,6 +175,13 @@ classdef braidTest < matlab.unittest.TestCase
       bsub = braidlab.braid([3 1 -1],4);
       testCase.verifyEqual(b.subbraid(3:6),bsub);
       testCase.verifyTrue(lexeq(b.subbraid(3:6),bsub));
+    end
+    
+    function test_braid_databraid(testCase)
+      dbr = testCase.dbr;
+      testCase.verifyEqual(dbr.dilatation('method','proj'), ...
+                           dbr.dilatation('method','nonproj'),...
+                           'AbsTol',1e-12);
     end
   end
 end
