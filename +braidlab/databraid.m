@@ -364,7 +364,7 @@ classdef databraid < braidlab.braid
       end
       
       % compute FTBE by dividing stretch by physical time length
-      D = stretch / params.T;
+      E = stretch / params.T;
 
     end
 
