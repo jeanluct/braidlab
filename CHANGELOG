@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
-2.x [2014-??-??]
+2.2 [2014-12-??]
 
-[Up to date until 840d314d77d52c59ad62e91a3131ba7d74473939]
+[Up to date until 1e17c1a]
 
 * Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.
 
