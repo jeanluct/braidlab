@@ -96,23 +96,23 @@ classdef loop < matlab.mixin.CustomDisplay
     %   with M identical loops.  This can be used to pre-allocate memory for
     %   a large number of loops.
     %
-    %   L = LOOP(N,'basepoint') or LOOP(N,M,'basepoint') adds a basepoint
+    %   L = LOOP(N,'BasePoint') or LOOP(N,M,'BasePoint') adds a basepoint
     %   puncture so the resulting loop has N+1 punctures.  The loop L is a
     %   (nonoriented) generating set for the fundamental group of the sphere
     %   with N punctures, with the extra puncture serving as the basepoint.
     %   This sort of object is convenient when looking for growth of loops
     %   under braid action, or for testing for braid equality.
     %
-    %   L = LOOP(...,'basepoint',B) specifies the basepoint to be puncture
+    %   L = LOOP(...,'BasePoint',B) specifies the basepoint to be puncture
     %   B, with 0 <= B <= N.  B=0 means no basepoint.
     %
-    %   L = LOOP('enum',VMIN,VMAX) returns a loop object containing all
+    %   L = LOOP('Enum',VMIN,VMAX) returns a loop object containing all
     %   loops with indices bounded from below by the vector VMIN, and from
     %   above by the vector VMAX.  Both VMIN and VMAX are of size 2N-4,
     %   where N is the number of punctures.  There are PROD(VMAX-VMIN+1)
     %   such loops.
     %
-    %   L = LOOP('enum',N,IMIN,IMAX) returns a loop object containing all
+    %   L = LOOP('Enum',N,IMIN,IMAX) returns a loop object containing all
     %   loops with N punctures and with entries bounded by the scalars IMIN
     %   and IMAX.  There are (IMAX-IMIN+1)^(2N-4) such loops.
     %

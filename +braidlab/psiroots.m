@@ -1,12 +1,12 @@
 function e = psiroots(n,flag)
 %PSIROOTS   Roots of low-entropy psi braids.
 %   E = PSIROOTS(N) returns the roots of the polynomial of the Nth
-%   low-entropy braid psi, created with braid('psi',N) for N > 4.  The
+%   low-entropy braid psi, created with braid('Psi',N) for N > 4.  The
 %   roots are sorted in descending order of magnitude.
 %
 %   For 3 <= N <= 4 the roots are those of the lowest-entropy braids.
 %
-%   E = PSIROOTS(N,'poly') returns the coefficients of the polynomial, in
+%   E = PSIROOTS(N,'Poly') returns the coefficients of the polynomial, in
 %   Matlab vector form.
 %
 %   Reference:

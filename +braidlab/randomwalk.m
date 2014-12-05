@@ -4,8 +4,8 @@ function X = randomwalk(n,N,eps,opts)
 %   on the unit square.  XY has size [K+1 2 N].  The random walkers are
 %   reflected when they hit the boundaries.
 %
-%   XY = RANDOMWALK(N,K,EPS,DOMAIN), where DOMAIN is 'disk', 'plane', or
-%   'square', specifies the shape of the domain.  Reflecting boundary
+%   XY = RANDOMWALK(N,K,EPS,DOMAIN), where DOMAIN is 'Disk', 'Plane', or
+%   'Square', specifies the shape of the domain.  Reflecting boundary
 %   conditions are applied at the boundaries.
 %
 %   XY = RANDOMWALK(X0,K,EPS,...) uses the N initial particle positions in
@@ -39,10 +39,10 @@ function X = randomwalk(n,N,eps,opts)
 
 % TODO:
 %
-% 'brownian': choose stepsize from normal distribution.  Normalize
+% 'Brownian': choose stepsize from normal distribution.  Normalize
 % eps to have same diffusion constant as random walk?
 %
-% 'lattice': eps specifies the spacing.
+% 'Lattice': eps specifies the spacing.
 %
 
 if isscalar(n)

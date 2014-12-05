@@ -4,7 +4,7 @@ function [varargout] = cycle(b,varargin)
 %   The sparse matrix M is is the product of the matrices in the limit
 %   cycle.
 %
-%   CYCLE(B,L) uses the initial loop L (default loop(B.n,'basepoint')) for
+%   CYCLE(B,L) uses the initial loop L (default loop(B.n,'BasePoint')) for
 %   the iteration.
 %
 %   CYCLE(B,...,MAXIT,NCONVREQ) also specifies the maximum number of
@@ -12,13 +12,13 @@ function [varargout] = cycle(b,varargin)
 %   convergences for the cycle NCONVREQ (default 5).  Either argument can be
 %   replaced by [] to use its default value.
 %
-%   CYCLE(B,'plot',...) makes a plot showing the convergence to the
+%   CYCLE(B,'Plot',...) makes a plot showing the convergence to the
 %   matrix entries to the limit cycle.
 %
 %   [M,PERIOD,IT] = CYCLE(B,...) also returns the period of the cycle and
 %   the number of iterations IT that were required to achieve convergence.
 %
-%   MI = CYCLE(B,...,'iterates') or CYCLE(B,...,'iter') returns a cell array
+%   MI = CYCLE(B,...,'Iterates') or CYCLE(B,...,'Iter') returns a cell array
 %   MI with PERIOD elements, each containing the matrix of an iterate from
 %   the limit cycle.  The matrix M above is MI{PERIOD}*...*MI{1}.
 %
@@ -42,10 +42,10 @@ function [varargout] = cycle(b,varargin)
 %
 %        3
 %
-%   With 'iterates', we find the individual matrices that make up the
+%   With 'Iterates', we find the individual matrices that make up the
 %   period-3 cycle:
 %
-%   >> MI = cycle(b,'iterates')
+%   >> MI = cycle(b,'Iterates')
 %
 %   MI =
 %

@@ -6,7 +6,7 @@ function XYc = closure(XY,ctype)
 %   (when projected along the X axis).  The data format is
 %   XY(TIMESTEP,COORD,PARTICLES).
 %
-%   XYC = CLOSURE(XY,'mindist') closes the trajectories to minimize the sum
+%   XYC = CLOSURE(XY,'MinDist') closes the trajectories to minimize the sum
 %   of the Euclidean distances between the final and initial points.  This
 %   uses Markus Buehren's implementation of the Hungarian algorithm for the
 %   optimal assigment problem.

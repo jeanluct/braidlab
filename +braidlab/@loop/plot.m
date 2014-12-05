@@ -3,7 +3,7 @@ function plot(varargin)
 %   PLOT(L) plots a representative of the equivalence class
 %   defined by the loop L.
 %
-%   PLOT(L,'PROPNAME',VALUE,...) can be used to set property PROPNAME to
+%   PLOT(L,'PropName',VALUE,...) can be used to set property PropName to
 %   VALUE.  Valid properties are
 %
 %   LineColor          The line color used to draw the loop.
