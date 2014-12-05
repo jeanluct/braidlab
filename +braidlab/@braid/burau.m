@@ -10,7 +10,7 @@ function m = burau(b,t)
 %   the symbolic toolbox, use BURAU(B,sym('t')).  Note that the symbolic
 %   toolbox is much slower.
 %
-%   M = BURAU(B,'abs') returns the matrix of the "absolute value" monoid,
+%   M = BURAU(B,'Abs') returns the matrix of the "absolute value" monoid,
 %   where every nonzero entry of the Burau matrices of the standard braid
 %   generators are set to one, before multiplying them together.  The
 %   spectral radius of this matrix is an upper bound on the braid's

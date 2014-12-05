@@ -8,14 +8,13 @@ function [varargout] = entropy(b,varargin)
 %   the iteration fails to converge, the braid is most likely finite-order
 %   and an entropy of zero is returned.
 %
-%   ENTR = ENTROPY(B, 'Parameter',Value, ... ) takes additional
-%   parameter-value pairs that modify algorithm behavior (defaults
-%   in braces).
+%   ENTR = ENTROPY(B,'Parameter',VALUE,... ) takes additional
+%   parameter-value pairs that modify algorithm behavior (defaults in
+%   braces).
 %
-%   * Method - Algorithm Choice [ 'trains' | 'bh' | 'train-tracks' |
-%   'moussafir' | {'iter'} ] Chooses between Bestvina-Handel Train
-%   Tracks or Moussafir Iterative algorithm. Note that for long braids
-%   B-H algorithm becomes very inefficient.
+%   * Method - Algorithm Choice [ 'trains' | {'iter'} ] Chooses between
+%   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
+%   for long braids B-H algorithm becomes very inefficient.
 %
 %   The following options apply only to Iterative algorithm:
 %
@@ -29,7 +28,7 @@ function [varargout] = entropy(b,varargin)
 %   specified as a positive number
 %
 %   * Length - Choice of loop length function [ 'intaxis' |
-%   'minlength' | { 'l2norm' } ] See documentation of loop.intaxis,
+%   'minlength' | { 'l2norm' } ]  See documentation of loop.intaxis,
 %   loop.minlength, loop.l2norm for details. The choice should affect
 %   the output only if finite (small) number of iterations is
 %   performed. For large number of iterations, 'l2norm' should be
@@ -41,10 +40,10 @@ function [varargout] = entropy(b,varargin)
 %   achieving Tol a few times does not guarantee Tol digits, so
 %   increasing NConv is required for extreme accuracy.
 %
-%   ENTR = ENTROPY(B, 'OneStep', ...) computes a single iteration of the
+%   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
 %   algorithm. Shortcut for Tol = 0 && MaxIt = 1
 %
-%   ENTR = ENTROPY(B, 'Finite', 'MaxInt', N, ...) compute exactly N
+%   ENTR = ENTROPY(B, 'Finite','MaxInt',N, ...) compute exactly N
 %   iterations of the algorithm ('MaxInt' parameter has to be
 %   specified). Identical to passing Tol = 0 and MaxInt = N.
 %

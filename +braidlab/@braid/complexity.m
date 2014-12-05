@@ -7,9 +7,8 @@ function [c,bE] = complexity(b, varargin)
 %   where E is a canonical curve diagram, and |L| gives the number of
 %   intersections of the curve diagram L with the real axis.
 %
-%   C = COMPLEXITY(B, 'Parameter', Value,...) takes additional
-%   parameter-value pairs that modify algorithm behavior (defaults
-%   in braces).
+%   C = COMPLEXITY(B,'Parameter',Value,...) takes additional parameter-value
+%   pairs that modify algorithm behavior (defaults in braces).
 %
 %   * Length - Choice of loop length |L| [ {'intaxis'} | 'minlength' |
 %   'l2norm' ] See documentation of loop.intaxis, loop.minlength,
@@ -18,7 +17,7 @@ function [c,bE] = complexity(b, varargin)
 %   * Base - base of logarithm used [ {e} | number > 1 ] Chooses a
 %   different base for the logarithms used in computations.
 %
-%   C = COMPLEXITY(B, 'DW') matches original Dynnikov-Wiest
+%   C = COMPLEXITY(B,'DW') matches original Dynnikov-Wiest
 %   definition. Shortcut for 'LengthType'='intaxis', 'Base'=2
 %
 %   [C,BE] = COMPLEXITY(...)

@@ -226,7 +226,7 @@ are other ways to construct a \braid, such as using random %
 \index{braid class@\braid\ class!constructor!random braid} generators, here a
 braid with~$5$ strings and~$10$ random generators:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> braid('random',5,10)
+>> braid('Random',5,10)
 
 ans = < 1  4 -4  2  4 -1 -2  4  4  4 >
 \end{lstlisting}
@@ -235,7 +235,7 @@ The constructor can also build some standard braids: %
 \index{braid class@\braid\ class!constructor!knots}
 \index{knot!braid representative}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> braid('halftwist',5)
+>> braid('HalfTwist',5)
 
 ans = < 4  3  2  1  4  3  2  4  3  4 >
 
@@ -327,9 +327,9 @@ ans = 0
 To force the entropy to be computed using the Bestvina--Handel train track
 algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm|(}%
-we add an optional \lstinline{'method'} parameter:
+we add an optional \lstinline{'Method'} parameter:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> entropy(braid([1 2]),'method','trains')
+>> entropy(braid([1 2]),'Method','trains')
 
 ans = 0
 \end{lstlisting}
@@ -461,20 +461,20 @@ braid~$\sigma_1^3$ \citep{AlexanderPolynomial}, which gives a Laurent
 polynomial
 \index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1 1]))  % can also use braid('trefoil')
+>> alexpoly(braid([1 1 1]))  % can also use braid('Trefoil')
 
 ans(z) = + z^(+2) - z^(+1) + 1
 \end{lstlisting}
 The figure-eight knot is the closure of~$(\sigma_1\sigma_2^{-1})^2$:
 \index{knot!figure-eight}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 -2 1 -2]))  % or braid('figure-8')
+>> alexpoly(braid([1 -2 1 -2]))  % or braid('Figure-8')
 
 ans(z) = - 1 + 3*z^(-1) - z^(-2)
 \end{lstlisting}
 This can be `centered' so that it satisfies~$p(z)=\pm p(1/z)$:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 -2 1 -2]),'centered')
+>> alexpoly(braid([1 -2 1 -2]),'Centered')
 
 ans(z) = - z^(+1) + 3 - z^(-1)
 \end{lstlisting}
@@ -483,20 +483,20 @@ so it can be used to determine when two knots are not the same.  For knots,
 the centered polynomial is guaranteed to have integral powers.  For links,
 such as the Hopf link consisting of two singly-linked loops, it might not:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1]),'centered')  % the Hopf link
+>> alexpoly(braid([1 1]),'Centered')  % the Hopf link
 
 Error using braidlab.braid/alexpoly
-Polynomial with fractional powers.  Remove 'centered' option or use the symbolic toolbox.
+Polynomial with fractional powers.  Remove 'Centered' option or use the symbolic toolbox.
 \end{lstlisting}
 \index{Matlab!symbolic toolbox}%
 Fractional powers cannot be represented with a \lstinline{laurpoly} object. %
 \index{laurpoly@\lstinline{laurpoly}|)}%
 \index{Laurent polynomials|)}%
-In that case we can drop the `centered' option, which yields the uncentered
+In that case we can drop the \lstinline{Centered} option, which yields the uncentered
 polynomial $1-z$.  Alternatively, we can switch to using a variable from the
 symbolic toolbox:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> alexpoly(braid([1 1]),sym('x'),'centered')
+>> alexpoly(braid([1 1]),sym('x'),'Centered')
 
 ans = 1/x^(1/2) - x^(1/2)
 \end{lstlisting}
@@ -712,7 +712,7 @@ ans = 1
 \end{lstlisting}
 There are other ways to enforce closure of a braid (see
 \lstinline{help closure}), in particular
-\lstinline{closure(XY,'mindist')}, which minimizes the total distance
+\lstinline{closure(XY,'MinDist')}, which minimizes the total distance
 between the initial and final points.
 \index{projection line|)}%
 \index{braid!closure|)}%
@@ -1045,18 +1045,18 @@ iterations accordingly. %
 \index{loop!coordinates|(}
 \index{loop class@\loopc\ class!constructor|(}
 
-The command \lstinline{loop(n,'basepoint')} returns a \emph{canonical set of
+The command \lstinline{loop(n,'BasePoint')} returns a \emph{canonical set of
   loops} for~$n$ punctures:%
 \index{punctures|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> l = loop(5,'bp')    % 'bp' is short for 'basepoint'
+>> l = loop(5,'BP')    % 'BP' is short for 'BasePoint'
 
 ans = (( 0  0  0  0 -1 -1 -1 -1 ))*
 \end{lstlisting}
 \index{loop!multi-|(} This multiloop is depicted in
 Figure~\ref{fig:fundloops}, with basepoint puncture shown in green.  The
 \lstinline{*} indicates that this loop has a basepoint.  Note that the
-multiloop returned by \hbox{\lstinline{loop(5,'bp')}} actually has 6
+multiloop returned by \hbox{\lstinline{loop(5,'BP')}} actually has 6
 punctures!  The rightmost puncture is meant to represent the boundary of a
 disk, %
 \index{disk, punctured}%
@@ -1085,8 +1085,8 @@ which is a unique normal form.
   \label{fig:fundloops_act}
 }
 \end{center}
-\caption{(a) The multiloop created by \lstinline{loop(5,'bp')}, with basepoint
-  puncture in green.  (b) The multiloop \lstinline{b*loop(5,'bp')}, where
+\caption{(a) The multiloop created by \lstinline{loop(5,'BP')}, with basepoint
+  puncture in green.  (b) The multiloop \lstinline{b*loop(5,'BP')}, where
   \lstinline{b} is the braid
   $\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$. \index{loop!multi-}}
 \end{figure}
@@ -1094,17 +1094,17 @@ which is a unique normal form.
 The canonical loop coordinates for braids exploit the fact that two braids are
 equal if and only if they act the same way on the fundamental group of the
 disk \citep{Dehornoy2008}.  Hence, if we take a braid and act on
-\lstinline{loop(5,'bp')},
+\lstinline{loop(5,'BP')},
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([1 2 3 -4]);
->> b*loop(5,'bp')
+>> b*loop(5,'BP')
 
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))*
 \end{lstlisting}
 then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))*} can be thought
 of as \emph{uniquely} characterizing the braid.  It is this property that is
 used to rapidly determine equality of braids.  (The loop
-\lstinline{b*loop(5,'bp')} is plotted in Figure~\ref{fig:fundloops_act}.)  The
+\lstinline{b*loop(5,'BP')} is plotted in Figure~\ref{fig:fundloops_act}.)  The
 same loop coordinates for the braid can be obtained without creating an
 intermediate loop with %
 \index{braid class@\braid\ class!loopcoords@\lstinline{loopcoords}}
@@ -1228,9 +1228,9 @@ The difference is that \lstinline{M} may only be applied \emph{to this
 action).
 
 A common thing to do is to find the effective linear action on the canonical
-set \lstinline{loop(b.n,'bp')} (see Section~\ref{sec:loopcoords}):
+set \lstinline{loop(b.n,'BP')} (see Section~\ref{sec:loopcoords}):
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [~,M] = b*loop(b.n,'bp'); full(M)
+>> [~,M] = b*loop(b.n,'BP'); full(M)
 
 ans = 0     0    -1     0
       0     1     0     1
@@ -1308,22 +1308,22 @@ Figure~\ref{fig:efflinact1} shows the output of
   \label{fig:efflinact3}
 }
 \end{center}
-\caption{The plot produced by \lstinline{cycle(b,'plot')} %
+\caption{The plot produced by \lstinline{cycle(b,'Plot')} %
   for (a) \lstinline{b = braid([1 -2])}; (b) \lstinline{b = braid([1 2 3])};
-  (c) \lstinline{b = braid('psi',11)}.}
+  (c) \lstinline{b = braid('Psi',11)}.}
 \index{braid class@\braid\ class!cycle@\lstinline{cycle}}%
 \label{fig:efflinact}
 \end{figure}
 %
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2]); M = cycle(b,'plot');
+>> b = braid([1 -2]); M = cycle(b,'Plot');
 \end{lstlisting}
 The member function \lstinline{cycle} iterates the braid on an initial loop,
-taken to be the canonical set \lstinline{loop(b.n,'bp')}.  The vertical axis
+taken to be the canonical set \lstinline{loop(b.n,'BP')}.  The vertical axis
 in Fig.~\ref{fig:efflinact1} shows the elements of the effective linear action
 as a function of iterates of the braid.  The matrix of the action is flattened
 into a vector of length~$4^2$, where~$4$ is the dimension the initial loop
-\lstinline{loop(b.n,'bp')}.  It is evident that the fixed point is reached
+\lstinline{loop(b.n,'BP')}.  It is evident that the fixed point is reached
 rapidly, since the `stripes' stop changing.
 
 \index{braid!pseudo-Anosov|(}%
@@ -1342,11 +1342,11 @@ example with the following:%
 %
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = braid([-1 -2 -3 4]);
->> M = b.cycle(loop(b.n),'iter')
+>> M = b.cycle(loop(b.n),'Iter')
 
 M = [6x6 double]    [6x6 double]
 \end{lstlisting}
-The option \lstinline{'iter'} tells \lstinline{cycle} to compute an individual
+The option \lstinline{'Iter'} tells \lstinline{cycle} to compute an individual
 matrix for each iterate of the cycle, rather than the net product of all the
 matrices in the cycle.  The output is a cell array %
 \index{Matlab!cell array}%
@@ -1376,7 +1376,7 @@ any initial loop will give the same matrices.
 What is more surprising is that these limit cycles occur for finite-order
 braids as well.  Figure~\ref{fig:efflinact2} is produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 2 3]); [~,period] = cycle(b,'plot')
+>> b = braid([1 2 3]); [~,period] = cycle(b,'Plot')
 
 period = 4
 \end{lstlisting}
@@ -1392,12 +1392,12 @@ Pseudo-Anosov braids %
 can achieve longer cycles, which \braidlab\ can find:
 Figure~\ref{fig:efflinact3} is the plot produced by
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid('psi',11); [M,period] = cycle(b,'plot');
+>> b = braid('Psi',11); [M,period] = cycle(b,'Plot');
 \end{lstlisting}
 The period here is~$5$, and the matrix~$M$ is~$20$ by~$20$.  The braid %
 \index{psi braids@$\psi$ braids}%
 \index{braid!entropy!minimum}%
-\lstinline{braid('psi',11)} is the braid~$\psi_{11}$ in the notation of
+\lstinline{braid('Psi',11)} is the braid~$\psi_{11}$ in the notation of
 \citet{Venzke_thesis}.  It is a pseudo-Anosov braid with low %
 \index{braid!pseudo-Anosov}%
 \index{dilatation}%
@@ -1418,7 +1418,7 @@ with the matrix in hand we can find the characteristic polynomial:%
 \index{Matlab!symbolic toolbox}%
 is needed for \lstinline{poly2sym} and \lstinline{factor}.}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid('psi',7); [M,period] = cycle(b);
+>> b = braid('Psi',7); [M,period] = cycle(b);
 >> factor(poly2sym(charpoly(M)))  % convert to symbolic form
 
 ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2
@@ -1427,7 +1427,7 @@ ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2
 Compare this to the known polynomial that gives the dilation:
 \index{psiroots@\lstinline{psiroots}}
 \begin{lstlisting}[frame=single,framerule=0pt]
->> factor(poly2sym(psiroots(7,'poly')))
+>> factor(poly2sym(psiroots(7,'Poly')))
 
 ans = (x + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)
 \end{lstlisting}

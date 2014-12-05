@@ -14,7 +14,7 @@ function p = alexpoly(b,x,opt)
 %   also be a numeric type (a real or complex number), but in that case the
 %   'centered' option below is unavailable.
 %
-%   P = ALEXPOLY(B,X,'centered') or ALEXPOLY(B,'centered') centers the
+%   P = ALEXPOLY(B,X,'Centered') or ALEXPOLY(B,'Centered') centers the
 %   polynomial so that P(X) = (+/-)P(1/X).  (The + sign always applies if
 %   the closure of the braid is a knot, rather than a link.)  This may fail
 %   when using the laurpoly class, since polynomials with fractional powers
@@ -30,7 +30,7 @@ function p = alexpoly(b,x,opt)
 %
 %   This can be centered to make the Laurent polynomial palindromic:
 %
-%   >> ALEXPOLY(braid('3_1'),'centered')
+%   >> ALEXPOLY(braid('3_1'),'Centered')
 %
 %   ans(z) = + z^(+1) - 1 + z^(-1)
 %
@@ -44,17 +44,17 @@ function p = alexpoly(b,x,opt)
 %   The braid [1 1], which corresponds to the Hopf link, cannot be centered
 %   using the laurpoly class, since this requires fractional exponents:
 %
-%   >> ALEXPOLY(braid([1 1]),'centered')
+%   >> ALEXPOLY(braid([1 1]),'Centered')
 %
 %   Error using braidlab.braid/alexpoly
-%   Polynomial with fractional powers.  Remove 'centered' option or use
+%   Polynomial with fractional powers.  Remove 'Centered' option or use
 %   the symbolic toolbox.
 %
 %   >> ALEXPOLY(braid([1 1]))
 %
 %   ans(z) = - z^(+1) + 1
 %
-%   >> ALEXPOLY(braid([1 1]),sym('x'),'centered')
+%   >> ALEXPOLY(braid([1 1]),sym('x'),'Centered')
 %
 %   ans = 1/x^(1/2) - x^(1/2)
 %

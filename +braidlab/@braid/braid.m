@@ -78,15 +78,15 @@ classdef braid < matlab.mixin.CustomDisplay
     %   BC = BRAID(B) copies the object B of type BRAID or CFBRAID to the BRAID
     %   object BC.
     %
-    %   B = BRAID('random',N,K) returns a random braid of N strings with K
+    %   B = BRAID('Random',N,K) returns a random braid of N strings with K
     %   crossings (generators).  The K generators are chosen uniformly in
     %   [-(N-1):-1 1:N-1].
     %
-    %   B = BRAID('halftwist',N) or BRAID('Delta',N) returns the word D in
+    %   B = BRAID('HalfTwist',N) or BRAID('Delta',N) returns the word D in
     %   Artin generators representing the positive half-twist (Delta) for
     %   the braid group with N strings.
     %
-    %   B = BRAID('fulltwist',N) or BRAID('Delta2',N) returns the square
+    %   B = BRAID('FullTwist',N) or BRAID('Delta2',N) returns the square
     %   of the half-twist braid.
     %
     %   B = BRAID('HironakaKin',M,N) or BRAID('HK',M,N) returns a member of
