@@ -268,20 +268,22 @@ classdef databraid < braidlab.braid
       bt.word = bt.word(sel);
     end
     
-    function D = dilatation( B, varargin )
-    % DILATATION     Compute databraid loop dilatation.
-    %   D = DILATATION(B) Computes databraid dilatation which is the
-    %   concept that parallels the notion of Dynnikov-Wiest
-    %   complexity for abstract braids.
+    function E = ftbe( B, varargin )
+    % FTBE     Finite Time Braiding Exponent
+    %   E = FTBE(B) Computes databraid Finite Time Braiding
+    %   Exponent. FTBE is defined for data braids without relying
+    %   on reapplication of the braid to a given loop. Intuitively,
+    %   its relation to braid entropy is analogous to relation of
+    %   Finite Time Lyapunov Exponents to entropy in a periodic flow.
     %
-    %   Dilatation is computed as 
-    %   D = ( ln|B.l| - ln|l| ) / T
+    %   Finite Time Braiding Exponent is computed as 
+    %   E = ( ln|B.l| - ln|l| ) / T
     %   where l is the fundamental loop set, B.l denotes action of
     %   the braid on the fundamental loop, log is the natural
     %   logarithm, and T is the difference between crossing times of
     %   the first generator and the last generator in B.
     %   
-    %   D = DILATATION(B, NAME, VALUE, ... ) is the same as above
+    %   E = FTBE(B, NAME, VALUE, ... ) is the same as above
     %   except it allows modification of the basic formula by
     %   specifying name-value pairs as follows.
     %
@@ -304,11 +306,11 @@ classdef databraid < braidlab.braid
     %   loop.minlength, loop.l2norm for details.
     %   
     %   * T - [ real ] - Uses a custom value for length of interval
-    %   over which the data braid dilatation is computed. Default is
-    %   the difference between first and last crossing time in the
-    %   braid which might underestimate the time if the first
-    %   generator appeared late, or if the last crossing did not
-    %   appear at the end of the physical braid.
+    %   over which FTBE is computed. Default is the difference between
+    %   first and last crossing time in the braid which might
+    %   underestimate the time if the first generator appeared late,
+    %   or if the last crossing did not appear at the end of the
+    %   physical braid.
     %
     %   * 'base' - [ positive real ] - Use a custom base of
     %   logarithm instead of natural logarithm.
@@ -361,7 +363,7 @@ classdef databraid < braidlab.braid
         stretch = stretch/reallog( params.base );
       end
       
-      % compute dilatation by dividing stretch by physical time length
+      % compute FTBE by dividing stretch by physical time length
       D = stretch / params.T;
 
     end
