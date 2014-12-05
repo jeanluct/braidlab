@@ -17,21 +17,21 @@
   loop([a b]) instead).  This shouldn't affect things much as that
   form was hardly used and was not documented in the guide.
 
-* Loop constructor can take an option 'basepoint' when creating loops,
+* Loop constructor can take an option 'BasePoint' when creating loops,
   to add an extra puncture.  The basepoint is not allowed to move
   under braid operations.
 
 * Loop constructor: loop(n) now returns a loop with n punctures,
-  rather than (n+1).  Use loop(n,'basepoint') to add the extra puncture.
+  rather than (n+1).  Use loop(n,'BasePoint') to add the extra puncture.
 
 * loop.n now returns the number of non-basepoint punctures.  Use
   loop.totaln to get the total number of punctures, including the
   basepoint.
 
-* Loop constructor has an option 'enum' to enumerate a list of loops
+* Loop constructor has an option 'Enum' to enumerate a list of loops
   with coordinate values between specified bounds.
 
-* Loop constructor takes 'fulltwist' option.
+* Loop constructor takes 'FullTwist' option.
 
 * loop.minlength is now a C++ MEX file.
 
@@ -39,12 +39,12 @@
 
 * braid.entropy supports different length functions.  The arguments to
   entropy have change significantly.  In particular, the train-track
-  algorithm is now specified using entropy(b,'method','trains').
+  algorithm is now specified using entropy(b,'Method','trains').
 
 * databraid.entropy and databraid.complexity are no longer
   implemented.  Instead, use databraid.ftbe (Finite Time Braiding
   Exponent).  This is to distinguish the entropy of data, which
-  doesn't necessarily close, to that of a 'true' braid.
+  doesn't necessarily close, to that of a "true" braid.
 
 ------------------------------------------------------------------------
 2.1 [2014-10-02]
