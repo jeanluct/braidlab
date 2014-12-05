@@ -41,6 +41,11 @@
   entropy have change significantly.  In particular, the train-track
   algorithm is now specified using entropy(b,'method','trains').
 
+* databraid.entropy and databraid.complexity are no longer
+  implemented.  Instead, use databraid.ftbe (Finite Time Braiding
+  Exponent).  This is to distinguish the entropy of data, which
+  doesn't necessarily close, to that of a 'true' braid.
+
 ------------------------------------------------------------------------
 2.1 [2014-10-02]
 
