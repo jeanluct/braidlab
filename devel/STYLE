@@ -68,6 +68,10 @@ function [varargout] = tntype(b)
   thereafter.  This is to be consistent with Matlab style.  The
   one-line summary has punctuation.
 
+* Optional flags should have the capitalization
+  'PropertyName','value'.  That is, the property itself is
+  capitalized, but not the value.
+
 * Global variables should be avoided as much as possible, but if they
   are needed should be of the form BRAIDLAB_global_variable_name, with
   the latter part in all lowercase.
