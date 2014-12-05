@@ -380,6 +380,18 @@ classdef databraid < braidlab.braid
       error('BRAIDLAB:databraid:inv:undefined',...
             'This operation is not defined for databraids.')
     end
+
+    function entropy(~)
+      error('BRAIDLAB:databraid:entropy:undefined',...
+            ['This operation is not defined for databraids.  ' ...
+             'Use databraid.ftbe instead.'])
+    end
+
+    function complexity(~)
+      error('BRAIDLAB:databraid:complexity:undefined',...
+            ['This operation is not defined for databraids.  ' ...
+             'Use databraid.ftbe instead.'])
+    end
   end % methods block
 
 end % databraid classdef
