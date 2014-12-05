@@ -63,6 +63,8 @@
 \newcommand{\mathnotation}[2]{\newcommand{#1}{\ensuremath{#2}}}
 
 \DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\FTBE}{FTBE}
+
 
 %
 % Symbols
@@ -771,14 +773,35 @@ ordering of the crossing times.
   \lstinline{databraid.braid}.
 \item Multiplication of two \hbox{\lstinline{databraid}s} is only defined if
   the crossing times of the first braid are all earlier than the second.
-\item Powers and inverses of \hbox{\lstinline{databraid}s} are not defined.
-\item Entropy of \hbox{\lstinline{databraid}s} is an ambiguously defined concept. While entropy of certain braids can be computed non-iteratively, e.g., in \citet{Hall2009}, in general, it is only estimated by an iterative process. Iterations rely on self-multiplication of the braid, which is ill-defined for \hbox{\lstinline{databraid}s}. Functions \lstinline{entropy} and \lstinline{complexity} can still be used by re-casting \lstinline{databraid} objects to \lstinline{braid} objects this should be avoided in favor of the appropriate concept for \hbox{\lstinline{databraid}s}, Finite Time Braiding Exponent (FTBE), \lstinline{databraid.ftbe}, \cite{Budisic2014}. FTBE is defined by
+\item Powers and inverses of \hbox{\lstinline{databraid}s} are not defined,
+  since this would break the time-ordering of crossings.
+\item\index{FTBE (Finite Time Braiding Exponent)|(}%
+  \index{braid class@\braid\ class!entropy@\lstinline{entropy}}%
+  \index{braid class@\braid\ class!complexity@\lstinline{complexity}}%
+  The entropy of a \lstinline{databraid} is an ambiguously defined concept.
+  While entropy of certain braids can be computed non-iteratively, e.g., in
+  \citet{Hall2009}, in general it is only estimated by an iterative process.
+  Iterations rely on taking powers of the braid, which is not defined for
+  \hbox{\lstinline{databraid}s}.  The functions \hbox{\lstinline{entropy}} and
+  \hbox{\lstinline{complexity}} can still be used by converting
+  \lstinline{databraid} objects to \lstinline{braid} objects; however, this
+  should be avoided in favor of the appropriate concept for
+  \hbox{\lstinline{databraid}s},
+  the Finite Time Braiding Exponent (FTBE) \citep{Thiffeault2005,Budisic2014}.
+  A \lstinline{databraid}~$b_T$ recorded over a time interval of length~$T$
+  has an FTBE defined by
   \begin{equation}
-    \beta = \frac{1}{T} \ln \frac{ \vert B_{T}\, \ell \vert}{\vert \ell\vert},\label{eq:ftbe}
+    \FTBE(b_{T})
+    = \frac{1}{T}\, \log \frac{ \lvert b_{T}\, \ell \rvert}{\lvert\ell\rvert},
+    \label{eq:ftbe}
   \end{equation}
-where \(\ell\) is an appropriate loop described in \citet{Dynnikov2007}, \(B_{T} \ell\) is that loop transformed by a single application of the braid recorded over interval of length \(T\), and \(\vert.\vert\) is a measure of length of the loop.
+  where $\ell$ is a loop given by the generating set for the fundamental group
+  of the disk with $n$ punctures (see Section~\ref{sec:loopcoords}),
+  and~$b_{T} \ell$ is that loop transformed by a single application of the
+  braid.  Here~$\lvert\cdot\rvert$ is a measure of the length of the loop.
+  See the method \lstinline{databraid.ftbe} for more details.
+  \index{FTBE (Finite Time Braiding Exponent)|)}
 \end{itemize}
-% 
 
 \index{crossing!times|)}%
 
