@@ -772,10 +772,19 @@ ordering of the crossing times.
 \item Multiplication of two \hbox{\lstinline{databraid}s} is only defined if
   the crossing times of the first braid are all earlier than the second.
 \item Powers and inverses of \hbox{\lstinline{databraid}s} are not defined.
-\end{itemize} %
+\item Entropy of \hbox{\lstinline{databraid}s} is an ambiguously defined concept. While entropy of certain braids can be computed non-iteratively, e.g., in \citet{Hall2009}, in general, it is only estimated by an iterative process. Iterations rely on self-multiplication of the braid, which is ill-defined for \hbox{\lstinline{databraid}s}. Functions \lstinline{entropy} and \lstinline{complexity} can still be used by re-casting \lstinline{databraid} objects to \lstinline{braid} objects this should be avoided in favor of the appropriate concept for \hbox{\lstinline{databraid}s}, Finite Time Braiding Exponent (FTBE), \lstinline{databraid.ftbe}, \cite{Budisic2014}. FTBE is defined by
+  \begin{equation}
+    \beta = \frac{1}{T} \ln \frac{ \vert B_{T}\, \ell \vert}{\vert \ell\vert},\label{eq:ftbe}
+  \end{equation}
+where \(\ell\) is an appropriate loop described in \citet{Dynnikov2007}, \(B_{T} \ell\) is that loop transformed by a single application of the braid recorded over interval of length \(T\), and \(\vert.\vert\) is a measure of length of the loop.
+\end{itemize}
+% 
+
 \index{crossing!times|)}%
 
-\index{databraid class@\lstinline{databraid} class|)}%
+\index{databraid class@\lstinline{databraid} class|)}% 
+\index{databraid class@\lstinline{databraid} class!FTBE}% TODO: does not generate a link
+\index{Finite Time Braiding Exponent (FTBE)|see {\lstinline{databraid} class}}% TODO: does not generate a link
 
 \index{braid class@\braid\ class!constructor!from data|)}
 \index{braid!from data|)}%
