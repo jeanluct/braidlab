@@ -96,14 +96,21 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
-
-if useMatlabVersion
-  %% MATLAB version of the algorithm
-  [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
-else
-  %% C++ version of the algorithm
+try
+  assert(~useMatlabVersion, 'BRAIDLAB:noMEX', ['Matlab version ' ...
+                      'forced']);
+  
+    %% C++ version of the algorithm
   Nthreads = getAvailableThreadNumber(); % defined at the end
   [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
+  
+catch me
+  if ~strcmpi(me.identifier, 'BRAIDLAB:noMEX')
+    rethrow me;
+  else
+    %% MATLAB version of the algorithm
+    [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
+  end
 end
 
 varargout{1} = braidlab.braid(gen,n);

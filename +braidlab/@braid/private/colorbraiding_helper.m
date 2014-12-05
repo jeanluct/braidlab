@@ -1,23 +1,10 @@
-function result = areEqual(A,B,precision) %#ok<STOUT,INUSD>
-%AREEQUAL   Check for equality within given precision.
-%   AREEQUAL(A,B,PRECISION) Checks if elements of A and B are within
-%   10^PRECISION (int exponent) float-representable numbers.
+function varargout = colorbraiding_helper(varargin)
+% COLORBRAIDING_HELPER Compiled MEX function. See colorbraiding_helper.cpp
 %
-%   Returns a logical matrix of size equal to A and B containing results of
-%   tests.
-%
-%   AREEQUAL is implemented as a MATLAB MEX file. This file holds only its
-%   documentation.
-%
-%   Example
-%      A = rand(10,10);
-%      areEqual(A,A+5*eps(A),5)
-%      areEqual(A,A+5*eps(A),3)
-
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   http:%github.com/jeanluct/braidlab
 %
 %   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
@@ -35,9 +22,7 @@ function result = areEqual(A,B,precision) %#ok<STOUT,INUSD>
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <http:%www.gnu.org/licenses/>.
 % LICENSE>
 
-assert(exist('areEqual') == 3, 'BRAIDLAB:MEXonly', ...
-       ['areEqual function is available only if braidlab is ' ...
-        'MEX-compiled.'] );
+braidlab.util.assertmex(mfilename);
