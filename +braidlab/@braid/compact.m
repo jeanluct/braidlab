@@ -58,6 +58,10 @@ function c = compact(b)
 %  return;
 %end
 
+assert(exist('compact_helper') == 3, 'BRAIDLAB:MEXonly', ...
+       ['Compact function is available only if braidlab is ' ...
+        'MEX-compiled.'] );
+
 if ~isempty(b.word) && length(b) > 1
   bc = compact_helper(b.word);
 else

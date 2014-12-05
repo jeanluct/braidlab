@@ -25,4 +25,4 @@ function varargout = colorbraiding_helper(varargin)
 %   along with Braidlab.  If not, see <http:%www.gnu.org/licenses/>.
 % LICENSE>
 
-braidlab.util.assertmex;
+braidlab.util.assertmex(mfilename);
