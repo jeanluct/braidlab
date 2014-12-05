@@ -311,7 +311,7 @@ classdef databraid < braidlab.braid
     %     underestimate the time if the first generator appeared late, or if
     %     the last crossing did not appear at the end of the physical braid.
     %
-    %   * 'base' - [ positive real ] - Use a custom base of
+    %   * Base - [ positive real ] - Use a custom base of
     %     logarithm instead of natural logarithm.
     %
     %   This is a method for the DATABRAID class
