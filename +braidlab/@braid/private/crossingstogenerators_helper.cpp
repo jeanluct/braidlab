@@ -33,7 +33,7 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-#include "colorbraiding_helper.hpp"
+#include "crossingstogenerators_helper.hpp"
 #include "mex.h"
 
 /*
@@ -60,14 +60,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (nrhs >= 3) {
     if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
         !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:colorbraiding_helper:threadsinput",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:crossingstogenerators_helper:threadsinput",
                          "Number of threads must be "
                          "noncomplex scalar double.");
     }
 
     NThreadsRequested = (size_t) mxGetScalar(prhs[2]);
     if (1 <= BRAIDLAB_debuglvl)  {
-      printf("colorbraiding_helper: Number of threads requested %d\n",
+      printf("crossingstogenerators_helper: Number of threads requested %d\n",
              NThreadsRequested );
     }
   }
@@ -84,7 +84,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #ifdef BRAIDLAB_NOTHREADING
   if (NThreadsRequested > 1) {
     mexWarnMsgIdAndTxt(
-                 "BRAIDLAB:braid:colorbraiding_helper:nothreadingsupport",
+                 "BRAIDLAB:braid:crossingstogenerators_helper:nothreadingsupport",
                  "You requested multithreaded execution, but "
                  "either your compiler does not support it or "
                  "MEX file was compiled with BRAIDLAB_NOTHREADING flag.  "
@@ -94,7 +94,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #else
   if (NThreadsRequested < 1) {
     mexErrMsgIdAndTxt(
-                "BRAIDLAB:braid:colorbraiding_helper:numthreadsnotpositive",
+                "BRAIDLAB:braid:crossingstogenerators_helper:numthreadsnotpositive",
                 "Number of threads requested must be positive"
                 " when running in multithreaded mode");
   }
@@ -103,12 +103,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   Timer tictoc(1);
 
   if (nrhs < 2)
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:crossingstogenerators_helper:input",
                       "2 arguments required.");
 
   Real3DMatrix trj = Real3DMatrix( prhs[0] );
   if ( trj.C() != 2 ) {
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding_helper:input",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:crossingstogenerators_helper:input",
                       "Trajectory should have 2 columns.");
   }
 
@@ -116,7 +116,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   if ( trj.R() != t.N() ) {
     mexErrMsgIdAndTxt(
-        "BRAIDLAB:braid:colorbraiding_helper:input",
+        "BRAIDLAB:braid:crossingstogenerators_helper:input",
         "Trajectory matrix and time vector should have same number of rows.");
   }
 

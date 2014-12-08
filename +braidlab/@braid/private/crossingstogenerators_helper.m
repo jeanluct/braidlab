@@ -1,5 +1,5 @@
-function varargout = colorbraiding_helper(varargin)
-% COLORBRAIDING_HELPER Compiled MEX function. See colorbraiding_helper.cpp
+function varargout = crossingstogenerators_helper(varargin)
+% CROSSINGSTOGENERATORS_HELPER Compiled MEX function. See crossingstogenerators_helper.cpp
 %
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
