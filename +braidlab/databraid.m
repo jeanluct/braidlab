@@ -185,16 +185,30 @@ classdef databraid < braidlab.braid
       bs = braidlab.databraid(bb,b.tcross(ii));
     end
 
-    function c = tensor(a,b)
-    %TENSOR   Tensor product of two databraids.
-    %   C = TENSOR(A,B) returns the tensor product of the databraids A and
-    %   B, which is the braid obtained by putting A and B side-by-side, with
-    %   A on the left.  The crossing times are sorted chronologically.
+    function c = tensor(varargin)
+    %TENSOR   Tensor product of databraids.
+    %   C = TENSOR(B1,B2) returns the tensor product of the databraids B1 and
+    %   B2, which is the databraid obtained by laying B1 and B2 side-by-side,
+    %   with B1 on the left.  The crossing times are sorted chronologically.
+    %
+    %   C = TENSOR(B1,B2,B3,...) returns the tensor product of several
+    %   databraids.
     %
     %   This is a method for the DATABRAID class.
-    %   See also DATABRAID.
-      tcr = sort([a.tcross b.tcross]);
-      c = braidlab.databraid(tensor@braidlab.braid(a,b),tcr);
+    %   See also DATABRAID, BRAID.TENSOR.
+      if nargin < 2
+        error('BRAIDLAB:databraid:tensor:badarg', ...
+              'Need at least two databraids.')
+      elseif nargin == 2
+        a = varargin{1}; b = varargin{2};
+        % Sort, but keep track of index changes.
+        [tcr,idx] = sort([a.tcross b.tcross]);
+        c = braidlab.databraid(tensor@braidlab.braid(a,b),tcr);
+        % Re-order the generators according to sorting.
+        c.word = c.word(idx);
+      else
+        c = tensor(varargin{1},tensor(varargin{2:end}));
+      end
     end
 
     function c = compact(b)
