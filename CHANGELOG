@@ -1,4 +1,11 @@
-Changelog for CBraid and Braiding (lightly edited svn log):
+Changelog for CBraid and Braiding
+=================================
+
+========================================================================
+After r12 the code was moved from Googlecode/SVN to GitHub/Git, so no
+version numbers anymore.
+
+From here is the lightly edited svn log.
 
 ------------------------------------------------------------------------
 r11 | jeanlucth@gmail.com | 2014-07-04 09:06:25 -0500 (Fri, 04 Jul 2014) | 1 line
