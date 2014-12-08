@@ -17,7 +17,7 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   is also used by the DATABRAID subclass.
 %
 %   ** Implementation: ** By default, the function invokes a C++
-%   implementation of the algorithm from file colorbraiding_helper.cpp. To
+%   implementation of the algorithm from file crossingstogenerators_helper.cpp. To
 %   use a slower, MATLAB implementation, set a global MATLAB variable
 %   BRAIDLAB_braid_nomex to true. A comparison between MATLAB and
 %   C++ versions of the algorithm can be run by executing
@@ -102,7 +102,7 @@ try
   
     %% C++ version of the algorithm
   Nthreads = getAvailableThreadNumber(); % defined at the end
-  [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
+  [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
   
 catch me
   if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')

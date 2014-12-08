@@ -1,13 +1,12 @@
-function c = tensor(varargin)
-%TENSOR   Tensor product of braids.
-%   C = TENSOR(B1,B2) returns the tensor product of the braids B1 and B2,
-%   which is the braid obtained by laying B1 and B2 side-by-side, with B1 on
-%   the left.
+function bt = trunc(b,interval)
+%TRUNC   Truncate databraid by choosing crossings from a time subinterval.
+%   BT = TRUNC(B,INTERVAL) Truncates the braid generators to those
+%   whose crossing times TCROSS lie in the interval
+%   INTERVAL(1) <= TCROSS <= INTERVAL(2).
+%   If INTERVAL is a single number, then selected crossings will have
+%   TCROSS <= INTERVAL.
 %
-%   C = TENSOR(B1,B2,B3,...) returns the tensor product of several braids.
-%
-%   This is a method for the BRAID class.
-%   See also BRAID, BRAID.MTIMES.
+%   This is a method for the DATABRAID class.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -33,19 +32,22 @@ function c = tensor(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2
-  error('BRAIDLAB:braid:tensor:badarg', ...
-        'Need at least two braids.')
-elseif nargin == 2
-  a = varargin{1};
-  b = varargin{2};
-  n1 = a.n;
-  n2 = b.n;
-
-  sg = sign(b.word);
-  idx = abs(b.word) + n1;  % re-index generators of b
-
-  c = braidlab.braid([a.word idx.*sg],n1+n2);
-else
-  c = tensor(varargin{1},tensor(varargin{2:end}));
+bt = b;
+if nargin < 2 || ~isnumeric(interval)
+  error('BRAIDLAB:databraid:trunc:badarg','Not enough input arguments.')
 end
+
+if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
+  error('BRAIDLAB:databraid:trunc:badarg',...
+        'Interval has to be a non-empty 1 or 2 element vector.')
+end
+
+% select the desired crossing times
+if numel(interval) == 1
+  sel = bt.tcross <= interval;
+else
+  sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
+end
+
+bt.tcross = bt.tcross(sel);
+bt.word = bt.word(sel);

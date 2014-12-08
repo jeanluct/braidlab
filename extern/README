@@ -1,6 +1,6 @@
 assignmentoptimal is obtained from http://www.mathworks.com/matlabcentral/fileexchange/6543.  The compiled mex file is copied to the private folder of +braidlab. (Version 2011-07-05)
 
-CBraid is obtained from https://cbraid.googlecode.com/svn/trunk. (rev 9)
+CBraid is obtained from https://github.com/jeanluct/cbraid. (rev 5c3fdc1)
 
 trains is obtained from https://bitbucket.org/jeanluc/braid-code/raw/tip/trains. (rev 66)
 

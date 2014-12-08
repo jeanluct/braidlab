@@ -1,13 +1,5 @@
-function c = tensor(varargin)
-%TENSOR   Tensor product of braids.
-%   C = TENSOR(B1,B2) returns the tensor product of the braids B1 and B2,
-%   which is the braid obtained by laying B1 and B2 side-by-side, with B1 on
-%   the left.
-%
-%   C = TENSOR(B1,B2,B3,...) returns the tensor product of several braids.
-%
-%   This is a method for the BRAID class.
-%   See also BRAID, BRAID.MTIMES.
+function check_tcross(br)
+%CHECK_TCROSS   Validate crossing times.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -33,19 +25,24 @@ function c = tensor(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2
-  error('BRAIDLAB:braid:tensor:badarg', ...
-        'Need at least two braids.')
-elseif nargin == 2
-  a = varargin{1};
-  b = varargin{2};
-  n1 = a.n;
-  n2 = b.n;
+% Must have as many times as the word length.
+if length(br.word) ~= length(br.tcross)
+  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+	'Must have as many crossing times as generators.')
+end
 
-  sg = sign(b.word);
-  idx = abs(b.word) + n1;  % re-index generators of b
+% Cannot have decreasing times.
+dt = diff(br.tcross);
+if any(dt < 0)
+  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+	'Crossing times must be nondecreasing.')
+end
 
-  c = braidlab.braid([a.word idx.*sg],n1+n2);
-else
-  c = tensor(varargin{1},tensor(varargin{2:end}));
+% Check: if there are simultaneous crossings, they must
+% correspond to different generators.
+isim = find(~dt);
+if any(abs(br.word(isim+1) - br.word(isim)) <= 1)
+  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+	['Cannot have simultaneous crossing times for noncommuting' ...
+	 ' generators.'])
 end

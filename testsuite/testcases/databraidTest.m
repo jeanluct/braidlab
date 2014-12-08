@@ -1,14 +1,3 @@
-function c = tensor(varargin)
-%TENSOR   Tensor product of braids.
-%   C = TENSOR(B1,B2) returns the tensor product of the braids B1 and B2,
-%   which is the braid obtained by laying B1 and B2 side-by-side, with B1 on
-%   the left.
-%
-%   C = TENSOR(B1,B2,B3,...) returns the tensor product of several braids.
-%
-%   This is a method for the BRAID class.
-%   See also BRAID, BRAID.MTIMES.
-
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
@@ -33,19 +22,27 @@ function c = tensor(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2
-  error('BRAIDLAB:braid:tensor:badarg', ...
-        'Need at least two braids.')
-elseif nargin == 2
-  a = varargin{1};
-  b = varargin{2};
-  n1 = a.n;
-  n2 = b.n;
+classdef databraidTest < matlab.unittest.TestCase
 
-  sg = sign(b.word);
-  idx = abs(b.word) + n1;  % re-index generators of b
+  properties
+    dbr
+  end
 
-  c = braidlab.braid([a.word idx.*sg],n1+n2);
-else
-  c = tensor(varargin{1},tensor(varargin{2:end}));
+  methods (TestMethodSetup)
+    function createDatabraid(testCase)
+      import braidlab.databraid
+
+      data = load('testdata','XY','ti');
+      testCase.dbr = databraid( data.XY, data.ti );
+    end
+  end
+
+  methods (Test)
+    function test_databraid_ftbe(testCase)
+      dbr = testCase.dbr;
+      testCase.verifyEqual(dbr.ftbe('method','proj'), ...
+                           dbr.ftbe('method','nonproj'),...
+                           'AbsTol',1e-12);
+    end
+  end
 end
