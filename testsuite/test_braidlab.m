@@ -49,6 +49,7 @@ end
 
 suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'cycleTest.m']);
