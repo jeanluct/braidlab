@@ -27,8 +27,8 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [5]: http://arxiv.org/abs/1410.0849
 [6]: http://chaos.utexas.edu/people/post-docs/michael-allshouse
 [7]: http://www.liv.ac.uk/~tobyhall/T_Hall.html
-[8]: http://code.google.com/p/cbraid
-[9]: http://personal.us.es/meneses/index2.swf
+[8]: https://github.com/jeanluct/cbraid
+[9]: http://personal.us.es/meneses/software.php
 [10]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
 [11]: http://www.mathworks.com/matlabcentral/fileexchange/6543
 [12]: https://github.com/progschj/ThreadPool
