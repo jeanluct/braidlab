@@ -1,4 +1,9 @@
 function test_braidlab( nomex )
+%% TEST_BRAIDLAB Run unit tests.
+%
+%  TEST_BRAIDLAB Runs unit tests for MEX files.
+%  TEST_BRAIDLAB(1) Runs unit tests without MEX functionality.
+
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
@@ -37,6 +42,14 @@ tcfolder = [pwd '/testcases/'];
 if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_loop_nomex
   clear global BRAIDLAB_braid_nomex
+  if ~braidlab.util.assertmex(['+braidlab/@braid/private/' ...
+                        'compact_helper'])
+    msg = ['Requested MEX tests and braidlab looks uncompiled.' ...
+           char(10) 'Either compile braidlab or pass 1 to test_braidlab ' ...
+           'otherwise there will be a LOT of errors.'];
+    warning(msg);
+    pause(1);
+  end
   disp('Testing braidlab with MEX algorithms.');
 else
   % disable MEX algorithms
