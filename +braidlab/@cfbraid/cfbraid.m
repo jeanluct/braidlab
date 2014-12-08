@@ -78,7 +78,9 @@ classdef cfbraid < matlab.mixin.CustomDisplay
         end
       else
         if nargin < 2
-          br.n = max(abs(b))+1;
+          if ~isempty(b)
+            br.n = max(abs(b))+1;
+          end
         else
           br.n = nn;
           if br.n < max(abs(b))+1
