@@ -2,7 +2,7 @@ function [c,bE] = complexity(b, varargin)
 %COMPLEXITY   Dynnikov-Wiest geometric complexity of a braid.
 %   C = COMPLEXITY(B) returns the Dynnikov-Wiest complexity of a braid:
 %
-%     C(B) = ln|B.E| - ln|E|
+%     C(B) = log|B.E| - log|E|
 %
 %   where E is a canonical curve diagram, and |L| gives the number of
 %   intersections of the curve diagram L with the real axis.
