@@ -78,6 +78,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        check_tcross(br);
         return
       elseif ismatrix(XY)
         br.n = max(size(XY));
@@ -87,6 +88,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        check_tcross(br);
         return
       elseif nargin < 2
         t = 1:size(XY,1);
@@ -380,6 +382,35 @@ classdef databraid < braidlab.braid
     end
 
   end % methods block
+
+
+  methods (Access = private)
+    function check_tcross(br)
+
+      % Must have as many times as the word length.
+      if length(br.word) ~= length(br.tcross)
+        error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+              'Must have as many crossing times as generators.')
+      end
+
+      % Cannot have decreasing times.
+      dt = diff(br.tcross);
+      if any(dt < 0)
+        error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+              'Crossing times must be nondecreasing.')
+      end
+
+      % Check: if there are simultaneous crossings, they must
+      % correspond to different generators.
+      isim = find(~dt);
+      if any(abs(br.word(isim+1) - br.word(isim)) <= 1)
+        error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+              ['Cannot have simultaneous crossing times for noncommuting' ...
+               ' generators.'])
+      end
+    end
+  end % methods block
+
 
   % Some operations are not appropriate for databraids, since they break
   % chronology.  Hide these, though they can still be called and will
