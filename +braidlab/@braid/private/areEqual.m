@@ -1,7 +1,7 @@
-function result = areEqual(A,B,precision) %#ok<STOUT,INUSD>
-%AREEQUAL   Check for equality within given precision.
-%   AREEQUAL(A,B,PRECISION) Checks if elements of A and B are within
-%   10^PRECISION (int exponent) float-representable numbers.
+function result = areEqual(A,B,D) %#ok<STOUT,INUSD>
+%AREEQUAL   Check for equality within a given precision.
+%   AREEQUAL(A,B,D) Checks if elements of A and B are within
+%   D (int exponent) float-representable numbers.
 %
 %   Returns a logical matrix of size equal to A and B containing results of
 %   tests.
@@ -38,6 +38,50 @@ function result = areEqual(A,B,precision) %#ok<STOUT,INUSD>
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-assert(exist('areEqual') == 3, 'BRAIDLAB:MEXonly', ...
-       ['areEqual function is available only if braidlab is ' ...
-        'MEX-compiled.'] );
+
+assert( all(A(:) < B(:)), 'BRAIDLAB:areEqual:badarg', ['Input arguments ' ...
+                    'have to be in A < B order'] );
+
+result = reshape( B(:) <= nextafter(A(:), D), size(A) );
+
+end
+
+function y = nextafter(x,d)
+%NEXTAFTER Increment last bit of a floating point number.
+% NEXTAFTER(X) adds one unit to the last place of X.
+% NEXTAFTER(X,D) for positive D does the same thing.
+% NEXTAFTER(X,D) for negative D subtracts one unit ("Next Before")
+% Examples:
+% nextafter(1) is 1 + eps
+% nextafter(1,-1) is 1 - eps/2
+% nextafter(0) is the smallest floating point number.
+%
+% Adapted from a function by Cleve Moler:
+% http://www.mathworks.com/matlabcentral/newsreader/view_thread/192
+   
+[f,e] = log2(abs(x));
+u = pow2(2,e-54);
+if x == 0, 
+  u = eps*realmin; 
+end
+
+if nargin < 2, 
+  d = 1; 
+end
+
+if d == 0
+  y = x;
+  return;
+end
+
+if d < 0, 
+  u = -u; 
+end
+
+if f == 1/2 & sign(x) ~= sign(d), 
+  u = u/2; 
+end
+
+y = nextafter(x, d - sign(d)) + u; 
+
+end
