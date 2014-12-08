@@ -1,8 +1,8 @@
 function varargout = intersec_helper(varargin)
-%% INTERSEC_HELPER Please see intersec_helper.cpp
+%INTERSEC_HELPER Please see intersec_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

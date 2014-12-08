@@ -1,8 +1,8 @@
 function varargout = entropy_helper(varargin)
-%% ENTROPY_HELPER Please see entropy_helper.cpp
+%ENTROPY_HELPER Please see entropy_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

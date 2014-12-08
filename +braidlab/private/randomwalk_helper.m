@@ -1,8 +1,8 @@
 function varargout = randomwalk_helper(varargin)
-%% RANDOMWALK_HELPER Please see randomwalk_helper.cpp
+%RANDOMWALK_HELPER Please see randomwalk_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

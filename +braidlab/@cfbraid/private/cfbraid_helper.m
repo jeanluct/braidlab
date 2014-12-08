@@ -1,8 +1,8 @@
 function varargout = cfbraid_helper(varargin)
-%% CFBRAID_HELPER Please see cfbraid_helper.cpp
+%CFBRAID_HELPER Please see cfbraid_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

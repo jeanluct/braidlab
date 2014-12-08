@@ -1,8 +1,8 @@
 function varargout = compact_helper(varargin)
-%% COMPACT_HELPER Please see compact_helper.cpp
+%COMPACT_HELPER Please see compact_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

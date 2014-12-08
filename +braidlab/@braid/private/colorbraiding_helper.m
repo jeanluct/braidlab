@@ -1,9 +1,8 @@
 function varargout = colorbraiding_helper(varargin)
-% COLORBRAIDING_HELPER Compiled MEX function. See
-% colorbraiding_helper.cpp
+%COLORBRAIDING_HELPER Please see colorbraiding_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 %
 % <LICENSE

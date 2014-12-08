@@ -1,8 +1,8 @@
 function varargout = tntype_helper(varargin)
-%% TNTYPE_HELPER Please see tntype_helper.cpp
+%TNTYPE_HELPER Please see tntype_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

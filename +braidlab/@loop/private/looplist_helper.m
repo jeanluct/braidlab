@@ -1,8 +1,8 @@
 function varargout = looplist_helper(varargin)
-%% LOOPLIST_HELPER Please see looplist_helper.cpp
+%LOOPLIST_HELPER Please see looplist_helper.cpp.
 %
-% This M-file is invoked only when the corresponding MEX function
-% does not exist.
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
