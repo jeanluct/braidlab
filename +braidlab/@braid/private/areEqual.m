@@ -38,11 +38,12 @@ function result = areEqual(A,B,D) %#ok<STOUT,INUSD>
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+sel = A(:) < B(:);
 
-assert( all(A(:) < B(:)), 'BRAIDLAB:areEqual:badarg', ['Input arguments ' ...
-                    'have to be in A < B order'] );
+result = true( size(A) );
 
-result = reshape( B(:) <= nextafter(A(:), D), size(A) );
+result(sel) = B(sel) <= nextafter(A(sel), D);
+result(~sel) = A(~sel) <= nextafter(B(~sel), D);
 
 end
 
