@@ -350,9 +350,9 @@ classdef databraid < braidlab.braid
       % pick computation method
       switch params.method
         case 'proj', % projectivized uses entropy
-          stretch = entropy(B,'onestep','length',params.length);
+          stretch = entropy(braid(B),'onestep','length',params.length);
         case 'nonproj', % non-projectivized uses complexity
-          stretch = complexity(B,'length',params.length);
+          stretch = complexity(braid(B),'length',params.length);
       end
 
       % change base if needed
