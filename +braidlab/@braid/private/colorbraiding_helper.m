@@ -1,5 +1,10 @@
 function varargout = colorbraiding_helper(varargin)
-% COLORBRAIDING_HELPER Compiled MEX function. See colorbraiding_helper.cpp
+% COLORBRAIDING_HELPER Compiled MEX function. See
+% colorbraiding_helper.cpp
+%
+% This M-file is invoked only when the corresponding MEX function
+% does not exist.
+
 %
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -25,4 +30,4 @@ function varargout = colorbraiding_helper(varargin)
 %   along with Braidlab.  If not, see <http:%www.gnu.org/licenses/>.
 % LICENSE>
 
-braidlab.util.assertmex(mfilename);
+throwAsCaller(braidlab.util.NoMEXException(mfilename));

@@ -1,19 +1,4 @@
-function out = assertmex(functionname)
-%%ASSERTMEX Assert that MEX file exists
-%
-% ASSERTMEX(functionname) Checks that a mex file "functionname" exists. If
-% it does not exist, function throws BRAIDLAB:noMEX error.
-%
-% OUT = ASSERTMEX(functionname) Returns TRUE if mex file
-% "functionname" exists and FALSE otherwise. No errors are thrown.
-%
-% ... = ASSERTMEX; Same as above, except the desired functionname
-% is detected by checking call stack. This can be useful in
-% development stages, but final versions of code should specify
-% function name explicitly to speed up the code.
-%
-% Consider also invoking the function as assertmex(mfilename) if
-% the calling function is the first function in an m-file.
+%NOMEXEXCEPTIOn   Exception thrown when braidlab MEX file does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -39,17 +24,12 @@ function out = assertmex(functionname)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 1
-  [ST,I] = dbstack(1);
-  functionname = ST(1).name;
-end
-
-if nargout < 1
-  if exist(functionname) ~= 3
-    throw(braidlab.util.NoMEXException(functionname));
-  end
-else
-    out = (exist(functionname) == 3);
-end
-
+classdef NoMEXException < MException
+	methods
+		function obj = NoMEXException(varargin)
+			obj = obj@MException('BRAIDLAB:NOMEX', varargin{:});
+      obj.message = ['Missing MEX: ' obj.message char(10) ...
+                    'Please compile braidlab to access full functionality.'];
+		end
+	end
 end
