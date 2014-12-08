@@ -1,8 +1,10 @@
-function c = tensor(a,b)
-%TENSOR   Tensor product of two braids.
-%   C = TENSOR(A,B) returns the tensor product of the braids A and B, which
-%   is the braid obtained by putting A and B side-by-side, with A on the
-%   left.
+function c = tensor(varargin)
+%TENSOR   Tensor product of braids.
+%   C = TENSOR(B1,B2) returns the tensor product of the braids B1 and B2,
+%   which is the braid obtained by laying B1 and B2 side-by-side, with B1 on
+%   the left.
+%
+%   C = TENSOR(B1,B2,B3,...) returns the tensor product of several braids.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.MTIMES.
@@ -31,10 +33,19 @@ function c = tensor(a,b)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-n1 = a.n;
-n2 = b.n;
+if nargin < 2
+  error('BRAIDLAB:braid:tensor:badarg', ...
+        'Need at least two braids.')
+elseif nargin == 2
+  a = varargin{1};
+  b = varargin{2};
+  n1 = a.n;
+  n2 = b.n;
 
-sg = sign(b.word);
-idx = abs(b.word) + n1;  % re-index generators of b2
+  sg = sign(b.word);
+  idx = abs(b.word) + n1;  % re-index generators of b2
 
-c = braidlab.braid([a.word idx.*sg],n1+n2);
+  c = braidlab.braid([a.word idx.*sg],n1+n2);
+else
+  c = tensor(varargin{1},tensor(varargin{2:end}));
+end
