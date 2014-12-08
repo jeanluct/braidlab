@@ -2,16 +2,15 @@ Methods and features that are not yet in the guide:
 
 randomwalk
 braid.gencount
-loop(...,'noboundary')
 loop.nested
 loop.components
-loop.plot('components')
+loop.plot('Components') and other options
 loop.getgraph
-loop.loop('enum')
+loop.loop('Enum')
 loop.l2norm
 debugmsg & BRAIDLAB_debuglvl
 BRAIDLAB_threads
 @cfbraid class
-loop.zeros (now obsolete, but could mention pre-allocation in guide)
+loop pre-allocation (see devel/test/loop_speedtest)
 format loose/compact
 databraid.trunc

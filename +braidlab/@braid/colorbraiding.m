@@ -105,8 +105,8 @@ try
   [gen,tcr] = colorbraiding_helper(XYtraj,t,Nthreads);
   
 catch me
-  if ~strcmpi(me.identifier, 'BRAIDLAB:noMEX')
-    rethrow me;
+  if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+    rethrow(me);
   else
     %% MATLAB version of the algorithm
     [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
