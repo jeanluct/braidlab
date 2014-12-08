@@ -38,26 +38,29 @@ function c = compact(b)
 
 c = b;
 
-function [cc,shorter] = canceladj(cc)
-  shorter = false;
-
-  i1 = 1:2:length(cc.word)-1;
-  ic = find(cc.word(i1) == -cc.word(i1+1));
-  if ~isempty(ic), shorter = true; end
-  cc.word(i1(ic)) = 0; cc.word(i1(ic)+1) = 0;
-
-  i2 = 2:2:length(cc.word)-1;
-  ic = find(cc.word(i2) == -cc.word(i2+1));
-  if ~isempty(ic), shorter = true; end
-  cc.word(i2(ic)) = 0; cc.word(i2(ic)+1) = 0;
-
-  i0 = find(cc.word ~= 0);
-  cc.word = cc.word(i0);
-  cc.tcross = cc.tcross(i0);
-end
-
 % Keep cancelling until nothing changes.
 shorter = true;
 while shorter
   [c,shorter] = canceladj(c);
 end
+
+%====================================================================
+function [cc,shorter] = canceladj(cc)
+
+shorter = false;
+
+w = cc.word;  % Make a copy, to avoid braid.set method.
+
+i1 = 1:2:length(w)-1;
+ic = find(w(i1) == -w(i1+1));
+if ~isempty(ic), shorter = true; end
+w(i1(ic)) = 0; w(i1(ic)+1) = 0;
+
+i2 = 2:2:length(w)-1;
+ic = find(w(i2) == -w(i2+1));
+if ~isempty(ic), shorter = true; end
+w(i2(ic)) = 0; w(i2(ic)+1) = 0;
+
+i0 = find(w ~= 0);
+cc.tcross = cc.tcross(i0);
+cc.word = w(i0);
