@@ -105,7 +105,8 @@ try
   [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
   
 catch me
-  if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+  % revert to Matlab version if there is no MEX version
+  if ~isa(me,'braidlab.util.NoMEXException')
     rethrow(me);
   else
     %% MATLAB version of the algorithm

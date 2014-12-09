@@ -1,10 +1,14 @@
-function varargout = crossingstogenerators_helper(varargin)
-% CROSSINGSTOGENERATORS_HELPER Compiled MEX function. See crossingstogenerators_helper.cpp
+function varargout = colorbraiding_helper(varargin)
+%COLORBRAIDING_HELPER   See colorbraiding_helper.cpp.
+%
+%   This M-file is invoked only when the corresponding MEX function
+%   does not exist.
+
 %
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http:%github.com/jeanluct/braidlab
+%   http://github.com/jeanluct/braidlab
 %
 %   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
@@ -25,4 +29,4 @@ function varargout = crossingstogenerators_helper(varargin)
 %   along with Braidlab.  If not, see <http:%www.gnu.org/licenses/>.
 % LICENSE>
 
-braidlab.util.assertmex(mfilename);
+throwAsCaller(braidlab.util.NoMEXException(mfilename));

@@ -38,17 +38,17 @@ Ls = nan(size(strands));
 
 % loop in parallel over all numbers of strands
 parfor s = 1:length(strands)
-  
+
   Nstrands = strands(s);
-  
+
   % boundaries of the length interval we are searching
   Llower = 1;
   Lupper = inf; % initial length
-  
-  
+
+
   Nleft = Ntries;
   while Nleft > 0
-    
+
     % the attempt is either in the middle of the interval
     if Lupper < inf
       L = round((Llower + Lupper)/2);
@@ -56,21 +56,21 @@ parfor s = 1:length(strands)
     else
       L = 2*Llower;
     end
-    
+
     %% produce a valid set of generators
     rng(1); % we need a repeatable set of generators
     maxIndAllowed = Nstrands-1;
     g = randi( [-maxIndAllowed, maxIndAllowed], [1, L] ); % discrete integer distribution
     maxIndex = max(abs(g(:)));
     assert( maxIndex <= maxIndAllowed, 'Generator index is badly set')
-    
+
     %% produce a braid
     B = braid(g, Nstrands);
-    
+
     fprintf('S: %d, Tries left %d, L = %d in [%d, %d], max index used %d...', ...
       Nstrands, Nleft, L, Llower, Lupper, maxIndex );
     overflow = false;
-    
+
     %% overflow is detected using braidlab's internal error reporting
     % the error code has to contain 'BRAIDLAB' and 'overflow' in it
     try
@@ -85,7 +85,7 @@ parfor s = 1:length(strands)
         rethrow ME;
       end
     end
-    
+
     %% on overflow, set the upper boundary of the length interval
     if overflow
       fprintf('caught overflow error.\n');
@@ -95,7 +95,7 @@ parfor s = 1:length(strands)
       fprintf('no overflow.\n');
       Llower = L;
     end
-    
+
     %% termination is when the boundaries surround only a single number
     if abs(Llower-Lupper) <= 1
       fprintf('S: %d, Zeroed in at %d.\n', Nstrands, L);
@@ -103,7 +103,7 @@ parfor s = 1:length(strands)
     else
       Nleft = Nleft-1;
     end
-    
+
   end
 end
 

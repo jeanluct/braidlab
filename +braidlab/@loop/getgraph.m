@@ -254,10 +254,10 @@ global edgecount
 
 dp = next(1) - mine(1); % index distance between punctures
 assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
-	'Requests one or two consecutive punctures');
+        'Requests one or two consecutive punctures');
 
 assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
-	'Vertex indices must be nonzero') ;
+        'Vertex indices must be nonzero') ;
 
 edgecount = edgecount + 1;
 froms(edgecount) = graph_keytohash(mine, M, T);
