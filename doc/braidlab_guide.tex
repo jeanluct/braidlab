@@ -1897,6 +1897,13 @@ $ cd braidlab; make BRAIDLAB_USE_GMP=0
 This will slow down some functions, in particular testing for equality of
 large braids.
 
+If you wish to compile \lstinline{braidlab} from source using GMP, you have to make GMP headers, specifically \lstinline{gmp.h} and \lstinline{gmpxx.h}, available to the C++ compiler that MATLAB is using. Both GCC compiler (more common on Linux systems) and Clang compiler (more common on Mac OS X systems) use environment variable \lstinline{CPLUS_INCLUDE_PATH} to specify path to include files. For example, if both headers reside in \lstinline{/usr/local/include} on your Linux or Mac OS X system, you would issue
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ export CPLUS_INCLUDE_PATH=/usr/local/include
+\end{lstlisting}
+before issuing \lstinline{make} that builds \lstinline{braidlab}.
+
 
 \subsection{Setting Matlab's path}
 \label{sec:path}
