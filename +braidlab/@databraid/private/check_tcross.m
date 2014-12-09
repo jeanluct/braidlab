@@ -28,21 +28,31 @@ function check_tcross(br)
 % Must have as many times as the word length.
 if length(br.word) ~= length(br.tcross)
   error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	'Must have as many crossing times as generators.')
+        'Must have as many crossing times as generators.')
 end
 
 % Cannot have decreasing times.
 dt = diff(br.tcross);
 if any(dt < 0)
   error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	'Crossing times must be nondecreasing.')
+        'Crossing times must be nondecreasing.')
 end
 
-% Check: if there are simultaneous crossings, they must
-% correspond to different generators.
-isim = find(~dt);
-if any(abs(br.word(isim+1) - br.word(isim)) <= 1)
-  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	['Cannot have simultaneous crossing times for noncommuting' ...
-	 ' generators.'])
+% Check: if there are simultaneous crossings, they must correspond to
+% commuting generators.
+runs = diff(find([1,dt,1]));  % Find run lengths of simultaneous crossing times
+starts = find([1,dt]);        % Find where they start
+starts = starts(runs > 1);    % Keep only runs of length > 1
+runs = runs(runs > 1);
+% Now loop over each run block.
+for i = 1:length(runs)
+  % Take the difference of the absolute index of generators.
+  rungens = sort(abs(br.word(starts(i):starts(i)+runs(i)-1)));
+  % These differences must all be > 1, indicating the generators commute.
+  % Otherwise it's an error.
+  if any(diff(rungens) <= 1)
+    error('BRAIDLAB:databraid:check_tcross:badsimtimes', ...
+          ['Cannot have simultaneous crossing times ' ...
+           'for noncommuting generators.'])
+  end
 end
