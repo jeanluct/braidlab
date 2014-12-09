@@ -93,9 +93,9 @@ classdef databraidTest < matlab.unittest.TestCase
       testCase.verifyTrue(b1 ~= b2);
 
       % These should be equal: see issue #97.
-      %b1 = braidlab.databraid([1 2 3 5 7],[1 2 3 3]);
-      %b2 = braidlab.databraid([1 2 5 7 3],[1 2 3 3]);
-      %testCase.verifyTrue(b1 == b2);
+      b1 = braidlab.databraid([1 2 -3  5 -7 6],[1 2 3 3 3 4]);
+      b2 = braidlab.databraid([1 2  5 -7 -3 6],[1 2 3 3 3 4]);
+      testCase.verifyTrue(b1 == b2);
     end
 
     function test_databraid_mtimes(testCase)

@@ -141,7 +141,19 @@ classdef databraid < braidlab.braid
     %
     %   This is a method for the DATABRAID class.
     %   See also BRAID.EQ, BRAID.LEXEQ.
-      ee = (lexeq(braid(b1),braid(b2)) && all(b1.tcross == b2.tcross));
+      if length(b1.tcross) ~= length(b2.tcross)
+	ee = false;
+	return
+      end
+      ee = all(b1.tcross == b2.tcross);
+      if ee
+        % If there are simultaneous times, for which the generators have to
+        % commute, sort the generators according to absolute value.  See
+        % issue #97.
+        w1 = sort_sim_tcross(b1);
+        w2 = sort_sim_tcross(b2);
+        ee = all(w1.word == w2.word);
+      end
     end
 
     function ee = ne(b1,b2)
