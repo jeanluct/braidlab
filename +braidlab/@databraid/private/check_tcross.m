@@ -1,4 +1,4 @@
-function check_tcross(br)
+function br = check_tcross(br)
 %CHECK_TCROSS   Validate crossing times.
 
 % <LICENSE
@@ -28,21 +28,16 @@ function check_tcross(br)
 % Must have as many times as the word length.
 if length(br.word) ~= length(br.tcross)
   error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	'Must have as many crossing times as generators.')
+        'Must have as many crossing times as generators.')
 end
 
 % Cannot have decreasing times.
 dt = diff(br.tcross);
 if any(dt < 0)
   error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	'Crossing times must be nondecreasing.')
+        'Crossing times must be nondecreasing.')
 end
 
-% Check: if there are simultaneous crossings, they must
-% correspond to different generators.
-isim = find(~dt);
-if any(abs(br.word(isim+1) - br.word(isim)) <= 1)
-  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
-	['Cannot have simultaneous crossing times for noncommuting' ...
-	 ' generators.'])
-end
+% Check: if there are simultaneous crossings, they must correspond to
+% commuting generators.
+sort_sim_tcross(br);

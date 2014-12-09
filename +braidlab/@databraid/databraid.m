@@ -55,8 +55,8 @@ classdef databraid < braidlab.braid
     %   DATABRAID(XY,T) specifies the times of the datapoints.  T defaults
     %   to 1:NSTEPS.
     %
-    %   DATABRAID(XY,T,PROJANG) or DATABRAID(XY,PROJ) uses a projection line
-    %   with angle PROJANG (in radians) from the X axis to determine
+    %   DATABRAID(XY,T,PROJANG) or DATABRAID(XY,PROJANG) uses a projection
+    %   line with angle PROJANG (in radians) from the X axis to determine
     %   crossings.  The default is to project onto the X axis (PROJANG = 0).
     %
     %   DATABRAID(BB,T) creates a databraid from a braid BB and crossing
@@ -109,6 +109,8 @@ classdef databraid < braidlab.braid
         proj = third;
       end
       if nargin > 3
+        % This never actually happens since only 3 named arguments.
+        % Leave in in case we switch to varargin format.
         error('BRAIDLAB:databraid:databraid:badarg', ...
               'Too many input arguments.')
       end
@@ -139,7 +141,19 @@ classdef databraid < braidlab.braid
     %
     %   This is a method for the DATABRAID class.
     %   See also BRAID.EQ, BRAID.LEXEQ.
-      ee = (lexeq(braid(b1),braid(b2)) | any(b1.tcross ~= b2.tcross));
+      if length(b1.tcross) ~= length(b2.tcross)
+	ee = false;
+	return
+      end
+      ee = all(b1.tcross == b2.tcross);
+      if ee
+        % If there are simultaneous times, for which the generators have to
+        % commute, sort the generators according to absolute value.  See
+        % issue #97.
+        w1 = sort_sim_tcross(b1);
+        w2 = sort_sim_tcross(b2);
+        ee = all(w1.word == w2.word);
+      end
     end
 
     function ee = ne(b1,b2)

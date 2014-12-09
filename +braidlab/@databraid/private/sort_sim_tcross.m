@@ -1,14 +1,5 @@
-function c = tensor(varargin)
-%TENSOR   Tensor product of databraids.
-%   C = TENSOR(B1,B2) returns the tensor product of the databraids B1 and
-%   B2, which is the databraid obtained by laying B1 and B2 side-by-side,
-%   with B1 on the left.  The crossing times are sorted chronologically.
-%
-%   C = TENSOR(B1,B2,B3,...) returns the tensor product of several
-%   databraids.
-%
-%   This is a method for the DATABRAID class.
-%   See also DATABRAID, BRAID.TENSOR.
+function br = sort_sim_tcross(br)
+%SORT_SIM_TCROSS   Sort generators that have simultaneous crossing times.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -34,17 +25,27 @@ function c = tensor(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2
-  error('BRAIDLAB:databraid:tensor:badarg', ...
-        'Need at least two databraids.')
-elseif nargin == 2
-  a = varargin{1}; b = varargin{2};
-  % Sort, but keep track of index changes.
-  [tcr,idx] = sort([a.tcross b.tcross]);
-  ab = tensor@braidlab.braid(a,b);
-  % Re-order the generators according to sorting.
-  ab.word = ab.word(idx);
-  c = braidlab.databraid(ab,tcr);
-else
-  c = tensor(varargin{1},tensor(varargin{2:end}));
+dt = diff(br.tcross);
+
+runs = diff(find([1,dt,1]));  % Find run lengths of simultaneous crossing times
+starts = find([1,dt]);        % Find where they start
+
+% Keep only runs of length > 1.
+starts = starts(runs > 1);
+runs = runs(runs > 1);
+
+% Now loop over each run block.
+for i = 1:length(runs)
+  % The word of generators for this run.
+  w = br.word(starts(i):starts(i)+runs(i)-1);
+  % Sort according to absolute index of generators.
+  [~,idx] = sort(abs(w)); w = w(idx);
+  % The differences between absolute values must all be > 1, indicating the
+  % generators commute.  Otherwise it's an error.
+  if any(diff(abs(w)) <= 1)
+    error('BRAIDLAB:databraid:sort_sim_tcross:badsimtimes', ...
+          ['Cannot have simultaneous crossing times ' ...
+           'for noncommuting generators.'])
+  end
+  br.word(starts(i):starts(i)+runs(i)-1) = w;
 end
