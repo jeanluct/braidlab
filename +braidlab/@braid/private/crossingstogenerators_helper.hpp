@@ -210,9 +210,13 @@ public:
   // The next line is for gcc >= 4.8 (c++11 I think).
   // using std::logic_error::logic_error;
   // Explicitly declare and define the constructor instead.
-  PWXexception(const std::string& __arg) : std::logic_error(__arg) {};
+  PWXexception(const std::string& __arg, mwIndex I, mwIndex J) : 
+    std::logic_error(__arg), L(I), R(J) {};
 
   int code;
+  
+  mwIndex L, R; // particles causing the error
+ 
   // return code of the Matlab error that should be reported
   const char* id() {
     switch (code) {
@@ -467,10 +471,13 @@ crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
         mexPrintf("\n");
       }
     }
-    std::stringstream report;
-    report << crossingErrors.begin()->what();
-    report << "\n[Error 1/" << count << " in threads.]";
+
     // first error is invoked as a MATLAB error
+    std::stringstream report;
+    report << "[";
+    report << crossingErrors.begin()->L << " ";
+    report << crossingErrors.begin()->R << "]";
+
     mexErrMsgIdAndTxt(crossingErrors.begin()->id(), report.str().c_str() );
   }
 
@@ -886,7 +893,7 @@ std::pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
   if (sgn<double>(delta) != sgn<double>(T) ) {
     PWXexception e("Error in interpolating crossing time."
                    " Interpolated time-point is outside the interval "
-                   "determined by input.");
+                   "determined by input.", L+1, R+1);
     e.code = 1;
     throw e;
   }
@@ -937,7 +944,7 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
   else
     report << "braid not defined.";
 
-  PWXexception e(report.str());
+  PWXexception e(report.str(), I+1, J+1);
   e.code = code;
   throw e;
 
