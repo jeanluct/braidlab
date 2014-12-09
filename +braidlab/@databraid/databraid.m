@@ -141,7 +141,7 @@ classdef databraid < braidlab.braid
     %
     %   This is a method for the DATABRAID class.
     %   See also BRAID.EQ, BRAID.LEXEQ.
-      ee = (lexeq(braid(b1),braid(b2)) & all(b1.tcross == b2.tcross));
+      ee = (lexeq(braid(b1),braid(b2)) && all(b1.tcross == b2.tcross));
     end
 
     function ee = ne(b1,b2)
