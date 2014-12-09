@@ -40,7 +40,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) colorbraiding_helper.$(MEXSUFFIX) areEqual.$(MEXSUFFIX)
+all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) crossingstogenerators_helper.$(MEXSUFFIX) areEqual.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX

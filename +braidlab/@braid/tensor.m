@@ -43,7 +43,7 @@ elseif nargin == 2
   n2 = b.n;
 
   sg = sign(b.word);
-  idx = abs(b.word) + n1;  % re-index generators of b2
+  idx = abs(b.word) + n1;  % re-index generators of b
 
   c = braidlab.braid([a.word idx.*sg],n1+n2);
 else

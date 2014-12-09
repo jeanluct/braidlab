@@ -55,7 +55,7 @@ classdef cfbraid < matlab.mixin.CustomDisplay
     %   expressed as a list of Artin generators.  W can also be a BRAID or
     %   CFBRAID object.  If W is a list, CFBRAID(W,N) can be used to specify
     %   the number of strings N of the braid group, which is otherwise
-    %   guessed from W.
+    %   deduced from W.
     %
     %   This is a method for the CFBRAID class.
     %   See also BRAID.
@@ -78,7 +78,9 @@ classdef cfbraid < matlab.mixin.CustomDisplay
         end
       else
         if nargin < 2
-          br.n = max(abs(b))+1;
+          if ~isempty(b)
+            br.n = max(abs(b))+1;
+          end
         else
           br.n = nn;
           if br.n < max(abs(b))+1

@@ -1,19 +1,12 @@
-function out = assertmex(functionname)
-%%ASSERTMEX Assert that MEX file exists
+function bt = trunc(b,interval)
+%TRUNC   Truncate databraid by choosing crossings from a time subinterval.
+%   BT = TRUNC(B,INTERVAL) Truncates the braid generators to those
+%   whose crossing times TCROSS lie in the interval
+%   INTERVAL(1) <= TCROSS <= INTERVAL(2).
+%   If INTERVAL is a single number, then selected crossings will have
+%   TCROSS <= INTERVAL.
 %
-% ASSERTMEX(functionname) Checks that a mex file "functionname" exists. If
-% it does not exist, function throws BRAIDLAB:noMEX error.
-%
-% OUT = ASSERTMEX(functionname) Returns TRUE if mex file
-% "functionname" exists and FALSE otherwise. No errors are thrown.
-%
-% ... = ASSERTMEX; Same as above, except the desired functionname
-% is detected by checking call stack. This can be useful in
-% development stages, but final versions of code should specify
-% function name explicitly to speed up the code.
-%
-% Consider also invoking the function as assertmex(mfilename) if
-% the calling function is the first function in an m-file.
+%   This is a method for the DATABRAID class.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -39,17 +32,22 @@ function out = assertmex(functionname)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 1
-  [ST,I] = dbstack(1);
-  functionname = ST(1).name;
+bt = b;
+if nargin < 2 || ~isnumeric(interval)
+  error('BRAIDLAB:databraid:trunc:badarg','Not enough input arguments.')
 end
 
-if nargout < 1
-  if exist(functionname) ~= 3
-    throw(braidlab.util.NoMEXException(functionname));
-  end
+if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
+  error('BRAIDLAB:databraid:trunc:badarg',...
+        'Interval has to be a non-empty 1 or 2 element vector.')
+end
+
+% select the desired crossing times
+if numel(interval) == 1
+  sel = bt.tcross <= interval;
 else
-    out = (exist(functionname) == 3);
+  sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
 end
 
-end
+bt.tcross = bt.tcross(sel);
+bt.word = bt.word(sel);

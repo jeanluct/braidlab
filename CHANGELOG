@@ -1,7 +1,5 @@
 ------------------------------------------------------------------------
-2.2 [2014-12-??]
-
-[Up to date until 1e17c1a]
+3.0 [2014-12-09]
 
 * Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.
 
@@ -37,6 +35,10 @@
 
 * Update braid.plot for Matlab 2014b.
 
+* braid.tensor and databraid.tensor can handle more than one braid at
+  a time.  There was also a bug in databraid.tensor: the braids have
+  to be interweaved.
+
 * braid.entropy supports different length functions.  The arguments to
   entropy have change significantly.  In particular, the train-track
   algorithm is now specified using entropy(b,'Method','trains').
@@ -45,6 +47,18 @@
   implemented.  Instead, use databraid.ftbe (Finite Time Braiding
   Exponent).  This is to distinguish the entropy of data, which
   doesn't necessarily close, to that of a "true" braid.
+
+* databraid now allows generators with simultaneous times, as long as
+  all the generators for a given time commute with each other.  This
+  affects in particular testing for equality of two databraids.  For
+  example, databraid([1 3],[1 1]) and databraid([3 1],[1 1]) are now
+  equal.
+
+* More unit tests in the testsuite, especially for cfbraid
+  (undocumented class for canonical form braids, but used behind the
+  scenes) and databraid.
+
+* And of course, many bugfixes and small tweaks...
 
 ------------------------------------------------------------------------
 2.1 [2014-10-02]

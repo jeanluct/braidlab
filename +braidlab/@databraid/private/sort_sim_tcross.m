@@ -1,19 +1,5 @@
-function out = assertmex(functionname)
-%%ASSERTMEX Assert that MEX file exists
-%
-% ASSERTMEX(functionname) Checks that a mex file "functionname" exists. If
-% it does not exist, function throws BRAIDLAB:noMEX error.
-%
-% OUT = ASSERTMEX(functionname) Returns TRUE if mex file
-% "functionname" exists and FALSE otherwise. No errors are thrown.
-%
-% ... = ASSERTMEX; Same as above, except the desired functionname
-% is detected by checking call stack. This can be useful in
-% development stages, but final versions of code should specify
-% function name explicitly to speed up the code.
-%
-% Consider also invoking the function as assertmex(mfilename) if
-% the calling function is the first function in an m-file.
+function br = sort_sim_tcross(br)
+%SORT_SIM_TCROSS   Sort generators that have simultaneous crossing times.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -39,17 +25,27 @@ function out = assertmex(functionname)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 1
-  [ST,I] = dbstack(1);
-  functionname = ST(1).name;
-end
+dt = diff(br.tcross);
 
-if nargout < 1
-  if exist(functionname) ~= 3
-    throw(braidlab.util.NoMEXException(functionname));
+runs = diff(find([1,dt,1]));  % Find run lengths of simultaneous crossing times
+starts = find([1,dt]);        % Find where they start
+
+% Keep only runs of length > 1.
+starts = starts(runs > 1);
+runs = runs(runs > 1);
+
+% Now loop over each run block.
+for i = 1:length(runs)
+  % The word of generators for this run.
+  w = br.word(starts(i):starts(i)+runs(i)-1);
+  % Sort according to absolute index of generators.
+  [~,idx] = sort(abs(w)); w = w(idx);
+  % The differences between absolute values must all be > 1, indicating the
+  % generators commute.  Otherwise it's an error.
+  if any(diff(abs(w)) <= 1)
+    error('BRAIDLAB:databraid:sort_sim_tcross:badsimtimes', ...
+          ['Cannot have simultaneous crossing times ' ...
+           'for noncommuting generators.'])
   end
-else
-    out = (exist(functionname) == 3);
-end
-
+  br.word(starts(i):starts(i)+runs(i)-1) = w;
 end

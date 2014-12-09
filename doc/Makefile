@@ -48,5 +48,5 @@ distclean: clean
 	# Revert PDF file to latest revision.
 	git checkout $(MASTERFILE).pdf
 	# Update timestamp so make knows to remake the file.
-	#touch -d "`hg parent  $(MASTERFILE).pdf -T '{date|isodate}\n'`" \
-	#	$(MASTERFILE).pdf
+	touch -d "`git log -1 --date=iso --format=%cd $(MASTERFILE).pdf`" \
+		$(MASTERFILE).pdf

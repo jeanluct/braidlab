@@ -1846,11 +1846,12 @@ computing the Smith Normal Form of a matrix \citep{snf}.
 \label{sec:install}
 \index{installing \braidlab}
 
-\braidlab\ consists of Matlab files together with C and C++ auxiliary files,
-so-called MEX files.  The MEX files are used to greatly speed up calculations.
-Many commands will work even if the MEX files are unavailable, but much more
-slowly.  (A few commands won't work at all.)  However, MEX files need to be
-first compiled with Matlab's \lstinline{mex} compiler.
+\index{Matlab!MEX files|(} \braidlab\ consists of Matlab files together with C
+and C++ auxiliary files, so-called MEX files.  The MEX files are used to
+greatly speed up calculations.  Many commands will work even if the MEX files
+are unavailable, but much more slowly.  (A few commands won't work at all.)
+However, MEX files need to be first compiled with Matlab's \lstinline{mex}
+compiler.  \index{Matlab!MEX files|)}
 
 \subsection{Precompiled packages}
 
@@ -1888,14 +1889,37 @@ you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly.
 \index{Matlab!MEX files|)}
 
-\index{GMP} If you receive error messages because GMP (the GNU MultiPrecision
-library) is not installed on your system, instead of the above use
+\index{GMP|(}%
+If you receive error messages because GMP (the GNU MultiPrecision library) is
+not installed on your system, instead of the above use
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make BRAIDLAB_USE_GMP=0
 \end{lstlisting}
 This will slow down some functions, in particular testing for equality of
 large braids.
+
+If you wish to compile \braidlab\ from source using GMP, you need to make the
+GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
+compiler that Matlab is using. Both the %
+\index{GCC compiler}%
+GCC compiler (more common on Linux %
+\index{Linux}%
+systems) and %
+\index{Clang compiler}%
+Clang compiler (more common on Mac OS~X systems) %
+\index{OS X}%
+use the environment variable
+\lstinline{CPLUS_INCLUDE_PATH} to specify path to include files. For example,
+if both header files reside in \lstinline{/usr/local/include} on your Linux or
+Mac OS~X system, you would issue
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ export CPLUS_INCLUDE_PATH=/usr/local/include
+\end{lstlisting}
+before issuing \lstinline{make} that builds \lstinline{braidlab}.
+%
+\index{GMP|)}
 
 
 \subsection{Setting Matlab's path}
@@ -1946,10 +1970,13 @@ Here are some common problems that can occur when installing braidlab.
 
 \subsubsection{Unsupported compiler}
 
+\index{Linux|(}%
 Linux distributions often use very recent C/C++ compilers that are not yet
 supported by Matlab.  If you get such an error from MEX, it will tell you
-which version of GCC it wants.  For example, if it claims it needs GCC 4.7 or
-earlier, you can try
+which version of %
+\index{GCC compiler|(}%
+GCC it wants.  For example, if it claims it needs GCC 4.7 or earlier, you can
+try
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ which gcc-4.7
@@ -1975,11 +2002,14 @@ will \emph{not} overwrite the default compiler.
 
 If your Linux distribution doesn't allow you to easily install the required
 compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
-  and install it from scratch!}  That's fairly tedious, though.
+  and install it from scratch!}  That's fairly tedious, though. %
+\index{GCC compiler|)}%
+\index{Linux|)}%
 
 
 \subsubsection{Polish \LaTeX\ gets in the way}
 
+\index{Linux|(}%
 This is a strange one.  If on compilation you see an error like this:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
@@ -2004,12 +2034,15 @@ manually rename the Polish \lstinline{mex} command to something like
 path.
 
 Another solution is to make sure that the Matlab executable directory appears
-early in bash's path variable.  On Mac OSX this reads
+early in bash's path variable.  On Mac OS~X %
+\index{OS X}%
+this reads
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
->> export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
+$ export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
 \end{lstlisting}
 for Matlab R2014a.
+\index{Linux|)}%
 
 
 \subsubsection{\lstinline{largeArraydims} warning}
