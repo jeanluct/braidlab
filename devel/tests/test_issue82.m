@@ -1,5 +1,7 @@
 load issue82
 
+proj = .1;
+
 slice1 = XY(:,:,1);
 slice2 = XY(:,:,2);
 slice3 = XY(:,:,4);
@@ -11,7 +13,7 @@ global BRAIDLAB_braid_nomex;
 try
     disp('With MEX');
     BRAIDLAB_braid_nomex = 0;
-    braidlab.braid(XY)
+    braidlab.braid(XY,proj)
 catch me
     disp(me)
 end
@@ -19,7 +21,7 @@ end
 try
     disp('Without MEX');
     BRAIDLAB_braid_nomex = 1;
-    braidlab.braid(XY)
+    braidlab.braid(XY,proj)
 catch me
     disp(me)
 end
@@ -31,7 +33,7 @@ global BRAIDLAB_braid_nomex;
 try
     disp('With MEX');
     BRAIDLAB_braid_nomex = 0;
-    braidlab.braid(XY)
+    braidlab.braid(XY,proj)
 catch me
     disp(me)
 end
@@ -39,7 +41,7 @@ end
 try
     disp('Without MEX');
     BRAIDLAB_braid_nomex = 1;
-    braidlab.braid(XY)
+    braidlab.braid(XY,proj)
 catch me
     disp(me)
 end

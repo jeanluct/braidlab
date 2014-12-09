@@ -17,19 +17,19 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   is also used by the DATABRAID subclass.
 %
 %   ** Implementation: ** By default, the function invokes a C++
-%   implementation of the algorithm from file crossingstogenerators_helper.cpp. To
-%   use a slower, MATLAB implementation, set a global MATLAB variable
-%   BRAIDLAB_braid_nomex to true. A comparison between MATLAB and
-%   C++ versions of the algorithm can be run by executing
-%   braidlab/devel/test_colorbraid.m
+%   implementation of the algorithm from file
+%   crossingstogenerators_helper.cpp. To use a slower, MATLAB
+%   implementation, set a global MATLAB variable BRAIDLAB_braid_nomex to
+%   true. A comparison between MATLAB and C++ versions of the algorithm can
+%   be run by executing braidlab/devel/test_colorbraid.m
 %
-%   When MATLAB version is used, code emits the warning
+%   When MATLAB version is used, code issues the warning
 %   BRAIDLAB:braid:colorbraiding:matlab
 %
-%   C++ version of the code additionally tries to run in a multi-threaded
-%   mode, using as many threads as available to Matlab. If you want to
-%   manually set the number of threads used, set a global MATLAB variable
-%   BRAIDLAB_threads to a positive integer.
+%   The C++ version of the code additionally tries to run in a
+%   multi-threaded mode, using as many threads as available to Matlab. If
+%   you want to manually set the number of threads used, set a global MATLAB
+%   variable BRAIDLAB_threads to a positive integer.
 %
 %   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
 
@@ -97,13 +97,12 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
 try
-  assert(~useMatlabVersion, 'BRAIDLAB:noMEX', ['Matlab version ' ...
-                      'forced']);
-  
-    %% C++ version of the algorithm
+  assert(~useMatlabVersion, 'BRAIDLAB:noMEX', 'Matlab version forced');
+
+  %% C++ version of the algorithm
   Nthreads = getAvailableThreadNumber(); % defined at the end
   [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
-  
+
 catch me
   if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
     rethrow(me);
@@ -116,8 +115,8 @@ end
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
 
-% =========================================================================
 
+% =========================================================================
 function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t,idx)
 %% CROSSINGSTOGENERATORS
 %
@@ -317,6 +316,8 @@ XYr = zeros(size(XY));
 XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
 XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
 
+
+% =========================================================================
 function Nthreads = getAvailableThreadNumber
 %%GETAVAILABLETHREADNUMBER
 %
