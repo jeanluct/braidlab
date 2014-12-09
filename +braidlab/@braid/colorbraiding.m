@@ -111,7 +111,7 @@ try % trapping to ensure proper identification of strands
       rethrow(me);
     else
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
+      [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
     end
   end
 
