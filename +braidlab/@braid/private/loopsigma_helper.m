@@ -1,5 +1,5 @@
 function varargout = loopsigma_helper(varargin)
-%LOOPSIGMA_HELPER Please see loopsigma_helper.cpp.
+%LOOPSIGMA_HELPER   See loopsigma_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
 %   does not exist.
@@ -7,7 +7,7 @@ function varargout = loopsigma_helper(varargin)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http:%github.com/jeanluct/braidlab
+%   http://github.com/jeanluct/braidlab
 %
 %   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>

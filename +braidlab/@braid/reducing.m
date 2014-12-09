@@ -34,7 +34,7 @@ function l = reducing(b,ntries)
 %   lred = loop([0 -1 0 0 0 0 0 1]);
 
 warning('BRAIDLAB:braid:reducing:exp', ...
-	'This function is experimental!  Use with caution!')
+        'This function is experimental!  Use with caution!')
 
 if nargin < 2, ntries = 5; end
 

@@ -1,8 +1,8 @@
-function test_braidlab( nomex )
-%% TEST_BRAIDLAB Run unit tests.
+function test_braidlab(nomex)
+%TEST_BRAIDLAB   Run a suite of braidlab unit tests.
+%   TEST_BRAIDLAB runs several unit tests for braidlad (default).
 %
-%  TEST_BRAIDLAB Runs unit tests for MEX files.
-%  TEST_BRAIDLAB(1) Runs unit tests without MEX functionality.
+%   TEST_BRAIDLAB('NoMEX') runs unit tests without MEX functionality.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
