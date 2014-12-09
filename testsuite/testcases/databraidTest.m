@@ -57,14 +57,14 @@ classdef databraidTest < matlab.unittest.TestCase
                            'BRAIDLAB:databraid:check_tcross:badtimes');
       % Simultaneous times for noncommuting generators.
       testCase.verifyError(@() databraid([1 2],[1 1]), ...
-                           'BRAIDLAB:databraid:check_tcross:badsimtimes');
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
       % Simultaneous times for *commuting* generators is ok.
       databraid([1 3],[1 1]);
 
       % However all the generators have to pairwise commute.
       % This shouldn't work: see issue #94.
       testCase.verifyError(@() databraid([4 1 3],[1 1 1]), ...
-                           'BRAIDLAB:databraid:check_tcross:badsimtimes');
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
 
       % A more complicated example with two simultaneous blocks.  The first
       % has the generators [5 1 3], which is fine, the second [7 6], which
@@ -72,7 +72,7 @@ classdef databraidTest < matlab.unittest.TestCase
       testCase.verifyError(@() ...
                            databraid([ 1  2  3 5 1 3 4 5 6 7 6], ...
                                      [-3 -2 -1 1 1 1 2 3 4 5 5]), ...
-                           'BRAIDLAB:databraid:check_tcross:badsimtimes')
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes')
       % Replace 7 by 8: now [8 6] commute, and it's ok.
       databraid([1 2 3 5 1 3 4 5 6 8 6],[-3 -2 -1 1 1 1 2 3 4 5 5]);
     end
@@ -116,12 +116,12 @@ classdef databraidTest < matlab.unittest.TestCase
       b1 = databraid([1 3],[1 2]);
       b2 = databraid([4 2],[2 3]);
       testCase.verifyError(@() b1*b2, ...
-                           'BRAIDLAB:databraid:check_tcross:badsimtimes');
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
       % This shouldn't work: 6 and 5 don't commute.  See issue #98.
       b1 = databraid([1 5 3],[1 2 2]);
       b2 = databraid([6 2],[2 3]);
       testCase.verifyError(@() b1*b2, ...
-                           'BRAIDLAB:databraid:check_tcross:badsimtimes')
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes')
     end
 
     function test_databraid_ftbe(testCase)
