@@ -6,7 +6,8 @@ function howmanycom() {
 }
 export -f howmanycom
 
-howmanycom release-2.1   HEAD
+howmanycom release-3.0   HEAD
+howmanycom release-2.1   release-3.0
 howmanycom release-2.0   release-2.1
 howmanycom release-1.0.5 release-2.0
 howmanycom release-1.0.4 release-1.0.5
