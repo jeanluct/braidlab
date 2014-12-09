@@ -41,9 +41,10 @@ elseif nargin == 2
   a = varargin{1}; b = varargin{2};
   % Sort, but keep track of index changes.
   [tcr,idx] = sort([a.tcross b.tcross]);
-  c = braidlab.databraid(tensor@braidlab.braid(a,b),tcr);
+  ab = tensor@braidlab.braid(a,b);
   % Re-order the generators according to sorting.
-  c.word = c.word(idx);
+  ab.word = ab.word(idx);
+  c = braidlab.databraid(ab,tcr);
 else
   c = tensor(varargin{1},tensor(varargin{2:end}));
 end
