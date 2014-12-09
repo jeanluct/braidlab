@@ -1,19 +1,5 @@
-function out = assertmex(functionname)
-%%ASSERTMEX Assert that MEX file exists
-%
-% ASSERTMEX(functionname) Checks that a mex file "functionname" exists. If
-% it does not exist, function throws BRAIDLAB:noMEX error.
-%
-% OUT = ASSERTMEX(functionname) Returns TRUE if mex file
-% "functionname" exists and FALSE otherwise. No errors are thrown.
-%
-% ... = ASSERTMEX; Same as above, except the desired functionname
-% is detected by checking call stack. This can be useful in
-% development stages, but final versions of code should specify
-% function name explicitly to speed up the code.
-%
-% Consider also invoking the function as assertmex(mfilename) if
-% the calling function is the first function in an m-file.
+function br = check_tcross(br)
+%CHECK_TCROSS   Validate crossing times.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -39,17 +25,19 @@ function out = assertmex(functionname)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 1
-  [ST,I] = dbstack(1);
-  functionname = ST(1).name;
+% Must have as many times as the word length.
+if length(br.word) ~= length(br.tcross)
+  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+        'Must have as many crossing times as generators.')
 end
 
-if nargout < 1
-  if exist(functionname) ~= 3
-    throw(braidlab.util.NoMEXException(functionname));
-  end
-else
-    out = (exist(functionname) == 3);
+% Cannot have decreasing times.
+dt = diff(br.tcross);
+if any(dt < 0)
+  error('BRAIDLAB:databraid:check_tcross:badtimes', ...
+        'Crossing times must be nondecreasing.')
 end
 
-end
+% Check: if there are simultaneous crossings, they must correspond to
+% commuting generators.
+sort_sim_tcross(br);
