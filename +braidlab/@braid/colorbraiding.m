@@ -96,20 +96,56 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
-try
-  assert(~useMatlabVersion, 'BRAIDLAB:noMEX', 'Matlab version forced');
 
-  %% C++ version of the algorithm
-  Nthreads = getAvailableThreadNumber(); % defined at the end
-  [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
+try % trapping to ensure proper identification of strands
+  
+  try % trapping to switch between MEX and Matlab versions
+    assert(~useMatlabVersion, 'BRAIDLAB:noMEX', 'Matlab version forced');
+
+    %% C++ version of the algorithm
+    Nthreads = getAvailableThreadNumber(); % defined at the end
+    [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
+
+  catch me
+    if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+      rethrow(me);
+    else
+      %% MATLAB version of the algorithm
+      [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
+    end
+  end
 
 catch me
-  if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
-    rethrow(me);
-  else
-    %% MATLAB version of the algorithm
-    [gen,tcr,~] = crossingsToGenerators(XYtraj,t,idx);
+  
+  % Identify particles causing the error using IDX vector
+  % and re-throw the error with appropriate reporting
+  switch(me.identifier)
+    case 'BRAIDLAB:braid:colorbraiding:coincidentparticles'
+      
+      localPair = eval(me.message);
+      sortedPair = idx(localPair);
+      
+      error(me.identifier, ...
+            sprintf(['Paths of particles %d and %d intersect. The ' ...
+                     'braid cannot be formed'], ...
+                    sortedPair(1), ...
+                    sortedPair(2)) );
+      
+    case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
+
+      localPair = eval(me.message);
+      sortedPair = idx(localPair);
+      
+      error(me.identifier, ...
+            sprintf(['Paths of particles %d and %d have a ' ...
+                     'coincident projection. Try changing the ' ...
+                     'projection angle'], ...
+                    sortedPair(1), ...
+                    sortedPair(2)) );
+    otherwise
+      rethrow(me)
   end
+  
 end
 
 varargout{1} = braidlab.braid(gen,n);

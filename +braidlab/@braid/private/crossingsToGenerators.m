@@ -1,4 +1,4 @@
-function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t,idx)
+function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t)
 %CROSSINGSTOGENERATORS Convert a physical braid to a list of braid generators.
 %
 %   The order of each particle is determined according to its first (X)
@@ -79,16 +79,13 @@ for I = 1:n
     nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
 
     if ~isempty(nearcoinc)
-      msg = sprintf([ 'Particles %g and %g have coincident %%s ' ...
-                      'at time index %g: ' ],idx(I),idx(J),nearcoinc(1));
       % Use relative precision to test equality (same as C++ code).
       if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
-              [ msg 'braid not defined.' ],'coordinates')
+              mat2str([I J]) )
       else
         error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
-              [ msg 'change projection angle ' ...
-                '(type help braid.braid).' ],'projection')
+              mat2str([I J]) )
       end
     end
 
@@ -98,8 +95,8 @@ for I = 1:n
 
     % Do some X coordinates coincide?
     if ~isempty(find(perm == 0,1))
-      error('BRAIDLAB:braid:colorbraiding:coincidentprojection', ...
-            'Somehow there are still coincident projection coordinates...')
+      error('BRAIDLAB:braid:colorbraiding:coincidentprojectionuncaught', ...
+            'Somehow there are still coincident projection coordinates.')
     end
 
     ii = 1:length(perm)-1;
