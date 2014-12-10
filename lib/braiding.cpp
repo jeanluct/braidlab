@@ -2511,6 +2511,7 @@ list<ArtinBraid > Trajectory_Sliding(ArtinBraid B)
 
 list<ArtinBraid > Trajectory_Sliding(ArtinBraid B, ArtinBraid & C, sint16 & d)
 {
+  sint16 size=0;
   list<ArtinBraid > p;
   list<ArtinBraid>::iterator it;
  
@@ -2643,6 +2644,7 @@ list<ArtinFactor> Returns_Sliding(ArtinBraid B, ArtinFactor F)
 {
  list<ArtinFactor> ret;
  list<ArtinFactor>::iterator it=ret.end();
+ sint16 n=B.Index();
  ArtinBraid B1=B;
  sint16 i, N=1;  
 
@@ -2741,6 +2743,7 @@ list<ArtinFactor> ret;
 list<ArtinFactor>::iterator it=ret.end();
 
 ArtinBraid B2=B; 
+sint16 i, index=0;
 
 list<ArtinBraid> T=Trajectory_Sliding(B);
 list<ArtinBraid>::reverse_iterator itb;
@@ -2799,8 +2802,8 @@ ArtinFactor MinSC(ArtinBraid B, ArtinFactor F)
       if(LeftMeet(F,*it)==F)
 	return *it;
     }
-  cout << "Error in MinCS.";
-  exit(1);
+
+return ArtinFactor(B.Index(),1);
 }
 
 
