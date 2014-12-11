@@ -40,15 +40,18 @@ function val = conv(varargin)
 
 import braidlab.util.validateflag
 
+% List the conventions here.
 persistent genrotdir
 
+% Default values.
 if isempty(genrotdir), genrotdir = 1; end
 
 if nargin == 0
-  % Maybe list all conventions?
+  % Maybe list all conventions by default?
   error('BRAIDLAB:braid:conv:badarg','Need at least one argument.')
 end
 
+% One argument means query mode.
 if nargin == 1
   flag = lower(varargin{1});
   switch flag
@@ -59,6 +62,10 @@ if nargin == 1
   end
   return
 end
+
+% From here this isn't quite the right behavior.
+% The default values can overwrite previous ones for unspecified parameters?
+% val needs to be set to an assigned value?
 
 parser = inputParser;
 parser.addParameter('genrotdir', 1, @(x) x == 1 || x == -1);
