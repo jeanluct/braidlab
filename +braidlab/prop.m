@@ -15,6 +15,11 @@ function [varargout] = prop(varargin)
 %   * GenOverUnder - Whether to plot a positive generator as over/under or
 %   under/over [ {true} | false ].  This only affects braid.plot.
 %
+%   * BraidPlotDir - The direction that braid.plot displays braids [
+%   {'bt'} | 'tb' | 'lr' | 'rl' ].  Here 'btlr' mean bottom, top, left,
+%   right.  The default is bottom-to-top ('bt'), but popular conventions
+%   also include 'tb' and 'lr'.
+%
 %   See also BRAID, LOOP.
 
 % <LICENSE
@@ -44,11 +49,12 @@ function [varargout] = prop(varargin)
 import braidlab.util.validateflag
 
 % List the properties here.
-persistent genrotdir genoverunder
+persistent genrotdir genoverunder braidplotdir
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
 if isempty(genoverunder), genoverunder = true; end
+if isempty(braidplotdir), braidplotdir = 'bt'; end
 
 if nargin == 0
   % Maybe list all properties by default?
@@ -63,6 +69,8 @@ if nargin == 1
     varargout{1} = genrotdir;
    case {'genoverunder'}
     varargout{1} = genoverunder;
+   case {'braidplotdir'}
+    varargout{1} = braidplotdir;
    otherwise
     error('BRAIDLAB:prop:badarg','Unknown string argument.')
   end
@@ -72,14 +80,18 @@ end
 parser = inputParser;
 parser.addParameter('genrotdir', [], @(x) x == 1 || x == -1);
 parser.addParameter('genoverunder', [], @(x) x == true || x == false);
+parser.addParameter('braidplotdir', [],  @(s) ischar(s) && ...
+                   any(strcmpi(s,{'bt','tb','lr','rl'})));
+
 parser.parse(varargin{:});
 params = parser.Results;
 
 % Do not overwrite arguments that weren't specified (no default values).
 if ~isempty(params.genrotdir), genrotdir = params.genrotdir; end
 if ~isempty(params.genoverunder), genoverunder = params.genoverunder; end
+if ~isempty(params.braidplotdir), braidplotdir = params.braidplotdir; end
 
 if nargout > 0
   error('BRAIDLAB:prop:badnargout', ...
-	'No return value assigned when setting a property.')
+        'No return value assigned when setting a property.')
 end

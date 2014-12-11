@@ -30,7 +30,6 @@ function plot(b)
 % LICENSE>
 
 % TODO: specify some of these settings as function arguments.
-% Allow a different orientation: 'LR', 'TB' (default), 'BT'.
 % Allow color, line width.
 % Specify style (rounded, line...)
 baseX = 0; baseY = 0;
@@ -56,7 +55,7 @@ end
 if isempty(b.word)
   for k = 1:b.n
     posX = baseX + (k-1)*gapX; posY = baseY;
-    plot([posX posX],[posY posY+gapY],lat{:})
+    plt([posX posX],[posY posY+gapY],lat{:})
     hold on
   end
   if ~holdstate
@@ -68,8 +67,25 @@ if isempty(b.word)
 end
 
 % Convention: plot over-under (default) vs under-over.
+% Set using braidlab.prop('GenOverUnder',[ {true} | false ]).
 if braidlab.prop('GenOverUnder') == false
   b.word = -b.word;
+end
+
+% Convention: plot braids bottom-to-top by default ('bt').
+% Set using braidlab.prop('BraidPlotDir',VALUE).
+switch lower(braidlab.prop('braidplotdir'))
+ case 'bt'
+  plt = @plot;
+ case 'lr'
+  plt = @(x,y,varargin) plot(y,-x,varargin{:});
+ case 'rl'
+  plt = @(x,y,varargin) plot(-y,-x,varargin{:});
+ case 'tb'
+  plt = @(x,y,varargin) plot(x,-y,varargin{:});
+ otherwise
+  error('BRAIDLAB:braid:plot:badbraidplotdir', ...
+        'Unknown value for BraidPlotDir.  See ''help braidlab.prop.''')
 end
 
 if ~uselines
@@ -94,31 +110,31 @@ for k = 1:b.length
   if ~uselines
     sgn = (sign(b.word(k))+1)/2 + 1;
     % Draw the 'over' line.
-    plot(posX+xx,posY+bline{3-sgn},lat{:})
+    plt(posX+xx,posY+bline{3-sgn},lat{:})
     hold on
     % Draw the 'under' line with a gap.
-    plot(posX+gapX-xx,posY+bline{sgn},lat{:})
+    plt(posX+gapX-xx,posY+bline{sgn},lat{:})
   else % use straight line segments graphics command.
     if sign(b.word(k)) == 1
       % Draw the 'over' line.
-      plot([posX posX+gapX],[posY posY+gapY],lat{:})
+      plt([posX posX+gapX],[posY posY+gapY],lat{:})
       hold on
       % Draw the 'under' line with a gap.
-      plot([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      plot([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plt([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],lat{:})
+      plt([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
     else
       % Draw the 'over' line.
-      plot([posX+gapX posX],[posY posY+gapY],lat{:})
+      plt([posX+gapX posX],[posY posY+gapY],lat{:})
       % Draw the 'under' line with a gap.
-      plot([posX posX+cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      plot([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plt([posX posX+cutf*gapX],[posY posY+cutf*gapY],lat{:})
+      plt([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
     end
   end
   % Plot the remaining vertical lines.
   for l = 1:b.n
     if l ~= gen && l ~= gen+1
       posX = baseX + gapX*(l-1);
-      plot([posX posX],[posY posY+gapY],lat{:})
+      plt([posX posX],[posY posY+gapY],lat{:})
     end
   end
 end
