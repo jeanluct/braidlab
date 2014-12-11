@@ -20,7 +20,12 @@ function [varargout] = prop(varargin)
 %   default is bottom-to-top ('bt'), but popular conventions also include
 %   'tb' and 'lr'.
 %
-%   See also BRAID, LOOP.
+%   * LoopCoordsBasePoint - The position of the basepoint when defining the
+%   loop coordinates of a braid using braid.loopcoords ['left' |
+%   {'right'} | 'dehornoy'].  The option 'dehornoy' sets the basepoint to
+%   'left' and also sets 'GenRotDir' to -1.  See braid.loopcoords.
+%
+%   See also BRAID, BRAID.LOOPCOORDS, LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -49,12 +54,13 @@ function [varargout] = prop(varargin)
 import braidlab.util.validateflag
 
 % List the properties here.
-persistent genrotdir genplotoverunder braidplotdir
+persistent genrotdir genplotoverunder braidplotdir loopcoordsbasepoint
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
 if isempty(genplotoverunder), genplotoverunder = true; end
 if isempty(braidplotdir), braidplotdir = 'bt'; end
+if isempty(loopcoordsbasepoint), loopcoordsbasepoint = 'right'; end
 
 if nargin == 0
   % Maybe list all properties by default?
@@ -71,6 +77,8 @@ if nargin == 1
     varargout{1} = genplotoverunder;
    case {'braidplotdir'}
     varargout{1} = braidplotdir;
+   case {'loopcoordsbasepoint'}
+    varargout{1} = loopcoordsbasepoint;
    otherwise
     error('BRAIDLAB:prop:badarg','Unknown string argument.')
   end
@@ -82,6 +90,8 @@ parser.addParameter('genrotdir', [], @(x) x == 1 || x == -1);
 parser.addParameter('genplotoverunder', [], @(x) x == true || x == false);
 parser.addParameter('braidplotdir', [],  @(s) ischar(s) && ...
                    any(strcmpi(s,{'bt','tb','lr','rl'})));
+parser.addParameter('loopcoordsbasepoint', [],  @(s) ischar(s) && ...
+                   any(strcmpi(s,{'left','right','dehornoy'})));
 
 parser.parse(varargin{:});
 params = parser.Results;
@@ -93,7 +103,23 @@ end
 if ~isempty(params.genplotoverunder)
   genplotoverunder = params.genplotoverunder;
 end
-if ~isempty(params.braidplotdir), braidplotdir = params.braidplotdir; end
+if ~isempty(params.braidplotdir)
+  braidplotdir = params.braidplotdir;
+end
+if ~isempty(params.loopcoordsbasepoint)
+  if strcmpi(params.loopcoordsbasepoint,'dehornoy')
+    loopcoordsbasepoint = 'left';
+    if ~isempty(params.genrotdir)
+      if params.genrotdir ~= -1
+        error('BRAIDLAB:prop:badgenrotdir', ...
+              'Property ''dehornoy'' is incompatible with GenRotDir=1.');
+      end
+    end
+    genrotdir = -1;
+  else
+    loopcoordsbasepoint = params.loopcoordsbasepoint;
+  end
+end
 
 if nargout > 0
   error('BRAIDLAB:prop:badnargout', ...
