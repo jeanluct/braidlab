@@ -67,6 +67,11 @@ if isempty(b.word)
   return
 end
 
+% Convention: plot over-under (default) vs under-over.
+if braidlab.prop('GenOverUnder') == false
+  b.word = -b.word;
+end
+
 if ~uselines
   f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
   xx = linspace(0,gapX,npts);

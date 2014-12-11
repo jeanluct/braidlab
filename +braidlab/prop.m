@@ -1,7 +1,7 @@
 function [varargout] = prop(varargin)
 %PROP   Get and set global properties for braidlab.
-%   PROP('PropertyName',VALUE) assigns VALUE to a braidlab property.  This
-%   property is global to braidlab classes and functions.
+%   PROP('PropertyName',VALUE,...) assigns VALUE to a braidlab property.
+%   This property is global to braidlab classes and functions.
 %
 %   PROP('PropertyName') returns the current value of the property.
 %
@@ -11,6 +11,9 @@ function [varargout] = prop(varargin)
 %   | -1 ].  This is the direction of rotation when strings are exchanged by
 %   a generator.  A value of 1 corresponds to clockwise, -1 to
 %   counterclockwise.
+%
+%   * GenOverUnder - Whether to plot a positive generator as over/under or
+%   under/over [ {true} | false ].  This only affects braid.plot.
 %
 %   See also BRAID, LOOP.
 
@@ -41,10 +44,11 @@ function [varargout] = prop(varargin)
 import braidlab.util.validateflag
 
 % List the properties here.
-persistent genrotdir
+persistent genrotdir genoverunder
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
+if isempty(genoverunder), genoverunder = true; end
 
 if nargin == 0
   % Maybe list all properties by default?
@@ -57,22 +61,23 @@ if nargin == 1
   switch flag
    case {'genrotdir'}
     varargout{1} = genrotdir;
+   case {'genoverunder'}
+    varargout{1} = genoverunder;
    otherwise
     error('BRAIDLAB:prop:badarg','Unknown string argument.')
   end
   return
 end
 
-% From here this isn't quite the right behavior.
-% The default values can overwrite previous ones for unspecified parameters?
-% val needs to be set to an assigned value?
-
 parser = inputParser;
-parser.addParameter('genrotdir', 1, @(x) x == 1 || x == -1);
+parser.addParameter('genrotdir', [], @(x) x == 1 || x == -1);
+parser.addParameter('genoverunder', [], @(x) x == true || x == false);
 parser.parse(varargin{:});
 params = parser.Results;
 
-genrotdir = params.genrotdir;
+% Do not overwrite arguments that weren't specified (no default values).
+if ~isempty(params.genrotdir), genrotdir = params.genrotdir; end
+if ~isempty(params.genoverunder), genoverunder = params.genoverunder; end
 
 if nargout > 0
   error('BRAIDLAB:prop:badnargout', ...
