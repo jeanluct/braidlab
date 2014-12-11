@@ -1,17 +1,17 @@
 function val = conv(varargin)
-%CONV   Get and set conventions for braids.
-%   braid.CONV('PropertyName',VALUE) assigns VALUE to a braid property.
-%   This property is shared by all braid objects and need only be set once.
+%CONV   Get and set conventions for braidlab.
+%   CONV('PropertyName',VALUE) assigns VALUE to a braidlab property.  This
+%   property is shared by all braid objects and need only be set once.
 %
-%   braid.CONV('PropertyName') returns the current value of the property.
+%   CONV('PropertyName') returns the current value of the property.
 %
 %   Valid properties and values are (defaults in braces):
 %
-%   * RotDir - The direction of rotation of generators [ {1} | -1 ].  This
-%   is the direction of rotation when strings are exchanged by generators.
-%   A value of 1 corresponds to clockwise, -1 to counterclockwise.
+%   * GenRotDir - The direction of rotation of braid group generators [ {1}
+%   | -1 ].  This is the direction of rotation when strings are exchanged by
+%   a generator.  A value of 1 corresponds to clockwise, -1 to
+%   counterclockwise.
 %
-%   This is a static method for the BRAID class.
 %   See also BRAID, LOOP.
 
 % <LICENSE
@@ -40,9 +40,9 @@ function val = conv(varargin)
 
 import braidlab.util.validateflag
 
-persistent rotdir
+persistent genrotdir
 
-if isempty(rotdir), rotdir = 1; end
+if isempty(genrotdir), genrotdir = 1; end
 
 if nargin == 0
   % Maybe list all conventions?
@@ -52,8 +52,8 @@ end
 if nargin == 1
   flag = lower(varargin{1});
   switch flag
-   case {'rotdir'}
-    val = rotdir;
+   case {'genrotdir'}
+    val = genrotdir;
    otherwise
     error('BRAIDLAB:braid:conv:badarg','Unknown string argument.')
   end
@@ -61,10 +61,10 @@ if nargin == 1
 end
 
 parser = inputParser;
-parser.addParameter('rotdir', 1, @(x) x == 1 || x == -1);
+parser.addParameter('genrotdir', 1, @(x) x == 1 || x == -1);
 parser.parse(varargin{:});
 params = parser.Results;
 
-rotdir = params.rotdir;
+genrotdir = params.genrotdir;
 
-val = rotdir;
+val = genrotdir;
