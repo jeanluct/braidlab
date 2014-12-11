@@ -67,8 +67,8 @@ if isempty(b.word)
 end
 
 % Convention: plot over-under (default) vs under-over.
-% Set using braidlab.prop('GenOverUnder',[ {true} | false ]).
-if braidlab.prop('GenOverUnder') == false
+% Set using braidlab.prop('GenPlotOverUnder',[ {true} | false ]).
+if braidlab.prop('GenPlotOverUnder') == false
   b.word = -b.word;
 end
 

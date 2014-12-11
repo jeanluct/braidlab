@@ -7,18 +7,18 @@ function [varargout] = prop(varargin)
 %
 %   Valid properties and values are (defaults in braces):
 %
-%   * GenRotDir - The direction of rotation of braid group generators [ {1}
-%   | -1 ].  This is the direction of rotation when strings are exchanged by
-%   a generator.  A value of 1 corresponds to clockwise, -1 to
+%   * GenRotDir - The direction of rotation of braid group generators [{1} |
+%   -1].  This is the direction of rotation when strings are exchanged by a
+%   generator.  A value of 1 corresponds to clockwise, -1 to
 %   counterclockwise.
 %
-%   * GenOverUnder - Whether to plot a positive generator as over/under or
-%   under/over [ {true} | false ].  This only affects braid.plot.
+%   * GenPlotOverUnder - Whether to plot a positive generator as over/under
+%   or under/over [{true} | false].  This only affects braid.plot.
 %
-%   * BraidPlotDir - The direction that braid.plot displays braids [
-%   {'bt'} | 'tb' | 'lr' | 'rl' ].  Here 'btlr' mean bottom, top, left,
-%   right.  The default is bottom-to-top ('bt'), but popular conventions
-%   also include 'tb' and 'lr'.
+%   * BraidPlotDir - The direction that braid.plot displays braids [{'bt'} |
+%   'tb' | 'lr' | 'rl'].  Here 'btlr' mean bottom, top, left, right.  The
+%   default is bottom-to-top ('bt'), but popular conventions also include
+%   'tb' and 'lr'.
 %
 %   See also BRAID, LOOP.
 
@@ -49,11 +49,11 @@ function [varargout] = prop(varargin)
 import braidlab.util.validateflag
 
 % List the properties here.
-persistent genrotdir genoverunder braidplotdir
+persistent genrotdir genplotoverunder braidplotdir
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
-if isempty(genoverunder), genoverunder = true; end
+if isempty(genplotoverunder), genplotoverunder = true; end
 if isempty(braidplotdir), braidplotdir = 'bt'; end
 
 if nargin == 0
@@ -67,8 +67,8 @@ if nargin == 1
   switch flag
    case {'genrotdir'}
     varargout{1} = genrotdir;
-   case {'genoverunder'}
-    varargout{1} = genoverunder;
+   case {'genplotoverunder'}
+    varargout{1} = genplotoverunder;
    case {'braidplotdir'}
     varargout{1} = braidplotdir;
    otherwise
@@ -79,7 +79,7 @@ end
 
 parser = inputParser;
 parser.addParameter('genrotdir', [], @(x) x == 1 || x == -1);
-parser.addParameter('genoverunder', [], @(x) x == true || x == false);
+parser.addParameter('genplotoverunder', [], @(x) x == true || x == false);
 parser.addParameter('braidplotdir', [],  @(s) ischar(s) && ...
                    any(strcmpi(s,{'bt','tb','lr','rl'})));
 
@@ -87,8 +87,12 @@ parser.parse(varargin{:});
 params = parser.Results;
 
 % Do not overwrite arguments that weren't specified (no default values).
-if ~isempty(params.genrotdir), genrotdir = params.genrotdir; end
-if ~isempty(params.genoverunder), genoverunder = params.genoverunder; end
+if ~isempty(params.genrotdir)
+  genrotdir = params.genrotdir;
+end
+if ~isempty(params.genplotoverunder)
+  genplotoverunder = params.genplotoverunder;
+end
 if ~isempty(params.braidplotdir), braidplotdir = params.braidplotdir; end
 
 if nargout > 0
