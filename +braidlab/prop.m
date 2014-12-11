@@ -1,9 +1,9 @@
-function [varargout] = conv(varargin)
-%CONV   Get and set conventions for braidlab.
-%   CONV('PropertyName',VALUE) assigns VALUE to a braidlab property.  This
-%   property is shared by all braid objects and need only be set once.
+function [varargout] = prop(varargin)
+%PROP   Get and set global properties for braidlab.
+%   PROP('PropertyName',VALUE) assigns VALUE to a braidlab property.  This
+%   property is global to braidlab classes and functions.
 %
-%   CONV('PropertyName') returns the current value of the property.
+%   PROP('PropertyName') returns the current value of the property.
 %
 %   Valid properties and values are (defaults in braces):
 %
@@ -40,15 +40,15 @@ function [varargout] = conv(varargin)
 
 import braidlab.util.validateflag
 
-% List the conventions here.
+% List the properties here.
 persistent genrotdir
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
 
 if nargin == 0
-  % Maybe list all conventions by default?
-  error('BRAIDLAB:braid:conv:badarg','Need at least one argument.')
+  % Maybe list all properties by default?
+  error('BRAIDLAB:prop:badarg','Need at least one argument.')
 end
 
 % One argument means query mode.
@@ -58,7 +58,7 @@ if nargin == 1
    case {'genrotdir'}
     varargout{1} = genrotdir;
    otherwise
-    error('BRAIDLAB:braid:conv:badarg','Unknown string argument.')
+    error('BRAIDLAB:prop:badarg','Unknown string argument.')
   end
   return
 end
@@ -75,6 +75,6 @@ params = parser.Results;
 genrotdir = params.genrotdir;
 
 if nargout > 0
-  error('BRAIDLAB:braid:conv:badnargout', ...
+  error('BRAIDLAB:prop:badnargout', ...
 	'No return value assigned when setting a property.')
 end
