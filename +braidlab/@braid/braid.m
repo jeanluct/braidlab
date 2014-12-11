@@ -515,4 +515,8 @@ classdef braid < matlab.mixin.CustomDisplay
     [varargout] = colorbraiding(XY,t,proj)
   end % methods block
 
+  methods (Static = true)
+    val = conv(varargin)
+  end % methods block
+
 end % braid classdef
