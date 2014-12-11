@@ -1,4 +1,4 @@
-function val = conv(varargin)
+function [varargout] = conv(varargin)
 %CONV   Get and set conventions for braidlab.
 %   CONV('PropertyName',VALUE) assigns VALUE to a braidlab property.  This
 %   property is shared by all braid objects and need only be set once.
@@ -56,7 +56,7 @@ if nargin == 1
   flag = lower(varargin{1});
   switch flag
    case {'genrotdir'}
-    val = genrotdir;
+    varargout{1} = genrotdir;
    otherwise
     error('BRAIDLAB:braid:conv:badarg','Unknown string argument.')
   end
@@ -74,4 +74,7 @@ params = parser.Results;
 
 genrotdir = params.genrotdir;
 
-val = genrotdir;
+if nargout > 0
+  error('BRAIDLAB:braid:conv:badnargout', ...
+	'No return value assigned when setting a property.')
+end
