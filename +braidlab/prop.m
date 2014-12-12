@@ -5,6 +5,9 @@ function [varargout] = prop(varargin)
 %
 %   PROP('PropertyName') returns the current value of the property.
 %
+%   PROP with no argument returns a struct with all the properties and their
+%   current values.
+%
 %   Valid properties and values are (defaults in braces):
 %
 %   * GenRotDir [{1} | -1]- The direction of rotation of braid group
@@ -57,23 +60,22 @@ function [varargout] = prop(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-import braidlab.util.validateflag
+% TODO: also allow PROP(STRUCT) to set arguments.
 
-% List the properties here.
-persistent ...
-    genrotdir genloopactdir genplotoverunder ...
-    braidplotdir loopcoordsbasepoint
+% The persistent struct that contains the properties.
+persistent pr
 
 % Default values.
-if isempty(genrotdir), genrotdir = 1; end
-if isempty(genloopactdir), genloopactdir = 'lr'; end
-if isempty(genplotoverunder), genplotoverunder = true; end
-if isempty(braidplotdir), braidplotdir = 'bt'; end
-if isempty(loopcoordsbasepoint), loopcoordsbasepoint = 'right'; end
+if isempty(pr)
+  pr.GenRotDir = 1;
+  pr.GenLoopActDir = 'lr';
+  pr.GenPlotOverUnder = true;
+  pr.BraidPlotDir = 'bt';
+  pr.LoopCoordsBasePoint = 'right';
+ end
 
 if nargin == 0
-  % Maybe list all properties by default?
-  error('BRAIDLAB:prop:badarg','Need at least one argument.')
+  varargout{1} = pr;
 end
 
 % One argument means query mode.
@@ -81,15 +83,15 @@ if nargin == 1
   flag = lower(varargin{1});
   switch flag
    case {'genrotdir'}
-    varargout{1} = genrotdir;
+    varargout{1} = pr.GenRotDir;
    case {'genloopactdir'}
-    varargout{1} = genloopactdir;
+    varargout{1} = pr.GenLoopActDir;
    case {'genplotoverunder'}
-    varargout{1} = genplotoverunder;
+    varargout{1} = pr.GenPlotOverUnder;
    case {'braidplotdir'}
-    varargout{1} = braidplotdir;
+    varargout{1} = pr.BraidPlotDir;
    case {'loopcoordsbasepoint'}
-    varargout{1} = loopcoordsbasepoint;
+    varargout{1} = pr.LoopCoordsBasePoint;
    otherwise
     error('BRAIDLAB:prop:badarg','Unknown string argument.')
   end
@@ -111,29 +113,29 @@ params = parser.Results;
 
 % Do not overwrite arguments that weren't specified (no default values).
 if ~isempty(params.genrotdir)
-  genrotdir = params.genrotdir;
+  pr.GenRotDir = params.genrotdir;
 end
 if ~isempty(params.genloopactdir)
-  genloopactdir = params.genloopactdir;
+  pr.GenLoopActDir = params.genloopactdir;
 end
 if ~isempty(params.genplotoverunder)
-  genplotoverunder = params.genplotoverunder;
+  pr.GenPlotOverUnder = params.genplotoverunder;
 end
 if ~isempty(params.braidplotdir)
-  braidplotdir = params.braidplotdir;
+  pr.BraidPlotDir = params.braidplotdir;
 end
 if ~isempty(params.loopcoordsbasepoint)
   if strcmpi(params.loopcoordsbasepoint,'dehornoy')
-    loopcoordsbasepoint = 'left';
+    pr.LoopCoordsBasePoint = 'left';
     if ~isempty(params.genrotdir)
       if params.genrotdir ~= -1
         error('BRAIDLAB:prop:badgenrotdir', ...
               'Property ''dehornoy'' is incompatible with GenRotDir=1.');
       end
     end
-    genrotdir = -1;
+    pr.GenRotDir = -1;
   else
-    loopcoordsbasepoint = params.loopcoordsbasepoint;
+    pr.LoopCoordsBasePoint = params.loopcoordsbasepoint;
   end
 end
 
