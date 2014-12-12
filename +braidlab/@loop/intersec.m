@@ -58,8 +58,8 @@ if ~usematlab
     usematlab = false;
 
     % form output vectors
-    mu = intcoords(1:2*obj.n-4, :).';
-    nu = intcoords(2*obj.n-3:end, :).';
+    mu = intcoords(1:2*obj.totaln-4, :).';
+    nu = intcoords(2*obj.totaln-3:end, :).';
   catch me
     warning(me.identifier, [ me.message ...
                     ' Reverting to Matlab intersec'] );
