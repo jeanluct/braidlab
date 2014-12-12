@@ -58,9 +58,6 @@ all: check-env
 	cd +braidlab/@braid/private; $(MAKE) all
 	cd +braidlab/@loop/private; $(MAKE) all
 	cd +braidlab/@cfbraid/private; $(MAKE) all
-	cd extern/assignmentoptimal; \
-		$(MAKE) all; \
-		mv -f assignmentoptimal.mex* ../../+braidlab/private
 
 check-env:
 ifndef MEXSUFFIX
@@ -72,7 +69,6 @@ doc:
 
 # remove MEX files and object files.
 clean:
-	cd extern/assignmentoptimal; $(MAKE) clean
 	cd extern/cbraid/lib; $(MAKE) clean
 	cd extern/trains; $(MAKE) clean
 	cd +braidlab/@braid/private; $(MAKE) clean
