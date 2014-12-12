@@ -74,6 +74,9 @@ elseif isa(b2,'braidlab.loop')
   if braidlab.prop('GenRotDir') == -1
     b1.word = -b1.word;
   end
+  if strcmpi(braidlab.prop('GenLoopActDir'),'rl')
+    b1.word = b1.word(end:-1:1);
+  end
   [varargout{1:nargout}] = loopsigma(b1.word,b2.coords);
   varargout{1} = braidlab.loop(varargout{1},'bp',b2.basepoint);
   if nargout > 1

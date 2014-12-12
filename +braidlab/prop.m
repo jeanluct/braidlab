@@ -7,25 +7,31 @@ function [varargout] = prop(varargin)
 %
 %   Valid properties and values are (defaults in braces):
 %
-%   * GenRotDir - The direction of rotation of braid group generators [{1} |
-%   -1].  This is the direction of rotation when strings are exchanged by a
-%   generator.  A value of 1 corresponds to clockwise, -1 to
+%   * GenRotDir [{1} | -1]- The direction of rotation of braid group
+%   generators.  This is the direction of rotation when strings are
+%   exchanged by a generator.  A value of 1 corresponds to clockwise, -1 to
 %   counterclockwise.
 %
-%   * GenPlotOverUnder - Whether to plot a positive generator as over/under
-%   or under/over [{true} | false].  This only affects braid.plot.
+%   * GenLoopActDir [{'lr'} | 'rl'] - The direction of application of
+%   generators acting on a loop.  The default is a left-to-right ('lr'),
+%   that is for generators s1 and s2 and a loop l, ([s1 s2])*l = s2(s1(l)).
+%   This is also called a right group action.  The other option is
+%   right-to-left ('rl'), called a left group action.
 %
-%   * BraidPlotDir - The direction that braid.plot displays braids [{'bt'} |
-%   'tb' | 'lr' | 'rl'].  Here 'btlr' mean bottom, top, left, right.  The
-%   default is bottom-to-top ('bt'), but popular conventions also include
-%   'tb' and 'lr'.
+%   * GenPlotOverUnder [{true} | false] - Whether to plot a positive
+%   generator as over/under or under/over.  This only affects braid.plot.
 %
-%   * LoopCoordsBasePoint - The position of the basepoint when defining the
-%   loop coordinates of a braid using braid.loopcoords ['left' |
-%   {'right'} | 'dehornoy'].  The option 'dehornoy' sets the basepoint to
-%   'left' and also sets 'GenRotDir' to -1.  See braid.loopcoords.
+%   * BraidPlotDir [{'bt'} | 'tb' | 'lr' | 'rl'] - The direction that
+%   braid.plot displays braids.  Here 'btlr' mean bottom, top, left, right.
+%   The default is bottom-to-top ('bt'), but popular conventions also
+%   include 'tb' and 'lr'.
 %
-%   See also BRAID, BRAID.LOOPCOORDS, LOOP.
+%   * LoopCoordsBasePoint ['left' | {'right'} | 'dehornoy'] - The position
+%   of the basepoint when defining the loop coordinates of a braid using
+%   braid.loopcoords.  The option 'dehornoy' sets the basepoint to 'left'
+%   and also sets 'GenRotDir' to -1.  See braid.loopcoords.
+%
+%   See also BRAID, BRAID.LOOPCOORDS, BRAID.MTIMES, LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -54,10 +60,13 @@ function [varargout] = prop(varargin)
 import braidlab.util.validateflag
 
 % List the properties here.
-persistent genrotdir genplotoverunder braidplotdir loopcoordsbasepoint
+persistent ...
+    genrotdir genloopactdir genplotoverunder ...
+    braidplotdir loopcoordsbasepoint
 
 % Default values.
 if isempty(genrotdir), genrotdir = 1; end
+if isempty(genloopactdir), genloopactdir = 'lr'; end
 if isempty(genplotoverunder), genplotoverunder = true; end
 if isempty(braidplotdir), braidplotdir = 'bt'; end
 if isempty(loopcoordsbasepoint), loopcoordsbasepoint = 'right'; end
@@ -73,6 +82,8 @@ if nargin == 1
   switch flag
    case {'genrotdir'}
     varargout{1} = genrotdir;
+   case {'genloopactdir'}
+    varargout{1} = genloopactdir;
    case {'genplotoverunder'}
     varargout{1} = genplotoverunder;
    case {'braidplotdir'}
@@ -87,10 +98,12 @@ end
 
 parser = inputParser;
 parser.addParameter('genrotdir', [], @(x) x == 1 || x == -1);
+parser.addParameter('genloopactdir', [],  @(s) ischar(s) && ...
+                   any(strcmpi(s,{'lr','rl'})));
 parser.addParameter('genplotoverunder', [], @(x) x == true || x == false);
-parser.addParameter('braidplotdir', [],  @(s) ischar(s) && ...
+parser.addParameter('braidplotdir', [], @(s) ischar(s) && ...
                    any(strcmpi(s,{'bt','tb','lr','rl'})));
-parser.addParameter('loopcoordsbasepoint', [],  @(s) ischar(s) && ...
+parser.addParameter('loopcoordsbasepoint', [], @(s) ischar(s) && ...
                    any(strcmpi(s,{'left','right','dehornoy'})));
 
 parser.parse(varargin{:});
@@ -99,6 +112,9 @@ params = parser.Results;
 % Do not overwrite arguments that weren't specified (no default values).
 if ~isempty(params.genrotdir)
   genrotdir = params.genrotdir;
+end
+if ~isempty(params.genloopactdir)
+  genloopactdir = params.genloopactdir;
 end
 if ~isempty(params.genplotoverunder)
   genplotoverunder = params.genplotoverunder;

@@ -72,6 +72,10 @@ conv = braidlab.prop('LoopCoordsBasePoint');
 if braidlab.prop('GenRotDir') == -1
   b.word = -b.word;
 end
+% If left action, generators act from right to left, so reverse list.
+if strcmpi(braidlab.prop('GenLoopActDir'),'rl')
+  b.word = b.word(end:-1:1);
+end
 
 if nargin > 1
   notypespec = false;
