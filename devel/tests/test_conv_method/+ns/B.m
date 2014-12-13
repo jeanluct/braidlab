@@ -1,8 +1,8 @@
-classdef B < A
+classdef B < ns.A
 
   methods
     function obj = B(b)
-      obj = obj@A(b);
+      obj = obj@ns.A(b);
     end
 
     function a = A(obj)
@@ -17,7 +17,7 @@ classdef B < A
   methods (Access = private)
     function a = conv_to_A(obj)
       disp('converting B to A.')
-      a = A(obj.dat);
+      a = ns.A(obj.dat);
     end
   end
 
