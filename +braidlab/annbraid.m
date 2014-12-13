@@ -69,13 +69,22 @@ classdef annbraid < braidlab.braid
       obj.n = value+1;
     end
 
-    function b = tobraid(ab)
-    %TOBRAID   Convert an ANNBRAID to a regular BRAID.
+    function b = braid(ab)
+    %BRAID   Convert an ANNBRAID to a regular BRAID.
     %   C = BRAID(B) converts the annular braid B to a regular braid object
     %   C by transforming each generator.
     %
     %   This is a method for the ANNBRAID class.
     %   See also BRAID.BRAID.
+      disp('converting annbraid to braid...')
+      b = convert_to_braid(ab);
+    end
+  end % methods block
+
+
+  methods (Access = private)
+
+    function b = convert_to_braid(ab)
 
       n = ab.nann;
       idxn = find(abs(ab.word) == n);

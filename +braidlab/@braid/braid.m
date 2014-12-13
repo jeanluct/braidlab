@@ -128,7 +128,14 @@ classdef braid < matlab.mixin.CustomDisplay
 
       % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
-      if isa(b,'braidlab.braid')
+      if isa(b,'braidlab.annbraid')
+        % This is a bit of a kludge.  annbraid needs a custom conversion
+        % to braid.  b.braid calls the right function (annbraid.braid),
+        % but braid(b) doesn't.  That's ok, let's just do it here.
+        % This needs to go here because b is then also a braid.
+        br = b.braid;
+        return
+      elseif isa(b,'braidlab.braid')
         br.n     = b.n;
         br.word  = b.word;
       elseif isa(b,'braidlab.cfbraid')
