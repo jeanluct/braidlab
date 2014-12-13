@@ -142,8 +142,8 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also BRAID.EQ, BRAID.LEXEQ.
       if length(b1.tcross) ~= length(b2.tcross)
-	ee = false;
-	return
+        ee = false;
+        return
       end
       ee = all(b1.tcross == b2.tcross);
       if ee
@@ -199,6 +199,16 @@ classdef databraid < braidlab.braid
       % a list of the generators that were kept.
       [bb,ii] = subbraid@braidlab.braid(b,s);
       bs = braidlab.databraid(bb,b.tcross(ii));
+    end
+
+  end % methods block
+
+
+  methods (Access = protected)
+
+    function displayScalarObject(b)
+      fprintf('braid: '), disp(braid(b));
+      fprintf('tcross: '), disp(b.tcross);
     end
 
   end % methods block
