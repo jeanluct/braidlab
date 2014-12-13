@@ -1,9 +1,12 @@
-function plot(b)
+function plot(b,varargin)
 %PLOT   Plot a braid diagram.
 %   PLOT(B) plots a braid diagram corresponding to the braid B.
 %
+%   PLOT(B,...) gives the line specification as for Matlab's PLOT command.
+%   The default LineSpec is PLOT(B,'k','LineWidth',2).
+%
 %   This is a method for the BRAID class.
-%   See also BRAID.
+%   See also BRAID, PLOT.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -37,7 +40,12 @@ gapX = 100; gapY = 150;
 cutf = .35;
 uselines = false; % If true, use straight line segments.
 npts = 40;
-lat = {'k-','LineWidth',2};
+
+if nargin > 1
+  lat = varargin;
+else
+  lat = {'k-','LineWidth',2};
+end
 
 if ~isscalar(b)
   error('BRAIDLAB:braid:plot',['Can only plot scalar braid, not array of' ...
