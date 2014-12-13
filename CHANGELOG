@@ -1,4 +1,11 @@
 ------------------------------------------------------------------------
+3.0.1 [201x-xx-xx]
+
+* Improved installation instructions in guide.
+
+* Fixed a big when calling C++ version of intersec.
+
+------------------------------------------------------------------------
 3.0 [2014-12-09]
 
 * Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.
