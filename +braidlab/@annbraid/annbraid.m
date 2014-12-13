@@ -64,7 +64,6 @@ classdef annbraid < braidlab.braid
     function value = get.nann(obj)
       value = obj.n-1;
     end
-
     function obj = set.nann(obj,value)
       obj.n = value+1;
     end
@@ -76,40 +75,7 @@ classdef annbraid < braidlab.braid
     %
     %   This is a method for the ANNBRAID class.
     %   See also BRAID.BRAID.
-      disp('converting annbraid to braid...')
       b = convert_to_braid(ab);
-    end
-  end % methods block
-
-
-  methods (Access = private)
-
-    function b = convert_to_braid(ab)
-
-      n = ab.nann;
-      idxn = find(abs(ab.word) == n);
-      if isempty(idxn)
-        w = ab.word;
-      else
-        % Sigma_n = n n n-1 n-2 ... 1 -2 -3 ... -n -n
-        Sn = [n n:-1:2 1 -(2:n) -n];
-        Sni = [n n:-1:2 -1 -(2:n) -n];
-        if ab.word(idxn(1)) > 0
-          w = [ab.word(1:idxn(1)-1) Sn];
-        else
-          w = [ab.word(1:idxn(1)-1) Sni];
-        end
-        for i = 2:length(idxn)
-          w = [w ab.word(idxn(i-1)+1:idxn(i)-1)];
-          if ab.word(idxn(i)) > 0
-            w = [w Sn];
-          else
-            w = [w Sni];
-          end
-        end
-        w = [w ab.word(idxn(end)+1:end)];
-      end
-      b = braidlab.braid(w,ab.n);
     end
   end % methods block
 
