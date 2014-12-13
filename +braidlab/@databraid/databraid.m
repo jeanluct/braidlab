@@ -121,7 +121,7 @@ classdef databraid < braidlab.braid
 
     function b = braid(db)
     %BRAID   Convert a DATABRAID to a BRAID.
-    %   C = BRAID(B) converts the databraid B to a regular braid object B
+    %   C = BRAID(B) converts the databraid B to a regular braid object C
     %   by dropping the crossing times.
     %
     %   This is a method for the DATABRAID class.
