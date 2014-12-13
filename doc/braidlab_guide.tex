@@ -198,7 +198,7 @@ The method \lstinline{compact} is based on the heuristic algorithm
 of~\citet{Bangert2002}, since finding the braid of minimum length in the
 standard generators is in general difficult~\citep{Paterson1991}.  Hence,
 there is no guarantee that in general \lstinline{compact} will find the
-identity braid, even though it do so here.  To really test if a braid is the
+identity braid, even though it does so here.  To really test if a braid is the
 identity (trivial braid), use the method \lstinline{istrivial}: %
 \index{braid class@\braid\ class!istrivial@\lstinline{istrivial}}
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -220,7 +220,7 @@ Note that
 >> help braid
 \end{lstlisting}
 describes the class \braid.  To get more information on the \braid\
-constructor, invoke %
+constructor, invoke%
 \index{braid class@\braid\ class!constructor}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> help braid.braid
@@ -1898,8 +1898,19 @@ compiler.  \index{Matlab!MEX files|)}
 Some zip and tar files of the precompiled latest released version are
 available at \url{http://github.com/jeanluct/braidlab/releases}.  If one of
 those suits your system, then download and untar/unzip (it might still work
-even if the system doesn't match perfectly).
+even if the system doesn't match perfectly).  For Mac OS~X, there is a version
+compiled without \href{https://gmplib.org/}{GMP} (the GNU MultiPrecision
+library) %
+\index{GMP}%
+since it is a bit tricky to install (see Section~\ref{sec:gmp}).
 
+On Ubuntu or Debian Linux, you can install the GMP source and binaries with
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo apt-get install libgmp-dev
+\end{lstlisting}
+After you install the binaries you must set the Matlab path as described in
+Section~\ref{sec:path}.
 
 \subsection{Cloning the repository}
 \label{sec:cloning}
@@ -1930,39 +1941,16 @@ or run (much) more slowly.
 \index{Matlab!MEX files|)}
 
 \index{GMP|(}%
-If you receive error messages because GMP (the GNU MultiPrecision library) is
-not installed on your system, instead of the above use
+If you receive error messages because \href{https://gmplib.org/}{GMP} (the GNU
+MultiPrecision library) is not installed on your system, instead of the above
+use
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make BRAIDLAB_USE_GMP=0
 \end{lstlisting}
 This will slow down some functions, in particular testing for equality of
-large braids.
+large braids.  If you want to install GMP first, see Section~\ref{sec:gmp}.
 
-If you wish to compile \braidlab\ from source using GMP, you need to make the
-GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
-compiler that Matlab is using. Both the %
-\index{GCC compiler}%
-GCC compiler (more common on Linux %
-\index{Linux}%
-systems) and %
-\index{Clang compiler}%
-Clang compiler (more common on Mac OS~X systems) %
-\index{OS X}%
-use the environment variable
-\lstinline{CPLUS_INCLUDE_PATH} to specify path to include files. For example,
-if both header files reside in \lstinline{/usr/local/include} on your Linux or
-Mac OS~X system, you would issue (in \lstinline{bash} shell):
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ export CPLUS_INCLUDE_PATH=/usr/local/include
-\end{lstlisting}
-or in \lstinline{tcsh} shell (now default on Mac OS X):
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=csh,backgroundcolor=\color{white}]
-$ setenv CPLUS_INCLUDE_PATH /usr/local/include
-\end{lstlisting}
-before issuing \lstinline{make} that builds \lstinline{braidlab}.
 %
 \index{GMP|)}
 
@@ -2011,7 +1999,8 @@ Note that running the testsuite requires Matlab version 2013a or later.
 \label{sec:trouble}
 \index{installing \braidlab!troubleshooting|(}
 
-Here are some common problems that can occur when installing braidlab.
+Here are some common problems that can occur when installing or compiling
+braidlab.
 
 \subsubsection{Unsupported compiler}
 
@@ -2052,6 +2041,44 @@ compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
 \index{Linux|)}%
 
 
+\subsubsection{Compiling with GMP}
+\label{sec:gmp}
+
+\index{GMP|(}%
+\href{https://gmplib.org/}{GMP} is the GNU MultiPrecision library.  \braidlab\
+uses GMP to handle arbitrarily large integers, which is necessary for testing
+equality of very long braids.  If GMP is not available, \braidlab\ falls back
+on the VPI library \citep{vpi}, which is written natively in Matlab and hence
+is much slower.
+
+If you wish to compile \braidlab\ from source using GMP, you need to make the
+GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
+compiler that Matlab is using. Both the %
+\index{GCC compiler}%
+GCC compiler (more common on Linux %
+\index{Linux}%
+systems) and %
+\index{Clang compiler}%
+Clang compiler (more common on Mac OS~X systems) %
+\index{OS X}%
+use the environment variable \lstinline{CPLUS_INCLUDE_PATH} to specify path to
+include files. For example, if both header files reside in
+\lstinline{/usr/local/include} on your Linux or Mac OS~X system, you would
+issue (in \lstinline{bash} shell):
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ export CPLUS_INCLUDE_PATH=/usr/local/include
+\end{lstlisting}
+or in \lstinline{tcsh} shell (now the default on Mac OS X):
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=csh,backgroundcolor=\color{white}]
+$ setenv CPLUS_INCLUDE_PATH /usr/local/include
+\end{lstlisting}
+before issuing \lstinline{make} that builds \lstinline{braidlab}.
+
+\index{GMP|)}%
+
+
 \subsubsection{Polish \LaTeX\ gets in the way}
 
 \index{Linux|(}%
@@ -2086,7 +2113,7 @@ and under \lstinline{bash} shell this reads
   language=bash,backgroundcolor=\color{white}]
 $ export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
 \end{lstlisting}
-or under \lstinline{tcsh} shell (now default in Mac OS~X) 
+or under \lstinline{tcsh} shell (now the default in Mac OS~X) 
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ setenv PATH /Applications/MATLAB_R2014a.app/bin:$PATH
