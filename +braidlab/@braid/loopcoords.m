@@ -1,15 +1,15 @@
-function l = loopcoords(b,conv,typ)
+function l = loopcoords(b,typ)
 %LOOPCOORDS   Loop coordinates of a braid.
-%   L = LOOPCOORDS(B) returns the Dynnikov loop coordinates of a braid, as
-%   defined by Dehornoy.  The are defined by the action of a braid on a
-%   nested generating set for the fundamental group of the disk with n
-%   punctures.
+%   L = LOOPCOORDS(B) returns the Dynnikov loop coordinates L of a braid B,
+%   as defined by Dehornoy (see reference below).  They are defined by the
+%   action of a braid on a nested generating set for the fundamental group
+%   of the disk with n punctures.
 %
-%   L = LOOPCOORDS(B,CONV) controls the convetion whether the boundary
-%   puncture is added to the right (CONV='right', the default) or left
-%   (CONV='left').  If CONV='dehornoy', then generators are defined
-%   anticlockwise with an extra puncture on the left, to agree with
-%   Dehornoy's convention.
+%   The braidlab property 'LoopCoordsBasePoint' controls the convention as
+%   to whether the basepoint puncture is added to the right ('right', the
+%   default) or left ('left').  If 'LoopCoordsBasePoint' is set to
+%   'dehornoy', then generators are defined anticlockwise with an extra
+%   puncture on the left, to agree with Dehornoy's convention.
 %
 %   Note that the final (a(n),b(n)) pair of coordinates of Dehornoy's form
 %   are redundant, so we drop them here.  In our convention we also list the
@@ -18,8 +18,9 @@ function l = loopcoords(b,conv,typ)
 %
 %   Example: consider the braid of Dehornoy's Example 3.15:
 %
-%   >> b=braid([1 -2 1 2 1 3 -1 -2 -1 -2 -1 2 2 -3 -2]);
-%   >> b.loopcoords('dehornoy')  % use Dehornoy's convention
+%   >> prop('LoopCoordsBasePoint','dehornoy')  % use Dehornoy's convention
+%   >> b = braid([1 -2 1 2 1 3 -1 -2 -1 -2 -1 2 2 -3 -2]);
+%   >> b.loopcoords
 %
 %   ans =
 %
@@ -30,17 +31,16 @@ function l = loopcoords(b,conv,typ)
 %   to our (a1,a2,a3,b1,b2,b3).  The '*1' at the end indicates that puncture
 %   1 is used as a basepoint (see LOOP.LOOP).
 %
-%   L = LOOPCOORDS(B,CONV,'TYPE') or LOOPCOORDS(B,CONV,@TYPE) creates a loop
-%   with coordinates of type TYPE.  The default is TYPE=int64.  Other useful
-%   values are double, int32, and vpi (variable precision integers).  Use
-%   CONV=[] for the default convention.  Note that fixed-precision integer
-%   types can overflow for long braids.
+%   L = LOOPCOORDS(B,'TYPE') or LOOPCOORDS(B,@TYPE) creates a loop with
+%   coordinates of type TYPE.  The default is TYPE=int64.  Other useful
+%   values are double, int32, and vpi (variable precision integers).  Note
+%   that fixed-precision integer types can overflow for long braids.
 %
 %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
 %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, BRAID.EQ, LOOP.
+%   See also BRAID, BRAID.EQ, PROP, LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -66,11 +66,18 @@ function l = loopcoords(b,conv,typ)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if nargin < 2, conv = 'right'; end
+conv = braidlab.prop('LoopCoordsBasePoint');
 
-if isempty(conv), conv = 'right'; end
+% If generators are defined counterclockwise, then invert the generators.
+if braidlab.prop('GenRotDir') == -1
+  b.word = -b.word;
+end
+% If left action, generators act from right to left, so reverse list.
+if strcmpi(braidlab.prop('GenLoopActDir'),'rl')
+  b.word = b.word(end:-1:1);
+end
 
-if nargin > 2
+if nargin > 1
   notypespec = false;
   if ischar(typ)
     htyp = str2func(typ);
@@ -88,20 +95,22 @@ end
 if strcmp(char(htyp),'vpi'), braidlab.util.checkvpi; end
 
 switch lower(conv)
- case {'left','dehornoy'}
+ case 'left'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the left.
   n1 = b.n-1;
   l = braidlab.loop([zeros(1,n1) ones(1,n1)],'bp',1);
   % Convert sigma_i to sigma_(i+1), to leave room for the puncture on the left.
   w = sign(b.word).*(abs(b.word)+1);
-  if strcmpi(conv,'dehornoy'), w = -w; end % Dehornoy uses anticlockwise conv.
  case 'right'
   % Nested generators of the fundamental group, anchored to an extra
   % puncture on the right.
   l = braidlab.loop(b.n,'bp');
   % No need to convert sigmas.
   w = b.word;
+ otherwise
+  error('BRAIDLAB:braid:loopcoords:badconv', ...
+        'Unknown convention %s for loopcoords.',conv)
 end
 
 try
