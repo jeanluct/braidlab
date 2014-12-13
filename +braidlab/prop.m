@@ -5,6 +5,8 @@ function [varargout] = prop(varargin)
 %
 %   PROP('PropertyName') returns the current value of the property.
 %
+%   PROP('Reset') resets all the properties to their default values.
+%
 %   PROP with no argument returns a struct with all the properties and their
 %   current values.
 %
@@ -66,13 +68,7 @@ function [varargout] = prop(varargin)
 persistent pr
 
 % Default values.
-if isempty(pr)
-  pr.GenRotDir = 1;
-  pr.GenLoopActDir = 'lr';
-  pr.GenPlotOverUnder = true;
-  pr.BraidPlotDir = 'bt';
-  pr.LoopCoordsBasePoint = 'right';
- end
+if isempty(pr), pr = prdef; end
 
 if nargin == 0
   varargout{1} = pr;
@@ -82,6 +78,9 @@ end
 if nargin == 1
   flag = lower(varargin{1});
   switch flag
+   case {'default','reset'}
+    pr = prdef;
+    varargout{1} = pr;
    case {'genrotdir'}
     varargout{1} = pr.GenRotDir;
    case {'genloopactdir'}
@@ -140,6 +139,15 @@ if ~isempty(params.loopcoordsbasepoint)
 end
 
 if nargout > 0
-  error('BRAIDLAB:prop:badnargout', ...
-        'No return value assigned when setting a property.')
+  varargout{1} = pr;
 end
+
+%======================================================================
+function pr = prdef
+
+% Default values.
+pr.GenRotDir = 1;
+pr.GenLoopActDir = 'lr';
+pr.GenPlotOverUnder = true;
+pr.BraidPlotDir = 'bt';
+pr.LoopCoordsBasePoint = 'right';
