@@ -1823,6 +1823,46 @@ string being removed will have returned to its initial position many times. %
 \index{punctures!filling-in|)}
 
 
+\section{Setting global properties}
+\label{sec:prop}
+
+Braids have been studied for a long time and by many communities, so several
+different conventions were bound to emerge.  \braidlab\ has some reasonable
+default conventions, but perhaps you'd be happier if it used your favorite
+one.  Luckily, \braidlab\ has you covered.
+
+\index{prop@\lstinline{prop}|(}%
+To see the properties available and their current values, use the
+\lstinline{prop} command:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> prop
+
+ans =         GenRotDir: 1
+          GenLoopActDir: 'lr'
+       GenPlotOverUnder: 1
+           BraidPlotDir: 'bt'
+    LoopCoordsBasePoint: 'right'
+\end{lstlisting}
+To set a property, use something like \lstinline{prop('BraidPlotDir','lr')}.
+This will plot braids from left-to-right from now on, as in
+Fig.~\ref{fig:fulltwist_lr}.
+%
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=\textwidth]{fulltwist_lr}
+  \end{center}
+  \caption{\lstinline{plot(braid('FullTwist',5))} with the property
+    \lstinline{'BraidPlotDir'} set to \hbox{\lstinline{'lr'}}.}
+  \label{fig:fulltwist_lr}
+\end{figure}
+%
+The default is \lstinline{'bt'} for bottom-to-top.  Other possible values are
+\lstinline{'tb'} for top-to-bottom and \lstinline{'rl'} for right-to-left.
+See \lstinline{help prop} for more information on properties and allowed
+values.
+\index{prop@\lstinline{prop}|)}
+
+
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgments}
 
