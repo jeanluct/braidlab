@@ -1,5 +1,5 @@
 %ANNBRAID   Class for representing braids on the annulus.
-%   A ANNBRAID object holds a braid defined on an annular domain.
+%   An ANNBRAID object holds a braid defined on an annular domain.
 %
 %   In addition to the data members of the BRAID class, the class ANNBRAID
 %   has the dependent property
@@ -54,20 +54,51 @@ classdef annbraid < braidlab.braid
     %   Note that B.N will return NANN+1, which includes the basepoint
     %   string.
     %
+    %   BC = ANNBRAID(B) copies the object B of type ANNBRAID or BRAID to
+    %   the ANNBRAID object BC.  An annbraid is created from a
+    %   braid by adding a basepoint puncture.
+    %
+    %   B = ANNBRAID('Random',NANN,K) returns a random braid of NANN strings
+    %   with K crossings (generators).  The K generators are chosen
+    %   uniformly in [-NANN:-1 1:NANN].
+    %
     %   This is a method for the ANNBRAID class.
     %   See also ANNBRAID, BRAID.
+
       if nargin > 0
         if isa(varargin{1},'braidlab.braid')
+          % Create an annbraid from a braid by appending a basepoint.
+          varargin{2} = varargin{1}.n+1;
+          varargin{1} = varargin{1}.word;
         elseif max(size(size(varargin{1}))) == 3
           % Create braid from data.
-          error('Not implemented yet.')
+          error('Creating an annbraid from data is not implemented yet.')
+        elseif ischar(varargin{1})
+          switch lower(varargin{1})
+           case 'random'
+            % Pass an extra string to the constructor, representing the
+            % basepoint.
+            varargin{2} = varargin{2}+1;
+           otherwise
+            error('BRAIDLAB:annbraid:annbraid', ...
+                  'String argument ''%s'' not supported for annbraid.', ...
+                  varargin{1})
+          end
         else
           % Numerical first argument.
           % Pass an extra string to the constructor, representing the basepoint.
           if nargin > 1
             varargin{2} = varargin{2}+1;
+          elseif isempty(varargin{1})
+            % Empty first argument with no second argument creates
+            % trivial braid, as if there were no arguments.
+            varargin{2} = 2;
           end
         end
+      else
+        % Create a trivial braid with one string and one basepoint.
+        varargin{1} = [];
+        varargin{2} = 2;
       end
       obj = obj@braidlab.braid(varargin{:});
     end
@@ -96,8 +127,6 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      class(b1)
-      class(b2)
       if isa(b2,'braidlab.annbraid')
         % If b2 is also an annular braid, the product is simple concatenation.
         varargout{1} = braidlab.annbraid(mtimes@braidlab.braid(b1,b2));
