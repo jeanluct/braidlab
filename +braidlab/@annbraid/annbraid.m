@@ -43,24 +43,33 @@ classdef annbraid < braidlab.braid
 
   methods
 
-    function obj = annbraid(w,secnd)
+    function obj = annbraid(varargin)
     %ANNBRAID   Construct an annbraid object.
     %   B = ANNBRAID(W) constucts an annular braid B from a word W.
     %
-    %   B = ANNBRAID(W,N) constucts an annular braid from a word W with N
-    %   strings.  The 'basepoint' string is *not* included in those N
-    %   strings, so generator values can be between -N and N.
+    %   B = ANNBRAID(W,NANN) constucts an annular braid from a word W with
+    %   NANN strings.  The 'basepoint' string is *not* included in those
+    %   NANN strings, so generator values can be between -NANN and NANN.
+    %
+    %   Note that B.N will return NANN+1, which includes the basepoint
+    %   string.
     %
     %   This is a method for the ANNBRAID class.
     %   See also ANNBRAID, BRAID.
-      if nargin == 0, return; end
-      % Pass an extra string to the constructor, representing the basepoint.
-      if nargin < 2
-        bsecnd = max(abs(w))+2;
-      else
-        bsecnd = secnd+1;
+      if nargin > 0
+        if isa(varargin{1},'braidlab.braid')
+        elseif max(size(size(varargin{1}))) == 3
+          % Create braid from data.
+          error('Not implemented yet.')
+        else
+          % Numerical first argument.
+          % Pass an extra string to the constructor, representing the basepoint.
+          if nargin > 1
+            varargin{2} = varargin{2}+1;
+          end
+        end
       end
-      obj = obj@braidlab.braid(w,bsecnd);
+      obj = obj@braidlab.braid(varargin{:});
     end
 
     % The annular strings are the strings without the basepoint.
@@ -83,13 +92,26 @@ classdef annbraid < braidlab.braid
     end
 
     function [varargout] = mtimes(b1,b2)
+    %MTIMES   Multiply two annbraids together or act on a loop with an annbraid.
 
       if isa(b2,'braidlab.annbraid')
         % If b2 is also an annular braid, the product is simple concatenation.
-        varargout{1} = mtimes@braidlab.braid(b1,b2);
+        varargout{1} = braidlab.annbraid(mtimes@braidlab.braid(b1,b2));
       elseif isa(b2,'braidlab.loop')
+        if b2.basepoint < b1.n
+          error('BRAIDLAB:annbraid:mtimes', ...
+                'Annular braid can only act on a loop with a basepoint.')
+        end
         [varargout{1:nargout}] = mtimes@braidlab.braid(b1.braid,b2);
       end
+    end
+
+    function bm = mpower(b,m)
+    %MPOWER   Raise an annbraid to some positive or negative power.
+    %
+    %   This is a method for the ANNBRAID class.
+    %   See also ANNBRAID, ANNBRAID.MTIMES, ANNBRAID.INV.
+      bm = braidlab.annbraid(mpower@braidlab.braid(b,m));
     end
 
     function bi = inv(b)
@@ -97,7 +119,44 @@ classdef annbraid < braidlab.braid
     %
     %   This is a method for the ANNBRAID class.
     %   See also ANNBRAID, ANNBRAID.MTIMES, ANNBRAID.MPOWER.
-      bi = inv@braidlab.braid(b);
+      bi = braidlab.annbraid(inv@braidlab.braid(b));
+    end
+
+    function p = perm(obj)
+    %PERM   Permutation corresponding to an annbraid.
+    %
+    %   This is a method for the ANNBRAID class.
+    %   See also ANNBRAID, ANNBRAID.ISPURE.
+
+      p = perm@braidlab.braid(obj.braid);
+
+      if p(end) ~= length(p)
+        error('BRAIDLAB:annbraid:badperm', ...
+              'Basepoint should not move.')
+      end
+      % Drop the last entry: ignore basepoint in the permutation.
+      p(end) = [];
+    end
+
+    function wr = writhe(obj)
+    %WRITHE   Writhe of an annbraid.
+    %
+    %   This is a method for the ANNBRAID class.
+    %   See also ANNBRAID.
+
+      % Convert the annbraid to a braid first, to include the basepoint.
+      wr = writhe@braidlab.braid(obj.braid);
+    end
+
+    function str = char(b)
+    %CHAR   Convert annbraid to string.
+    %
+    %   This is a method for the ANNBRAID class.
+    %   See also ANNBRAID, ANNBRAID.DISP.
+
+      str = char@braidlab.braid(b);
+      % Append an asterisk: same notation as for basepoint.
+      str = [str '*'];
     end
 
   end % methods block
