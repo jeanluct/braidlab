@@ -45,10 +45,14 @@ classdef annbraid < braidlab.braid
 
     function obj = annbraid(w,secnd)
     %ANNBRAID   Construct an annbraid object.
-    %   B = ANNBRAID(W) constucts an annular braid from a word W.
+    %   B = ANNBRAID(W) constucts an annular braid B from a word W.
+    %
+    %   B = ANNBRAID(W,N) constucts an annular braid from a word W with N
+    %   strings.  The 'basepoint' string is *not* included in those N
+    %   strings, so generator values can be between -N and N.
     %
     %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID, BRAID, ANNBRAID/ANNBRAID.
+    %   See also ANNBRAID, BRAID.
       if nargin == 0, return; end
       % Pass an extra string to the constructor, representing the basepoint.
       if nargin < 2
@@ -77,6 +81,25 @@ classdef annbraid < braidlab.braid
     %   See also BRAID.BRAID.
       b = convert_to_braid(ab);
     end
+
+    function [varargout] = mtimes(b1,b2)
+
+      if isa(b2,'braidlab.annbraid')
+        % If b2 is also an annular braid, the product is simple concatenation.
+        varargout{1} = mtimes@braidlab.braid(b1,b2);
+      elseif isa(b2,'braidlab.loop')
+        [varargout{1:nargout}] = mtimes@braidlab.braid(b1.braid,b2);
+      end
+    end
+
+    function bi = inv(b)
+    %INV   Inverse of an annbraid.
+    %
+    %   This is a method for the ANNBRAID class.
+    %   See also ANNBRAID, ANNBRAID.MTIMES, ANNBRAID.MPOWER.
+      bi = inv@braidlab.braid(b);
+    end
+
   end % methods block
 
 end % annbraid classdef
