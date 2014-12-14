@@ -267,15 +267,6 @@ classdef annbraid < braidlab.braid
       plot@braidlab.braid(b.braid,varargin{:});
     end
 
-    function l = reducing(b,varargin)
-      ; %#ok<NOSEM>
-      % Do not put comments above the first line of code, so the help
-      % message from braid superclass is displayed.
-
-      % Maybe should convert to a curve with a basepoint.
-      l = reducing@braidlab.braid(b.braid,varargin{:});
-    end
-
     function [varargout] = tntype(b)
       ; %#ok<NOSEM>
       % Do not put comments above the first line of code, so the help
