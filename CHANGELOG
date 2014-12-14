@@ -8,6 +8,8 @@
 * Fix a bug in braid.mtimes that disallowed valid action on loop with
   basepoint.
 
+* Remove broken braid.reducing.
+
 ------------------------------------------------------------------------
 3.0 [2014-12-09]
 
