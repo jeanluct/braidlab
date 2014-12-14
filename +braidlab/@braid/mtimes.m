@@ -58,6 +58,10 @@ elseif isa(b2,'braidlab.loop')
            '  Instead use matrix of loop.coords.  ' ...
            'Try ''help loop.loop''.'])
   end
+  if b1.n > b2.totaln
+    error('BRAIDLAB:braid:mtimes:badgen', ...
+          'Braid has too many strings for the loop.')
+  end
   if b2.basepoint
     p = b1.perm;
     p = [p (length(p)+1):b2.totaln];
@@ -65,10 +69,6 @@ elseif isa(b2,'braidlab.loop')
       error('BRAIDLAB:braid:mtimes:fixbp', ...
             'Braid cannot move the basepoint.')
     end
-  end
-  if b1.n > b2.n
-    error('BRAIDLAB:braid:mtimes:badgen', ...
-          'Braid has too many strings for the loop.')
   end
   % If generators are defined counterclockwise, then invert the generators.
   if braidlab.prop('GenRotDir') == -1
