@@ -2,9 +2,9 @@
 %   A ANNBRAID object holds a braid defined on an annular domain.
 %
 %   In addition to the data members of the BRAID class, the class ANNBRAID
-%   has the following data member (property):
+%   has the dependent property
 %
-%    '???'   ???
+%    'nann'     the number of annular strings, not counting the basepoint
 %
 %   METHODS('ANNBRAID') shows a list of methods.
 %
@@ -92,11 +92,18 @@ classdef annbraid < braidlab.braid
     end
 
     function [varargout] = mtimes(b1,b2)
-    %MTIMES   Multiply two annbraids together or act on a loop with an annbraid.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
 
+      class(b1)
+      class(b2)
       if isa(b2,'braidlab.annbraid')
         % If b2 is also an annular braid, the product is simple concatenation.
         varargout{1} = braidlab.annbraid(mtimes@braidlab.braid(b1,b2));
+      elseif isa(b2,'braidlab.braid')
+        % If b2 is a braid, return a plain braidlab.braid.
+        varargout{1} = mtimes@braidlab.braid(b1.braid,b2);
       elseif isa(b2,'braidlab.loop')
         if b2.basepoint < b1.n
           error('BRAIDLAB:annbraid:mtimes', ...
@@ -107,26 +114,25 @@ classdef annbraid < braidlab.braid
     end
 
     function bm = mpower(b,m)
-    %MPOWER   Raise an annbraid to some positive or negative power.
-    %
-    %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID, ANNBRAID.MTIMES, ANNBRAID.INV.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
       bm = braidlab.annbraid(mpower@braidlab.braid(b,m));
     end
 
     function bi = inv(b)
-    %INV   Inverse of an annbraid.
-    %
-    %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID, ANNBRAID.MTIMES, ANNBRAID.MPOWER.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
       bi = braidlab.annbraid(inv@braidlab.braid(b));
     end
 
     function p = perm(obj)
-    %PERM   Permutation corresponding to an annbraid.
-    %
-    %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID, ANNBRAID.ISPURE.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
 
       p = perm@braidlab.braid(obj.braid);
 
@@ -139,26 +145,132 @@ classdef annbraid < braidlab.braid
     end
 
     function wr = writhe(obj)
-    %WRITHE   Writhe of an annbraid.
-    %
-    %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
 
       % Convert the annbraid to a braid first, to include the basepoint.
       wr = writhe@braidlab.braid(obj.braid);
     end
 
     function str = char(b)
-    %CHAR   Convert annbraid to string.
-    %
-    %   This is a method for the ANNBRAID class.
-    %   See also ANNBRAID, ANNBRAID.DISP.
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
 
       str = char@braidlab.braid(b);
       % Append an asterisk: same notation as for basepoint.
       str = [str '*'];
     end
 
+    function p = alexpoly(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      p = alexpoly@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function m = burau(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      m = burau@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function c = compact(b)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      % Note here we do *not* convert to a braidlab.braid first.
+      c = braidlab.annbraid(compact@braidlab.braid(b));
+    end
+
+    function [c,bE] = complexity(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      [c,bE] = complexity@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function [varargout] = conjtest(b1,b2)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      varargout{1:nargout} = conjtest@braidlab.braid(b1.braid,b2.braid);
+    end
+
+    function [varargout] = cycle(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      varargout{1:nargout} = cycle@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function [varargout] = entropy(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      varargout{1:nargout} = entropy@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function l = loopcoords(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      l = loopcoords@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function plot(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      % This isn't a great way to plot.  Would be better to highlight the
+      % boundary puncture with a different color.
+      plot@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function l = reducing(b,varargin)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      % Maybe should convert to a curve with a basepoint.
+      l = reducing@braidlab.braid(b.braid,varargin{:});
+    end
+
+    function [varargout] = tntype(b)
+      ; %#ok<NOSEM>
+      % Do not put comments above the first line of code, so the help
+      % message from braid superclass is displayed.
+
+      varargout{1:nargout} = tntype@braidlab.braid(b.braid);
+    end
+
+  end % methods block
+
+
+  % Some operations are not appropriate for annbraids, since they break
+  % chronology.  Hide these, though they can still be called and will
+  % return an error message.
+  methods (Hidden)
+    function tensor(~)
+      error('BRAIDLAB:databraid:tensor:undefined',...
+            'This operation is not yet implemented for databraids.')
+    end
+
+    function subbraid(~)
+      error('BRAIDLAB:databraid:subbraid:undefined',...
+            'This operation is not yet implemented for databraids.')
+    end
   end % methods block
 
 end % annbraid classdef
