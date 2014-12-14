@@ -1473,25 +1473,7 @@ They seem to occur for \emph{any} braid, regardless of its %
 isotopy class.  In that sense they could provide an alternative to the the
 Bestvina--Handel train track algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm}%
-which is used to compute the isotopy class of a braid.  \braidlab\ has some
-experimental support for this in the form of the method
-\lstinline{reducing}: %
-\index{braid class@\braid\ class!reducing@\lstinline{reducing}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([-3  1 -4  2 -3 -1 -2  3 -2  4  3  4]);
->> l = b.reducing
-Warning: This function is experimental!  Use with caution!
-
-ans = (( 0 -1  0  0  0  0 ))
-
->> b*l   % check that it is indeed a reducing curve
-
-ans = (( 0 -1  0  0  0  0 ))
-\end{lstlisting}
-\lstinline{reducing} found a reducing curve for the braid and returned it as a
-set of loop coordinates.  However, note that at this point
-\lstinline{reducing} can return too many curves, or none even when one exists.
-\index{braid class@\braid\ class!reducing@\lstinline{reducing}|)}%
+which is used to compute the isotopy class of a braid.
 
 \index{cycle!of effective linear action|)}%
 \index{effective linear action|)}%
