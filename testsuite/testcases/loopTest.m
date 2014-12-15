@@ -314,17 +314,20 @@ classdef loopTest < matlab.unittest.TestCase
 
       l = loopcoords(b);
       testCase.verifyEqual(l.coords,int64([1 -2 1 -2 -2 2]));
-      l = loopcoords(b,[],'double');
+      l = loopcoords(b,'double');
       testCase.verifyEqual(l.coords,[1 -2 1 -2 -2 2]);
-      l = loopcoords(b,[],'int32');
+      l = loopcoords(b,'int32');
       testCase.verifyEqual(l.coords,int32([1 -2 1 -2 -2 2]));
-      l = loopcoords(b,[],'vpi');
+      l = loopcoords(b,'vpi');
       testCase.verifyEqual(l.coords,vpi([1 -2 1 -2 -2 2]));
 
-      l = loopcoords(b,'left');
+      braidlab.prop('LoopCoordsBasePoint','left')
+      l = loopcoords(b);
       testCase.verifyEqual(l.coords,int64([-1 2 -3 0 0 0]));
-      l = loopcoords(b,'dehornoy');
+      braidlab.prop('LoopCoordsBasePoint','dehornoy')
+      l = loopcoords(b);
       testCase.verifyEqual(l.coords,int64([1 -2 3 0 0 0]));
+      braidlab.prop('reset');
 
       % Make a braid that will overflow int64.
       b = braidlab.braid(repmat([1 -2],[1 50]));
