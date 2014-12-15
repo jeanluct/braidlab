@@ -129,7 +129,8 @@ classdef annbraid < braidlab.braid
 
       if isa(b2,'braidlab.annbraid')
         % If b2 is also an annular braid, the product is simple concatenation.
-        varargout{1} = braidlab.annbraid(mtimes@braidlab.braid(b1,b2));
+        varargout{1} = braidlab.annbraid([b1.word b2.word], ...
+                                         max(b1.nann,b2.nann));
       elseif isa(b2,'braidlab.braid')
         % If b2 is a braid, return a plain braidlab.braid.
         varargout{1} = mtimes@braidlab.braid(b1.braid,b2);
@@ -147,7 +148,8 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      bm = braidlab.annbraid(mpower@braidlab.braid(b,m));
+      br = mpower@braidlab.braid(b,m);
+      bm = braidlab.annbraid(br.word,b.nann);
     end
 
     function bi = inv(b)
@@ -155,7 +157,8 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      bi = braidlab.annbraid(inv@braidlab.braid(b));
+      br = inv@braidlab.braid(b);
+      bi = braidlab.annbraid(br.word,b.nann);
     end
 
     function p = perm(obj)
@@ -214,7 +217,8 @@ classdef annbraid < braidlab.braid
       % message from braid superclass is displayed.
 
       % Note here we do *not* convert to a braidlab.braid first.
-      c = braidlab.annbraid(compact@braidlab.braid(b));
+      bc = compact@braidlab.braid(b);
+      c = braidlab.annbraid(bc.word,b.nann);
     end
 
     function [c,bE] = complexity(b,varargin)
