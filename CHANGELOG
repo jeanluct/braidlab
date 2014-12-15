@@ -5,6 +5,8 @@
   such as the way braids are plotted and the direction of rotation for
   generators.
 
+* The class annbraid is used to represent braids on annular domains.
+
 ------------------------------------------------------------------------
 3.0.1 [201x-xx-xx]
 
