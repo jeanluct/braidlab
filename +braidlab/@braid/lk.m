@@ -6,6 +6,13 @@ function m = lk(b,t,q)
 %
 %   M = LK(B,sym('t'),sym('q')) uses monomials from the symbolic toolbox.
 %
+%   The matrix M has dimension N(N-1)/2, where N is the number of strings
+%   of B.  This method can be very slow when using the symbolic toolbox,
+%   even for moderate N.
+%
+%   Unlike the Burau representation, the Lawrence-Krammer representation is
+%   faithful for all N.
+%
 %   This is a method for the BRAID class.
 %   See also BRAID, BRAID.BURAU.
 
@@ -33,24 +40,35 @@ function m = lk(b,t,q)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+% Default values (double).
 if nargin < 3, q = -1; end
 if nargin < 2, t = 1; end
 
 n = b.n;
-N = n*(n-1)/2;
+N = n*(n-1)/2;   % matrix dimension
 
 if n == 2
   m(1,1) = (-q^2*t)^writhe(b);
   return
 end
 
+% The type of parameters t and q.
 typ = str2func(class(t));
+% If q is symbolic but not t, typ is symbolic.
+if strcmpi(class(q),'sym') && ~strcmpi(class(t),'sym')
+  typ = str2func('sym');
+end
 
+% Fill matrices for generators.
 [sig,isig] = fillgens(n,t,q,typ);
+
+%check_relations(sig)
+%check_relations(isig)
 
 % Make diagonal matrix.
 m = typ(eye(N));
 
+% Multiply matrices together according to the braid word.
 for gen = b.word(end:-1:1)
   i = abs(gen);
   if gen > 0
@@ -64,15 +82,15 @@ end
 %========================================================================
 function [sig,isig] = fillgens(n,t,q,typ)
 
-% Make this persistent for each n.
+% Make this persistent for each n?  Difficult to do since t and q can change.
 
 v = zeros(n-1,n);
-
 N = n*(n-1)/2;
 
 sig = typ(zeros(n-1,N,N));
 isig = typ(zeros(n-1,N,N));
 
+% Make an index of the basis of the module.
 idx = 1;
 for j = 1:n-1
   for k = j+1:n
@@ -81,6 +99,9 @@ for j = 1:n-1
   end
 end
 
+% Fill matrices with the Lawrence-Krammer representation.  Not the prettiest
+% or fastest code, but it is easy to check that it works fine with the
+% check_relations function below.
 for i = 1:n-1
   for j1 = 1:n-1
     for k1 = j1+1:n
