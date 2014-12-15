@@ -3,10 +3,12 @@
 
 * Improved installation instructions in guide.
 
+* Fixed some incorrect output in guide.
+
 * Fixed a bug when calling C++ version of intersec.
 
-* Fix a bug in braid.mtimes that disallowed valid action on loop with
-  basepoint.
+* Fixed a bug in braid.mtimes that disallowed valid action on loop
+  with basepoint.
 
 * Remove broken braid.reducing.
 
