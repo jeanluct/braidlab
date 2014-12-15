@@ -5,12 +5,22 @@
   such as the way braids are plotted and the direction of rotation for
   generators.
 
+* The class annbraid is used to represent braids on annular domains.
+
+* The Lawrence-Krammer braid.lk representation has been added to the
+  braid class.
+
 ------------------------------------------------------------------------
 3.0.1 [201x-xx-xx]
 
 * Improved installation instructions in guide.
 
-* Fixed a big when calling C++ version of intersec.
+* Fixed a bug when calling C++ version of intersec.
+
+* Fix a bug in braid.mtimes that disallowed valid action on loop with
+  basepoint.
+
+* Remove broken braid.reducing.
 
 ------------------------------------------------------------------------
 3.0 [2014-12-09]

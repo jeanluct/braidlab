@@ -37,6 +37,8 @@ end
 
 import matlab.unittest.*
 
+braidlab.prop('reset');
+
 tcfolder = [pwd '/testcases/'];
 
 if nargin < 1 || isempty(nomex)

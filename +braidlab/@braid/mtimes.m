@@ -40,7 +40,10 @@ function [varargout] = mtimes(b1,b2)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if isa(b2,'braidlab.braid')
+if isa(b2,'braidlab.annbraid')
+  % If b2 is an annbraid, the product is a plain braid.
+  varargout{1} = mtimes(b1,b2.braid);
+elseif isa(b2,'braidlab.braid')
   % If b2 is also a braid, the product is simple concatenation.
   varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
 elseif isa(b2,'braidlab.loop')

@@ -1,14 +1,4 @@
-function bt = trunc(b,interval)
-%TRUNC   Truncate a databraid by choosing crossings from a time subinterval.
-%   BT = TRUNC(B,INTERVAL) truncates the braid generators to those
-%   whose crossing times TCROSS lie in the interval
-%
-%      INTERVAL(1) <= TCROSS <= INTERVAL(2).
-%
-%   If INTERVAL is a single number, then selected crossings will have
-%   TCROSS <= INTERVAL.
-%
-%   This is a method for the DATABRAID class.
+function b = convert_to_braid(obj)
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -34,22 +24,28 @@ function bt = trunc(b,interval)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-bt = b;
-if nargin < 2 || ~isnumeric(interval)
-  error('BRAIDLAB:databraid:trunc:badarg','Not enough input arguments.')
-end
-
-if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
-  error('BRAIDLAB:databraid:trunc:badarg',...
-        'Interval has to be a non-empty 1 or 2 element vector.')
-end
-
-% select the desired crossing times
-if numel(interval) == 1
-  sel = bt.tcross <= interval;
+n = obj.nann;
+idxn = find(abs(obj.word) == n);
+if isempty(idxn)
+  w = obj.word;
 else
-  sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);
+  % Sigma_n = n n n-1 n-2 ... 1 -2 -3 ... -n -n
+  Sn = [n n:-1:2 1 -(2:n) -n];
+  Sni = [n n:-1:2 -1 -(2:n) -n];
+  if obj.word(idxn(1)) > 0
+    w = [obj.word(1:idxn(1)-1) Sn];
+  else
+    w = [obj.word(1:idxn(1)-1) Sni];
+  end
+  for i = 2:length(idxn)
+    w = [w obj.word(idxn(i-1)+1:idxn(i)-1)];
+    if obj.word(idxn(i)) > 0
+      w = [w Sn];
+    else
+      w = [w Sni];
+    end
+  end
+  w = [w obj.word(idxn(end)+1:end)];
 end
 
-bt.tcross = bt.tcross(sel);
-bt.word = bt.word(sel);
+b = braidlab.braid(w,obj.n);

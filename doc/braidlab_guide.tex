@@ -58,6 +58,7 @@
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
+\newcommand{\annbraid}{\texttt{annbraid}}%{\lstinline{anbraid}}
 \newcommand{\loopc}{\texttt{loop}}%{\lstinline{loop}}
 
 \newcommand{\mathnotation}[2]{\newcommand{#1}{\ensuremath{#2}}}
@@ -541,6 +542,82 @@ ans = 1
 \end{lstlisting}
 The writhe is a braid invariant.
 \index{braid class@\braid\ class!writhe@\lstinline{writhe}|)}%
+
+
+\subsubsection{The \annbraid\ subclass}
+\label{sec:annbraid}
+
+\index{annbraid@\lstinline{annbraid}|(}
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \includegraphics[height=.2\textheight]{annulardomain}
+      \label{fig:annulardomain}
+    }\hspace{1em}
+    \subfigure[]{
+      \includegraphics[height=.2\textheight]{annulardomain2}
+      \label{fig:annulardomain2}
+    }
+  \end{center}
+  \caption{(a) Punctures in an annular domain.  (b) The punctures rearranged
+    with the center of the annulus as an extra puncture on the right.}
+\end{figure}
+%
+
+Often it is useful to consider braids in an annular domain, as in
+Fig.~\ref{fig:annulardomain}.  Since it doesn't change the overall topology,
+it is convenient to rearrange the punctures as in
+Fig.~\ref{fig:annulardomain2}.  The center of the annulus becomes an extra
+puncture, but that extra puncture is fixed.  For~$\nn$ moving punctures, the
+braid group on the annulus has~$\nn$
+generators~$\{\Sigma_1,\ldots,\Sigma_\nn\}$, one more than for the standard
+braid group owing to the fixed puncture.  These are related to the standard
+generators by~$\Sigma_i=\sigma_i$ for~$1 \le i <\nn$, and
+\begin{equation}
+  \Sigma_\nn = \sigma_\nn^2 \sigma_{\nn-1} \cdots \sigma_2\,\sigma_1\,
+  \sigma_2^{-1} \cdots \sigma_{\nn-1}^{-1} \sigma_\nn^{-2}\,.
+\end{equation}
+This last generator effectively exchanges puncture~$\nn$ with puncture~$1$,
+exploiting the annular topology.
+
+\braidlab\ support annular braids with the subclass \annbraid, derived from
+\braid.  The syntax for creating an annular braid is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = annbraid([1 2 -3])
+
+b = < 1  2 -3 >*
+\end{lstlisting}
+The asterisk indicates that this is an annular braid, which has an extra fixed
+puncture on the right (called the basepoint).  Hence, the braid has~$4$
+punctures, as indicated by
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b.n    % total number of punctures, including the fixed one
+
+ans = 4
+\end{lstlisting}
+but only~$3$ punctures can move, as returned by \lstinline{nann}, the number
+of annular punctures:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b.nann    % number of moving punctures
+
+ans = 3
+\end{lstlisting}
+
+Many of the methods work described for the \lstinline{braid} class can be
+applied to \annbraid{}s.  For instance,
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> entropy(braid([1 -2])))      % entropy of a normal braid
+
+ans = 0.9624
+>> entropy(annbraid([1 -2])))   % entropy of annular braid
+
+ans = 1.7627
+\end{lstlisting}
+The annular braid has more entropy, since curves grow faster by getting
+entangled on the extra puncture.
+
+\index{annbraid@\lstinline{annbraid}|)}
 
 
 \subsection{Constructing a braid from data}
