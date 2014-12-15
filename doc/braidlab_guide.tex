@@ -559,10 +559,10 @@ along a projection line~\citep{Thiffeault2005,Thiffeault2010}. %
 \index{projection line|(}%
 The \braid\ constructor allows us to do this easily.
 
-The folder \lstinline{testsuite} %
+The folder \lstinline{testsuite/testcases} %
 \index{testsuite}%
 contains a dataset of trajectories, from laboratory data for granular
-media~\citep{Puckett2012}.  From the \lstinline{testsuite} folder, we load the
+media~\citep{Puckett2012}.  We load the
 data:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> clear; load testdata
@@ -598,11 +598,11 @@ shows
 }
 \end{center}
 \caption{(a) A dataset of four trajectories, (b) projected along the~$X$ axis.
-  (c) The compacted braid~$ \sigma_1^{-1} \sigma_2^{-1}
-  \sigma_1^{-8}\sigma_3^2\sigma_2\sigma_1$ corresponding to the~$X$ projection
-  in (b).  (d) The compacted
-  braid~$\sigma_3^{-7}\sigma_1\sigma_3^{-1}\sigma_1$ corresponding to the~$Y$
-  projection, with closure enforced. %
+  (c) The compacted braid~$ \sigma_2^{-2} \sigma_1^{-1} \sigma_2^{-1}
+  \sigma_1^{-5} \sigma_3 \sigma_1^{-1}\sigma_3\sigma_2\sigma_1$ corresponding
+  to the~$X$ projection in (b).  (d) The compacted
+  braid~$\sigma_3^{-4}\sigma_1\sigma_3^{-1}\sigma_1\sigma_3^{-3}$
+  corresponding to the~$Y$ projection, with closure enforced. %
   \index{braid!closure}%
   The braids in (c) and (d) are conjugate.\index{braid!conjugate}}
 \end{figure}
@@ -627,7 +627,7 @@ the braid: %
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = compact(b)
 
-b = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
+b = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 >> b.length
 
 ans = 14
@@ -642,7 +642,7 @@ this by creating a subbraid %
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}}%
 with only those two strings:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> subbraid(bX,[2 3])
+>> subbraid(b,[2 3])
 
 ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
 \end{lstlisting}
@@ -663,7 +663,7 @@ instance, to project along the~$Y$ axis we invoke
 ans = 673
 >> b.compact
 
-ans = < -3 -3 -3 -3 -3 -3 -3  1 -3 >
+ans = < -3 -3 -3 -3  1 -3 -3 -3 -3 >
 \end{lstlisting}
 In general, a change of projection line only changes the braid by
 conjugation~\citep{Boyland1994,Thiffeault2010}.  We can test for
@@ -691,9 +691,9 @@ closure method: %
 >> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
 
-bX = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
+bX = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 
-bY = < -3 -3 -3 -3 -3 -3 -3  1 -3  1 >
+bY = < -3 -3 -3 -3  1 -3  1 -3 -3 -3 >
 \end{lstlisting}
 This default closure simply draws line segments from the final points to the
 initial points in such a way that no new crossings are created in the~$X$
