@@ -228,14 +228,24 @@ classdef databraid < braidlab.braid
             'This operation is not defined for databraids.')
     end
 
-    function entropy(~)
-      error('BRAIDLAB:databraid:entropy:undefined',...
+    function complexity(~)
+      error('BRAIDLAB:databraid:complexity:undefined',...
             ['This operation is not defined for databraids.  ' ...
              'Use databraid.ftbe instead.'])
     end
 
-    function complexity(~)
-      error('BRAIDLAB:databraid:complexity:undefined',...
+    function conjtest(~)
+      error('BRAIDLAB:databraid:conjtest:undefined',...
+            'This operation is not defined for databraids.')
+    end
+
+    function cycle(~)
+      error('BRAIDLAB:databraid:cycle:undefined',...
+            'This operation is not defined for databraids.')
+    end
+
+    function entropy(~)
+      error('BRAIDLAB:databraid:entropy:undefined',...
             ['This operation is not defined for databraids.  ' ...
              'Use databraid.ftbe instead.'])
     end
