@@ -52,11 +52,10 @@ end
 
 % TODO:
 % Specify style (rounded, line...)
-% Plot each strand once only, to avoid ugly joint.
+
 baseX = 0; baseY = 0;
 gapX = 100; gapY = 150;
 cutf = .35;
-uselines = false; % If true, use straight line segments.
 npts = 40;
 lw = 2;
 defls = {'k-','LineWidth',lw};
@@ -139,65 +138,56 @@ if isempty(b.word)
   return
 end
 
-if ~uselines
-  f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
-  xx = linspace(0,gapX,npts);
-  % The 'over' line.
-  bline{1} = f(xx);
-  % The 'under' line.
-  bline{2} = f(xx);
-  bline{2}(cutf*gapX < xx & xx < (1-cutf)*gapX) = NaN;
-  % Pad xx with an extra point at the beginning and end, to create a bit of
-  % overlap.
-  xx = [0 xx gapX];
-  bline{1} = [-gapY/2/npts bline{1} gapY+gapY/2/npts];
-  bline{2} = [-gapY/2/npts bline{2} gapY+gapY/2/npts];
-end
+% Define the function to plot generators.
+f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
+xx = linspace(0,gapX,npts);
+% The 'over' line.
+bline{1} = f(xx);
+% The 'under' line.
+bline{2} = f(xx);
+bline{2}(cutf*gapX < xx & xx < (1-cutf)*gapX) = NaN;
+% Pad xx with an extra point at the beginning and end, to create a bit of
+% overlap.
+xx = [0 xx gapX];
+bline{1} = [-gapY/2/npts bline{1} gapY+gapY/2/npts];
+bline{2} = [-gapY/2/npts bline{2} gapY+gapY/2/npts];
 
 % Keep track of permutation, for coloring purposes.
 p = 1:b.n;
-greenstring = b.n;
 
+for i = 1:b.n, strX{i} = []; strY{i} = []; end
+
+% Fill line data
 for k = 1:b.length
   gen = abs(b.word(k));
 
   p([gen gen+1]) = p([gen+1 gen]);   % update permutation
 
-  la1 = lat{p(gen+1)};
-  la2 = lat{p(gen)};
-
   posX = double(baseX + gapX*(gen-1));
   posY = double(baseY + gapY*(k-1));
-  if ~uselines
-    sgn = (sign(b.word(k))+1)/2 + 1;
-    % Draw the 'over' line.
-    plt(posX+xx,posY+bline{3-sgn},la1{:})
-    hold on
-    % Draw the 'under' line with a gap.
-    plt(posX+gapX-xx,posY+bline{sgn},la2{:})
-  else % use straight line segments graphics command.
-    if sign(b.word(k)) == 1
-      % Draw the 'over' line.
-      plt([posX posX+gapX],[posY posY+gapY],la1{:})
-      hold on
-      % Draw the 'under' line with a gap.
-      plt([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],la2{:})
-      plt([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],la2{:})
-    else
-      % Draw the 'over' line.
-      plt([posX+gapX posX],[posY posY+gapY],la2{:})
-      % Draw the 'under' line with a gap.
-      plt([posX posX+cutf*gapX],[posY posY+cutf*gapY],la1{:})
-      plt([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],la1{:})
-    end
-  end
-  % Plot the remaining vertical lines.
+
+  sgn = (sign(b.word(k))+1)/2 + 1;
+  % The 'over' line.
+  strX{p(gen+1)} = [strX{p(gen+1)} posX+xx];
+  strY{p(gen+1)} = [strY{p(gen+1)} posY+bline{3-sgn}];
+  % The 'under' line with a gap.
+  strX{p(gen)} = [strX{p(gen)} posX+gapX-xx];
+  strY{p(gen)} = [strY{p(gen)} posY+bline{sgn}];
+
+  % The remaining vertical lines.
   for l = 1:b.n
     if l ~= gen && l ~= gen+1
       posX = baseX + gapX*(l-1);
-      plt([posX posX],[posY posY+gapY],lat{p(l)}{:})
+      strX{p(l)} = [strX{p(l)} posX posX];
+      strY{p(l)} = [strY{p(l)} posY posY+gapY];
     end
   end
+end
+
+% Plot the strings continuously, to avoid ugly break when using dashes.
+for l = 1:b.n
+  plt(strX{l},strY{l},lat{l}{:})
+  hold on
 end
 
 if ~holdstate
