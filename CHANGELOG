@@ -5,10 +5,11 @@
   such as the way braids are plotted and the direction of rotation for
   generators.
 
-* The class annbraid is used to represent braids on annular domains.
+* braid.plot takes color and linestyle attributes.
 
-* The Lawrence-Krammer braid.lk representation has been added to the
-  braid class.
+* braid.lk returns the Lawrence-Krammer braid.lk representation of a braid.
+
+* The class annbraid is used to represent braids on annular domains.
 
 ------------------------------------------------------------------------
 3.0.1 [201x-xx-xx]
