@@ -138,8 +138,11 @@ if isempty(b.word)
   return
 end
 
-% Define the function to plot generators.
-f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
+% Define the shape function to plot generators.
+% The shape function should satisfy shapefun(0)=0, shapefun(1)=1.
+shapefun = @(x) asin(2*x-1)/pi + 1/2;
+%shapefun = @(x) x;  % straight line segments
+f = @(x) gapY * shapefun(x/gapX);
 xx = linspace(0,gapX,npts);
 % The 'over' line.
 bline{1} = f(xx);
