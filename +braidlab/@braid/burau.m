@@ -1,6 +1,6 @@
 function m = burau(b,t)
 %BURAU   The Burau matrix representation of a braid.
-%   M = BURAU(B,T) returns the reduced Burau matrix representation for the
+%   M = BURAU(B,T) returns the reduced Burau matrix representation M of the
 %   braid B, with Burau parameter T.  Here T is a complex number with |T|=1
 %   (default T=-1).
 %
