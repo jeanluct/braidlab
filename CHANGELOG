@@ -7,6 +7,9 @@
 
 * The class annbraid is used to represent braids on annular domains.
 
+* The Lawrence-Krammer braid.lk representation has been added to the
+  braid class.
+
 ------------------------------------------------------------------------
 3.0.1 [201x-xx-xx]
 
