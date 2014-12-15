@@ -55,8 +55,8 @@ classdef annbraid < braidlab.braid
     %   string.
     %
     %   BC = ANNBRAID(B) copies the object B of type ANNBRAID or BRAID to
-    %   the ANNBRAID object BC.  An annbraid is created from a
-    %   braid by adding a basepoint puncture.
+    %   the ANNBRAID object BC.  An ANNBRAID is created from a BRAID by
+    %   adding a basepoint puncture.
     %
     %   B = ANNBRAID('Random',NANN,K) returns a random braid of NANN strings
     %   with K crossings (generators).  The K generators are chosen
@@ -266,9 +266,13 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      % This isn't a great way to plot.  Would be better to highlight the
-      % boundary puncture with a different color.
-      plot@braidlab.braid(b.braid,varargin{:});
+      if nargin < 2
+        for i = 1:b.nann, lspec{i} = 'k'; end
+        lspec{b.n} = {'g','LineWidth',3};
+        plot@braidlab.braid(b.braid,lspec);
+      else
+        plot@braidlab.braid(b.braid,varargin{:});
+      end
     end
 
     function [varargout] = tntype(b)

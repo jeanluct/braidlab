@@ -63,7 +63,6 @@ defls = {'k-','LineWidth',lw};
 
 if nargin > 1
   if iscell(varargin{1})
-    keyboard
     if length(varargin{1}) < b.n
       error('BRAIDLAB:braid:plot:badlinespec', ...
             'Not enough colorspec/linespec for %g strings.',b.n)
