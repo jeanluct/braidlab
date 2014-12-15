@@ -3,7 +3,20 @@ function plot(b,varargin)
 %   PLOT(B) plots a braid diagram corresponding to the braid B.
 %
 %   PLOT(B,...) gives the line specification as for Matlab's PLOT command.
-%   The default LineSpec is PLOT(B,'k','LineWidth',2).
+%   The default is PLOT(B,'k','LineWidth',2).
+%
+%   PLOT(B,{CLSPEC1,CLSPEC2,...,CLSPECN}) plots each string of B with a
+%   color and line specified by CLSPECx.  There must be exactly B.N
+%   character strings in the cell.  Use CLSPECx=[] for default linespec.
+%
+%   Example: PLOT(B,{'r--','b:','k'}) for a three-string braid B plots the
+%   first string dashed-red, the second dotted-blue, and the third solid
+%   black.
+%
+%   Use {CLSPEC1} for multiple options for a string.
+%
+%   Example: PLOT(B,{{'r--','LineWidth',3},'b:','k'}) for a three-string
+%   braid B plots the first string with a thick line.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, PLOT.
@@ -32,24 +45,55 @@ function plot(b,varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-% TODO: specify some of these settings as function arguments.
-% Allow color, line width.
+if ~isscalar(b)
+  error('BRAIDLAB:braid:plot:noarray', ...
+        'Can only plot scalar braid, not array of braids.');
+end
+
+% TODO:
 % Specify style (rounded, line...)
+% Plot each strand once only, to avoid ugly joint.
 baseX = 0; baseY = 0;
 gapX = 100; gapY = 150;
 cutf = .35;
 uselines = false; % If true, use straight line segments.
 npts = 40;
+lw = 2;
+defls = {'k-','LineWidth',lw};
 
 if nargin > 1
-  lat = varargin;
+  if iscell(varargin{1})
+    keyboard
+    if length(varargin{1}) < b.n
+      error('BRAIDLAB:braid:plot:badlinespec', ...
+            'Not enough colorspec/linespec for %g strings.',b.n)
+    end
+    for i = 1:b.n
+      if isempty(varargin{1}{i})
+        % Use default spec for [] or {}.
+        lat{i} = defls;
+      elseif iscell(varargin{1}{i})
+        % varargin{i} is a cell, e.g. {'g:','LineWidth',1}
+        lat{i} = varargin{1}{i};
+      elseif ischar(varargin{1}{i})
+        % varargin{i} is a string, e.g. 'r--'
+        % Wrap in cell, use default linewidth.
+        lat{i} = {varargin{1}{i},'LineWidth',lw};
+      else
+        error('BRAIDLAB:braid:plot:badlinespec','Bad linespec.')
+      end
+    end
+  else
+    % Only one set of linespecs.  Apply to all strings.
+    for i = 1:b.n
+      lat{i} = {varargin{1:end}};
+    end
+  end
 else
-  lat = {'k-','LineWidth',2};
-end
-
-if ~isscalar(b)
-  error('BRAIDLAB:braid:plot',['Can only plot scalar braid, not array of' ...
-                    ' braids.']);
+  % Default linespec.
+  for i = 1:b.n
+    lat{i} = defls;
+  end
 end
 
 if ishold
@@ -57,21 +101,6 @@ if ishold
 else
   holdstate = false;
   cla
-end
-
-% Plot an empty braid word (exciting!).
-if isempty(b.word)
-  for k = 1:b.n
-    posX = baseX + (k-1)*gapX; posY = baseY;
-    plt([posX posX],[posY posY+gapY],lat{:})
-    hold on
-  end
-  if ~holdstate
-    hold off
-    axis equal
-    axis off
-  end
-  return
 end
 
 % Convention: plot over-under (default) vs under-over.
@@ -96,6 +125,21 @@ switch lower(braidlab.prop('braidplotdir'))
         'Unknown value for BraidPlotDir.  See ''help braidlab.prop.''')
 end
 
+% Plot an empty braid word (exciting!).
+if isempty(b.word)
+  for k = 1:b.n
+    posX = baseX + (k-1)*gapX; posY = baseY;
+    plt([posX posX],[posY posY+gapY],lat{k}{:})
+    hold on
+  end
+  if ~holdstate
+    hold off
+    axis equal
+    axis off
+  end
+  return
+end
+
 if ~uselines
   f = @(x) gapY/pi * asin(2*x/gapX - 1) + gapY/2;
   xx = linspace(0,gapX,npts);
@@ -111,38 +155,48 @@ if ~uselines
   bline{2} = [-gapY/2/npts bline{2} gapY+gapY/2/npts];
 end
 
+% Keep track of permutation, for coloring purposes.
+p = 1:b.n;
+greenstring = b.n;
+
 for k = 1:b.length
   gen = abs(b.word(k));
+
+  p([gen gen+1]) = p([gen+1 gen]);   % update permutation
+
+  la1 = lat{p(gen+1)};
+  la2 = lat{p(gen)};
+
   posX = double(baseX + gapX*(gen-1));
   posY = double(baseY + gapY*(k-1));
   if ~uselines
     sgn = (sign(b.word(k))+1)/2 + 1;
     % Draw the 'over' line.
-    plt(posX+xx,posY+bline{3-sgn},lat{:})
+    plt(posX+xx,posY+bline{3-sgn},la1{:})
     hold on
     % Draw the 'under' line with a gap.
-    plt(posX+gapX-xx,posY+bline{sgn},lat{:})
+    plt(posX+gapX-xx,posY+bline{sgn},la2{:})
   else % use straight line segments graphics command.
     if sign(b.word(k)) == 1
       % Draw the 'over' line.
-      plt([posX posX+gapX],[posY posY+gapY],lat{:})
+      plt([posX posX+gapX],[posY posY+gapY],la1{:})
       hold on
       % Draw the 'under' line with a gap.
-      plt([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      plt([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plt([posX+gapX posX+gapX-cutf*gapX],[posY posY+cutf*gapY],la2{:})
+      plt([posX+gapX-(1-cutf)*gapX posX],[posY+(1-cutf)*gapY posY+gapY],la2{:})
     else
       % Draw the 'over' line.
-      plt([posX+gapX posX],[posY posY+gapY],lat{:})
+      plt([posX+gapX posX],[posY posY+gapY],la2{:})
       % Draw the 'under' line with a gap.
-      plt([posX posX+cutf*gapX],[posY posY+cutf*gapY],lat{:})
-      plt([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],lat{:})
+      plt([posX posX+cutf*gapX],[posY posY+cutf*gapY],la1{:})
+      plt([posX+(1-cutf)*gapX posX+gapX],[posY+(1-cutf)*gapY posY+gapY],la1{:})
     end
   end
   % Plot the remaining vertical lines.
   for l = 1:b.n
     if l ~= gen && l ~= gen+1
       posX = baseX + gapX*(l-1);
-      plt([posX posX],[posY posY+gapY],lat{:})
+      plt([posX posX],[posY posY+gapY],lat{p(l)}{:})
     end
   end
 end
