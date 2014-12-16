@@ -1981,12 +1981,18 @@ compiler.  \index{Matlab!MEX files|)}
 \subsection{Precompiled packages}
 \label{sec:precompiled}
 
-Some zip and tar files of the precompiled latest released version are
+Some tar files of the precompiled latest released version are
 available at \url{http://github.com/jeanluct/braidlab/releases}.  If one of
-those suits your system, then download and untar/unzip (it might still work
-even if the system doesn't match perfectly).  For Mac OS~X, there is a version
-compiled without \href{https://gmplib.org/}{GMP} (the GNU MultiPrecision
-library) %
+those suits your system, then download and untar:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ tar xvzf braidlab-<version>.tar.gz
+\end{lstlisting}
+A binary might still work even if the operating system and Matlab versions
+don't match exactly.
+
+For Mac OS~X, there is a version compiled without
+\href{https://gmplib.org/}{GMP} (the GNU MultiPrecision library) %
 \index{GMP}%
 since it is a bit tricky to install (see Section~\ref{sec:gmp}).
 
