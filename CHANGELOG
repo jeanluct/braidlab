@@ -1,9 +1,11 @@
 ------------------------------------------------------------------------
-3.0.1 [201x-xx-xx]
+3.0.1 [2014-12-16]
 
-* Improved installation instructions in guide.
+* Improved installation instructions in guide, in particular for GMP.
 
-* Fixed some incorrect output in guide.
+* Fixed anonymous GitHub links for cloning in guide.
+
+* Fixed some outdated output in guide.
 
 * Fixed a bug when calling C++ version of intersec.
 
