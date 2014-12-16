@@ -560,8 +560,11 @@ The writhe is a braid invariant.
       \label{fig:annulardomain2}
     }
   \end{center}
-  \caption{(a) Punctures in an annular domain.  (b) The punctures rearranged
-    with the center of the annulus as an extra puncture on the right.}
+  \caption{(a) Punctures in an annular domain, with two generators.  The
+    generator~$\Sigma_\nn$ is unique to the annulus.  (b) The punctures
+    rearranged with the center of the annulus as an extra puncture on the
+    right, showing how the generator~$\Sigma_\nn$ can be deformed in terms of
+    standard generators as in~\eqref{eq:Sigman}.}
 \end{figure}
 %
 
@@ -577,6 +580,7 @@ generators by~$\Sigma_i=\sigma_i$ for~$1 \le i <\nn$, and
 \begin{equation}
   \Sigma_\nn = \sigma_\nn^2 \sigma_{\nn-1} \cdots \sigma_2\,\sigma_1\,
   \sigma_2^{-1} \cdots \sigma_{\nn-1}^{-1} \sigma_\nn^{-2}\,.
+  \label{eq:Sigman}
 \end{equation}
 This last generator effectively exchanges puncture~$\nn$ with puncture~$1$,
 exploiting the annular topology.
@@ -616,6 +620,19 @@ ans = 1.7627
 \end{lstlisting}
 The annular braid has more entropy, since curves grow faster by getting
 entangled on the extra puncture.
+%
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{annbraid_s1s-2}
+  \end{center}
+  \caption{The output of \lstinline{plot(annbraid([1 -2]))}.  The green strand
+    represents the center of the annulus, as in
+    Fig.~\ref{fig:annulardomain2}. (See Section~\ref{sec:prop} for how to plot
+    braids sideways.)}
+  \label{fig:annbraid_s1s-2}
+\end{figure}
+%
+The annular braid is shown in Fig.~\ref{fig:annbraid_s1s-2}.
 
 \index{annbraid@\lstinline{annbraid}|)}
 
