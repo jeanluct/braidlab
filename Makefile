@@ -29,6 +29,9 @@ ifeq ($(SYS), Linux)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexa64
 	endif
+	ifeq ($(ARCH), i686)
+		MEXSUFFIX = mexglx
+	endif
 endif
 ifeq ($(SYS), Darwin)
 	ifeq ($(ARCH), x86_64)
