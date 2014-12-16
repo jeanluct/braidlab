@@ -217,7 +217,7 @@ classdef annbraid < braidlab.braid
       % message from braid superclass is displayed.
 
       % Note here we do *not* convert to a braidlab.braid first.
-      bc = compact@braidlab.braid(b);
+      bc = compact@braidlab.braid(b,true);
       c = braidlab.annbraid(bc.word,b.nann);
     end
 
