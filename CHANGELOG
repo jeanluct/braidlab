@@ -7,7 +7,7 @@
 
 * braid.plot takes color and linestyle attributes.
 
-* braid.lk returns the Lawrence-Krammer braid.lk representation of a braid.
+* braid.lk returns the Lawrence-Krammer representation of a braid.
 
 * The class annbraid is used to represent braids on annular domains.
 
