@@ -1,4 +1,22 @@
 ------------------------------------------------------------------------
+3.0.1 [2014-12-16]
+
+* Improved installation instructions in guide, in particular for GMP.
+
+* Fixed anonymous GitHub links for cloning in guide.
+
+* Fixed some outdated output in guide.
+
+* Fixed a bug when calling C++ version of intersec.
+
+* Fixed a bug in braid.mtimes that disallowed valid action on loop
+  with basepoint.
+
+* Remove broken braid.reducing.
+
+* Makefile detects Linux 32-bit architecture.
+
+------------------------------------------------------------------------
 3.0 [2014-12-09]
 
 * Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.

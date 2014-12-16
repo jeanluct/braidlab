@@ -225,11 +225,8 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
 
     // two-element loop 2k-1 and 2k
     for ( i = 2*k-1; i <= 2*k ; i++ ) {
-      mu[i] = std::pow(-1,i) * a[k] + (
-                                       ( b[k] >= 0 ) ?
-                                       nu[k]/2 :
-                                       nu[k+1]/2
-                                        );
+      mu[i] = ( i % 2 == 0 ? a[k] : -a[k] ) + 
+        ( b[k] >= 0  ? nu[k]/2 : nu[k+1]/2 );
     }
   }
   return;

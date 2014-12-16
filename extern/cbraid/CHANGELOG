@@ -1,5 +1,28 @@
-Changelog for CBraid and Braiding (lightly edited svn log):
+Changelog for CBraid and Braiding
+=================================
 
+========================================================================
+After r12 the code was moved from Googlecode/SVN to GitHub/Git, so no
+version numbers anymore.
+
+From here is the lightly edited svn log.
+
+------------------------------------------------------------------------
+r11 | jeanlucth@gmail.com | 2014-07-04 09:06:25 -0500 (Fri, 04 Jul 2014) | 1 line
+
+Removed some unused variables in new code.
+------------------------------------------------------------------------
+r10 | jeanlucth@gmail.com | 2014-07-04 09:02:38 -0500 (Fri, 04 Jul 2014) | 7 lines
+
+New code contributed by Maria Cumplido (student of Juan
+González-Meneses).  Juan's description: The old code computed some
+sets called Ultra Summit Sets, while the new one computes Sets of
+Sliding Circuits (which are in general the same as above, but not
+always).
+------------------------------------------------------------------------
+r9 | jeanlucth@gmail.com | 2013-12-13 08:29:27 -0600 (Fri, 13 Dec 2013) | 1 line
+
+Updated CHANGELOG.
 ------------------------------------------------------------------------
 r8 | jeanlucth@gmail.com | 2013-12-13 08:20:15 -0600 (Fri, 13 Dec 2013) | 1 line
 

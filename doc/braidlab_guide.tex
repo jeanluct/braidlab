@@ -198,7 +198,7 @@ The method \lstinline{compact} is based on the heuristic algorithm
 of~\citet{Bangert2002}, since finding the braid of minimum length in the
 standard generators is in general difficult~\citep{Paterson1991}.  Hence,
 there is no guarantee that in general \lstinline{compact} will find the
-identity braid, even though it do so here.  To really test if a braid is the
+identity braid, even though it does so here.  To really test if a braid is the
 identity (trivial braid), use the method \lstinline{istrivial}: %
 \index{braid class@\braid\ class!istrivial@\lstinline{istrivial}}
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -220,7 +220,7 @@ Note that
 >> help braid
 \end{lstlisting}
 describes the class \braid.  To get more information on the \braid\
-constructor, invoke %
+constructor, invoke%
 \index{braid class@\braid\ class!constructor}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> help braid.braid
@@ -559,10 +559,10 @@ along a projection line~\citep{Thiffeault2005,Thiffeault2010}. %
 \index{projection line|(}%
 The \braid\ constructor allows us to do this easily.
 
-The folder \lstinline{testsuite} %
+The folder \lstinline{testsuite/testcases} %
 \index{testsuite}%
 contains a dataset of trajectories, from laboratory data for granular
-media~\citep{Puckett2012}.  From the \lstinline{testsuite} folder, we load the
+media~\citep{Puckett2012}.  We load the
 data:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> clear; load testdata
@@ -598,11 +598,11 @@ shows
 }
 \end{center}
 \caption{(a) A dataset of four trajectories, (b) projected along the~$X$ axis.
-  (c) The compacted braid~$ \sigma_1^{-1} \sigma_2^{-1}
-  \sigma_1^{-8}\sigma_3^2\sigma_2\sigma_1$ corresponding to the~$X$ projection
-  in (b).  (d) The compacted
-  braid~$\sigma_3^{-7}\sigma_1\sigma_3^{-1}\sigma_1$ corresponding to the~$Y$
-  projection, with closure enforced. %
+  (c) The compacted braid~$ \sigma_2^{-2} \sigma_1^{-1} \sigma_2^{-1}
+  \sigma_1^{-5} \sigma_3 \sigma_1^{-1}\sigma_3\sigma_2\sigma_1$ corresponding
+  to the~$X$ projection in (b).  (d) The compacted
+  braid~$\sigma_3^{-4}\sigma_1\sigma_3^{-1}\sigma_1\sigma_3^{-3}$
+  corresponding to the~$Y$ projection, with closure enforced. %
   \index{braid!closure}%
   The braids in (c) and (d) are conjugate.\index{braid!conjugate}}
 \end{figure}
@@ -627,7 +627,7 @@ the braid: %
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = compact(b)
 
-b = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
+b = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 >> b.length
 
 ans = 14
@@ -642,7 +642,7 @@ this by creating a subbraid %
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}}%
 with only those two strings:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> subbraid(bX,[2 3])
+>> subbraid(b,[2 3])
 
 ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
 \end{lstlisting}
@@ -663,7 +663,7 @@ instance, to project along the~$Y$ axis we invoke
 ans = 673
 >> b.compact
 
-ans = < -3 -3 -3 -3 -3 -3 -3  1 -3 >
+ans = < -3 -3 -3 -3  1 -3 -3 -3 -3 >
 \end{lstlisting}
 In general, a change of projection line only changes the braid by
 conjugation~\citep{Boyland1994,Thiffeault2010}.  We can test for
@@ -691,9 +691,9 @@ closure method: %
 >> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
 
-bX = < -1 -2 -1 -1 -1 -1 -1 -1 -1 -1  3  3  2  1 >
+bX = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 
-bY = < -3 -3 -3 -3 -3 -3 -3  1 -3  1 >
+bY = < -3 -3 -3 -3  1 -3  1 -3 -3 -3 >
 \end{lstlisting}
 This default closure simply draws line segments from the final points to the
 initial points in such a way that no new crossings are created in the~$X$
@@ -1473,25 +1473,7 @@ They seem to occur for \emph{any} braid, regardless of its %
 isotopy class.  In that sense they could provide an alternative to the the
 Bestvina--Handel train track algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm}%
-which is used to compute the isotopy class of a braid.  \braidlab\ has some
-experimental support for this in the form of the method
-\lstinline{reducing}: %
-\index{braid class@\braid\ class!reducing@\lstinline{reducing}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([-3  1 -4  2 -3 -1 -2  3 -2  4  3  4]);
->> l = b.reducing
-Warning: This function is experimental!  Use with caution!
-
-ans = (( 0 -1  0  0  0  0 ))
-
->> b*l   % check that it is indeed a reducing curve
-
-ans = (( 0 -1  0  0  0  0 ))
-\end{lstlisting}
-\lstinline{reducing} found a reducing curve for the braid and returned it as a
-set of loop coordinates.  However, note that at this point
-\lstinline{reducing} can return too many curves, or none even when one exists.
-\index{braid class@\braid\ class!reducing@\lstinline{reducing}|)}%
+which is used to compute the isotopy class of a braid.
 
 \index{cycle!of effective linear action|)}%
 \index{effective linear action|)}%
@@ -1854,11 +1836,42 @@ However, MEX files need to be first compiled with Matlab's \lstinline{mex}
 compiler.  \index{Matlab!MEX files|)}
 
 \subsection{Precompiled packages}
+\label{sec:precompiled}
 
 Some zip and tar files of the precompiled latest released version are
 available at \url{http://github.com/jeanluct/braidlab/releases}.  If one of
 those suits your system, then download and untar/unzip (it might still work
-even if the system doesn't match perfectly).
+even if the system doesn't match perfectly).  For Mac OS~X, there is a version
+compiled without \href{https://gmplib.org/}{GMP} (the GNU MultiPrecision
+library) %
+\index{GMP}%
+since it is a bit tricky to install (see Section~\ref{sec:gmp}).
+
+On Ubuntu or Debian Linux, you can install the GMP source and binaries with
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo apt-get install libgmp-dev
+\end{lstlisting}
+After you install the binaries you must set the Matlab path as described in
+Section~\ref{sec:path}.
+
+\index{OS X|(}%
+Mac OS~X does not have the access to \lstinline{apt} or
+\lstinline{aptitude}. Their functionality is in part reproduced by the %
+\index{Homebrew}%
+\href{http://brew.sh/}{Homebrew project}. If you install Homebrew, you can
+easily obtain GMP by running
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ brew install gmp
+\end{lstlisting}
+Since \lstinline{brew} is conservative about installing libraries and
+sources into system directories, you will likely need to set
+\lstinline{LD_LIBRARY_PATH}, and \lstinline{PATH} variables to include
+the location of the local Homebrew library storage (see Homebrew
+documentation for further instruction).
+
+\index{OS X|)}%
 
 
 \subsection{Cloning the repository}
@@ -1870,14 +1883,14 @@ version, and know how to compile Matlab MEX %
 source repository with the terminal command
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ git clone git@github.com:jeanluct/braidlab.git
+$ git clone https://github.com/jeanluct/braidlab.git
 \end{lstlisting}
 assuming Git is installed on your system.  If you prefer to use
 Mercurial\index{Mercurial}, make sure you have the
 \href{http://hg-git.github.io/}{\lstinline{hg-git}} extension enabled and type
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ hg clone git+ssh://git@github.com/jeanluct/braidlab.git
+$ hg clone git+https://github.com/jeanluct/braidlab.git
 \end{lstlisting}
 Either way, after the cloning finishes type
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
@@ -1890,34 +1903,16 @@ or run (much) more slowly.
 \index{Matlab!MEX files|)}
 
 \index{GMP|(}%
-If you receive error messages because GMP (the GNU MultiPrecision library) is
-not installed on your system, instead of the above use
+If you receive error messages because \href{https://gmplib.org/}{GMP} (the GNU
+MultiPrecision library) is not installed on your system, instead of the above
+use
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make BRAIDLAB_USE_GMP=0
 \end{lstlisting}
 This will slow down some functions, in particular testing for equality of
-large braids.
+large braids.  If you want to install GMP first, see Section~\ref{sec:gmp}.
 
-If you wish to compile \braidlab\ from source using GMP, you need to make the
-GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
-compiler that Matlab is using. Both the %
-\index{GCC compiler}%
-GCC compiler (more common on Linux %
-\index{Linux}%
-systems) and %
-\index{Clang compiler}%
-Clang compiler (more common on Mac OS~X systems) %
-\index{OS X}%
-use the environment variable
-\lstinline{CPLUS_INCLUDE_PATH} to specify path to include files. For example,
-if both header files reside in \lstinline{/usr/local/include} on your Linux or
-Mac OS~X system, you would issue
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ export CPLUS_INCLUDE_PATH=/usr/local/include
-\end{lstlisting}
-before issuing \lstinline{make} that builds \lstinline{braidlab}.
 %
 \index{GMP|)}
 
@@ -1966,7 +1961,8 @@ Note that running the testsuite requires Matlab version 2013a or later.
 \label{sec:trouble}
 \index{installing \braidlab!troubleshooting|(}
 
-Here are some common problems that can occur when installing braidlab.
+Here are some common problems that can occur when installing or compiling
+braidlab.
 
 \subsubsection{Unsupported compiler}
 
@@ -2007,6 +2003,45 @@ compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
 \index{Linux|)}%
 
 
+\subsubsection{Compiling with GMP}
+\label{sec:gmp}
+
+\index{GMP|(}%
+\href{https://gmplib.org/}{GMP} is the GNU MultiPrecision library.  \braidlab\
+uses GMP to handle arbitrarily large integers, which is necessary for testing
+equality of very long braids.  If GMP is not available, \braidlab\ falls back
+on the VPI library \citep{vpi}, which is written natively in Matlab and hence
+is much slower.
+
+If you wish to compile \braidlab\ from source using GMP, you first need to
+install GMP (see \ref{sec:precompiled}), and then make the GMP headers
+\lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++ compiler that
+Matlab is using. Both the %
+\index{GCC compiler}%
+GCC compiler (more common on Linux %
+\index{Linux}%
+systems) and %
+\index{Clang compiler}%
+Clang compiler (more common on Mac OS~X systems) %
+\index{OS X}%
+use the environment variable \lstinline{CPLUS_INCLUDE_PATH} to specify path to
+include files. For example, if both header files reside in
+\lstinline{/usr/local/include} on your Linux or Mac OS~X system, you would
+issue (in \lstinline{bash} shell):
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include
+\end{lstlisting}
+or in \lstinline{tcsh} shell (now the default on Mac OS~X):
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=csh,backgroundcolor=\color{white}]
+$ setenv CPLUS_INCLUDE_PATH $CPLUS_INCLUDE_PATH:/usr/local/include
+\end{lstlisting}
+before issuing the \lstinline{make} command to build \lstinline{braidlab}.
+
+\index{GMP|)}%
+
+
 \subsubsection{Polish \LaTeX\ gets in the way}
 
 \index{Linux|(}%
@@ -2034,16 +2069,20 @@ manually rename the Polish \lstinline{mex} command to something like
 path.
 
 Another solution is to make sure that the Matlab executable directory appears
-early in bash's path variable.  On Mac OS~X %
-\index{OS X}%
-this reads
+early in bash's path variable. For Matlab R2014b on Mac OS~X %
+\index{OS X}% 
+and under \lstinline{bash} shell this reads
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
+$ export PATH=/Applications/MATLAB_R2014b.app/bin:$PATH
 \end{lstlisting}
-for Matlab R2014a.
-\index{Linux|)}%
+or under \lstinline{tcsh} shell (now the default in Mac OS~X) 
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ setenv PATH /Applications/MATLAB_R2014b.app/bin:$PATH
+\end{lstlisting}
 
+\index{Linux|)}%
 
 \subsubsection{\lstinline{largeArraydims} warning}
 
