@@ -1855,7 +1855,12 @@ $ sudo apt-get install libgmp-dev
 After you install the binaries you must set the Matlab path as described in
 Section~\ref{sec:path}.
 
-Mac OS X does not have the access to \lstinline{apt} or \lstinline{aptitude}. Their functionality is in part reproduced by the \href{http://brew.sh/}{Homebrew project}. If you install Homebrew, you can easily obtain GMP by running
+\index{OS X|(}%
+Mac OS~X does not have the access to \lstinline{apt} or
+\lstinline{aptitude}. Their functionality is in part reproduced by the %
+\index{Homebrew}%
+\href{http://brew.sh/}{Homebrew project}. If you install Homebrew, you can
+easily obtain GMP by running
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ brew install gmp
@@ -1865,6 +1870,9 @@ sources into system directories, you will likely need to set
 \lstinline{LD_LIBRARY_PATH}, and \lstinline{PATH} variables to include
 the location of the local Homebrew library storage (see Homebrew
 documentation for further instruction).
+
+\index{OS X|)}%
+
 
 \subsection{Cloning the repository}
 \label{sec:cloning}
@@ -2005,9 +2013,10 @@ equality of very long braids.  If GMP is not available, \braidlab\ falls back
 on the VPI library \citep{vpi}, which is written natively in Matlab and hence
 is much slower.
 
-If you wish to compile \braidlab\ from source using GMP, you first need to install GMP (see \ref{sec:precompiled}), and then make the
-GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
-compiler that Matlab is using. Both the %
+If you wish to compile \braidlab\ from source using GMP, you first need to
+install GMP (see \ref{sec:precompiled}), and then make the GMP headers
+\lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++ compiler that
+Matlab is using. Both the %
 \index{GCC compiler}%
 GCC compiler (more common on Linux %
 \index{Linux}%
@@ -2023,12 +2032,12 @@ issue (in \lstinline{bash} shell):
   language=bash,backgroundcolor=\color{white}]
 $ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include
 \end{lstlisting}
-or in \lstinline{tcsh} shell (now the default on Mac OS X):
+or in \lstinline{tcsh} shell (now the default on Mac OS~X):
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=csh,backgroundcolor=\color{white}]
 $ setenv CPLUS_INCLUDE_PATH $CPLUS_INCLUDE_PATH:/usr/local/include
 \end{lstlisting}
-before issuing \lstinline{make} that builds \lstinline{braidlab}.
+before issuing the \lstinline{make} command to build \lstinline{braidlab}.
 
 \index{GMP|)}%
 
@@ -2060,17 +2069,17 @@ manually rename the Polish \lstinline{mex} command to something like
 path.
 
 Another solution is to make sure that the Matlab executable directory appears
-early in bash's path variable. For Matlab R2014a on Mac OS~X %
+early in bash's path variable. For Matlab R2014b on Mac OS~X %
 \index{OS X}% 
 and under \lstinline{bash} shell this reads
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ export PATH=/Applications/MATLAB_R2014a.app/bin:$PATH
+$ export PATH=/Applications/MATLAB_R2014b.app/bin:$PATH
 \end{lstlisting}
 or under \lstinline{tcsh} shell (now the default in Mac OS~X) 
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ setenv PATH /Applications/MATLAB_R2014a.app/bin:$PATH
+$ setenv PATH /Applications/MATLAB_R2014b.app/bin:$PATH
 \end{lstlisting}
 
 \index{Linux|)}%
