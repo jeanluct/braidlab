@@ -1836,6 +1836,7 @@ However, MEX files need to be first compiled with Matlab's \lstinline{mex}
 compiler.  \index{Matlab!MEX files|)}
 
 \subsection{Precompiled packages}
+\label{sec:precompiled}
 
 Some zip and tar files of the precompiled latest released version are
 available at \url{http://github.com/jeanluct/braidlab/releases}.  If one of
@@ -1853,6 +1854,17 @@ $ sudo apt-get install libgmp-dev
 \end{lstlisting}
 After you install the binaries you must set the Matlab path as described in
 Section~\ref{sec:path}.
+
+Mac OS X does not have the access to \lstinline{apt} or \lstinline{aptitude}. Their functionality is in part reproduced by the \href{http://brew.sh/}{Homebrew project}. If you install Homebrew, you can easily obtain GMP by running
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ brew install gmp
+\end{lstlisting}
+Since \lstinline{brew} is conservative about installing libraries and
+sources into system directories, you will likely need to set
+\lstinline{LD_LIBRARY_PATH}, and \lstinline{PATH} variables to include
+the location of the local Homebrew library storage (see Homebrew
+documentation for further instruction).
 
 \subsection{Cloning the repository}
 \label{sec:cloning}
@@ -1993,7 +2005,7 @@ equality of very long braids.  If GMP is not available, \braidlab\ falls back
 on the VPI library \citep{vpi}, which is written natively in Matlab and hence
 is much slower.
 
-If you wish to compile \braidlab\ from source using GMP, you need to make the
+If you wish to compile \braidlab\ from source using GMP, you first need to install GMP (see \ref{sec:precompiled}), and then make the
 GMP headers \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++
 compiler that Matlab is using. Both the %
 \index{GCC compiler}%
@@ -2009,12 +2021,12 @@ include files. For example, if both header files reside in
 issue (in \lstinline{bash} shell):
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ export CPLUS_INCLUDE_PATH=/usr/local/include
+$ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include
 \end{lstlisting}
 or in \lstinline{tcsh} shell (now the default on Mac OS X):
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=csh,backgroundcolor=\color{white}]
-$ setenv CPLUS_INCLUDE_PATH /usr/local/include
+$ setenv CPLUS_INCLUDE_PATH $CPLUS_INCLUDE_PATH:/usr/local/include
 \end{lstlisting}
 before issuing \lstinline{make} that builds \lstinline{braidlab}.
 
