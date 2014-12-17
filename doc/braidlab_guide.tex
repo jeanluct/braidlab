@@ -134,11 +134,12 @@ showstringspaces=false}
 \tableofcontents
 
 
-\section{Why braids?}
+\section{What are braids?}
 
-\subsection{The braid group}
+\subsection{A brief introduction to the braid group}
 \label{sec:braidgroup}
 
+Braids are collections of strings anchored between two planes,
 %
 \begin{figure}
   \begin{center}
@@ -151,36 +152,80 @@ showstringspaces=false}
       \label{fig:sbdiag}
     }
   \end{center}
-  \caption{(a) A geometric braid.  (b) The corresponding braid diagram.}
+  \caption{(a) A geometric braid with five strings.  (b) The corresponding
+    braid diagram.}
 \end{figure}
 %
+as in Fig.~\ref{fig:geombraid}.  More precisely this is called a
+\emph{geometric braid}.  In this case we can think of the vertical axis as
+`time' and the horizontal axes as `space.'  The strings cannot occupy the same
+point in space at the same time, and they can't reverse direction (i.e., they
+can't go back in time).  We consider two braids to be equal if their strings
+can be deformed into each other, without any string crossing any other.  The
+points on the bottom plane where the strings are anchored in
+Fig.~\ref{fig:geombraid} are the same as the points on the top plane.  In that
+sense braids naturally represent \emph{periodic orbits} of two-dimensional
+dynamical systems.  When slicing the braid horizontally at any given time we
+get a collection of points in the 2D plane, corresponding to the strings,
+which we call \emph{punctures}.
 
-%
+In fact braids with a given number of strings form a \emph{group}.  The group
+multiplication law is simply to lay one braid after another; it is easy to see
+that this is associative.  The identity braid consists of straight strings
+that are unentangled with each other.  The inverse of a braid is obtained by
+reversing time.  (See the book by \citeauthor{Birman1975} for more details.)
+
+The easiest way to represent a braid is to write it in terms of
+\emph{generators}, as in Fig,~\ref{fig:sbdiag}.  Here the geometric braid is
+combed such that only one crossing occurs at a time, and each crossings fits
+in a time interval of the same length.  Such a picture is called a \emph{braid
+  diagram}.  The operation of the~$i$th string being exchanged with
+the~$(i+1)$th string, such that the left string passes over the right, is
+called a \emph{generator} of the braid group, as is denoted~$\sigma_i$.  Any
+element of the braid group on~$\nn$ strings can be written as a product of the
+generators~$\{\sigma_1,\ldots,\sigma_{\nn-1}\}$ and their inverses.  Thus, the
+braid in Fig.~\ref{fig:sbdiag} can be
+written
+\begin{equation}
+  \sigma_3\,\sigma_2^{-1}\sigma_1^{-1}\,\sigma_2\sigma_3^{-1}
+  \sigma_2\sigma_1^{-1}\sigma_3^{-1}\,,
+  \label{eq:sbdiag}
+\end{equation}
+where we read the generators from left to right, and from bottom to top in
+Fig.~\ref{fig:sbdiag}.  A braid written in terms of generators as
+in~\eqref{eq:sbdiag} is called an \emph{algebraic braid}.
+
+% 
 \begin{figure}
   \begin{center}
     \subfigure[]{
       \raisebox{.09\textwidth}{%
         \includegraphics[width=.35\textwidth]{13is31}}
-      \label{fig:crossing}
+      \label{fig:13is31}
     }\hspace{.1\textwidth}
     \subfigure[]{
       \includegraphics[width=.35\textwidth]{121is212}
-      \label{fig:crossing2}
+      \label{fig:121is212}
     }
   \end{center}
   \caption{(a) Generators that don't share a string commute.  (b) The braid
     relation.}
 \end{figure}
 %
-
+The generators obey some special rules, called \emph{relations}, by virtue of
+arising from geometrical braids.  The relations are
 \begin{equation}
   \sigma_j\sigma_k=\sigma_k\sigma_j, \quad \lvert j-k\rvert > 1; \qquad
   \sigma_j\sigma_k\sigma_j = \sigma_k\sigma_j\sigma_k, \quad \lvert j-k\rvert=1.
   \label{eq:relations}
 \end{equation}
+The first type of relation, depicted in Fig.~\ref{fig:13is31}, says that
+generators commute if they don't share a string.  The second type, often
+called the braid relation, reflects the equality of the two braids shown in
+Fig.~\ref{fig:121is212}.  While it is obvious to see that the
+relations~\eqref{eq:relations} are satisfied, it is far less obvious that
+those are the \emph{only} relations that hold, as proved by \citet{Artin1947}.
 
-
-\jlt{Introduce punctures.}
 
 \subsection{Contructing a braid from orbit data}
 \label{sec:braidfromdata}
