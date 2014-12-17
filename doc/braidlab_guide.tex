@@ -136,25 +136,58 @@ showstringspaces=false}
 
 \section{Why braids?}
 
+\subsection{The braid group}
+\label{sec:braidgroup}
+
 %
 \begin{figure}
   \begin{center}
     \subfigure[]{
-      \includegraphics[width=.35\textwidth]{crossing}
+      \includegraphics[width=.25\textwidth]{geombraid}
+      \label{fig:geombraid}
+    }\hspace{.025\textwidth}
+    \subfigure[]{
+      \raisebox{.065\textwidth}{%
+        \includegraphics[width=.295\textwidth]{13is31}}
+      \label{fig:crossing}
+    }\hspace{.025\textwidth}
+    \subfigure[]{
+      \includegraphics[width=.28\textwidth]{121is212}
+      \label{fig:crossing2}
+    }
+  \end{center}
+  \caption{(a) A geometric braid.  (b) Generators that don't share a string
+    commute.  (c) The braid relation.}
+\end{figure}
+%
+
+\begin{equation}
+  \sigma_j\sigma_k=\sigma_k\sigma_j, \quad \lvert j-k\rvert > 1; \qquad
+  \sigma_j\sigma_k\sigma_j = \sigma_k\sigma_j\sigma_k, \quad \lvert j-k\rvert=1.
+  \label{eq:relations}
+\end{equation}
+
+
+\jlt{Introduce punctures.}
+
+\subsection{Contructing a braid from orbit data}
+\label{sec:braidfromdata}
+
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \includegraphics[width=.3\textwidth]{crossing}
       \label{fig:crossing}
     }\hspace{.2\textwidth}
     \subfigure[]{
-      \includegraphics[width=.35\textwidth]{crossing2}
+      \includegraphics[width=.3\textwidth]{crossing2}
       \label{fig:crossing2}
     }
   \end{center}
   \caption{[After~\citet{Thiffeault2005}.]}
 \end{figure}
 %
-
-\jlt{Introduce punctures.}
-\jlt{Braid relations.}
-\jlt{Braids from data.  Figures from Th2005?}
 
 
 \section{A tour of \braidlab}
