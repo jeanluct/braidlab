@@ -139,6 +139,8 @@ showstringspaces=false}
 \subsection{A brief introduction to the braid group}
 \label{sec:braidgroup}
 
+\index{braid!group|(}%
+\index{braid!geometric|(}%
 Braids are collections of strings anchored between two planes,
 %
 \begin{figure}
@@ -167,15 +169,19 @@ Fig.~\ref{fig:geombraid} are the same as the points on the top plane.  In that
 sense braids naturally represent \emph{periodic orbits} of two-dimensional
 dynamical systems.  When slicing the braid horizontally at any given time we
 get a collection of points in the 2D plane, corresponding to the strings,
-which we call \emph{punctures}.
+which we call \emph{punctures} or \emph{particles}. %
+\index{punctures}
 
 In fact braids with a given number of strings form a \emph{group}.  The group
 multiplication law is simply to lay one braid after another; it is easy to see
 that this is associative.  The identity braid consists of straight strings
 that are unentangled with each other.  The inverse of a braid is obtained by
 reversing time.  (See the book by \citeauthor{Birman1975} for more details.)
+\index{braid!geometric|)}%
 
-The easiest way to represent a braid is to write it in terms of
+\index{braid!algebraic|(}%
+The easiest way to represent a braid is to write it in terms of %
+\index{braid!generator|(}
 \emph{generators}, as in Fig,~\ref{fig:sbdiag}.  Here the geometric braid is
 combed such that only one crossing occurs at a time, and each crossings fits
 in a time interval of the same length.  Such a picture is called a \emph{braid
@@ -194,6 +200,7 @@ written
 where we read the generators from left to right, and from bottom to top in
 Fig.~\ref{fig:sbdiag}.  A braid written in terms of generators as
 in~\eqref{eq:sbdiag} is called an \emph{algebraic braid}.
+\index{braid!algebraic|)}%
 
 % 
 \begin{figure}
@@ -226,10 +233,14 @@ Fig.~\ref{fig:121is212}.  While it is obvious to see that the
 relations~\eqref{eq:relations} are satisfied, it is far less obvious that
 those are the \emph{only} relations that hold, as proved by \citet{Artin1947}.
 
+\index{braid!generator|)}
+\index{braid!group|)}%
+
 
 \subsection{Constructing a braid from orbit data}
 \label{sec:braidfromdata}
 
+\index{braid!from data|(}%
 %
 \begin{figure}
   \begin{center}
@@ -255,6 +266,7 @@ how do we do this in practice?  That is, if we have two-dimensional continuous
 trajectory data arising from some dynamical system, how do we turn this data
 into a braid?
 
+\index{projection line|(}%
 The technique was first described in \citet{Thiffeault2005} and refined in
 \citet{Thiffeault2010}.  We define a particular line in the 2D plane, called
 the projection line, and look at the order of the particles projected along
@@ -262,6 +274,7 @@ that line.  We label each particle according to its order when projected on
 this line.  In Fig.~\ref{fig:crossing}, for example, we see three particles
 labeled~$i$, $i+1$, $i+2$, where the projection line is the horizontal.
 
+\index{crossing|(}%
 A \emph{crossing} occurs whenever any two particles exchange position (only
 adjacent particles can exchange position at a given time, since the
 trajectories are continuous).  For particle~$i$ exchanging position with
@@ -273,7 +286,9 @@ generator corresponding to a crossing, and their order determined by when the
 crossing occurred.  Note that when two particles exchange position along the
 crossing line twice as in Fig.~\ref{fig:crossing2}, without exchanging
 positions vertically, then the two crossings yield the generators~$\sigma_i$
-followed by~$\sigma_i^{-1}$, which cancel.
+followed by~$\sigma_i^{-1}$, which cancel. %
+\index{projection line|)}%
+\index{crossing|)}%
 
 In some sense the outcome of this procedure is not a true geomtric braid,
 since the particles do not necessarily end up in the same positions as they
@@ -281,6 +296,8 @@ started.  (If the particles are part of a periodic orbit, then we do indeed
 obtain a braid.)  We do however obtain an algebraic braid, and as long as we
 are careful to take long enough trajectories the fact that the geometric braid
 does not close will not be too consequential.
+
+\index{braid!from data|)}%
 
 
 \section{A tour of \braidlab}
@@ -800,7 +817,8 @@ One of the main purposes of \braidlab\ is to analyze two-dimensional
 trajectory data using braids.  We can assign a braid to trajectory data by
 looking for \emph{crossings} %
 \index{crossing}%
-along a projection line~\citep{Thiffeault2005,Thiffeault2010}. %
+along a projection line (see \citet{Thiffeault2005,Thiffeault2010} and
+Section~\ref{sec:braidfromdata}). %
 \index{projection line|(}%
 The \braid\ constructor allows us to do this easily.
 
