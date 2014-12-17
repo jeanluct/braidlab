@@ -227,7 +227,7 @@ relations~\eqref{eq:relations} are satisfied, it is far less obvious that
 those are the \emph{only} relations that hold, as proved by \citet{Artin1947}.
 
 
-\subsection{Contructing a braid from orbit data}
+\subsection{Constructing a braid from orbit data}
 \label{sec:braidfromdata}
 
 %
@@ -242,9 +242,45 @@ those are the \emph{only} relations that hold, as proved by \citet{Artin1947}.
       \label{fig:crossing2}
     }
   \end{center}
-  \caption{[After~\citet{Thiffeault2005}.]}
+  \caption{(a) The two types of generators that occur when particles exchange
+    positions.  (b) A particle exchanging position twice in a row with another
+    leads to the generators~$\sigma_i$ followed by~$\sigma_i^{-1}$, which
+    cancel each other. [After~\citet{Thiffeault2005}.]}
 \end{figure}
 %
+
+So far we have regarded braids as given geometrical objects, and showed how to
+turn them into algebraic objects by writing them in terms of generators.  But
+how do we do this in practice?  That is, if we have two-dimensional continuous
+trajectory data arising from some dynamical system, how do we turn this data
+into a braid?
+
+The technique was first described in \citet{Thiffeault2005} and refined in
+\citet{Thiffeault2010}.  We define a particular line in the 2D plane, called
+the projection line, and look at the order of the particles projected along
+that line.  We label each particle according to its order when projected on
+this line.  In Fig.~\ref{fig:crossing}, for example, we see three particles
+labeled~$i$, $i+1$, $i+2$, where the projection line is the horizontal.
+
+A \emph{crossing} occurs whenever any two particles exchange position (only
+adjacent particles can exchange position at a given time, since the
+trajectories are continuous).  For particle~$i$ exchanging position with
+particle~$i+1$, we assign a generator~$\sigma_i$ to the crossing if the
+particle on the left passes above the one on the right, and~$\sigma_i^{-1}$ if
+it passes below (Fig.~\ref{fig:crossing}).  As we watch the trajectory unfold,
+we construct an algebraic braid as a sequence of generators, with each
+generator corresponding to a crossing, and their order determined by when the
+crossing occurred.  Note that when two particles exchange position along the
+crossing line twice as in Fig.~\ref{fig:crossing2}, without exchanging
+positions vertically, then the two crossings yield the generators~$\sigma_i$
+followed by~$\sigma_i^{-1}$, which cancel.
+
+In some sense the outcome of this procedure is not a true geomtric braid,
+since the particles do not necessarily end up in the same positions as they
+started.  (If the particles are part of a periodic orbit, then we do indeed
+obtain a braid.)  We do however obtain an algebraic braid, and as long as we
+are careful to take long enough trajectories the fact that the geometric braid
+does not close will not be too consequential.
 
 
 \section{A tour of \braidlab}
