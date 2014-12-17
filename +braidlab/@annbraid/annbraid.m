@@ -80,7 +80,7 @@ classdef annbraid < braidlab.braid
             % basepoint.
             varargin{2} = varargin{2}+1;
            otherwise
-            error('BRAIDLAB:annbraid:annbraid', ...
+            error('BRAIDLAB:annbraid:annbraid:badstrarg', ...
                   'String argument ''%s'' not supported for annbraid.', ...
                   varargin{1})
           end
@@ -136,7 +136,7 @@ classdef annbraid < braidlab.braid
         varargout{1} = mtimes@braidlab.braid(b1.braid,b2);
       elseif isa(b2,'braidlab.loop')
         if b2.basepoint < b1.n
-          error('BRAIDLAB:annbraid:mtimes', ...
+          error('BRAIDLAB:annbraid:mtimes:nobasepoint', ...
                 'Annular braid can only act on a loop with a basepoint.')
         end
         [varargout{1:nargout}] = mtimes@braidlab.braid(b1.braid,b2);
@@ -290,14 +290,16 @@ classdef annbraid < braidlab.braid
   % chronology.  Hide these, though they can still be called and will
   % return an error message.
   methods (Hidden)
-    function tensor(~)
-      error('BRAIDLAB:databraid:tensor:undefined',...
-            'This operation is not yet implemented for databraids.')
+    % Does this make sense for annbraids?
+    function tensor(varargin)
+      error('BRAIDLAB:annbraid:tensor:undefined',...
+            'This operation is not yet implemented for annbraids.')
     end
 
-    function subbraid(~)
-      error('BRAIDLAB:databraid:subbraid:undefined',...
-            'This operation is not yet implemented for databraids.')
+    % This could be implemented.
+    function subbraid(varargin)
+      error('BRAIDLAB:annbraid:subbraid:undefined',...
+            'This operation is not yet implemented for annbraids.')
     end
   end % methods block
 
