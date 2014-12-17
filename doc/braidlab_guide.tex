@@ -70,19 +70,19 @@
 %
 % Symbols
 %
-\renewcommand{\l}{\left}			% \left
-\renewcommand{\r}{\right}			% \right
+\renewcommand{\l}{\left}                        % \left
+\renewcommand{\r}{\right}                       % \right
 \mathnotation{\ee}{\mathrm{e}}                  % Base of natural log
-\mathnotation{\nn}{n}				% # of strings
-\mathnotation{\ac}{a}				% Dynnikov coord a
-\mathnotation{\bc}{b}				% Dynnikov coord b
-\mathnotation{\cc}{c}				% Dynnikov coord c
-\mathnotation{\dc}{d}				% Dynnikov coord d
-\mathnotation{\fc}{f}				% Dynnikov coord f
+\mathnotation{\nn}{n}                           % # of strings
+\mathnotation{\ac}{a}                           % Dynnikov coord a
+\mathnotation{\bc}{b}                           % Dynnikov coord b
+\mathnotation{\cc}{c}                           % Dynnikov coord c
+\mathnotation{\dc}{d}                           % Dynnikov coord d
+\mathnotation{\fc}{f}                           % Dynnikov coord f
 \mathnotation{\acnew}{\ac'}
 \mathnotation{\bcnew}{\bc'}
-\mathnotation{\abv}{\bm{u}}			% Dynnikov coord vector
-\mathnotation{\ip}{i}				% Counter for braid elements
+\mathnotation{\abv}{\bm{u}}                     % Dynnikov coord vector
+\mathnotation{\ip}{i}                           % Counter for braid elements
 \newcommand{\pos}[1]{#1^+}
 \renewcommand{\neg}[1]{#1^-}
 \mathnotation{\ldef}{\mathrel{\raisebox{.069ex}{:}\!\!=}}% Left define
@@ -143,21 +143,33 @@ showstringspaces=false}
 \begin{figure}
   \begin{center}
     \subfigure[]{
-      \includegraphics[width=.25\textwidth]{geombraid}
+      \includegraphics[height=.2\textheight]{geombraid}
       \label{fig:geombraid}
-    }\hspace{.025\textwidth}
+    }\hspace{.25\textwidth}
     \subfigure[]{
-      \raisebox{.065\textwidth}{%
-        \includegraphics[width=.295\textwidth]{13is31}}
+      \includegraphics[height=.2\textheight]{sbdiag}
+      \label{fig:sbdiag}
+    }
+  \end{center}
+  \caption{(a) A geometric braid.  (b) The corresponding braid diagram.}
+\end{figure}
+%
+
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \raisebox{.09\textwidth}{%
+        \includegraphics[width=.35\textwidth]{13is31}}
       \label{fig:crossing}
-    }\hspace{.025\textwidth}
+    }\hspace{.1\textwidth}
     \subfigure[]{
-      \includegraphics[width=.28\textwidth]{121is212}
+      \includegraphics[width=.35\textwidth]{121is212}
       \label{fig:crossing2}
     }
   \end{center}
-  \caption{(a) A geometric braid.  (b) Generators that don't share a string
-    commute.  (c) The braid relation.}
+  \caption{(a) Generators that don't share a string commute.  (b) The braid
+    relation.}
 \end{figure}
 %
 
