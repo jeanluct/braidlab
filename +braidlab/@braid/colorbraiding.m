@@ -17,11 +17,11 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   is also used by the DATABRAID subclass.
 %
 %   ** Implementation: ** By default, the function invokes a C++
-%   implementation of the algorithm from file
-%   crossingstogenerators_helper.cpp. To use a slower, MATLAB
-%   implementation, set a global MATLAB variable BRAIDLAB_braid_nomex to
-%   true. A comparison between MATLAB and C++ versions of the algorithm can
-%   be run by executing braidlab/devel/test_colorbraid.m
+%   implementation of the algorithm from file cross2gen_helper.cpp. To use a
+%   slower, MATLAB implementation, set a global MATLAB variable
+%   BRAIDLAB_braid_nomex to true. A comparison between MATLAB and C++
+%   versions of the algorithm can be run by executing
+%   braidlab/devel/test_colorbraid.m
 %
 %   When MATLAB version is used, code issues the warning
 %   BRAIDLAB:braid:colorbraiding:matlab
@@ -104,14 +104,14 @@ try % trapping to ensure proper identification of strands
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = crossingstogenerators_helper(XYtraj,t,Nthreads);
+    [gen,tcr] = cross2gen_helper(XYtraj,t,Nthreads);
 
   catch me
     if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
       rethrow(me);
     else
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = crossingsToGenerators(XYtraj,t);
+      [gen,tcr,~] = cross2gen(XYtraj,t);
     end
   end
 
@@ -171,8 +171,8 @@ global BRAIDLAB_threads
 if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
   % use the global variable to set the number of threads
   Nthreads = ceil(BRAIDLAB_threads);
-  debugmsg(sprintf('colorbraiding: Number of threads set by BRAIDLAB_threads to: %d.', ...
-                   Nthreads));
+  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ... 
+                    'BRAIDLAB_threads to: %d.'],Nthreads));
 else
   % try to autodetect the optimal number of threads (== number of cores)
   try

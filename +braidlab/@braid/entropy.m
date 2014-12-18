@@ -113,9 +113,6 @@ switch params.flag
   case 'onestep'
     params.tol = 0;
     params.maxit = 1;
-  otherwise
-    error('BRAIDLAB:braid:entropy:badflag',...
-          'Unknown flag name.')
 end
 
 b = params.b;
@@ -235,9 +232,9 @@ if usematlab
 
   % discount extra arcs if intaxis is used
   switch params.length
-    case 'intaxis',
+    case 'intaxis'
       discount = b.n - 1;
-    otherwise,
+    otherwise
       discount = 0;
   end
 
