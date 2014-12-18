@@ -1,4 +1,4 @@
-function varargout = conjtest_helper(varargin)
+function varargout = conjtest_helper(varargin) %#ok<STOUT>
 %CONJTEST_HELPER   See conjtest_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

@@ -267,6 +267,7 @@ classdef annbraid < braidlab.braid
       % message from braid superclass is displayed.
 
       if nargin < 2
+        lspec = cell(1,b.nann);
         for i = 1:b.nann, lspec{i} = 'k'; end
         lspec{b.n} = {'g','LineWidth',3};
         plot@braidlab.braid(b.braid,lspec);

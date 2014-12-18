@@ -25,7 +25,7 @@
 classdef databraidTest < matlab.unittest.TestCase
 
   properties
-    dbr
+    dbrtest
   end
 
   methods (TestMethodSetup)
@@ -33,7 +33,7 @@ classdef databraidTest < matlab.unittest.TestCase
       import braidlab.databraid
 
       data = load('testdata','XY','ti');
-      testCase.dbr = databraid(data.XY,data.ti);
+      testCase.dbrtest = databraid(data.XY,data.ti);
     end
   end
 
@@ -111,7 +111,7 @@ classdef databraidTest < matlab.unittest.TestCase
       % b2, even though they have the same crossing time.
       b1 = databraid([1 3],[1 2]);
       b2 = databraid([5 2],[2 3]);
-      b12 = b1*b2;
+      b12 = b1*b2; %#ok<NASGU>
       % This is not ok: the generators at the ends don't commute.
       b1 = databraid([1 3],[1 2]);
       b2 = databraid([4 2],[2 3]);
@@ -125,7 +125,7 @@ classdef databraidTest < matlab.unittest.TestCase
     end
 
     function test_databraid_ftbe(testCase)
-      dbr = testCase.dbr;
+      dbr = testCase.dbrtest;
       testCase.verifyEqual(dbr.ftbe('method','proj'), ...
                            dbr.ftbe('method','nonproj'),...
                            'AbsTol',1e-12);
@@ -133,7 +133,7 @@ classdef databraidTest < matlab.unittest.TestCase
 
     function test_databraid_hidden(testCase)
       % Make sure some hidden methods inherited from braid class give error.
-      dbr = testCase.dbr;
+      dbr = testCase.dbrtest;
       testCase.verifyError(@() mpower(dbr,2), ...
                            'BRAIDLAB:databraid:mpower:undefined');
       testCase.verifyError(@() inv(dbr), ...

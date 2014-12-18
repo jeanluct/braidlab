@@ -25,14 +25,14 @@
 classdef annbraidTest < matlab.unittest.TestCase
 
   properties
-    ab
+    ab1m2
   end
 
   methods (TestMethodSetup)
     function create_annbraid(testCase)
       import braidlab.annbraid
 
-      testCase.ab = annbraid([1 -2]);
+      testCase.ab1m2 = annbraid([1 -2]);
     end
   end
 
@@ -83,7 +83,7 @@ classdef annbraidTest < matlab.unittest.TestCase
       import braidlab.braid
       import braidlab.loop
 
-      ab = testCase.ab;
+      ab = testCase.ab1m2;
       b = braid([1 2]);
       % annbraid times braid is a braid.
       testCase.verifyTrue(isa(ab*b,'braidlab.braid'))
@@ -106,7 +106,7 @@ classdef annbraidTest < matlab.unittest.TestCase
     function test_inv_mpower(testCase)
       import braidlab.annbraid
 
-      ab = testCase.ab;
+      ab = testCase.ab1m2;
       % inv and mpower act only on word (no conversion to braid).
       ab2 = ab^2;
       testCase.verifyEqual(ab2,annbraid([1 -2 1 -2]))
@@ -118,13 +118,13 @@ classdef annbraidTest < matlab.unittest.TestCase
       import braidlab.annbraid
 
       % perm drops the basepoint, since it shouldn't move.
-      ab = testCase.ab;
+      ab = testCase.ab1m2;
       testCase.verifyEqual(perm(ab),[1 2])
     end
 
     function test_annbraid_hidden(testCase)
       % Make sure some hidden methods inherited from braid class give error.
-      ab = testCase.ab;
+      ab = testCase.ab1m2;
       testCase.verifyError(@() tensor(ab,ab), ...
                            'BRAIDLAB:annbraid:tensor:undefined');
       testCase.verifyError(@() subbraid(ab), ...
