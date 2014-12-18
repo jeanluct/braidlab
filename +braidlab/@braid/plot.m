@@ -60,6 +60,8 @@ npts = 40;
 lw = 2;
 defls = {'k-','LineWidth',lw};
 
+lat = cell(1,b.n);
+
 if nargin > 1
   if iscell(varargin{1})
     if length(varargin{1}) < b.n
@@ -84,7 +86,7 @@ if nargin > 1
   else
     % Only one set of linespecs.  Apply to all strings.
     for i = 1:b.n
-      lat{i} = {varargin{1:end}};
+      lat{i} = {varargin{1:end}}; %#ok<CCAT1>
     end
   end
 else
@@ -158,6 +160,7 @@ bline{2} = [-gapY/2/npts bline{2} gapY+gapY/2/npts];
 % Keep track of permutation, for coloring purposes.
 p = 1:b.n;
 
+strX = cell(1,b.n); strY = cell(1,b.n);
 for i = 1:b.n, strX{i} = []; strY{i} = []; end
 
 % Fill line data

@@ -1,4 +1,4 @@
-function varargout = entropy_helper(varargin)
+function varargout = entropy_helper(varargin) %#ok<STOUT>
 %ENTROPY_HELPER   See entropy_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

@@ -1,4 +1,4 @@
-function varargout = compact_helper(varargin)
+function varargout = compact_helper(varargin) %#ok<STOUT>
 %COMPACT_HELPER   See compact_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
@@ -29,4 +29,3 @@ function varargout = compact_helper(varargin)
 % LICENSE>
 
 throwAsCaller(braidlab.util.NoMEXException(mfilename));
-

@@ -30,7 +30,7 @@ if any(any(A - U*S*V' ~= 0))
         'Bad Smith form: not equal to A.')
 end
 
-if ~strcmp(class(A),'vpi')
+if ~strcmp(class(A),'vpi') %#ok<STISA>
   if any(any(eye(size(U)) - U*round(inv(U)) ~= 0))
     error('BRAIDLAB:braid:checksnf:badsnf', ...
           'Bad Smith form: inv(U) not integer.')

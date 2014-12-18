@@ -114,7 +114,8 @@ switch params.flag
     params.tol = 0;
     params.maxit = 1;
   otherwise
-    [];
+    error('BRAIDLAB:braid:entropy:badflag',...
+          'Unknown flag name.')
 end
 
 b = params.b;
@@ -151,13 +152,10 @@ end
 switch params.length
   case 'intaxis',
     lenfun = @(l)l.intaxis;
-    usediscount = true;
   case 'minlength',
     lenfun = @minlength;
-    usediscount = false;
   case 'l2norm',
     lenfun = @l2norm;
-    usediscount = false;
 end
 
 %% ITERATIVE ALGORITHM: set parameters
@@ -189,7 +187,7 @@ u = braidlab.loop(b.n,@double,'bp');
 
 %% determine if mex should be attempted
 global BRAIDLAB_braid_nomex
-if ~exist('BRAIDLAB_braid_nomex') || ...
+if ~exist('BRAIDLAB_braid_nomex','var') || ...
       isempty(BRAIDLAB_braid_nomex) || ...
       BRAIDLAB_braid_nomex == false
   usematlab = false;

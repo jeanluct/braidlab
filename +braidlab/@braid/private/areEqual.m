@@ -1,4 +1,4 @@
-function result = areEqual(A,B,D) %#ok<STOUT,INUSD>
+function result = areEqual(A,B,D)
 %AREEQUAL   Check for equality within a given precision.
 %   EE = AREEQUAL(A,B,D) checks if elements of A and B are within D (int
 %   exponent) float-representable numbers of each other.  Returns a logical
@@ -77,7 +77,7 @@ if d < 0,
   u = -u; 
 end
 
-if f == 1/2 & sign(x) ~= sign(d), 
+if f == 1/2 && sign(x) ~= sign(d), 
   u = u/2; 
 end
 

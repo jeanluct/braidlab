@@ -102,10 +102,10 @@ for i = 1:length(varargin)
   if ischar(varargin{i})
     if strcmpi(varargin{i},'plot')
       doplot = true;
-      iarg = [iarg i];
+      iarg = [iarg i]; %#ok<AGROW>
     elseif any(strcmpi(varargin{i},{'iterates','iter'}))
       doiter = true;
-      iarg = [iarg i];
+      iarg = [iarg i]; %#ok<AGROW>
     else
       error('BRAIDLAB:braid:cycle:badarg', ...
             'Unknown option ''%s''',varargin{i})
@@ -114,7 +114,7 @@ for i = 1:length(varargin)
     braidlab.util.checkvpi
     % Get the initial loop from arguments.
     l = loop(vpi(varargin{i}.coords),'bp',varargin{i}.basepoint);
-    iarg = [iarg i];
+    iarg = [iarg i]; %#ok<AGROW>
   end
 end
 % Erase the arguments that were parsed.
