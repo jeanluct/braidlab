@@ -2,12 +2,15 @@ function linecount_plot(ptype)
 
 if nargin < 1, ptype = 'rev'; end
 
-d = load('linecount.dat');
-ii = [1 ; find(diff(d(:,3)))+1];
+fid = fopen('linecount.dat','rt');
+dat = textscan(fid, '%s %d %d', 'HeaderLines', 0, 'CollectOutput', false);
+fclose(fid);
 
-rev = d(ii,1);
-utc = d(ii,2);
-lc = d(ii,3);
+revhash = dat{1};
+utc = dat{2};
+lc = dat{3};
+
+rev = 1:length(revhash);
 
 % Convert Unix time to datenum.
 dnum = utc/86400 + datenum(1970,1,1);
@@ -27,14 +30,16 @@ switch lower(ptype)
  otherwise
 end
 
+gl = @(x,y) gitlog(x,y,revhash);
+
 % Display clickable tooltips for each datapoint, showing Mercurial log.
 dcm_obj = datacursormode(fig);
 set(dcm_obj,'DisplayStyle','window','SnapToDataVertex','on',...
-	    'Enable','on','UpdateFcn',@hglog)
+            'Enable','on','UpdateFcn',gl)
 
 
 % ==================================================================
-function txt = hglog(~,event_obj)
+function txt = gitlog(~,event_obj,revhash)
 
 pos = get(event_obj,'Position');
 
@@ -47,15 +52,17 @@ else
   error('Unknown shell.')
 end
 
+gitcmd0 = 'git log -1 --pretty=format:''%h: %s''';
+
 if pos(1) > 5e5
   % pos(1) is most likely a datenum date, not a revision number.
   % Convert datenum to UTC.
   utc = int32(86400*(pos(1) - datenum(1970,1,1)));
-  hgcmd = sprintf('hg log -d "%d 0" --template ''{rev}: {desc}''',utc);
+  gitcmd = sprintf('%s --before="%d"',gitcmd0,utc);
 else
-  hgcmd = sprintf('hg log -r %d --template ''{rev}: {desc}''',pos(1));
+  gitcmd = sprintf('%s %s',gitcmd0,revhash{pos(1)});
 end
 
-[~,out] = system([termset ' ; ' hgcmd]);
+[~,out] = system([termset ' ; ' gitcmd]);
 out(end-8:end) = [];  % delete rubbish at the end of the string
 txt = {out};
