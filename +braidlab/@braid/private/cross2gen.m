@@ -1,5 +1,5 @@
-function [gen,tcr,cross_cell] = crossingsToGenerators(XYtraj,t)
-%CROSSINGSTOGENERATORS Convert a physical braid to a list of braid generators.
+function [gen,tcr,cross_cell] = cross2gen(XYtraj,t)
+%CROSS2GEN   Convert a physical braid to a list of braid generators.
 %
 %   The order of each particle is determined according to its first (X)
 %   coordinate.

@@ -38,11 +38,11 @@ else
     w = [obj.word(1:idxn(1)-1) Sni];
   end
   for i = 2:length(idxn)
-    w = [w obj.word(idxn(i-1)+1:idxn(i)-1)];
+    w = [w obj.word(idxn(i-1)+1:idxn(i)-1)]; %#ok<AGROW>
     if obj.word(idxn(i)) > 0
-      w = [w Sn];
+      w = [w Sn]; %#ok<AGROW>
     else
-      w = [w Sni];
+      w = [w Sni]; %#ok<AGROW>
     end
   end
   w = [w obj.word(idxn(end)+1:end)];

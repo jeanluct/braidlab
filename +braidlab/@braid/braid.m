@@ -425,7 +425,9 @@ classdef braid < matlab.mixin.CustomDisplay
 
       highestIndex = (b.n-1);
       i = double(-highestIndex:highestIndex);
-      c = hist( b.word, i );
+      c = hist(b.word,i);
+      i(highestIndex+1) = [];
+      c(highestIndex+1) = [];
     end
 
   end % methods block

@@ -1,4 +1,4 @@
-function test_braidlab(nomex)
+function res = test_braidlab(nomex)
 %TEST_BRAIDLAB   Run a suite of braidlab unit tests.
 %   TEST_BRAIDLAB runs several unit tests for braidlad (default).
 %
@@ -55,14 +55,15 @@ if nargin < 1 || isempty(nomex)
   disp('Testing braidlab with MEX algorithms.');
 else
   % disable MEX algorithms
-  global BRAIDLAB_loop_nomex;
-  global BRAIDLAB_braid_nomex;
+  global BRAIDLAB_loop_nomex; %#ok<TLEV>
+  global BRAIDLAB_braid_nomex; %#ok<TLEV>
   BRAIDLAB_braid_nomex = true;
   BRAIDLAB_loop_nomex = true;
   disp('Testing braidlab without MEX algorithms.');
 end
 
 suite = TestSuite.fromFolder(tcfolder);
+%suite = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
@@ -72,4 +73,4 @@ suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
 runner = TestRunner.withTextOutput;
-res = runner.run(suite) %#ok<NOPTS>
+res = runner.run(suite);

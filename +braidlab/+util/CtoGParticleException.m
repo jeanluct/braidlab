@@ -28,23 +28,21 @@ classdef CtoGParticleException < MException
   properties
     Particles;
   end
-  
-	methods
-		function obj = CtoGParticleException( id,particles )
-			obj = obj@MException( id, ['Caused by particles: ' ...
-                          mat2str(sort(particles(:))) ])
-      obj.Particles = particles;
-		end
-    
+
+  methods
+    function obj = CtoGParticleException( id,particles )
+       obj = obj@MException( id, ['Caused by particles: ' ...
+                                   mat2str(sort(particles(:))) ]);
+       obj.Particles = particles;
+    end
+
     function val = get.Particles(obj)
       val = obj.Particles;
     end
-    
+
     function obj = set.Particles(obj,val)
       obj.Particles = sort(val);
     end
-    
- end
- 
-end
+  end
 
+end

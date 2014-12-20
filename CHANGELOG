@@ -5,22 +5,29 @@
   such as the way braids are plotted and the direction of rotation for
   generators.
 
+* braid.plot takes color and linestyle attributes.
+
+* braid.lk returns the Lawrence-Krammer representation of a braid.
+
 * The class annbraid is used to represent braids on annular domains.
 
-* The Lawrence-Krammer braid.lk representation has been added to the
-  braid class.
+* The braidlab guide has been expanded with an introduction to braids.
 
 ------------------------------------------------------------------------
-3.0.1 [201x-xx-xx]
+3.0.1 [2014-12-16]
 
 * Improved installation instructions in guide.
 
+* Fixed some outdated output in guide.
+
 * Fixed a bug when calling C++ version of intersec.
 
-* Fix a bug in braid.mtimes that disallowed valid action on loop with
-  basepoint.
+* Fixed a bug in braid.mtimes that disallowed valid action on loop
+  with basepoint.
 
 * Remove broken braid.reducing.
+
+* Makefile detects Linux 32-bit architecture.
 
 ------------------------------------------------------------------------
 3.0 [2014-12-09]

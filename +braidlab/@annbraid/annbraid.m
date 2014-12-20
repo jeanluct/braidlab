@@ -55,8 +55,8 @@ classdef annbraid < braidlab.braid
     %   string.
     %
     %   BC = ANNBRAID(B) copies the object B of type ANNBRAID or BRAID to
-    %   the ANNBRAID object BC.  An annbraid is created from a
-    %   braid by adding a basepoint puncture.
+    %   the ANNBRAID object BC.  An ANNBRAID is created from a BRAID by
+    %   adding a basepoint puncture.
     %
     %   B = ANNBRAID('Random',NANN,K) returns a random braid of NANN strings
     %   with K crossings (generators).  The K generators are chosen
@@ -80,7 +80,7 @@ classdef annbraid < braidlab.braid
             % basepoint.
             varargin{2} = varargin{2}+1;
            otherwise
-            error('BRAIDLAB:annbraid:annbraid', ...
+            error('BRAIDLAB:annbraid:annbraid:badstrarg', ...
                   'String argument ''%s'' not supported for annbraid.', ...
                   varargin{1})
           end
@@ -129,13 +129,14 @@ classdef annbraid < braidlab.braid
 
       if isa(b2,'braidlab.annbraid')
         % If b2 is also an annular braid, the product is simple concatenation.
-        varargout{1} = braidlab.annbraid(mtimes@braidlab.braid(b1,b2));
+        varargout{1} = braidlab.annbraid([b1.word b2.word], ...
+                                         max(b1.nann,b2.nann));
       elseif isa(b2,'braidlab.braid')
         % If b2 is a braid, return a plain braidlab.braid.
         varargout{1} = mtimes@braidlab.braid(b1.braid,b2);
       elseif isa(b2,'braidlab.loop')
         if b2.basepoint < b1.n
-          error('BRAIDLAB:annbraid:mtimes', ...
+          error('BRAIDLAB:annbraid:mtimes:nobasepoint', ...
                 'Annular braid can only act on a loop with a basepoint.')
         end
         [varargout{1:nargout}] = mtimes@braidlab.braid(b1.braid,b2);
@@ -147,7 +148,8 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      bm = braidlab.annbraid(mpower@braidlab.braid(b,m));
+      br = mpower@braidlab.braid(b,m);
+      bm = braidlab.annbraid(br.word,b.nann);
     end
 
     function bi = inv(b)
@@ -155,7 +157,8 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      bi = braidlab.annbraid(inv@braidlab.braid(b));
+      br = inv@braidlab.braid(b);
+      bi = braidlab.annbraid(br.word,b.nann);
     end
 
     function p = perm(obj)
@@ -214,7 +217,8 @@ classdef annbraid < braidlab.braid
       % message from braid superclass is displayed.
 
       % Note here we do *not* convert to a braidlab.braid first.
-      c = braidlab.annbraid(compact@braidlab.braid(b));
+      bc = compact@braidlab.braid(b,true);
+      c = braidlab.annbraid(bc.word,b.nann);
     end
 
     function [c,bE] = complexity(b,varargin)
@@ -262,9 +266,14 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      % This isn't a great way to plot.  Would be better to highlight the
-      % boundary puncture with a different color.
-      plot@braidlab.braid(b.braid,varargin{:});
+      if nargin < 2
+        lspec = cell(1,b.nann);
+        for i = 1:b.nann, lspec{i} = 'k'; end
+        lspec{b.n} = {'g','LineWidth',3};
+        plot@braidlab.braid(b.braid,lspec);
+      else
+        plot@braidlab.braid(b.braid,varargin{:});
+      end
     end
 
     function [varargout] = tntype(b)
@@ -282,14 +291,16 @@ classdef annbraid < braidlab.braid
   % chronology.  Hide these, though they can still be called and will
   % return an error message.
   methods (Hidden)
-    function tensor(~)
-      error('BRAIDLAB:databraid:tensor:undefined',...
-            'This operation is not yet implemented for databraids.')
+    % Does this make sense for annbraids?
+    function tensor(varargin)
+      error('BRAIDLAB:annbraid:tensor:undefined',...
+            'This operation is not yet implemented for annbraids.')
     end
 
-    function subbraid(~)
-      error('BRAIDLAB:databraid:subbraid:undefined',...
-            'This operation is not yet implemented for databraids.')
+    % This could be implemented.
+    function subbraid(varargin)
+      error('BRAIDLAB:annbraid:subbraid:undefined',...
+            'This operation is not yet implemented for annbraids.')
     end
   end % methods block
 

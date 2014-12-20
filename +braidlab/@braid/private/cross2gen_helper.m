@@ -1,5 +1,5 @@
-function varargout = colorbraiding_helper(varargin)
-%COLORBRAIDING_HELPER   See colorbraiding_helper.cpp.
+function varargout = cross2gen_helper(varargin) %#ok<STOUT>
+%CROSS2GEN_HELPER   See cross2gen_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
 %   does not exist.

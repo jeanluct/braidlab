@@ -31,8 +31,8 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-#ifndef BRAIDLAB_CROSSINGSTOGENERATORS_HELPER_HPP
-#define BRAIDLAB_CROSSINGSTOGENERATORS_HELPER_HPP
+#ifndef BRAIDLAB_CROSS2GEN_HELPER_HPP
+#define BRAIDLAB_CROSS2GEN_HELPER_HPP
 
 
 // real GCC feature list:
@@ -438,7 +438,7 @@ template <typename T> int sgn(T val);
 //////////////////////////// DEFINITIONS  ////////////////////////////
 
 std::pair< std::vector<int>, std::vector<double> >
-crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
+cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
 {
   Timer tictoc( 1 );
   tictoc.tic();
@@ -455,7 +455,7 @@ crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors );
 
   pairCrosser.run(Nthreads);
-  tictoc.toc("crossingstogenerators_helper: pairwise crossing detection", true);
+  tictoc.toc("cross2gen_helper: pairwise crossing detection", true);
 
   // there were crossingErrors in pairwise detection
   if (! crossingErrors.empty() ) {
@@ -482,16 +482,16 @@ crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   }
 
   crossings.sort();
-  tictoc.toc("crossingstogenerators_helper: sorting crossdat", true);
+  tictoc.toc("cross2gen_helper: sorting crossdat", true);
 
   if (1 <= BRAIDLAB_debuglvl)  {
-    printf("crossingstogenerators_helper: Number of crossings %d\n", crossings.size() );
+    printf("cross2gen_helper: Number of crossings %d\n", crossings.size() );
     mexEvalString("pause(0.001);"); //flush
   }
 
   // Determine generators from ordered crossing data
   if (1 <= BRAIDLAB_debuglvl)  {
-    printf("crossingstogenerators_helper: Convert crossings to generator sequence\n");
+    printf("cross2gen_helper: Convert crossings to generator sequence\n");
     mexEvalString("pause(0.001);");
   }
 
@@ -538,11 +538,11 @@ crossingsToGenerators( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
     }
   }
 
-  tictoc.toc("crossingstogenerators_helper: generating the braid", true);
+  tictoc.toc("cross2gen_helper: generating the braid", true);
 
   stringSet.getBraid( retval.first );
   stringSet.getTime ( retval.second );
-  tictoc.toc("crossingstogenerators_helper: copying output");
+  tictoc.toc("cross2gen_helper: copying output");
 
   return retval;
 
@@ -671,7 +671,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
   // unthreaded version
   if ( NThreadsRequested == 1 ) {
     if (1 <= BRAIDLAB_debuglvl)  {
-      printf("crossingstogenerators_helper: pairwise crossings running UNTHREADED.\n" );
+      printf("cross2gen_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
     for (mwIndex I = 0; I < Nstrings; I++) {
@@ -691,7 +691,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 
     if (1 <= BRAIDLAB_debuglvl)  {
       printf(
-        "crossingstogenerators_helper: pairwise crossings running on %d threads.\n",
+        "cross2gen_helper: pairwise crossings running on %d threads.\n",
         NThreadsRequested );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -952,4 +952,4 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
 }
 
 
-#endif // BRAIDLAB_CROSSINGSTOGENERATORS_HELPER_HPP
+#endif // BRAIDLAB_CROSS2GEN_HELPER_HPP

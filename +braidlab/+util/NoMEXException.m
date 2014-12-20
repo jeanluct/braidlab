@@ -1,4 +1,4 @@
-%NOMEXEXCEPTIOn   Exception thrown when braidlab MEX file does not exist.
+%NOMEXEXCEPTION   Exception thrown when braidlab MEX file does not exist.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -25,11 +25,12 @@
 % LICENSE>
 
 classdef NoMEXException < MException
-        methods
-                function obj = NoMEXException(varargin)
-                        obj = obj@MException('BRAIDLAB:NOMEX', varargin{:});
+
+  methods
+    function obj = NoMEXException(varargin)
+      obj = obj@MException('BRAIDLAB:NOMEX', varargin{:});
       obj.message = ['Missing MEX: ' obj.message char(10) ...
-                    'Please compile braidlab to access full functionality.'];
-                end
-        end
+                     'Compile braidlab to access full functionality.'];
+    end
+  end
 end
