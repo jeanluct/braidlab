@@ -32,7 +32,7 @@ end
 
 gl = @(x,y) gitlog(x,y,revhash);
 
-% Display clickable tooltips for each datapoint, showing Mercurial log.
+% Display clickable tooltips for each datapoint, showing log message.
 dcm_obj = datacursormode(fig);
 set(dcm_obj,'DisplayStyle','window','SnapToDataVertex','on',...
             'Enable','on','UpdateFcn',gl)
