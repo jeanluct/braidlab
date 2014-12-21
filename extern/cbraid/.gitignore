@@ -1,0 +1,11 @@
+lib/.depends
+lib/braiding.o
+lib/cbraid.o
+lib/libcbraid.a
+.depends
+braiding
+braiding_main.o
+speedtest
+speedtest.o
+test
+test.o
