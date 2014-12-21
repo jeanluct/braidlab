@@ -1,7 +1,10 @@
 assignmentoptimal is obtained from http://www.mathworks.com/matlabcentral/fileexchange/6543.  The compiled mex file is copied to the private folder of +braidlab. (Version 2011-07-05)
 
-CBraid is obtained from https://github.com/jeanluct/cbraid. (rev b36a3e2)
+VariablePrecisionIntegers is obtained from http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic.  The functions not used by braidlab are not included. (Version 31 Jul 2013)
 
 trains is obtained from https://bitbucket.org/jeanluc/braid-code/raw/tip/trains. (rev 66)
 
-VariablePrecisionIntegers is obtained from http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic.  The functions not used by braidlab are not included. (Version 31 Jul 2013)
+CBraid is checked out from https://github.com/jeanluct/cbraid in a separate branch cbraid_branch.  To update CBraid to the latest:
+  git checkout cbraid_branch; git pull # pull changes from remote cbraid_remote
+  git checkout develop
+  git merge --squash -Xsubtree=extern/cbraid --no-commit cbraid_branch
