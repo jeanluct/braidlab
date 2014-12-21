@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   B.Set(n,w);
   G.Set(B);
 
-  decimal g = G.FindTrainTrack();
+  /* decimal g = G.FindTrainTrack(); */ /* Unused */
 
   /*
   if (G.GetType() == pA_or_red || G.GetType() == fo)
