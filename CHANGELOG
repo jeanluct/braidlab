@@ -16,13 +16,13 @@
 ------------------------------------------------------------------------
 3.0.1 [2014-12-16]
 
-* Improved installation instructions in guide.
+* Improve installation instructions in guide.
 
-* Fixed some outdated output in guide.
+* Fix some outdated output in guide.
 
-* Fixed a bug when calling C++ version of intersec.
+* Fix a bug when calling C++ version of intersec.
 
-* Fixed a bug in braid.mtimes that disallowed valid action on loop
+* Fix a bug in braid.mtimes that disallowed valid action on loop
   with basepoint.
 
 * Remove broken braid.reducing.
