@@ -7,7 +7,7 @@
 
 #endif
 
-#include "graph.h"
+#include "trains/graph.h"
 #include <sstream>
 #include <map>
 

@@ -3,8 +3,8 @@
 
 #endif
 
-#include "General.h"
-#include "decimal.h"
+#include "trains/General.h"
+#include "trains/decimal.h"
 #include <cstdlib>
 #ifndef VS2005
 #include <cstring>

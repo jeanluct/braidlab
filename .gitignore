@@ -1,0 +1,4 @@
+src/*.o
+src/frontend
+src/train
+src/libtrains.a

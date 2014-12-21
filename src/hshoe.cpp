@@ -4,7 +4,7 @@
 #endif
 
 #include <string>
-#include "hshoe.h"
+#include "trains/hshoe.h"
 
 namespace trains {
 
