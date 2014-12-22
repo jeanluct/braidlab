@@ -1,3 +1,4 @@
 src/*.o
 src/frontend
 src/train
+.sconsign.dblite
