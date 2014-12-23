@@ -5,7 +5,7 @@
 
 #endif
 
-#include "graph.h"
+#include "trains/graph.h"
 #include <fstream>
 
 namespace trains {

@@ -11,9 +11,9 @@
 #include <vector>
 #include <algorithm>
 #include <cctype>
-#include "Batch.h"
-#include "braid.h"
-#include "graph.h"
+#include "trains/Batch.h"
+#include "trains/braid.h"
+#include "trains/graph.h"
 
 namespace trains {
 

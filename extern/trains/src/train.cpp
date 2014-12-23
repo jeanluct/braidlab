@@ -4,14 +4,14 @@
 #include <math.h>
 #include <fstream>
 #include <string>
-#include "newarray.h"
-#include "Matrix.h"
-#include "braid.h"
-#include "graph.h"
-#include "hshoe.h"
-#include "help.h"
-#include "Batch.h"
-#include "ttt.h"
+#include "trains/newarray.h"
+#include "trains/Matrix.h"
+#include "trains/braid.h"
+#include "trains/graph.h"
+#include "trains/hshoe.h"
+#include "trains/help.h"
+#include "trains/Batch.h"
+#include "trains/ttt.h"
 
 using namespace std;
 
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   B.Set(n,w);
   G.Set(B);
 
-  decimal g = G.FindTrainTrack();
+  /* decimal g = G.FindTrainTrack(); */ /* Unused */
 
   /*
   if (G.GetType() == pA_or_red || G.GetType() == fo)

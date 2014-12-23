@@ -3,7 +3,7 @@
 
 #endif
 
-#include "edgevert.h"
+#include "trains/edgevert.h"
 
 namespace trains {
 

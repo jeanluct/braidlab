@@ -3,9 +3,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include "General.h"
+#include "trains/General.h"
 
-#include "help.h"
+#include "trains/help.h"
 
 namespace trains {
 
