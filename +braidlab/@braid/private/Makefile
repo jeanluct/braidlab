@@ -24,12 +24,14 @@
 #   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 # LICENSE>
 
-CBRAID_LIBDIR     = ../../../extern/cbraid/lib
-CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
+CBRAID_DIR        = ../../../extern/cbraid
+CBRAID_LIBDIR     = $(CBRAID_DIR)/lib
+CBRAID_INCLUDEDIR = $(CBRAID_DIR)/include
 CBRAID_LD         = -lcbraid-mex
 
-TRAINS_LIBDIR     = ../../../extern/trains
-TRAINS_INCLUDEDIR = ../../../extern
+TRAINS_DIR        = ../../../extern/trains
+TRAINS_LIBDIR     = $(TRAINS_DIR)/lib
+TRAINS_INCLUDEDIR = $(TRAINS_DIR)
 TRAINS_LD         = -ltrains
 
 # Need override since variable usually set as command-line argument.
@@ -56,7 +58,7 @@ endif
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
-	cd $(TRAINS_LIBDIR); \
+	cd $(TRAINS_DIR); \
 		make CXX="$(CXX) -fPIC" CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
