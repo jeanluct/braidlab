@@ -57,6 +57,8 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
+
+
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 	cd $(TRAINS_DIR); \
 		make CXX="$(CXX) -fPIC" CC=$(CC)
@@ -73,12 +75,15 @@ entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
-
 cross2gen_helper.$(MEXSUFFIX): cross2gen_helper.cpp \
 	cross2gen_helper.hpp areEqual.hpp ThreadPool_nofuture.h ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
+areEqual.$(MEXSUFFIX): areEqual.cpp \
+	areEqual.hpp
+# $< is the first dependency (the .cpp file).
+	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 clean:
 	rm -f *.$(MEXSUFFIX) *.o
