@@ -30,6 +30,8 @@ hold off
 
 global BRAIDLAB_braid_nomex
 global BRAIDLAB_debuglvl
+global BRAIDLAB_threads
+BRAIDLAB_threads = 1;
 
 BRAIDLAB_debuglvl=1;
 try
