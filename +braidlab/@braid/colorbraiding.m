@@ -61,7 +61,8 @@ function [varargout] = colorbraiding(XY,t,proj)
 import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex
+global BRAIDLAB_braid_nomex;
+debugmsg(['BRAIDLAB_braid_nomex: ' mat2str(BRAIDLAB_braid_nomex)])
 useMatlabVersion = (exist('BRAIDLAB_braid_nomex','var') && ...
                     ~isempty(BRAIDLAB_braid_nomex) && ...
                     all(BRAIDLAB_braid_nomex));
