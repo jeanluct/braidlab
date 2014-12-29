@@ -231,20 +231,6 @@ public:
     }
   }
 
-  // virtual const char* what() const throw()
-  // {
-  //   switch (code) {
-  //   case 1:
-  //     return "Error in interpolating crossing time. Interpolated time-point is not within the interval determined by input.";
-  //   case 2:
-  //     return "X coordinates of two trajectories are coincident. Try changing the projection angle.";
-  //   case 3:
-  //     return "X and Y coordinates of two trajectories are coincident. Trajectories have to be distinct at every time.";
-  //   default:
-  //     return "Unknown error. This should never happen!";
-  //   }
-  // }
-  
 };
 
 class ThreadSafeExceptionList {
@@ -496,8 +482,6 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   }
 
   Strings stringSet(Nstrings);
-
-  //  return retval;
 
   // Cycle through all crossings, apply them to the strands
   bool notcrossed;
@@ -807,8 +791,6 @@ void Strings::getTime( std::vector<double>& data ) {
 // Attempt to apply a pairwise crossing to the list
 // Successful if two strings were next to each other
 bool Strings::applyCrossing( const PWX& cross ) {
-
-  //  printf("Crossing time: %f\n", cross.t);
 
   std::pair<bool, mwIndex> success = switchByColor( cross.L, cross.R );
   if (success.first) {
