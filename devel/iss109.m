@@ -27,3 +27,29 @@ for i = 1:3
   hold on
 end
 hold off
+
+global BRIADLAB_braid_nomex
+global BRAIDLAB_debuglvl
+BRAIDLAB_debuglvl=1;
+try
+  BRAIDLAB_braid_nomex=true
+  braidlab.braid(XY)
+  warning('NOMEX did not catch an error');
+catch me
+  if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+      rethrow(me);
+  end  
+    disp('NOMEX ran into');
+    disp(me.message)
+end
+
+try
+    BRAIDLAB_braid_nomex=false
+
+braidlab.braid(XY)
+warning('MEX did not catch an error');
+catch me
+    disp('MEX ran into');
+    disp(me.message)
+end
+
