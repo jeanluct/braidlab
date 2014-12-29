@@ -28,28 +28,33 @@ for i = 1:3
 end
 hold off
 
-global BRIADLAB_braid_nomex
+global BRAIDLAB_braid_nomex
 global BRAIDLAB_debuglvl
+
 BRAIDLAB_debuglvl=1;
 try
-  BRAIDLAB_braid_nomex=true
+  BRAIDLAB_braid_nomex=true;
   braidlab.braid(XY)
   warning('NOMEX did not catch an error');
 catch me
-  if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
-      rethrow(me);
+
+  if isempty( regexpi(me.identifier, 'coincidentprojection') )
+    rethrow(me);
   end  
-    disp('NOMEX ran into');
-    disp(me.message)
+  disp('NOMEX ran into');
+  disp(me.message)
 end
 
 try
-    BRAIDLAB_braid_nomex=false
-
-braidlab.braid(XY)
-warning('MEX did not catch an error');
+  BRAIDLAB_braid_nomex=false;
+  braidlab.braid(XY)
+  warning('MEX did not catch an error');
 catch me
-    disp('MEX ran into');
-    disp(me.message)
+
+  if isempty( regexpi(me.identifier, 'coincidentprojection') )
+    rethrow(me);
+  end  
+  disp('MEX ran into');
+  disp(me.message)
 end
 
