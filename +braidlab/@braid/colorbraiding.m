@@ -62,10 +62,7 @@ import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
 global BRAIDLAB_braid_nomex;
-debugmsg(['BRAIDLAB_braid_nomex: ' mat2str(BRAIDLAB_braid_nomex)])
-useMatlabVersion = (exist('BRAIDLAB_braid_nomex','var') && ...
-                    ~isempty(BRAIDLAB_braid_nomex) && ...
-                    all(BRAIDLAB_braid_nomex));
+useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
 if any(isnan(XY) | isinf(XY))
   error('BRAIDLAB:braid:colorbraiding:badarg',...
@@ -101,16 +98,20 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 try % trapping to ensure proper identification of strands
   
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:noMEX', 'Matlab version forced');
+    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
+                        'forced']);
+    
+    debugmsg('Using MEX algorithm')
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
     [gen,tcr] = cross2gen_helper(XYtraj,t,Nthreads);
 
   catch me
-    if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
+    debugmsg('Using MATLAB algorithm')      
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XYtraj,t);
     end
