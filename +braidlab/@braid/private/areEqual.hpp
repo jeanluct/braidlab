@@ -34,20 +34,26 @@
 // check for equality taking float precision into account
 bool areEqual( double a, double b, int D ) {
 
-  if (a == b) return true;
+  bool retval;
 
-  // ensure a < b
-  if (b < a) {
-    double tmp = b;
-    b = a;
-    a = tmp;
+  if (a == b) 
+    retval = true;
+  else{
+    // ensure a < b
+    if (b < a) {
+      double tmp = b;
+      b = a;
+      a = tmp;
+    }
+    // compute the D-th representable number larger than a
+    double bnd = a;
+    for (int i = 0; i < D; i++)
+      bnd = std::nextafter(bnd, 1.0);
+    // check if b is between a and bnd
+    retval = b <= bnd;
   }
-  // compute the D-th representable number larger than a
-  double bnd = a;
-  for (int i = 0; i < D; i++)
-    bnd = std::nextafter(bnd, 1.0);
-  // check if b is between a and bnd
-  return b <= bnd;
+
+  return retval;
 }
 
 #endif
