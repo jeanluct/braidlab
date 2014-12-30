@@ -120,9 +120,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         "Trajectory matrix and time vector should have same number of rows.");
   }
 
+  if (2 <= BRAIDLAB_debuglvl)  {
+    printf("Trajectories:\n");
+    trj.print();
+  }
+
+
   tictoc.tic();
   std::pair< std::vector<int>, std::vector<double> >
-    retval = cross2gen( trj, t, NThreadsRequested );
+  // apply pairwise crossing generator
+  retval = cross2gen( trj, t, NThreadsRequested );
   tictoc.toc("Algorithm");
 
   tictoc.tic();

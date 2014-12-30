@@ -79,10 +79,8 @@
                                  // https://github.com/progschj/ThreadPool
 #endif
 
+#include "mex.h" 
 #include "areEqual.hpp"
-
-#include "mex.h"
-
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -133,6 +131,18 @@ public:
   // access matrix elements using matrix( r, c, s) syntax
   double operator()( const mwIndex row, const mwIndex col, const mwIndex spn )
     const;
+
+  // print 3D matrix, each 2D slice at a time
+  void print() {
+    for ( size_t s = 0; s < S(); s++ ) {
+      printf("Slice %d: \n",s);
+      for ( size_t r = 0; r < R(); r++ ) {
+        for ( size_t c = 0; c < C(); c++ )
+          printf("%.3f\t", (*this)(r, c, s) );
+        printf("\n");
+      }
+    }
+  }
 
   // access sizes
   mwSize R(void) const { return _R; }
@@ -549,13 +559,16 @@ double Real3DMatrix::operator()
 {
   if ( !( row < _R) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Row index out of bounds");
+                      "Row index out of bounds "
+                      "(Remember: zero indexing used)");
   if ( !( col < _C) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Column index out of bounds");
+                      "Column index out of bounds "
+                      "(Remember: zero indexing used)");
   if ( !( spn < _S) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Span index out of bounds");
+                      "Span index out of bounds "
+                      "(Remember: zero indexing used)");
 
   return data[(spn*_C + col)*_R + row];
 }
@@ -610,14 +623,17 @@ void PairCrossings::detectCrossings( mwIndex I ) {
       ...I...J...  J is_I_on_Left changes between two steps, it's
       an indication that the crossing happened.
     */
+
+    assertNotCoincident( XYtraj, 0, I, J );
     // loop over rows
     for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
 
       // does a crossing occur at time-index ti between trajectories I and J?
       try {
 
-        // Check that coordinates do not coincide.
-        assertNotCoincident( XYtraj, ti, I, J );
+        // Check that end-points do not coincide
+        // (beginning was checked in previous iteration)
+        assertNotCoincident( XYtraj, ti+1, I, J );
 
         // first element is true if crossing occurs
         // second element stores data about crossing 
@@ -904,6 +920,7 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const int precision)
 {
   int code = 0;
+
   if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X
     code = 2; // for code explanation, see PWXexception
     if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y
