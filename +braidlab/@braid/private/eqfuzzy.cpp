@@ -3,7 +3,7 @@
 //
 // Check equality of two vectors up to D float-representable numbers.
 //
-// See areEqual.m for documentation.
+// See eqfuzzy.m for documentation.
 
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
@@ -30,7 +30,7 @@
 // LICENSE>
 
 
-#include "areEqual.hpp"
+#include "eqfuzzy.hpp"
 #include "mex.h"
 
 int BRAIDLAB_debuglvl = -1;
@@ -44,12 +44,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   if ( nrhs < 2 ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:notenoughinputs",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:notenoughinputs",
                          "At least two inputs are required");
   }
 
   if (2 <= BRAIDLAB_debuglvl)  {
-    printf("areEqual: cpp implementation\n");
+    printf("eqfuzzy: cpp implementation\n");
     mexEvalString("pause(0.001);"); //flush
   }
 
@@ -61,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   else {
     if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
         !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:incorrectprecision",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:incorrectprecision",
                          "Precision must be a noncomplex scalar double.");
     }
     D = (size_t) mxGetScalar(prhs[2]);
@@ -75,26 +75,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // check that the sizes of inputs match
   if ( nSizesA != nSizesB ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:unmatchedinputs",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:unmatchedinputs",
                          "First two inputs have to have same dimensions.");
   }
 
   mwSize totalN = 1;
   for ( size_t k = 0; k < nSizesA; k++ ) {
     if ( sizesA[k] != sizesB[k] ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:unmatchedinputs",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:unmatchedinputs",
                          "First two inputs have to have same size.");
     }
     totalN *= sizesA[k];
   }
 
   if( !mxIsDouble(prhs[0]) || mxIsComplex(prhs[0]) )
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:badinputs",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:badinputs",
                          "First input has to be a real matrix.");
   double *A = mxGetPr( prhs[0] );
 
   if( !mxIsDouble(prhs[1]) || mxIsComplex(prhs[1]) )
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:areequal:badinputs",
+      mexErrMsgIdAndTxt( "BRAIDLAB:braid:eqfuzzy:badinputs",
                          "Second input has to be a real matrix.");
   double *B = mxGetPr( prhs[1] );
 
@@ -104,7 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // compare all elements
   for ( size_t k = 0; k < totalN; k++ ) {
-    R[k] = areEqual( A[k], B[k], D );
+    R[k] = eqfuzzy( A[k], B[k], D );
   }
 
 }

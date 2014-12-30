@@ -80,7 +80,7 @@
 #endif
 
 #include "mex.h" 
-#include "areEqual.hpp"
+#include "eqfuzzy.hpp"
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -402,7 +402,7 @@ public:
 
 
 // check if a and b are within D-th representable number of each other
-bool areEqual( double a, double b, int D);
+bool eqfuzzy( double a, double b, int D);
 
 /*
   Check that coordinates of trajectories I and J do not coincide at
@@ -419,7 +419,7 @@ bool areEqual( double a, double b, int D);
   both X and Y coordinates coincide, this is a true trajectory
   intersection, which means that the braid is undefined. 
 
-  Equality is checked by a custom areEqual function checks equality 
+  Equality is checked by a custom eqfuzzy function checks equality 
   within 10 float-representable increments (or as set by the last argument).
 */
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
@@ -505,7 +505,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
     // at the same time
     blockEnd = blockStart;
     blockEnd++;
-    while ( areEqual( blockStart->t,blockEnd->t,2 ) ) {// within 2-float numbers
+    while ( eqfuzzy( blockStart->t,blockEnd->t,2 ) ) {// within 2-float numbers
       blockEnd++;
     }
 
@@ -769,7 +769,7 @@ bool Strings::applyCrossings
   std::list<PWX>::iterator it = concurrentBlock.begin();
   while ( it != concurrentBlock.end() ) {
 
-    mxAssert(areEqual(blockTime,it->t,2),
+    mxAssert(eqfuzzy(blockTime,it->t,2),
        "The block of crossings should have the same time (up to 2 representable doubles).");
 
     if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
@@ -926,9 +926,9 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
 {
   int code = 0;
 
-  if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X
+  if ( eqfuzzy(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X
     code = 2; // for code explanation, see PWXexception
-    if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y
+    if ( eqfuzzy(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y
       code = 3; // for code explanation, see PWXexception
     }
   }

@@ -42,7 +42,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX) areEqual.$(MEXSUFFIX)
+all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX) eqfuzzy.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -76,12 +76,12 @@ entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 cross2gen_helper.$(MEXSUFFIX): cross2gen_helper.cpp \
-	cross2gen_helper.hpp areEqual.hpp ThreadPool_nofuture.h ThreadPool.h
+	cross2gen_helper.hpp eqfuzzy.hpp ThreadPool_nofuture.h ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
-areEqual.$(MEXSUFFIX): areEqual.cpp \
-	areEqual.hpp
+eqfuzzy.$(MEXSUFFIX): eqfuzzy.cpp \
+	eqfuzzy.hpp
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 

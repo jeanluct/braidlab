@@ -76,11 +76,11 @@ for I = 1:n
     dXtraj = Xtraj1 - Xtraj2;
 
     % Use relative precision to test equality (same as C++ code).
-    nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
+    nearcoinc = find(eqfuzzy(Xtraj1, Xtraj2, 10));
 
     if ~isempty(nearcoinc)
       % Use relative precision to test equality (same as C++ code).
-      if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
+      if any(eqfuzzy(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
               mat2str([I J]) )
       else

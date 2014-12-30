@@ -1,6 +1,6 @@
 //
 //
-// AREEQUAL
+// EQFUZZY
 //
 // Check equality of two vectors up to D float-representable numbers.
 //
@@ -26,13 +26,13 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-#ifndef BRAIDLAB_AREEQUAL_HPP
-#define BRAIDLAB_AREEQUAL_HPP
+#ifndef BRAIDLAB_EQFUZZY_HPP
+#define BRAIDLAB_EQFUZZY_HPP
 
 #include <cmath>
 
 // check for equality taking float precision into account
-bool areEqual( double a, double b, int D ) {
+bool eqfuzzy( double a, double b, int D ) {
 
   bool retval;
 

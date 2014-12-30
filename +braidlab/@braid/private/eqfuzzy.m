@@ -1,16 +1,16 @@
-function result = areEqual(A,B,D)
-%AREEQUAL   Check for equality within a given precision.
-%   EE = AREEQUAL(A,B,D) checks if elements of A and B are within D (int
+function result = eqfuzzy(A,B,D)
+%EQFUZZY   Check for equality within a given precision.
+%   EE = EQFUZZY(A,B,D) checks if elements of A and B are within D (int
 %   exponent) float-representable numbers of each other.  Returns a logical
 %   matrix EE of size equal to A and B containing results of tests.
 %
-%   AREEQUAL is implemented as a MATLAB MEX file. This file holds only its
+%   EQFUZZY is implemented as a MATLAB MEX file. This file holds only its
 %   documentation.
 %
 %   Example:
 %      A = rand(10,10);
-%      areEqual(A,A+5*eps(A),5)
-%      areEqual(A,A+5*eps(A),3)
+%      eqfuzzy(A,A+5*eps(A),5)
+%      eqfuzzy(A,A+5*eps(A),3)
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
