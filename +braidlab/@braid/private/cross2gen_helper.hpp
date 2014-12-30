@@ -623,8 +623,13 @@ void PairCrossings::detectCrossings( mwIndex I ) {
       ...I...J...  J is_I_on_Left changes between two steps, it's
       an indication that the crossing happened.
     */
-
-    assertNotCoincident( XYtraj, 0, I, J );
+    
+    try {
+      assertNotCoincident( XYtraj, 0, I, J );
+    }
+    catch( PWXexception& e ) {
+      listOfErrors.push_back( e );
+    }
     // loop over rows
     for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
 
