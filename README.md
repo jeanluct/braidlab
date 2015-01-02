@@ -41,3 +41,4 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [19]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
 
 [![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Fjeanluct%2Fbraidlab&_u=MAC~&tid=UA-46449211-2)]()
+[![Analytics](https://ga-beacon.appspot.com/UA-46449211-3/jeanluct/braidlab)](https://github.com/igrigorik/ga-beacon)
