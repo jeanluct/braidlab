@@ -3,3 +3,5 @@ _CBraid_ is a C++ library originally written by **[Jae Choon Cha](http://gt.post
 The library has been updated to run on modern compilers, and has been merged with _Braiding_ version v1.0 (2004/10/04) originally written by **[Juan Gonzalez-Meneses](http://personal.us.es/meneses/)** and distributed under the GPL.  Maria Cumplido contributed some code for computing sets of sliding circuits.
 
 The code is maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.edu/~jeanluc)**.
+
+[![Analytics](https://ga-beacon.appspot.com/UA-58116885-1/braidlab/readme)](https://github.com/igrigorik/ga-beacon)
