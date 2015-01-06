@@ -77,7 +77,7 @@ if d < 0,
   u = -u; 
 end
 
-if f == 1/2 && sign(x) ~= sign(d), 
+if (f == 1/2) & (sign(x) ~= sign(d))
   u = u/2; 
 end
 
