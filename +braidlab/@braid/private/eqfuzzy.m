@@ -57,15 +57,15 @@ function y = nextafter(x,d)
 %
 % Adapted from a function by Cleve Moler:
 % http://www.mathworks.com/matlabcentral/newsreader/view_thread/192
-   
+
 [f,e] = log2(abs(x));
 u = pow2(2,e-54);
-if x == 0, 
-  u = eps*realmin; 
+if x == 0,
+  u = eps*realmin;
 end
 
-if nargin < 2, 
-  d = 1; 
+if nargin < 2,
+  d = 1;
 end
 
 if d == 0
@@ -73,14 +73,14 @@ if d == 0
   return;
 end
 
-if d < 0, 
-  u = -u; 
+if d < 0,
+  u = -u;
 end
 
 if (f == 1/2) & (sign(x) ~= sign(d))
-  u = u/2; 
+  u = u/2;
 end
 
-y = nextafter(x, d - sign(d)) + u; 
+y = nextafter(x, d - sign(d)) + u;
 
 end

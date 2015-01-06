@@ -36,7 +36,7 @@ bool eqfuzzy( double a, double b, int D ) {
 
   bool retval;
 
-  if (a == b) 
+  if (a == b)
     retval = true;
   else{
     // ensure a < b
