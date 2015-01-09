@@ -241,7 +241,7 @@ characterize the braid group for~$\nn$ strings, denoted~$B_\nn$.
 
 
 \subsection{Constructing a braid from orbit data}
-\label{sec:braidfromdata}
+\label{sec:braidfromorbitdata}
 
 \index{braid!from data|(}%
 %
@@ -1914,9 +1914,9 @@ constructing braids.  If we give an optional projection angle %
 of~$\pi/2$ to \lstinline{taffy}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2)
-Error using colorbraiding
-Coincident projection coordinate; change projection angle
-   (type help braid.braid).
+Error using braidlab.braid/colorbraiding
+Paths of particles 3 and 2 have a coincident projection.
+Try changing the projection angle.
 \end{lstlisting}
 This corresponds to using the $y$ (vertical) axis to compute the braid, but as
 we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
