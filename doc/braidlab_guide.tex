@@ -2291,27 +2291,42 @@ try
 $ which gcc-4.7
 \end{lstlisting}
 to see if a path to the command exists.  If it does, you have an earlier
-compiler installed and you can proceed to build \braidlab\ as described in
-Section~\ref{sec:cloning} above, replacing the \lstinline{make} command with
+compiler installed and you can skip to the next paragraph.  If the
+\lstinline{which} command above didn't return anything, you can try to install
+an older version of GCC:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ make CC=gcc-4.7 CXX=g++-4.7
-\end{lstlisting}
-Note that this only works with Matlab R2014a or later.  Earlier versions of
-Matlab also require editing of a file called \lstinline{mexopts.sh}.
-
-If the \lstinline{which} command above didn't return anything, you can try to
-install an older version of GCC:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get install gcc-4.7 g++4.7
+$ sudo apt-get install gcc-4.7 g++-4.7
 \end{lstlisting}
 This last line is for Ubuntu and Debian Linux distributions.  Note that this
-will \emph{not} overwrite the default compiler.
+will \emph{not} overwrite the default compiler.  If your Linux distribution
+doesn't allow you to easily install the required compiler, you could always
+\href{https://gcc.gnu.org/releases.html}{compile and install it from scratch!}
+That's fairly tedious, though.
 
-If your Linux distribution doesn't allow you to easily install the required
-compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
-  and install it from scratch!}  That's fairly tedious, though. %
+Assuming that you now have a Matlab-supported compiler installed, you need to
+tell MEX to use it.  If you're lucky, this could be as easy as typing
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ mex -setup cpp
+\end{lstlisting}
+but typically this will just lead to Matlab using the wrong compiler anyways.
+In that case you can try and download
+\href{http://github.com/jeanluct/braidlab/raw/develop/devel/gcc-alternatives}{this
+  script}, then run it:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ bash ./gcc-alternatives
+\end{lstlisting}
+You will be prompted for your password (assuming you have administrator
+privileges), and then asked to select a compiler version.  You should then be
+able to compile \braidlab.  You can later switch back to your original
+compiler with the command 
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo update-alternatives --config gcc
+\end{lstlisting}
+
 \index{GCC compiler|)}%
 \index{Linux|)}%
 
