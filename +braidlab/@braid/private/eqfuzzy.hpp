@@ -4,8 +4,14 @@
 //
 // Check equality of two vectors up to D float-representable numbers.
 //
+
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
+//   Braidlab: a Matlab package for analyzing data using braids
+//
+//   http://github.com/jeanluct/braidlab
+//
+//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -22,9 +28,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
-// Use the group relations to shorten a braid word as much as
-// possible.
 
 #ifndef BRAIDLAB_EQFUZZY_HPP
 #define BRAIDLAB_EQFUZZY_HPP
