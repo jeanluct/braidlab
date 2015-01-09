@@ -107,7 +107,7 @@ try % trapping to ensure proper identification of strands
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = cross2gen_helper(XYtraj,t,Nthreads);
+    [gen,tcr] = cross2gen_helper(XYtraj,t,delta,Nthreads);
 
   catch me
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
