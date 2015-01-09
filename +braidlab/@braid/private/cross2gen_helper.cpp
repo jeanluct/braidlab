@@ -47,6 +47,11 @@ gen      - nG x 1 vector of generators in the braid
 tgen     - nG x 1 vector of timesteps ast which the generators were detected
 
 */
+
+#define p_XY (prhs[0])
+#define p_t (prhs[1])
+#define p_Nthreads (prhs[2])
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // read off global debug level
@@ -57,15 +62,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // read off number of threads that are requested
   size_t NThreadsRequested;
-  if (nrhs >= 3) {
-    if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
-        !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
+  if (nrhs >= 2) {
+    if ( !( !mxIsComplex(p_Nthreads) &&
+            mxGetNumberOfElements(p_Nthreads) == 1 ) ) {
       mexErrMsgIdAndTxt( "BRAIDLAB:braid:cross2gen_helper:threadsinput",
                          "Number of threads must be "
-                         "noncomplex scalar double.");
+                         "noncomplex scalar.");
     }
 
-    NThreadsRequested = (size_t) mxGetScalar(prhs[2]);
+    NThreadsRequested = (size_t) mxGetScalar(p_Nthreads);
     if (1 <= BRAIDLAB_debuglvl)  {
       printf("cross2gen_helper: Number of threads requested %d\n",
              NThreadsRequested );
@@ -73,7 +78,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
   else {
     NThreadsRequested = 0;
-  }
+  }  
 
 #ifdef BRAIDLAB_NOTHREADING
   if (2 <= BRAIDLAB_debuglvl)  {
@@ -106,13 +111,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:input",
                       "2 arguments required.");
 
-  Real3DMatrix trj = Real3DMatrix( prhs[0] );
+  Real3DMatrix trj = Real3DMatrix( p_XY );
   if ( trj.C() != 2 ) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:input",
                       "Trajectory should have 2 columns.");
   }
 
-  RealVector t = RealVector( prhs[1] );
+  RealVector t = RealVector( p_t );
 
   if ( trj.R() != t.N() ) {
     mexErrMsgIdAndTxt(
