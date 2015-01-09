@@ -611,8 +611,8 @@ each entry containing a \lstinline{laurpoly} object:
 
 ans(z) = + 1 - z^(-1)
 \end{lstlisting}
-Another option is to use Matlab's symbolic toolbox:
-\index{Matlab!symbolic toolbox}%
+Instead of \lstinline{laurpoly} objects, we can use Matlab's symbolic
+toolbox: \index{Matlab!symbolic toolbox}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> B = burau(braid([1 -2]),sym('t'))
 
@@ -625,6 +625,26 @@ where now \lstinline{B} is a matrix of \lstinline{sym} objects:
 
 ans = 1 - 1/t
 \end{lstlisting}
+
+\index{braid!Lawrence--Krammer representation|(}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|(}%
+Another well-known homological representation of braid groups is the
+Lawrence--Krammer representation \citep{Lawrence1990,Bigelow2001}.  It is
+given in terms of two parameters, usually denoted~$t$ and~$q$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> K = lk(braid([1 -2]),sym('t'),sym('q'))
+
+K = [ -(q-1)^2/q - q*t*(q-1),  -(q-1)/q,  (q^2-q+1)/q^2]
+    [                 -q^2*t,         0,              0]
+    [           -(q-1)/(q*t),  -1/(q*t),  (q-1)/(q^2*t)]
+\end{lstlisting}
+In this case there we cannot use \lstinline{laurpoly} entries, since the
+representation involves Laurent polynomials in two symbols.  For this reason,
+and because its size grows more rapidly with the number of strings (matrices
+of dimension $\tfrac12\nn(\nn-1)$), the Lawrence--Krammer representation is
+very slow to compute for large braids. %
+\index{braid!Lawrence--Krammer representation|)}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|)}%
 
 The reduced Burau matrix of a braid can be used to compute the
 \emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
