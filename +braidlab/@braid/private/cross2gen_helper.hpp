@@ -79,7 +79,7 @@
                                  // https://github.com/progschj/ThreadPool
 #endif
 
-#define ABSTOL_TIME (1e-14)
+#define ABSTOL_TIME (1e-18)
 
 #include "eqfuzzy.hpp"
 #include "mex.h" 
