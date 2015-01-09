@@ -79,8 +79,10 @@
                                  // https://github.com/progschj/ThreadPool
 #endif
 
-#include "mex.h" 
+#define ABSTOL_TIME (1e-14)
+
 #include "eqfuzzy.hpp"
+#include "mex.h" 
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -282,12 +284,14 @@ public:
   PairCrossings( Real3DMatrix& _XYtraj,
                  RealVector& _t, 
                  std::list<PWX>& crossingStorage, 
-                 std::list<PWXexception>& errorStorage) 
+                 std::list<PWXexception>& errorStorage,
+                 const double aAbsTol) 
     : listOfCrossings(crossingStorage),
       listOfErrors(errorStorage),
       XYtraj(_XYtraj),
       t(_t),
-      Nstrings(_XYtraj.S()) {}
+      Nstrings(_XYtraj.S()),
+      AbsTol(aAbsTol) {}
 
   // run the calculation on T threads
   void run( size_t T = 1 );
@@ -302,6 +306,7 @@ private:
   Real3DMatrix& XYtraj;
   RealVector& t;
   mwSize Nstrings;
+  double AbsTol;
 
 };
 
@@ -401,9 +406,6 @@ public:
 };
 
 
-// check if a and b are within D-th representable number of each other
-bool eqfuzzy( double a, double b, int D);
-
 /*
   Check that coordinates of trajectories I and J do not coincide at
   time-index ti.  
@@ -418,13 +420,10 @@ bool eqfuzzy( double a, double b, int D);
   Returns 2 if
   both X and Y coordinates coincide, this is a true trajectory
   intersection, which means that the braid is undefined. 
-
-  Equality is checked by a custom eqfuzzy function checks equality 
-  within 10 float-representable increments (or as set by the last argument).
 */
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const mwIndex I, const mwIndex J,
-                         const int precision = 10);
+                         const double AbsTol);
 
 // signum function
 template <typename T> int sgn(T val);
@@ -434,7 +433,8 @@ template <typename T> int sgn(T val);
 //////////////////////////// DEFINITIONS  ////////////////////////////
 
 std::pair< std::vector<int>, std::vector<double> >
-cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
+cross2gen( Real3DMatrix& XYtraj, RealVector& t,
+           const double AbsTol, size_t Nthreads )
 {
   Timer tictoc( 1 );
   tictoc.tic();
@@ -448,7 +448,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   std::list<PWX> crossings;
   std::list<PWXexception> crossingErrors;
 
-  PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors );
+  PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors, AbsTol );
 
   pairCrosser.run(Nthreads);
   tictoc.toc("cross2gen_helper: pairwise crossing detection", true);
@@ -505,7 +505,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
     // at the same time
     blockEnd = blockStart;
     blockEnd++;
-    while ( eqfuzzy( blockStart->t,blockEnd->t,2 ) ) {// within 2-float numbers
+    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) {// within 2-float numbers
       blockEnd++;
     }
 
@@ -625,7 +625,7 @@ void PairCrossings::detectCrossings( mwIndex I ) {
     */
     
     try {
-      assertNotCoincident( XYtraj, 0, I, J );
+      assertNotCoincident( XYtraj, 0, I, J, AbsTol );
     }
     catch( PWXexception& e ) {
       listOfErrors.push_back( e );
@@ -638,7 +638,7 @@ void PairCrossings::detectCrossings( mwIndex I ) {
 
         // Check that end-points do not coincide
         // (beginning was checked in previous iteration)
-        assertNotCoincident( XYtraj, ti+1, I, J );
+        assertNotCoincident( XYtraj, ti+1, I, J, AbsTol );
 
         // first element is true if crossing occurs
         // second element stores data about crossing 
@@ -769,7 +769,7 @@ bool Strings::applyCrossings
   std::list<PWX>::iterator it = concurrentBlock.begin();
   while ( it != concurrentBlock.end() ) {
 
-    mxAssert(eqfuzzy(blockTime,it->t,2),
+    mxAssert(std::abs(blockTime - it->t) < ABSTOL_TIME,
        "The block of crossings should have the same time (up to 2 representable doubles).");
 
     if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
@@ -807,7 +807,6 @@ void Strings::getTime( std::vector<double>& data ) {
   std::copy(t.begin(), t.end(), std::back_inserter(data));
 
 }
-
 
 // Attempt to apply a pairwise crossing to the list
 // Successful if two strings were next to each other
@@ -922,13 +921,13 @@ template <typename T> int sgn(T val) {
 // throws PWXexception otherwise
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const mwIndex I, const mwIndex J,
-                         const int precision)
+                         const double AbsTol)
 {
   int code = 0;
 
-  if ( eqfuzzy(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X
+  if ( eqfuzzy(XYtraj(ti, 0, I), XYtraj(ti, 0, J), AbsTol)  ) { // X
     code = 2; // for code explanation, see PWXexception
-    if ( eqfuzzy(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y
+    if ( eqfuzzy(XYtraj(ti, 1, I), XYtraj(ti, 1, J), AbsTol ) ) { // Y
       code = 3; // for code explanation, see PWXexception
     }
   }
