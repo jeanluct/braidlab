@@ -72,5 +72,6 @@ suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'databraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'taffyTest.m']);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite);
