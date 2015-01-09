@@ -96,11 +96,11 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 % tcr - times of generator occurrence
 
 try % trapping to ensure proper identification of strands
-  
+
   try % trapping to switch between MEX and Matlab versions
     assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
                         'forced']);
-    
+
     debugmsg('Using MEX algorithm')
 
     %% C++ version of the algorithm
@@ -111,19 +111,19 @@ try % trapping to ensure proper identification of strands
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')      
+    debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XYtraj,t);
     end
   end
 
 catch me
-  
+
   % Identify particles causing the error using IDX vector
   % and re-throw the error with appropriate reporting
   switch(me.identifier)
     case 'BRAIDLAB:braid:colorbraiding:coincidentparticles'
-      
+
       localPair = eval(me.message);
       sortedPair = idx(localPair);
 
@@ -173,7 +173,7 @@ global BRAIDLAB_threads
 if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
   % use the global variable to set the number of threads
   Nthreads = ceil(BRAIDLAB_threads);
-  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ... 
+  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ...
                     'BRAIDLAB_threads to: %d.'],Nthreads));
 else
   % try to autodetect the optimal number of threads (== number of cores)
