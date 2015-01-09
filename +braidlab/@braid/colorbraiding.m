@@ -79,6 +79,8 @@ if nargin < 3
   proj = 0;
 end
 
+delta = braidlab.prop('BraidAbsTol');
+
 % Rotate coordinates according to angle proj.  Note that since the
 % projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
@@ -113,7 +115,7 @@ try % trapping to ensure proper identification of strands
     else
     debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = cross2gen(XYtraj,t);
+      [gen,tcr,~] = cross2gen(XYtraj,t,delta);
     end
   end
 

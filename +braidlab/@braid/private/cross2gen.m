@@ -1,4 +1,4 @@
-function [gen,tcr,cross_cell] = cross2gen(XYtraj,t)
+function [gen,tcr,cross_cell] = cross2gen(XYtraj,t,delta)
 %CROSS2GEN   Convert a physical braid to a list of braid generators.
 %
 %   The order of each particle is determined according to its first (X)
@@ -53,8 +53,6 @@ function [gen,tcr,cross_cell] = cross2gen(XYtraj,t)
 import braidlab.util.debugmsg
 tic;
 n = size(XYtraj,3);
-
-delta = 1e-10; % for eqfuzzy
 
 cross_cell = cell(n); % Cell array for crossing times.
 
