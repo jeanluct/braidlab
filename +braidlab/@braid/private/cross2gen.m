@@ -75,12 +75,12 @@ for I = 1:n
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
 
-    % Use absolute precision to test equality (same as C++ code).
-    nearcoinc = find(eqfuzzy(Xtraj1,Xtraj2,delta));
+    % Use absolute precision to test equality.
+    nearcoinc = find(abs(dXtraj) < delta);
 
     if ~isempty(nearcoinc)
-      % Use absolute precision to test equality (same as C++ code).
-      if any(eqfuzzy(Ytraj1(nearcoinc),Ytraj2(nearcoinc),delta))
+      % Use absolute precision to test equality.
+      if any(abs(Ytraj1(nearcoinc)-Ytraj2(nearcoinc)) < delta)
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
               mat2str([I J]) )
       else
