@@ -82,7 +82,7 @@
                                  // https://github.com/progschj/ThreadPool
 #endif
 
-#define ABSTOL_TIME (1e-18)
+#define ABSTOL_TIME (1e-14)
 
 #include "eqfuzzy.hpp"
 #include "mex.h" 
@@ -508,9 +508,12 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
     // at the same time
     blockEnd = blockStart;
     blockEnd++;
-    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) {// within 2-float numbers
+    // all times within ABSTOL_TIME are considered to being concurrent
+    // blockEnd is the first non-concurrent crossing
+    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) { 
       blockEnd++;
     }
+    
 
     // apply the crossings to the permutation vector and update the braid
     bool success = stringSet.applyCrossings(blockStart, blockEnd);
@@ -754,38 +757,49 @@ bool Strings::applyCrossings
   ( std::list<PWX>::iterator start, std::list<PWX>::iterator end )
 {
 
+  mxAssert( distance(start, end) > 0,
+            "Block has to contain at least one crossing" );
+
+  if (3 <= BRAIDLAB_debuglvl)  {
+    printf("Concurrent block size: %d\n", distance(start, end) );
+  }
+
   // single crossing was sent -- if it cannot be applied successfuly,
   // there is no way to figure out what went wrong
-  if ( distance(start, end) <= 1) {
+  if ( distance(start, end) == 1) {
     return applyCrossing(*start);
   }
+  else {
 
-  double blockTime = start->t; // check that all crossings have the same time
+    double blockStartTime = start->t; 
 
-  // Multiple crossings were sent -- cycle through all of them and try
-  // to apply them sequentially and whittle the block to size zero.
-  // Every time we successfully apply a crossing, remove it from the list
-  // and re-start the application from the beginning.
-  // Reaching the end of the list means that in that pass, no applications
-  // were successful, so the list is inconsistent.
-  std::list<PWX> concurrentBlock( start, end );
-  std::list<PWX>::iterator it = concurrentBlock.begin();
-  while ( it != concurrentBlock.end() ) {
+    // Multiple crossings were sent -- cycle through all of them and try
+    // to apply them sequentially and whittle the block to size zero.
+    // Every time we successfully apply a crossing, remove it from the list
+    // and re-start the application from the beginning.
+    // Reaching the end of the list means that in that pass, no applications
+    // were successful, so the list is inconsistent.
+    std::list<PWX> concurrentBlock( start, end );
+    std::list<PWX>::iterator it = concurrentBlock.begin();
+    while ( it != concurrentBlock.end() ) {
 
-    mxAssert(std::abs(blockTime - it->t) < ABSTOL_TIME,
-       "The block of crossings should have the same time (up to 2 representable doubles).");
+      mxAssert(std::abs(blockStartTime - it->t) < ABSTOL_TIME,
+               "Entire block should be roughly concurrent.");
 
-    if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
-      concurrentBlock.erase(it);
-      it = concurrentBlock.begin();
+      if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
+        printf("Crossing applied successfuly\n");
+        concurrentBlock.erase(it);
+        it = concurrentBlock.begin();
+      }
+      else { // not successful -- try the next
+        printf("Crossing not applied successfuly\n");        
+        it++;
+      }
     }
-    else { // not successful -- try the next
-      it++;
-    }
+
+    // only empty list is a success
+    return concurrentBlock.empty();
   }
-
-  // only empty list is a success
-  return !concurrentBlock.empty();
 
 }
 
