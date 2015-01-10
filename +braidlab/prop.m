@@ -40,7 +40,7 @@ function [varargout] = prop(varargin)
 %   braid.loopcoords.  The option 'dehornoy' sets the basepoint to 'left'
 %   and also sets 'GenRotDir' to -1.  See braid.loopcoords.
 %
-%   See also BRAID, BRAID.LOOPCOORDS, BRAID.MTIMES, LOOP.
+%   See also BRAID, BRAID.BRAID, BRAID.LOOPCOORDS, BRAID.MTIMES, LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

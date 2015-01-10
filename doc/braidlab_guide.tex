@@ -1915,16 +1915,23 @@ of~$\pi/2$ to \lstinline{taffy}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2)
 Error using braidlab.braid/colorbraiding
-Paths of particles 3 and 2 have a coincident projection.
+Paths of particles 2 and 1 have a coincident projection.
 Try changing the projection angle.
 \end{lstlisting}
 This corresponds to using the $y$ (vertical) axis to compute the braid, but as
 we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
 the rods are initially perfectly aligned along that axis.  The braid obtained
 would depend sensitively on numerical roundoff when comparing the rod
-projections.  Instead of attempting to construct the braid, \braidlab\ returns
-an error and asks the user to modify the projection axis.  A tiny change in
-the projection line is sufficient to break the symmetry:
+projections.%
+%
+\footnote{\braidlab\ uses a property \lstinline{BraidAbsTol} to determine when
+  coordinates are close enough to be considered coincident, with a default
+  value of~$10^{-10}$.  See Section~\ref{sec:prop} for how to set global
+  properties.}
+%
+Instead of attempting to construct the braid, \braidlab\ returns an error and
+asks the user to modify the projection axis.  A tiny change in the projection
+line is sufficient to break the symmetry:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2 + .01)
 
@@ -2109,6 +2116,7 @@ To see the properties available and their current values, use the
 ans =         GenRotDir: 1
           GenLoopActDir: 'lr'
        GenPlotOverUnder: 1
+            BraidAbsTol: 1.0000e-10
            BraidPlotDir: 'bt'
     LoopCoordsBasePoint: 'right'
 \end{lstlisting}
