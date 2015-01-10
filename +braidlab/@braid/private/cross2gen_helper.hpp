@@ -84,7 +84,6 @@
 
 #define ABSTOL_TIME (1e-14)
 
-#include "eqfuzzy.hpp"
 #include "mex.h" 
 
 int BRAIDLAB_debuglvl = -1;
@@ -787,12 +786,10 @@ bool Strings::applyCrossings
                "Entire block should be roughly concurrent.");
 
       if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
-        printf("Crossing applied successfuly\n");
         concurrentBlock.erase(it);
         it = concurrentBlock.begin();
       }
       else { // not successful -- try the next
-        printf("Crossing not applied successfuly\n");        
         it++;
       }
     }
@@ -942,9 +939,9 @@ void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
 {
   int code = 0;
 
-  if ( eqfuzzy(XYtraj(ti, 0, I), XYtraj(ti, 0, J), AbsTol)  ) { // X
+  if ( std::abs(XYtraj(ti, 0, I) - XYtraj(ti, 0, J)) < AbsTol ) { // X
     code = 2; // for code explanation, see PWXexception
-    if ( eqfuzzy(XYtraj(ti, 1, I), XYtraj(ti, 1, J), AbsTol ) ) { // Y
+    if ( std::abs(XYtraj(ti, 1, I) - XYtraj(ti, 1, J)) < AbsTol ) { // Y
       code = 3; // for code explanation, see PWXexception
     }
   }
