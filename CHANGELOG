@@ -1,9 +1,14 @@
 ------------------------------------------------------------------------
-3.1 [2015-01-09]
+3.1 [2015-01-xx]
 
 * The function braidlab.prop can be used to set global properties,
   such as the way braids are plotted and the direction of rotation for
   generators.
+
+* braidlab.prop can set the absolute tolerance for determining
+  coincidence of coordinates when constructing a braid from data
+  (property BraidAbsTol).  This replaces the previous relative
+  comparison which had been used since 2.0.
 
 * braid.plot takes color and linestyle attributes.
 
