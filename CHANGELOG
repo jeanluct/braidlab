@@ -8,7 +8,7 @@
 * braidlab.prop can set the absolute tolerance for determining
   coincidence of coordinates when constructing a braid from data
   (property BraidAbsTol).  This replaces the previous relative
-  comparison which had been used since 2.0.
+  comparison which had been used since 2.0.  (See issue #117.)
 
 * braid.plot takes color and linestyle attributes.
 
@@ -16,9 +16,17 @@
 
 * The class annbraid is used to represent braids on annular domains.
 
+* databraids are displayed differently to braids, showing the crossing
+  times.
+
 * The braidlab guide has been expanded with an introduction to braids.
 
-* Setting up alternative compilers is described in the guide.
+* Setting up alternative compilers is described in the troubleshooting
+  section of the guide.
+
+* The taffy example in the guide no longer worked, due to some bugs in
+  braid creation code when coincident coordinates are involved.  (See
+  issues #116 and #117.)
 
 * Some bugfixes.
 
