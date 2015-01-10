@@ -101,8 +101,11 @@ classdef entropyTest < matlab.unittest.TestCase
       % Try a braid with more than 100 strings, so the maximum number of
       % iterations is determined by asymptotic spectral gap.  Have to use
       % higher tolerance, since the entropy converges slowly.
-      e = entropy(testCase.b6,'Tol',.01*tol);
-      testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
+      global BRAIDLAB_braid_nomex
+      if ~BRAIDLAB_braid_nomex    % Skip this test if not using MEX.
+        e = entropy(testCase.b6,'Tol',.01*tol);
+        testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
+      end
 
       % Specify 0 tolerance: should not issue a warning about lack of
       % convergence.
