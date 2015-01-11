@@ -84,7 +84,7 @@
 
 #define ABSTOL_TIME (1e-14)
 
-#include "mex.h" 
+#include "mex.h"
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -224,13 +224,13 @@ public:
   // The next line is for gcc >= 4.8 (c++11 I think).
   // using std::logic_error::logic_error;
   // Explicitly declare and define the constructor instead.
-  PWXexception(const std::string& __arg, mwIndex I, mwIndex J) : 
+  PWXexception(const std::string& __arg, mwIndex I, mwIndex J) :
     std::logic_error(__arg), L(I), R(J) {};
 
   int code;
-  
+
   mwIndex L, R; // particles causing the error
- 
+
   // return code of the Matlab error that should be reported
   const char* id() {
     switch (code) {
@@ -284,10 +284,10 @@ public:
   // inputs: _XYtraj (trajectory) _t (time)
   // output: storage
   PairCrossings( Real3DMatrix& _XYtraj,
-                 RealVector& _t, 
-                 std::list<PWX>& crossingStorage, 
+                 RealVector& _t,
+                 std::list<PWX>& crossingStorage,
                  std::list<PWXexception>& errorStorage,
-                 const double aAbsTol) 
+                 const double aAbsTol)
     : listOfCrossings(crossingStorage),
       listOfErrors(errorStorage),
       XYtraj(_XYtraj),
@@ -387,7 +387,7 @@ private:
   .first  - true if crossing occured
   .second  - crossing data containing crossing information
 
-  Throws PWXexception in case input trajectories 
+  Throws PWXexception in case input trajectories
   overlap in X or XY coordinates.
 */
 std::pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
@@ -410,18 +410,18 @@ public:
 
 /*
   Check that coordinates of trajectories I and J do not coincide at
-  time-index ti.  
+  time-index ti.
 
-  Returns 0 if 
+  Returns 0 if
   X coordinates do not coincide (everything is OK).
 
-  Returns 1 if 
+  Returns 1 if
   only X coordinates coincide for a pair of strings. This means a
-  different projection angle will fix things. 
+  different projection angle will fix things.
 
   Returns 2 if
   both X and Y coordinates coincide, this is a true trajectory
-  intersection, which means that the braid is undefined. 
+  intersection, which means that the braid is undefined.
 */
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const mwIndex I, const mwIndex J,
@@ -458,7 +458,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
   // there were crossingErrors in pairwise detection
   if (! crossingErrors.empty() ) {
     int count  = 1;
-    // output individual errors 
+    // output individual errors
     if (1 <= BRAIDLAB_debuglvl)  {
       mexPrintf("List of all crossingErrors encountered:\n");
       for( std::list<PWXexception>::iterator e = crossingErrors.begin();
@@ -509,10 +509,10 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
     blockEnd++;
     // all times within ABSTOL_TIME are considered to being concurrent
     // blockEnd is the first non-concurrent crossing
-    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) { 
+    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) {
       blockEnd++;
     }
-    
+
 
     // apply the crossings to the permutation vector and update the braid
     bool success = stringSet.applyCrossings(blockStart, blockEnd);
@@ -628,7 +628,7 @@ void PairCrossings::detectCrossings( mwIndex I ) {
       ...I...J...  J is_I_on_Left changes between two steps, it's
       an indication that the crossing happened.
     */
-    
+
     try {
       assertNotCoincident( XYtraj, 0, I, J, AbsTol );
     }
@@ -646,7 +646,7 @@ void PairCrossings::detectCrossings( mwIndex I ) {
         assertNotCoincident( XYtraj, ti+1, I, J, AbsTol );
 
         // first element is true if crossing occurs
-        // second element stores data about crossing 
+        // second element stores data about crossing
         std::pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
 
         // interpolated crossing stored in PWX structure interpCross
@@ -770,7 +770,7 @@ bool Strings::applyCrossings
   }
   else {
 
-    double blockStartTime = start->t; 
+    double blockStartTime = start->t;
 
     // Multiple crossings were sent -- cycle through all of them and try
     // to apply them sequentially and whittle the block to size zero.

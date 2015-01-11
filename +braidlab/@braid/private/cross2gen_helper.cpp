@@ -112,7 +112,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if ( AbsTol <= 0 )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:abstolnonpositive",
                       "AbsTol must be a positive number.");
-  
+
 
   Timer tictoc(1);
 
