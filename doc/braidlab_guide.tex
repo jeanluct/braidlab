@@ -1802,7 +1802,13 @@ rotation.  (There are several videos of taffy pullers on
 \href{http://www.youtube.com/watch?v=6QkGp2qBbn4}{YouTube}.)
 
 Let's use \braidlab\ to analyze the rod motion.  From the folder
-\lstinline{doc/examples}, run the command %
+\lstinline{doc/examples}, run the command%
+%
+\footnote{When using the parallel code, the generator sequences in this
+  section may sometimes differ from run-to-run, due to the simultaneous
+  crossings.  However, the braids themselves are still equal, after the
+  relations~\eqref{eq:relations} are taken into account.}
+%
 \index{taffy@\lstinline{taffy}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = taffy('3rods')
