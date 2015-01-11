@@ -102,7 +102,8 @@ classdef entropyTest < matlab.unittest.TestCase
       % iterations is determined by asymptotic spectral gap.  Have to use
       % higher tolerance, since the entropy converges slowly.
       global BRAIDLAB_braid_nomex
-      if ~BRAIDLAB_braid_nomex    % Skip this test if not using MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Skip this test if not using MEX.
         e = entropy(testCase.b6,'Tol',.01*tol);
         testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
       end
