@@ -10,7 +10,7 @@ See the [*braidlab* user's guide][4].  If you already downloaded *braidlab* the 
 
 [Michael Allshouse][6] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Train][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; Jakob Progsch's [ThreadPool][12]; and John R. Gilbert's [function][13] for computing the Smith Normal Form of a matrix.
+*braidlab* uses Toby Hall's [Trains][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; Jakob Progsch's [ThreadPool][12]; and John R. Gilbert's [function][13] for computing the Smith Normal Form of a matrix.
 
 ### license
 
@@ -26,7 +26,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [4]: http://github.com/jeanluct/braidlab/raw/master/doc/braidlab_guide.pdf
 [5]: http://arxiv.org/abs/1410.0849
 [6]: http://chaos.utexas.edu/people/post-docs/michael-allshouse
-[7]: http://www.liv.ac.uk/~tobyhall/T_Hall.html
+[7]: https://github.com/jeanluct/trains
 [8]: https://github.com/jeanluct/cbraid
 [9]: http://personal.us.es/meneses/software.php
 [10]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
@@ -39,3 +39,5 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [17]: http://www.nsf.gov
 [18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
 [19]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
+
+[![Analytics](https://ga-beacon.appspot.com/UA-46449211-2/braidlab/readme)](https://github.com/igrigorik/ga-beacon)

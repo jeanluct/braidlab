@@ -76,7 +76,7 @@ classdef cycleTest < matlab.unittest.TestCase
     function test_cycle(testCase)
       [M1,period1,it1] = cycle(testCase.b1); %#ok<*PROP>
       [M2,period2,it2] = cycle(testCase.b2);
-      [M12,period12,it12] = cycle(tensor(testCase.b1,testCase.b2));
+      [~,period12,it12] = cycle(tensor(testCase.b1,testCase.b2));
 
       % Check periods.
       testCase.verifyEqual(period1,testCase.period1);

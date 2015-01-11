@@ -58,6 +58,7 @@
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
+\newcommand{\annbraid}{\texttt{annbraid}}%{\lstinline{anbraid}}
 \newcommand{\loopc}{\texttt{loop}}%{\lstinline{loop}}
 
 \newcommand{\mathnotation}[2]{\newcommand{#1}{\ensuremath{#2}}}
@@ -69,19 +70,19 @@
 %
 % Symbols
 %
-\renewcommand{\l}{\left}			% \left
-\renewcommand{\r}{\right}			% \right
+\renewcommand{\l}{\left}                        % \left
+\renewcommand{\r}{\right}                       % \right
 \mathnotation{\ee}{\mathrm{e}}                  % Base of natural log
-\mathnotation{\nn}{n}				% # of strings
-\mathnotation{\ac}{a}				% Dynnikov coord a
-\mathnotation{\bc}{b}				% Dynnikov coord b
-\mathnotation{\cc}{c}				% Dynnikov coord c
-\mathnotation{\dc}{d}				% Dynnikov coord d
-\mathnotation{\fc}{f}				% Dynnikov coord f
+\mathnotation{\nn}{n}                           % # of strings
+\mathnotation{\ac}{a}                           % Dynnikov coord a
+\mathnotation{\bc}{b}                           % Dynnikov coord b
+\mathnotation{\cc}{c}                           % Dynnikov coord c
+\mathnotation{\dc}{d}                           % Dynnikov coord d
+\mathnotation{\fc}{f}                           % Dynnikov coord f
 \mathnotation{\acnew}{\ac'}
 \mathnotation{\bcnew}{\bc'}
-\mathnotation{\abv}{\bm{u}}			% Dynnikov coord vector
-\mathnotation{\ip}{i}				% Counter for braid elements
+\mathnotation{\abv}{\bm{u}}                     % Dynnikov coord vector
+\mathnotation{\ip}{i}                           % Counter for braid elements
 \newcommand{\pos}[1]{#1^+}
 \renewcommand{\neg}[1]{#1^-}
 \mathnotation{\ldef}{\mathrel{\raisebox{.069ex}{:}\!\!=}}% Left define
@@ -131,6 +132,175 @@ showstringspaces=false}
 \end{abstract}
 
 \tableofcontents
+
+
+\section{What are braids?}
+
+\subsection{A brief introduction to the braid group}
+\label{sec:braidgroup}
+
+\index{braid!group|(}%
+\index{braid!geometric|(}%
+Braids are collections of strings anchored between two planes,
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \includegraphics[height=.2\textheight]{geombraid}
+      \label{fig:geombraid}
+    }\hspace{.25\textwidth}
+    \subfigure[]{
+      \includegraphics[height=.2\textheight]{sbdiag}
+      \label{fig:sbdiag}
+    }
+  \end{center}
+  \caption{(a) A geometric braid with five strings.  (b) The corresponding
+    braid diagram.}
+\end{figure}
+%
+as in Fig.~\ref{fig:geombraid}.  More precisely this is called a
+\emph{geometric braid}.  In this case we can think of the vertical axis as
+`time' and the horizontal axes as `space.'  The strings cannot occupy the same
+point in space at the same time, and they can't reverse direction (i.e., they
+can't go back in time).  We consider two braids to be equal if their strings
+can be deformed into each other, with no string crossing another.  The points
+on the bottom plane where the strings emanate in Fig.~\ref{fig:geombraid} are
+the same as the points on the top plane.  In that sense braids naturally
+represent \emph{periodic orbits} of two-dimensional dynamical systems.  When
+slicing the braid horizontally at any given time we get a collection of points
+in the 2D plane, corresponding to the strings.  We call these points
+\emph{punctures} or \emph{particles}. %
+\index{punctures}
+
+In fact the set of all braids with a given number of strings, and the same
+anchorpoints, form a \emph{group}.  The group multiplication law is simply to
+lay one braid after another; it is easy to see that this is associative.  The
+identity braid consists of straight strings that are unentangled with each
+other.  The inverse of a braid is obtained by reversing time.  (See the book
+by \citeauthor{Birman1975} for more details.)  \index{braid!geometric|)}%
+
+\index{braid!algebraic|(}%
+A convenient way to represent a braid is to deform it %
+as in Fig,~\ref{fig:sbdiag}.  Here the geometric braid is combed such that
+only one crossing occurs at a time, and each crossing fits in a time interval
+of the same length.  Such a picture is called a \emph{braid diagram}.  The
+operation of the~$i$th string (counted from left to right) being exchanged
+with the~$(i+1)$th string, such that the left string passes over the right, is
+called a %
+\index{braid!generator|(}%
+\emph{generator} of the braid group, as is denoted~$\sigma_i$.  Any element of
+the braid group on~$\nn$ strings can be written as a product of the
+generators~$\{\sigma_1,\ldots,\sigma_{\nn-1}\}$ and their inverses.  Thus, the
+braid in Fig.~\ref{fig:sbdiag} can be written
+\begin{equation}
+  \sigma_3\,\sigma_2^{-1}\sigma_1^{-1}\,\sigma_2\sigma_3^{-1}
+  \sigma_2\sigma_1^{-1}\sigma_3^{-1}\,,
+  \label{eq:sbdiag}
+\end{equation}
+where we read the generators from left to right, and from bottom to top in
+Fig.~\ref{fig:sbdiag}.  A braid written in terms of generators as
+in~\eqref{eq:sbdiag} is called an \emph{algebraic braid}.
+\index{braid!algebraic|)}%
+
+% 
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \raisebox{.09\textwidth}{%
+        \includegraphics[width=.35\textwidth]{13is31}}
+      \label{fig:13is31}
+    }\hspace{.1\textwidth}
+    \subfigure[]{
+      \includegraphics[width=.35\textwidth]{121is212}
+      \label{fig:121is212}
+    }
+  \end{center}
+  \caption{(a) Generators that don't share a string commute.  (b) The braid
+    relation.}
+  \label{fig:relations}
+\end{figure}
+%
+The generators obey some special rules, called \emph{relations}, by virtue of
+arising from geometrical braids.  The relations are
+\begin{equation}
+  \sigma_j\sigma_k=\sigma_k\sigma_j, \quad \lvert j-k\rvert > 1; \qquad
+  \sigma_j\sigma_k\sigma_j = \sigma_k\sigma_j\sigma_k, \quad \lvert j-k\rvert=1.
+  \label{eq:relations}
+\end{equation}
+The first type of relation, depicted in Fig.~\ref{fig:13is31}, says that
+generators commute if they don't share a string.  The second type, often
+called the braid relation, reflects the equality of the two braids shown in
+Fig.~\ref{fig:121is212}.  While it's obvious from Fig.~\ref{fig:relations}
+that the relations~\eqref{eq:relations} are satisfied, it is far less obvious
+that those are the \emph{only} relations that hold, as proved by
+\citet{Artin1947}.  Hence, the relations~\eqref{eq:relations} fully
+characterize the braid group for~$\nn$ strings, denoted~$B_\nn$.
+
+\index{braid!generator|)}
+\index{braid!group|)}%
+
+
+\subsection{Constructing a braid from orbit data}
+\label{sec:braidfromorbitdata}
+
+\index{braid!from data|(}%
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \includegraphics[width=.3\textwidth]{crossing}
+      \label{fig:crossing}
+    }\hspace{.2\textwidth}
+    \subfigure[]{
+      \includegraphics[width=.3\textwidth]{crossing2}
+      \label{fig:crossing2}
+    }
+  \end{center}
+  \caption{(a) The two types of generators that occur when particles exchange
+    positions.  (b) A particle exchanging position twice in a row with another
+    leads to the generators~$\sigma_i$ followed by~$\sigma_i^{-1}$, which
+    cancel each other. [After~\citet{Thiffeault2005}.]}
+\end{figure}
+%
+
+So far we have regarded braids as geometrical objects, and showed how to turn
+them into algebraic objects by writing them in terms of generators.  But in
+practice how do we create braids from particle orbits?  That is, if we have
+two-dimensional continuous trajectory data arising from some dynamical system,
+how do we turn this data into a braid?
+
+\index{projection line|(}%
+The technique to do this was described in \citet{Thiffeault2005}.  We define
+an arbitrary line in the 2D plane, called the \emph{projection line}, and look
+at the order of the particles projected along that line.  We label each
+particle according to its order when projected on this line.  In
+Fig.~\ref{fig:crossing}, for example, we see three particles labeled~$i$,
+$i+1$, $i+2$, where the projection line is the horizontal.
+
+\index{crossing|(}%
+A \emph{crossing} occurs whenever any two particles exchange position (only
+adjacent particles can exchange position at a given time, since the
+trajectories are continuous).  For particle~$i$ exchanging position with
+particle~$i+1$, we assign a generator~$\sigma_i$ to the crossing if the
+particle on the left passes above the one on the right, and~$\sigma_i^{-1}$ if
+it passes below (Fig.~\ref{fig:crossing}).  As we watch the trajectories
+unfold, we construct an algebraic braid as a sequence of generators, with each
+generator corresponding to a crossing, and their order determined by when each
+crossing occurs.  Note that when two particles exchange position along the
+crossing line twice as in Fig.~\ref{fig:crossing2}, without exchanging
+positions vertically, then the two crossings yield the generators~$\sigma_i$
+followed by~$\sigma_i^{-1}$, which cancel. %
+\index{projection line|)}%
+\index{crossing|)}%
+
+The outcome of this procedure is not a true geometric braid, since the
+particles do not necessarily end up in the same positions as they started.
+(If the particles are part of a periodic orbit, then we do obtain a geometric
+braid.)  We do however obtain an algebraic braid, and as long as we are
+careful to take long enough trajectories the fact that the geometric braid
+does not close will not be too consequential.
+
+\index{braid!from data|)}%
 
 
 \section{A tour of \braidlab}
@@ -441,8 +611,8 @@ each entry containing a \lstinline{laurpoly} object:
 
 ans(z) = + 1 - z^(-1)
 \end{lstlisting}
-Another option is to use Matlab's symbolic toolbox:
-\index{Matlab!symbolic toolbox}%
+Instead of \lstinline{laurpoly} objects, we can use Matlab's symbolic
+toolbox: \index{Matlab!symbolic toolbox}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> B = burau(braid([1 -2]),sym('t'))
 
@@ -455,6 +625,26 @@ where now \lstinline{B} is a matrix of \lstinline{sym} objects:
 
 ans = 1 - 1/t
 \end{lstlisting}
+
+\index{braid!Lawrence--Krammer representation|(}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|(}%
+Another well-known homological representation of braid groups is the
+Lawrence--Krammer representation \citep{Lawrence1990,Bigelow2001}.  It is
+given in terms of two parameters, usually denoted~$t$ and~$q$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> K = lk(braid([1 -2]),sym('t'),sym('q'))
+
+K = [ -(q-1)^2/q - q*t*(q-1),  -(q-1)/q,  (q^2-q+1)/q^2]
+    [                 -q^2*t,         0,              0]
+    [           -(q-1)/(q*t),  -1/(q*t),  (q-1)/(q^2*t)]
+\end{lstlisting}
+In this case there we cannot use \lstinline{laurpoly} entries, since the
+representation involves Laurent polynomials in two symbols.  For this reason,
+and because its size grows more rapidly with the number of strings (matrices
+of dimension $\tfrac12\nn(\nn-1)$), the Lawrence--Krammer representation is
+very slow to compute for large braids. %
+\index{braid!Lawrence--Krammer representation|)}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|)}%
 
 The reduced Burau matrix of a braid can be used to compute the
 \emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
@@ -543,6 +733,101 @@ The writhe is a braid invariant.
 \index{braid class@\braid\ class!writhe@\lstinline{writhe}|)}%
 
 
+\subsubsection{The \annbraid\ subclass}
+\label{sec:annbraid}
+
+\index{annbraid@\lstinline{annbraid}|(}
+\index{punctures!in annulus|(}
+%
+\begin{figure}
+  \begin{center}
+    \subfigure[]{
+      \includegraphics[width=.4\textwidth]{annulardomain}
+      \label{fig:annulardomain}
+    }\hspace{1em}
+    \subfigure[]{
+      \raisebox{3.75em}{\includegraphics[width=.5\textwidth]{annulardomain2}}
+      \label{fig:annulardomain2}
+    }
+  \end{center}
+  \caption{(a) Punctures in an annular domain, with two generators.  The
+    generator~$\Sigma_\nn$ is unique to the annulus.  (b) The punctures
+    rearranged with the center of the annulus as an extra puncture on the
+    right, showing how the generator~$\Sigma_\nn$ can be deformed in terms of
+    standard generators as in~\eqref{eq:Sigman}.}
+\end{figure}
+%
+
+Often it is useful to consider braids in an annular domain, as in
+Fig.~\ref{fig:annulardomain}.  Since it doesn't change the overall topology,
+it is convenient to rearrange the punctures as in
+Fig.~\ref{fig:annulardomain2}.  The center of the annulus becomes an extra
+puncture, but that extra puncture is fixed.  For~$\nn$ moving punctures, the
+braid group on the annulus has~$\nn$
+generators~$\{\Sigma_1,\ldots,\Sigma_\nn\}$, one more than for the standard
+braid group owing to the fixed puncture.  These are related to the standard
+generators by~$\Sigma_i=\sigma_i$ for~$1 \le i <\nn$, and
+\begin{equation}
+  \Sigma_\nn = \sigma_\nn^2 \sigma_{\nn-1} \cdots \sigma_2\,\sigma_1\,
+  \sigma_2^{-1} \cdots \sigma_{\nn-1}^{-1} \sigma_\nn^{-2}\,.
+  \label{eq:Sigman}
+\end{equation}
+This last generator effectively exchanges puncture~$\nn$ with puncture~$1$,
+exploiting the annular topology.
+
+\braidlab\ support annular braids with the subclass \annbraid, derived from
+\braid.  The syntax for creating an annular braid is
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b = annbraid([1 2 -3])
+
+b = < 1  2 -3 >*
+\end{lstlisting}
+The asterisk indicates that this is an annular braid, which has an extra fixed
+puncture on the right (called the basepoint).  Hence, the braid has~$4$
+punctures, as indicated by
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b.n    % total number of punctures, including the fixed one
+
+ans = 4
+\end{lstlisting}
+but only~$3$ punctures can move, as returned by \lstinline{nann}, the number
+of annular punctures:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> b.nann    % number of moving punctures
+
+ans = 3
+\end{lstlisting}
+
+Many of the methods work described for the \lstinline{braid} class can be
+applied to \annbraid{}s.  For instance,
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> entropy(braid([1 -2])))      % entropy of a normal braid
+
+ans = 0.9624
+>> entropy(annbraid([1 -2])))   % entropy of annular braid
+
+ans = 1.7627
+\end{lstlisting}
+The annular braid has more entropy, since curves grow faster by getting
+entangled on the extra puncture.
+%
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{annbraid_s1s-2}
+  \end{center}
+  \caption{The output of \lstinline{plot(annbraid([1 -2]))}.  The green strand
+    represents the center of the annulus, as in
+    Fig.~\ref{fig:annulardomain2}. (See Section~\ref{sec:prop} for how to plot
+    braids sideways.)}
+  \label{fig:annbraid_s1s-2}
+\end{figure}
+%
+The annular braid is shown in Fig.~\ref{fig:annbraid_s1s-2}.
+
+\index{punctures!in annulus|)}
+\index{annbraid@\lstinline{annbraid}|)}
+
+
 \subsection{Constructing a braid from data}
 \label{sec:braidfromdata}
 
@@ -555,7 +840,8 @@ One of the main purposes of \braidlab\ is to analyze two-dimensional
 trajectory data using braids.  We can assign a braid to trajectory data by
 looking for \emph{crossings} %
 \index{crossing}%
-along a projection line~\citep{Thiffeault2005,Thiffeault2010}. %
+along a projection line (see \citet{Thiffeault2005,Thiffeault2010} and
+Section~\ref{sec:braidfromdata}). %
 \index{projection line|(}%
 The \braid\ constructor allows us to do this easily.
 
@@ -779,7 +1065,8 @@ ordering of the crossing times.
   the crossing times of the first braid are all earlier than the second.
 \item Powers and inverses of \hbox{\lstinline{databraid}s} are not defined,
   since this would break the time-ordering of crossings.
-\item\index{FTBE (Finite Time Braiding Exponent)|(}%
+\item%
+  \index{Finite Time Braiding Exponent (FTBE)|(}%
   \index{braid class@\braid\ class!entropy@\lstinline{entropy}}%
   \index{braid class@\braid\ class!complexity@\lstinline{complexity}}%
   The entropy of a \lstinline{databraid} is an ambiguously defined concept.
@@ -791,7 +1078,7 @@ ordering of the crossing times.
   \lstinline{databraid} objects to \lstinline{braid} objects; however, this
   should be avoided in favor of the appropriate concept for
   \hbox{\lstinline{databraid}s},
-  the Finite Time Braiding Exponent (FTBE) \citep{Thiffeault2005,Budisic2014}.
+  the Finite Time Braiding Exponent (FTBE) \citep{Thiffeault2005,Budisic2015}.
   A \lstinline{databraid}~$b_T$ recorded over a time interval of length~$T$
   has an FTBE defined by
   \begin{equation}
@@ -800,18 +1087,18 @@ ordering of the crossing times.
     \label{eq:ftbe}
   \end{equation}
   where $\ell$ is a loop given by the generating set for the fundamental group
-  of the disk with $n$ punctures (see Section~\ref{sec:loopcoords}),
-  and~$b_{T} \ell$ is that loop transformed by a single application of the
-  braid.  Here~$\lvert\cdot\rvert$ is a measure of the length of the loop.
-  See the method \lstinline{databraid.ftbe} for more details.
-  \index{FTBE (Finite Time Braiding Exponent)|)}
+  of the disk with $n$ \index{punctures} punctures (see
+  Section~\ref{sec:loopcoords}), and~$b_{T} \ell$ is that loop transformed by
+  a single application of the braid.  Here~$\lvert\cdot\rvert$ is a measure of
+  the length of the loop.  See the method \lstinline{databraid.ftbe} for more
+  details.
 \end{itemize}
 
 \index{crossing!times|)}%
 
 \index{databraid class@\lstinline{databraid} class|)}% 
-\index{databraid class@\lstinline{databraid} class!FTBE}% TODO: does not generate a link
-\index{Finite Time Braiding Exponent (FTBE)|see {\lstinline{databraid} class}}% TODO: does not generate a link
+\index{databraid class@\lstinline{databraid} class!ftbe@\lstinline{ftbe}}%
+\index{Finite Time Braiding Exponent (FTBE)|)}
 
 \index{braid class@\braid\ class!constructor!from data|)}
 \index{braid!from data|)}%
@@ -1515,7 +1802,13 @@ rotation.  (There are several videos of taffy pullers on
 \href{http://www.youtube.com/watch?v=6QkGp2qBbn4}{YouTube}.)
 
 Let's use \braidlab\ to analyze the rod motion.  From the folder
-\lstinline{doc/examples}, run the command %
+\lstinline{doc/examples}, run the command%
+%
+\footnote{When using the parallel code, the generator sequences in this
+  section may sometimes differ from run-to-run, due to the simultaneous
+  crossings.  However, the braids themselves are still equal, after the
+  relations~\eqref{eq:relations} are taken into account.}
+%
 \index{taffy@\lstinline{taffy}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = taffy('3rods')
@@ -1627,17 +1920,24 @@ constructing braids.  If we give an optional projection angle %
 of~$\pi/2$ to \lstinline{taffy}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2)
-Error using colorbraiding
-Coincident projection coordinate; change projection angle
-   (type help braid.braid).
+Error using braidlab.braid/colorbraiding
+Paths of particles 2 and 1 have a coincident projection.
+Try changing the projection angle.
 \end{lstlisting}
 This corresponds to using the $y$ (vertical) axis to compute the braid, but as
 we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
 the rods are initially perfectly aligned along that axis.  The braid obtained
 would depend sensitively on numerical roundoff when comparing the rod
-projections.  Instead of attempting to construct the braid, \braidlab\ returns
-an error and asks the user to modify the projection axis.  A tiny change in
-the projection line is sufficient to break the symmetry:
+projections.%
+%
+\footnote{\braidlab\ uses a property \lstinline{BraidAbsTol} to determine when
+  coordinates are close enough to be considered coincident, with a default
+  value of~$10^{-10}$.  See Section~\ref{sec:prop} for how to set global
+  properties.}
+%
+Instead of attempting to construct the braid, \braidlab\ returns an error and
+asks the user to modify the projection axis.  A tiny change in the projection
+line is sufficient to break the symmetry:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2 + .01)
 
@@ -1690,7 +1990,7 @@ b = < 1 -2 >
 \end{figure}
 %
 The braids \lstinline{a} and \lstinline{b} are shown in
-Fig.~\ref{fig:subbraid}; their entropy is %
+Fig.~\ref{fig:subbraid}; their entropies are %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
 \index{braid!entropy|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -1805,13 +2105,55 @@ string being removed will have returned to its initial position many times. %
 \index{punctures!filling-in|)}
 
 
+\section{Setting global properties}
+\label{sec:prop}
+
+Braids have been studied for a long time and by many communities, so several
+different conventions were bound to emerge.  \braidlab\ has some reasonable
+default conventions, but perhaps you'd be happier if it used your favorite
+one.  Luckily, \braidlab\ has you covered.
+
+\index{prop@\lstinline{prop}|(}%
+To see the properties available and their current values, use the
+\lstinline{prop} command:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> prop
+
+ans =         GenRotDir: 1
+          GenLoopActDir: 'lr'
+       GenPlotOverUnder: 1
+            BraidAbsTol: 1.0000e-10
+           BraidPlotDir: 'bt'
+    LoopCoordsBasePoint: 'right'
+\end{lstlisting}
+To set a property, use something like \lstinline{prop('BraidPlotDir','lr')}.
+This will plot braids from left-to-right from now on, as in
+Fig.~\ref{fig:fulltwist_lr}.
+%
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=\textwidth]{fulltwist_lr}
+  \end{center}
+  \caption{\lstinline{plot(braid('FullTwist',5))} with the property
+    \lstinline{'BraidPlotDir'} set to \hbox{\lstinline{'lr'}}.}
+  \label{fig:fulltwist_lr}
+\end{figure}
+%
+The default is \lstinline{'bt'} for bottom-to-top.  Other possible values are
+\lstinline{'tb'} for top-to-bottom and \lstinline{'rl'} for right-to-left.
+See \lstinline{help prop} for more information on properties and allowed
+values.
+\index{prop@\lstinline{prop}|)}
+
+
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgments}
 
 The development of \braidlab\ was supported by the US National Science
 Foundation, under grants DMS-0806821 and CMMI-1233935.  The authors thank
 Michael Allshouse and Margaux Filippi for extensive testing and comments.
-Michael Allshouse also contributed some of the code.  James Puckett and Karen
+Michael Allshouse also contributed some of the code.  Alexander Flanagan
+helped with testing and the taffy puller research.  James Puckett and Karen
 Daniels provided the test data from their granular medium
 experiments~\citep{Puckett2012}.  \braidlab\ uses Toby Hall's \emph{Train}
 \citep{HallTrain}; Jae Choon Cha's \emph{CBraid} \citep{CBraid}; Juan
@@ -1838,12 +2180,18 @@ compiler.  \index{Matlab!MEX files|)}
 \subsection{Precompiled packages}
 \label{sec:precompiled}
 
-Some zip and tar files of the precompiled latest released version are
+Some tar files of the precompiled latest released version are
 available at \url{http://github.com/jeanluct/braidlab/releases}.  If one of
-those suits your system, then download and untar/unzip (it might still work
-even if the system doesn't match perfectly).  For Mac OS~X, there is a version
-compiled without \href{https://gmplib.org/}{GMP} (the GNU MultiPrecision
-library) %
+those suits your system, then download and untar:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ tar xvzf braidlab-<version>.tar.gz
+\end{lstlisting}
+A binary might still work even if the operating system and Matlab versions
+don't match exactly.
+
+For Mac OS~X, there is a version compiled without
+\href{https://gmplib.org/}{GMP} (the GNU MultiPrecision library) %
 \index{GMP}%
 since it is a bit tricky to install (see Section~\ref{sec:gmp}).
 
@@ -1897,9 +2245,10 @@ Either way, after the cloning finishes type
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make
 \end{lstlisting}
-to compile the MEX files.  Note that you can still use \braidlab\ even if
+to compile the MEX files.  (If for some reasone you need to recompile, run
+\lstinline{make clean} first.)  Note that you can still use \braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
-or run (much) more slowly.
+or run (much) more slowly. %
 \index{Matlab!MEX files|)}
 
 \index{GMP|(}%
@@ -1978,27 +2327,42 @@ try
 $ which gcc-4.7
 \end{lstlisting}
 to see if a path to the command exists.  If it does, you have an earlier
-compiler installed and you can proceed to build \braidlab\ as described in
-Section~\ref{sec:cloning} above, replacing the \lstinline{make} command with
+compiler installed and you can skip to the next paragraph.  If the
+\lstinline{which} command above didn't return anything, you can try to install
+an older version of GCC:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ make CC=gcc-4.7 CXX=g++-4.7
-\end{lstlisting}
-Note that this only works with Matlab R2014a or later.  Earlier versions of
-Matlab also require editing of a file called \lstinline{mexopts.sh}.
-
-If the \lstinline{which} command above didn't return anything, you can try to
-install an older version of GCC:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get install gcc-4.7 g++4.7
+$ sudo apt-get install gcc-4.7 g++-4.7
 \end{lstlisting}
 This last line is for Ubuntu and Debian Linux distributions.  Note that this
-will \emph{not} overwrite the default compiler.
+will \emph{not} overwrite the default compiler.  If your Linux distribution
+doesn't allow you to easily install the required compiler, you could always
+\href{https://gcc.gnu.org/releases.html}{compile and install it from scratch!}
+That's fairly tedious, though.
 
-If your Linux distribution doesn't allow you to easily install the required
-compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
-  and install it from scratch!}  That's fairly tedious, though. %
+Assuming that you now have a Matlab-supported compiler installed, you need to
+tell MEX to use it.  If you're lucky, this could be as easy as typing
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ mex -setup cpp
+\end{lstlisting}
+but typically this will just lead to Matlab using the wrong compiler anyways.
+In that case you can try and download
+\href{http://github.com/jeanluct/braidlab/raw/develop/devel/gcc-alternatives}{this
+  script}, then run it:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ bash ./gcc-alternatives
+\end{lstlisting}
+You will be prompted for your password (assuming you have administrator
+privileges), and then asked to select a compiler version.  You should then be
+able to compile \braidlab.  You can later switch back to your original
+compiler with the command 
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo update-alternatives --config gcc
+\end{lstlisting}
+
 \index{GCC compiler|)}%
 \index{Linux|)}%
 
@@ -2106,7 +2470,8 @@ longer type of internal array indexing.  Eventually the
 % \lstinputlisting[lastline=50]{+braidlab/@braid/braid.m}
 
 \index{crossing|seealso{projection line}}%
-\index{projection line|seealso{crossing}}
+\index{projection line|seealso{crossing}}%
+\index{Finite Time Braiding Exponent (FTBE)|seealso{\lstinline{databraid} class}}%
 
 \clearpage
 \addcontentsline{toc}{section}{Index}

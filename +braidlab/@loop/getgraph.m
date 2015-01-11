@@ -63,18 +63,15 @@ mu = double(mu); nu = double(nu);
 b_coord = [-nu(1)/2 b_coord nu(end)/2];
 
 % Convert to older P,M,N notation
+% Use a struct for easy argument passing.
 % intersections above punctures
-% Globals are used to speed up computation in local hash functions
-global M;
-M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
+pmn.M = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
-global N;
-N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
+pmn.N = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 % cumulative sum of intersections, i.e., intersections at punctures
 % 1, then 1+2, then 1+2+3, ...
-global T;
-T = cumsum( M + N );
+pmn.T = cumsum(pmn.M + pmn.N);
 
 %% GRAPH INDEXING
 %
@@ -86,18 +83,14 @@ T = cumsum( M + N );
 %    min(V) == -N(P)
 
 % number of vertices is the index of the last vertex:
-assert(graph_keytohash( [n, -N(n)], M, T ) == T(end), ...
+assert(graph_keytohash( [n, -pmn.N(n)], pmn.M, pmn.T ) == pmn.T(end), ...
        'BRAIDLAB:loop:getgraph:hasherror',...
        'Number of vertices and max linear index do not match' );
-nV = T(end);
+nV = pmn.T(end);
 
-global froms;
-global tos;
-global edgecount;
-
-edgecount = 0;
-froms = zeros(1,2*nV);
-tos = zeros(1,2*nV);
+pmn.edgecount = 0;
+pmn.froms = zeros(1,2*nV);
+pmn.tos = zeros(1,2*nV);
 
 
 %% Identify hairpins -- connections of vertices that are above/below same
@@ -111,7 +104,7 @@ for p = 1:n
 
   % Determine number of hairpins are at the present loop
   if p == n
-    nl = M(n); % this is equal to N(n) ?
+    nl = pmn.M(n); % this is equal to N(n) ?
   else
     nl = b_coord(p);
   end
@@ -119,7 +112,7 @@ for p = 1:n
   % Join vertices connected by hairpins, starting from
   % the inner most hairpin around the puncture and going out.
   for sc = 1:abs(nl)
-    joinpoints([p, -sign(nl)*sc],[p, sign(nl)*sc]);
+    pmn = joinpoints([p, -sign(nl)*sc],[p, sign(nl)*sc],pmn);
   end
 end
 
@@ -134,7 +127,7 @@ for p = 1:n-1
   end
 
   % segments that span two neighboring punctures
-  tojoin = M(p)-nr;
+  tojoin = pmn.M(p)-nr;
   if tojoin > 0
     % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
@@ -143,7 +136,7 @@ for p = 1:n-1
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoinup = M(p+1)-nl;
+    tojoinup = pmn.M(p+1)-nl;
     tojoindown = max(tojoin-tojoinup,0);
     % The lines that join downwards.
     for s = 1:tojoindown
@@ -154,7 +147,7 @@ for p = 1:n-1
       idx_mine = nr + s; % index of the vertex
       idx_next = -(nl-s+tojoindown+1);
 
-      joinpoints([p,idx_mine],[p+1,idx_next]);
+      pmn = joinpoints([p,idx_mine],[p+1,idx_next],pmn);
 
     end
     % The lines that join upwards (on the same side).
@@ -165,7 +158,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-      joinpoints([p,idx_mine],[p+1,idx_next]);
+      pmn = joinpoints([p,idx_mine],[p+1,idx_next],pmn);
     end
   end
 end
@@ -182,7 +175,7 @@ for p = 1:n-1
   end
 
   % segments that span two different punctures
-  tojoin = N(p)-nr;
+  tojoin = pmn.N(p)-nr;
   if tojoin > 0
     % How many left-hairpins (b<0) around the next puncture?
     if p < n-1
@@ -191,7 +184,7 @@ for p = 1:n-1
       nl = 0;
     end
     % We can't joint to these left-facing loops from the left.
-    tojoindown = N(p+1)-nl;
+    tojoindown = pmn.N(p+1)-nl;
     tojoinup = max(tojoin-tojoindown,0);
     % The lines that join upwards.
     for s = 1:tojoinup
@@ -201,7 +194,7 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-      joinpoints([p,idx_mine],[p+1,idx_next]);
+      pmn = joinpoints([p,idx_mine],[p+1,idx_next],pmn);
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
@@ -211,19 +204,19 @@ for p = 1:n-1
       % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-      joinpoints([p,idx_mine],[p+1,idx_next]);
+      pmn = joinpoints([p,idx_mine],[p+1,idx_next],pmn);
     end
   end
 end
 
-froms = froms(1:edgecount);
-tos = tos(1:edgecount);
+pmn.froms = pmn.froms(1:pmn.edgecount);
+pmn.tos = pmn.tos(1:pmn.edgecount);
 
-A = sparse( froms, tos, 1, nV, nV, length(froms) );
+A = sparse( pmn.froms, pmn.tos, 1, nV, nV, length(pmn.froms) );
 Lp = diag(sum(A+A.')) - (A+A.');
 
 
-function joinpoints(mine,next)
+function pmn = joinpoints(mine,next,pmn)
 %% joinpoints( mine, next )
 %
 % Function that modifies the graph structure by adding segments of
@@ -246,12 +239,6 @@ function joinpoints(mine,next)
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
 
-global M
-global T
-global froms
-global tos
-global edgecount
-
 dp = next(1) - mine(1); % index distance between punctures
 assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
         'Requests one or two consecutive punctures');
@@ -259,6 +246,6 @@ assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:getgraph:joinpoints',...
 assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:getgraph:joinpoints',...
         'Vertex indices must be nonzero') ;
 
-edgecount = edgecount + 1;
-froms(edgecount) = graph_keytohash(mine, M, T);
-tos(edgecount) = graph_keytohash(next, M, T);
+pmn.edgecount = pmn.edgecount + 1;
+pmn.froms(pmn.edgecount) = graph_keytohash(mine, pmn.M, pmn.T);
+pmn.tos(pmn.edgecount) = graph_keytohash(next, pmn.M, pmn.T);

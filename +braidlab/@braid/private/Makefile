@@ -24,12 +24,14 @@
 #   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 # LICENSE>
 
-CBRAID_LIBDIR     = ../../../extern/cbraid/lib
-CBRAID_INCLUDEDIR = ../../../extern/cbraid/include
+CBRAID_DIR        = ../../../extern/cbraid
+CBRAID_LIBDIR     = $(CBRAID_DIR)/lib
+CBRAID_INCLUDEDIR = $(CBRAID_DIR)/include
 CBRAID_LD         = -lcbraid-mex
 
-TRAINS_LIBDIR     = ../../../extern/trains
-TRAINS_INCLUDEDIR = ../../../extern
+TRAINS_DIR        = ../../../extern/trains
+TRAINS_LIBDIR     = $(TRAINS_DIR)/lib
+TRAINS_INCLUDEDIR = $(TRAINS_DIR)
 TRAINS_LD         = -ltrains
 
 # Need override since variable usually set as command-line argument.
@@ -40,7 +42,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) crossingstogenerators_helper.$(MEXSUFFIX) areEqual.$(MEXSUFFIX)
+all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -55,8 +57,10 @@ endif
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
+
+
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
-	cd $(TRAINS_LIBDIR); \
+	cd $(TRAINS_DIR); \
 		make CXX="$(CXX) -fPIC" CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
@@ -71,6 +75,10 @@ entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
+cross2gen_helper.$(MEXSUFFIX): cross2gen_helper.cpp \
+	cross2gen_helper.hpp ThreadPool_nofuture.h ThreadPool.h
+# $< is the first dependency (the .cpp file).
+	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 clean:
 	rm -f *.$(MEXSUFFIX) *.o

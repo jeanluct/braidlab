@@ -142,8 +142,8 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also BRAID.EQ, BRAID.LEXEQ.
       if length(b1.tcross) ~= length(b2.tcross)
-	ee = false;
-	return
+        ee = false;
+        return
       end
       ee = all(b1.tcross == b2.tcross);
       if ee
@@ -204,6 +204,16 @@ classdef databraid < braidlab.braid
   end % methods block
 
 
+  methods (Access = protected)
+
+    function displayScalarObject(b)
+      fprintf('braid: '), disp(braid(b));
+      fprintf('tcross: '), disp(b.tcross);
+    end
+
+  end % methods block
+
+
   % Some operations are not appropriate for databraids, since they break
   % chronology.  Hide these, though they can still be called and will
   % return an error message.
@@ -218,14 +228,24 @@ classdef databraid < braidlab.braid
             'This operation is not defined for databraids.')
     end
 
-    function entropy(~)
-      error('BRAIDLAB:databraid:entropy:undefined',...
+    function complexity(varargin)
+      error('BRAIDLAB:databraid:complexity:undefined',...
             ['This operation is not defined for databraids.  ' ...
              'Use databraid.ftbe instead.'])
     end
 
-    function complexity(~)
-      error('BRAIDLAB:databraid:complexity:undefined',...
+    function conjtest(~,~)
+      error('BRAIDLAB:databraid:conjtest:undefined',...
+            'This operation is not defined for databraids.')
+    end
+
+    function cycle(varargin)
+      error('BRAIDLAB:databraid:cycle:undefined',...
+            'This operation is not defined for databraids.')
+    end
+
+    function entropy(varargin)
+      error('BRAIDLAB:databraid:entropy:undefined',...
             ['This operation is not defined for databraids.  ' ...
              'Use databraid.ftbe instead.'])
     end

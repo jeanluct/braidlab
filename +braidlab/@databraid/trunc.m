@@ -1,8 +1,10 @@
 function bt = trunc(b,interval)
-%TRUNC   Truncate databraid by choosing crossings from a time subinterval.
-%   BT = TRUNC(B,INTERVAL) Truncates the braid generators to those
+%TRUNC   Truncate a databraid by choosing crossings from a time subinterval.
+%   BT = TRUNC(B,INTERVAL) truncates the braid generators to those
 %   whose crossing times TCROSS lie in the interval
-%   INTERVAL(1) <= TCROSS <= INTERVAL(2).
+%
+%      INTERVAL(1) <= TCROSS <= INTERVAL(2).
+%
 %   If INTERVAL is a single number, then selected crossings will have
 %   TCROSS <= INTERVAL.
 %

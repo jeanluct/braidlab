@@ -1,4 +1,4 @@
-function test_braidlab(nomex)
+function res = test_braidlab(nomex)
 %TEST_BRAIDLAB   Run a suite of braidlab unit tests.
 %   TEST_BRAIDLAB runs several unit tests for braidlad (default).
 %
@@ -37,30 +37,32 @@ end
 
 import matlab.unittest.*
 
+braidlab.prop('reset');
+
 tcfolder = [pwd '/testcases/'];
 
 if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_loop_nomex
   clear global BRAIDLAB_braid_nomex
-  if ~braidlab.util.assertmex(['+braidlab/@braid/private/' ...
-                        'compact_helper'])
-    msg = ['Requested MEX tests and braidlab looks uncompiled.' ...
-           char(10) 'Either compile braidlab or pass 1 to test_braidlab ' ...
-           'otherwise there will be a LOT of errors.'];
+  if ~braidlab.util.assertmex(['+braidlab/@braid/private/compact_helper'])
+    msg = ['Requested MEX tests but braidlab looks uncompiled.  ' ...
+           'Either compile braidlab or pass ''nomex'' to test_braidlab; ' ...
+           'otherwise there will be LOTS of errors.'];
     warning(msg);
     pause(1);
   end
   disp('Testing braidlab with MEX algorithms.');
 else
   % disable MEX algorithms
-  global BRAIDLAB_loop_nomex;
-  global BRAIDLAB_braid_nomex;
+  global BRAIDLAB_loop_nomex; %#ok<TLEV>
+  global BRAIDLAB_braid_nomex; %#ok<TLEV>
   BRAIDLAB_braid_nomex = true;
   BRAIDLAB_loop_nomex = true;
   disp('Testing braidlab without MEX algorithms.');
 end
 
 suite = TestSuite.fromFolder(tcfolder);
+%suite = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
@@ -69,5 +71,6 @@ suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'databraidTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
 %suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
+%suite = TestSuite.fromFile([tcfolder 'taffyTest.m']);
 runner = TestRunner.withTextOutput;
-res = runner.run(suite) %#ok<NOPTS>
+res = runner.run(suite);

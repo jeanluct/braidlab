@@ -128,7 +128,14 @@ classdef braid < matlab.mixin.CustomDisplay
 
       % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
-      if isa(b,'braidlab.braid')
+      if isa(b,'braidlab.annbraid')
+        % This is a bit of a kludge.  annbraid needs a custom conversion
+        % to braid.  b.braid calls the right function (annbraid.braid),
+        % but braid(b) doesn't.  That's ok, let's just do it here.
+        % This needs to go here because b is then also a braid.
+        br = b.braid;
+        return
+      elseif isa(b,'braidlab.braid')
         br.n     = b.n;
         br.word  = b.word;
       elseif isa(b,'braidlab.cfbraid')
@@ -332,65 +339,6 @@ classdef braid < matlab.mixin.CustomDisplay
       ee = all(obj.perm == 1:obj.n);
     end
 
-    function [varargout] = mtimes(b1,b2)
-    %MTIMES   Multiply two braids together or act on a loop with a braid.
-    %   C = B1*B2, where B1 and B2 are braid objects, return the product of
-    %   the two braids.  The product is the group operation in the braid
-    %   group (braid concatenation).
-    %
-    %   L2 = B*L, where B is a braid and L is a loop object, returns a new
-    %   loop L2 given by the action of B on L.  L can also be a column
-    %   vector of loops.
-    %
-    %   [L2,M] = B*L also returns the sparse matrix M giving the effective
-    %   linear action of the braid B on the loop L.  This means that the
-    %   piecewise-linear action B*L is equal to the matrix-vector
-    %   multiplication M*L.coords' for this particular loop L.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MPOWER, LOOP.
-      if isa(b2,'braidlab.braid')
-        % If b2 is also a braid, the product is simple concatenation.
-        varargout{1} = braidlab.braid([b1.word b2.word],max(b1.n,b2.n));
-      elseif isa(b2,'braidlab.loop')
-        % Action of braid on a loop.
-        %
-        % Have to define this here, rather than in the loop class, since the
-        % braid goes on the left, and Matlab determines which overloaded
-        % function to call by looking at the first argument.
-        if ~isscalar(b2)
-          % Can't act on array of loops with a braid.
-          % This is very inefficient, and can be done instead with a
-          % scalar containing an array of loop coordinates.
-          error('BRAIDLAB:braid:mtimes:notscalar', ...
-                ['Action of braid on nonscalar loop array not supported.' ...
-                 '  Instead use matrix of loop.coords.  ' ...
-                 'Try ''help loop.loop''.'])
-        end
-        if b1.n > b2.totaln
-          error('BRAIDLAB:braid:mtimes:badgen', ...
-                'Braid has too many strings for the loop.')
-        end
-        if b2.basepoint
-          p = b1.perm;
-          p = [p (length(p)+1):b2.totaln];
-          if p(b2.basepoint) ~= b2.basepoint
-            error('BRAIDLAB:braid:mtimes:fixbp', ...
-                  'Braid cannot move the basepoint.')
-          end
-        end
-        [varargout{1:nargout}] = loopsigma(b1.word,b2.coords);
-        varargout{1} = braidlab.loop(varargout{1},'bp',b2.basepoint);
-        if nargout > 1
-          % Actually, return the matrix of the linear action instead of pn.
-          varargout{2} = linact(b1,varargout{2},size(b2(1).coords,2));
-        end
-      else
-        error('BRAIDLAB:braid:mtimes:badobject', ...
-              'Cannot act with a braid on this object.')
-      end
-    end
-
     function bm = mpower(b,m)
     %MPOWER   Raise a braid to some positive or negative power.
     %   C = B^N, where B is a braid and N is a positive integer, returns the
@@ -477,7 +425,9 @@ classdef braid < matlab.mixin.CustomDisplay
 
       highestIndex = (b.n-1);
       i = double(-highestIndex:highestIndex);
-      c = hist( b.word, i );
+      c = hist(b.word,i);
+      i(highestIndex+1) = [];
+      c(highestIndex+1) = [];
     end
 
   end % methods block

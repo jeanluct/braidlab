@@ -1,4 +1,4 @@
-function varargout = tntype_helper(varargin)
+function varargout = tntype_helper(varargin) %#ok<STOUT>
 %TNTYPE_HELPER   See tntype_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

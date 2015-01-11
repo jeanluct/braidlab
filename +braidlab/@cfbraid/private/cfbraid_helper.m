@@ -1,4 +1,4 @@
-function varargout = cfbraid_helper(varargin)
+function varargout = cfbraid_helper(varargin) %#ok<STOUT>
 %CFBRAID_HELPER   See cfbraid_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
@@ -29,4 +29,3 @@ function varargout = cfbraid_helper(varargin)
 % LICENSE>
 
 throwAsCaller(braidlab.util.NoMEXException(mfilename));
-

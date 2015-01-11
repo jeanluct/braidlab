@@ -1,15 +1,49 @@
 ------------------------------------------------------------------------
+3.1 [2015-01-11]
+
+* The function braidlab.prop can be used to set global properties,
+  such as the way braids are plotted and the direction of rotation for
+  generators.
+
+* braidlab.prop can set the absolute tolerance for determining
+  coincidence of coordinates when constructing a braid from data
+  (property BraidAbsTol).  This replaces the previous relative
+  comparison which had been used since 2.0.  (See issue #117.)
+
+* braid.plot takes color and linestyle attributes.
+
+* braid.lk returns the Lawrence-Krammer representation of a braid.
+
+* The class annbraid is used to represent braids on annular domains.
+
+* databraids are displayed differently from braids, with crossing
+  times shown.
+
+* The braidlab guide has been expanded with a short introduction to
+  braids.
+
+* Setting up alternative compilers is described in the troubleshooting
+  section of the guide.
+
+* The taffy example in the guide no longer worked, due to some bugs in
+  braid creation code when coincident coordinates are involved.  (See
+  issues #116 and #117.)  Note that it is possible that the parallel
+  code returns different generator sequences when called multiple
+  times on the same dataset.  However, the resulting braids are still
+  equal (issue #118).
+
+* Some bugfixes.
+
+------------------------------------------------------------------------
 3.0.1 [2014-12-16]
 
-* Improved installation instructions in guide, in particular for GMP.
+* Improve installation instructions in guide.
 
-* Fixed anonymous GitHub links for cloning in guide.
+* Fix some outdated output in guide.
 
-* Fixed some outdated output in guide.
+* Fix a bug when calling C++ version of intersec.
 
-* Fixed a bug when calling C++ version of intersec.
-
-* Fixed a bug in braid.mtimes that disallowed valid action on loop
+* Fix a bug in braid.mtimes that disallowed valid action on loop
   with basepoint.
 
 * Remove broken braid.reducing.

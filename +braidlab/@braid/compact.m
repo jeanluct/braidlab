@@ -1,4 +1,4 @@
-function c = compact(b)
+function c = compact(b,annular)
 %COMPACT   Try to shorten a braid by cancelling generators.
 %   C = COMPACT(B) attempts to shorten a braid B by using group properties,
 %   and returns the shortened braid C.  The group relations are
@@ -59,7 +59,9 @@ function c = compact(b)
 %end
 
 if ~isempty(b.word) && length(b) > 1
-  bc = compact_helper(b.word);
+  % annular = true means an annular braid.
+  if nargin < 2, annular = false; end
+  bc = compact_helper(b.word,b.n,annular);
 else
   bc = b.word;
 end

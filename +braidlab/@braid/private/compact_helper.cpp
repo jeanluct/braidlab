@@ -80,7 +80,8 @@ void printvec(const std::vector<int>& b)
 
 template<class T>
 inline
-bool commute_and_cancel(T& b, const int dir, const bool secndrel)
+bool commute_and_cancel(T& b, const int dir, const int n,
+                        const bool secndrel, const bool annular)
 {
 #ifdef BRAIDLAB_COMPACT_DEBUG
   using std::cerr;
@@ -89,6 +90,7 @@ bool commute_and_cancel(T& b, const int dir, const bool secndrel)
   if (b.size() < 2) return false;
 
   bool shorter = false;
+  bool badrel = false;
   mwIndex pos0 = 0; // pos0 is the starting point of the "current" generator.
   do
     {
@@ -139,7 +141,19 @@ bool commute_and_cancel(T& b, const int dir, const bool secndrel)
                   break;
                 }
             }
-          if (abs(abs(b[i]) - abs(b[i+dir])) > 1)
+          if (annular)
+            {
+              // Omit commutation relation involving strings 1 and n-1
+              // for an annular braid.
+              badrel =
+                (abs(b[i]) == 1 && abs(b[i+dir]) == n-1) ||
+                (abs(b[i]) == n-1 && abs(b[i+dir]) == 1);
+#ifdef BRAIDLAB_COMPACT_DEBUG
+              if (badrel)
+                cerr << "Omitting annular commutation relation.\n";
+#endif
+            }
+          if (abs(abs(b[i]) - abs(b[i+dir])) > 1 && !badrel)
             {
               // Commute with the next generator.
 #ifdef BRAIDLAB_COMPACT_DEBUG
@@ -166,8 +180,24 @@ bool commute_and_cancel(T& b, const int dir, const bool secndrel)
                   cerr << i << "," << i+dir << "," << i+2*dir << endl;
                   cerr << "before: "; printvec(b);
 #endif
-                  std::swap(b[i],b[i+dir]);
-                  b[i+2*dir] = b[i];
+                  if (annular)
+                    {
+                      // Omit braid relation involving n-1 for an
+                      // annular braid.
+                      badrel =
+                        (abs(b[i]) == n-1 ||
+                         abs(b[i+dir]) == n-1 ||
+                         abs(b[i+2*dir] == n-1));
+#ifdef BRAIDLAB_COMPACT_DEBUG
+                      if (badrel)
+                        cerr << "Omitting annular braid relation.\n";
+#endif
+                    }
+                  if (!badrel)
+                    {
+                      std::swap(b[i],b[i+dir]);
+                      b[i+2*dir] = b[i];
+                    }
 #ifdef BRAIDLAB_COMPACT_DEBUG
                   cerr << " after: "; printvec(b);
 #endif
@@ -226,21 +256,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const mwSize N = max(mxGetM(wA),mxGetN(wA));
   const int *w = (int *)mxGetData(wA); // wA contains int32's.
 
-  int n = 1;
+  // The number of strings.
+  const int n = (int)mxGetScalar(prhs[1]);
+  // Third argument determines whether this is an annular braid.
+  const int annular = (int)mxGetScalar(prhs[2]);
 
   // Convert braid word to vector.
   std::vector<int> bw;
   for (mwIndex i = 0; i < N; ++i)
     {
-      n = max(n,abs(w[i])+1);
       bw.push_back(w[i]);
     }
 
   // Try to commute_and_cancel from the left/right until nothing changes.
-  while (commute_and_cancel(bw,1,false) || commute_and_cancel(bw,-1,false)) {}
+  // Omit the second type (three-string) of braid relations.
+  while (commute_and_cancel(bw,1,n,false,annular) ||
+         commute_and_cancel(bw,-1,n,false,annular)) {}
 
   // Try to commute_and_cancel from the left/right until nothing changes.
-  while (commute_and_cancel(bw,1,true) || commute_and_cancel(bw,-1,true)) {}
+  while (commute_and_cancel(bw,1,n,true,annular) ||
+         commute_and_cancel(bw,-1,n,true,annular)) {}
 
   // Now copy vector bw to an mxArray of int32's.
   plhs[0] = mxCreateNumericMatrix(1,bw.size(),mxINT32_CLASS,mxREAL);

@@ -1,12 +1,10 @@
-function outname = validateflag( requestedname, varargin )
-%%VALIDATEFLAG Match multiple strings to a single string name.
-%
-% V = VALIDATEFLAG( REQUESTEDNAME, FLAGNAME1, FLAGNAME1, ... )
-%   compares string REQUESTEDNAME to valid flag names. Each FLAGNAMEn
-%   argument is a either a string, or a cell array { FLAGNAME,
-%   ALTNAME1, ALTNAME2, ... }. If REQUESTEDNAME matches a FLAGNAME or
-%   any of the ALTNAME1, ALTNAME2, etc. then the output OUTNAME =
-%   FLAGNAME.
+function outname = validateflag(requestedname,varargin)
+%VALIDATEFLAG   Match multiple strings to a single string name.
+%   V = VALIDATEFLAG( REQUESTEDNAME, FLAGNAME1, FLAGNAME1, ... ) compares
+%   string REQUESTEDNAME to valid flag names. Each FLAGNAMEn argument is a
+%   either a string, or a cell array { FLAGNAME, ALTNAME1, ALTNAME2,
+%   ... }. If REQUESTEDNAME matches a FLAGNAME or any of the ALTNAME1,
+%   ALTNAME2, etc. then the output OUTNAME = FLAGNAME.
 %
 %   If no FLAGNAMEn is matched by REQUESTEDNAME, exception
 %   BRAIDLAB:validateflag:invalid is generated.
@@ -52,7 +50,7 @@ for n = 1:length(varargin)
   if iscell(varargin{n})
     flagset = varargin{n};
   else
-    flagset = {varargin{n}};
+    flagset = {varargin{n}}; %#ok<CCAT1>
   end
 
   try
@@ -82,6 +80,4 @@ end
 if isempty(outname)
   error('BRAIDLAB:validateflag:flaginvalid',...
         'Flag ''%s'' unmatched.', requestedname);
-end
-
 end

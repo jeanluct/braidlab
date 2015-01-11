@@ -32,7 +32,9 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env randomwalk_helper.$(MEXSUFFIX)
+ASSIGNOPTSRC=../../extern/assignmentoptimal/assignmentoptimal.c
+
+all: check-env randomwalk_helper.$(MEXSUFFIX) assignmentoptimal.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -45,6 +47,9 @@ endif
 
 %.$(MEXSUFFIX): %.cpp
 	$(MEX) $(MEXFLAGS) $^
+
+assignmentoptimal.$(MEXSUFFIX): $(ASSIGNOPTSRC)
+	$(MEX) $(MEXFLAGS) $(ASSIGNOPTSRC)
 
 clean:
 	rm -f *.$(MEXSUFFIX) *.o
