@@ -24,26 +24,58 @@
 
 classdef taffyTest < matlab.unittest.TestCase
 
+  properties
+    b3rods
+    b4rods
+    b6rodsbad
+    b6rods
+    b4rods2
+  end
+
+  methods (TestClassSetup)
+    function addExampleFolderToPath(testCase)
+      % The taffy routine is in the examples folder.
+      testCase.addTeardown(@path,addpath(fullfile(pwd,'../../doc/examples')));
+    end
+  end
+
+  methods (TestMethodSetup)
+    function create_taffy_braids(testCase)
+      import braidlab.braid
+      
+      testCase.b3rods = braid([-2 1 1 -2]);
+      testCase.b4rods = braid([1 3 2 2 1 3]);
+      testCase.b6rodsbad = braid([2 1 2 4 5 4 3 3 2 1 2 4 5 4]);
+      testCase.b6rods = braid([3 2 1 2 4 5 4 3 3 2 1 2 5 4 5 3]);
+      testCase.b4rods2 = braid([-2 2 1 3 2 -3 -1 3 1 2 1 3]);
+    end
+  end
+
   methods (Test)
     function test_taffy(testCase)
-      addpath ../../doc/examples
       import braidlab.braid
 
       b = taffy('3rods');
-      testCase.verifyEqual(b,braid([-2 1 1 -2]))
+      testCase.verifyEqual(b,testCase.b3rods)
       [t,entr] = tntype(b);
       testCase.verifyEqual(t,'pseudo-Anosov')
 
       b = taffy('4rods');
-      testCase.verifyEqual(b,braid([1 3 2 2 1 3]))
+      % Parallel code can return different generators, but same braids (#116).
+      %testCase.verifyEqual(b,testCase.b4rods)
+      testCase.verifyTrue(b == testCase.b4rods)
 
       b = taffy('6rods-bad');
-      testCase.verifyEqual(b,braid([2 1 2 4 5 4 3 3 2 1 2 4 5 4]))
+      % Parallel code can return different generators, but same braids (#116).
+      %testCase.verifyEqual(b,testCase.b6rodsbad)
+      testCase.verifyTrue(b == testCase.b6rodsbad)
       t = tntype(b);
       testCase.verifyEqual(t,'reducible')
 
       b = taffy('6rods');
-      testCase.verifyEqual(b,braid([3 2 1 2 4 5 4 3 3 2 1 2 5 4 5 3]))
+      % Parallel code can return different generators, but same braids (#116).
+      %testCase.verifyEqual(b,testCase.b6rods)
+      testCase.verifyTrue(b == testCase.b6rods)
       [t,entr] = tntype(b);
       testCase.verifyEqual(t,'pseudo-Anosov')
 
@@ -53,8 +85,11 @@ classdef taffyTest < matlab.unittest.TestCase
 
       % Perturb projection a bit.
       b = taffy('4rods',pi/2 + .01);
-      testCase.verifyEqual(b,braid([-2 2 1 3 2 -3 -1 3 1 2 1 3]))
-      testCase.verifyEqual(compact(b),braid([3 1 2 2 3 1]))
+      % Parallel code can return different generators, but same braids (#116).
+      %testCase.verifyEqual(b,testCase.b4rods2)
+      testCase.verifyTrue(b == testCase.b4rods2)
+
+      close(gcf)
     end
   end
 end
