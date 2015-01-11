@@ -41,6 +41,10 @@ for i in $REVLIST; do
     if [ -e '+braidlab/private/assignmentoptimal.c' ]; then
 	LINES=$(($LINES-441))
     fi
+    # arrow.m is included as part of examples, but is extern.
+    if [ -e 'doc/examples/arrow.m' ]; then
+	LINES=$(($LINES-1410))
+    fi
     # The date is in UTC seconds.
     DATE=`git log -1 --format=%ct $i`
     SHORTHASH=`git log -1 --format=%h $i`
