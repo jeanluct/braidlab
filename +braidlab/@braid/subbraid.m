@@ -43,20 +43,32 @@ end
 
 nn = length(s);
 
-p = 1:b.n;
+% keeps colors of strings during permutations
+p = 1:b.n; 
+
+% subbraid word
 bs = [];
+
+% indices of subbraid generators in the original braid
 is = [];
 
 for i = 1:length(b)
+    
+  %% determine if the generator permutes strings that are kept
   gen = abs(b.word(i)); % unsigned generator
-  i1 = find(p(gen) == s,1); i2 = find(p(gen+1) == s,1);
-  if ~isempty(i1) && ~isempty(i2)
+  
+  if any(p(gen) == s) && any(p(gen+1) == s)
     % The current generator involves two of our substrings.
     % Find the position of all sub-strings in p.
-    pos = ismember(p,s);
+    pos = ismember(p,s); % p(pos) contains only retained strings
+    
+    p(pos)
+    intersect(p,s)
+    
     % Of the substrings, find the order of the one we just switched.
     % This gives the unsigned generator for the subbraid.
-    sgen = find(p(pos) == s(i1));
+    sgen = find(p(pos) == p(gen))
+    
     % Restore sign and append to list.
     bs = [bs sign(b.word(i))*sgen]; %#ok<AGROW>
     % Optionally also keep track of which generators we kept.  This is
