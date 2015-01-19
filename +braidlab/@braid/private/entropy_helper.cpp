@@ -56,6 +56,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (mxGetM(dbglvl_ptr) != 0)
       dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
 
+  if (dbglvl >= 1)
+    printf("Using MEX entropy.\n");
+
   const mxArray *braidwordA = prhs[0];
   const int *braidword = (int *)mxGetData(braidwordA); // braidwordA contains int32's.
   const mxArray *uA = prhs[1];
