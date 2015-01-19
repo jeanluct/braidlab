@@ -46,6 +46,9 @@ nn = length(s);
 % keeps colors of strings during permutations
 p = 1:b.n; 
 
+% store membership of p in s, as logicals
+pos = ismember(p, s);
+
 % subbraid word
 bs = [];
 
@@ -57,17 +60,10 @@ for i = 1:length(b)
   %% determine if the generator permutes strings that are kept
   gen = abs(b.word(i)); % unsigned generator
   
-  if any(p(gen) == s) && any(p(gen+1) == s)
-    % The current generator involves two of our substrings.
-    % Find the position of all sub-strings in p.
-    pos = ismember(p,s); % p(pos) contains only retained strings
-    
-    p(pos)
-    intersect(p,s)
-    
+  if pos(gen) && pos(gen+1) 
     % Of the substrings, find the order of the one we just switched.
     % This gives the unsigned generator for the subbraid.
-    sgen = find(p(pos) == p(gen))
+    sgen = find(p(pos) == p(gen));
     
     % Restore sign and append to list.
     bs = [bs sign(b.word(i))*sgen]; %#ok<AGROW>
@@ -76,6 +72,7 @@ for i = 1:length(b)
     if nargout > 1, is = [is i]; end %#ok<AGROW>
   end
   p([gen gen+1]) = p([gen+1 gen]); % update permutation
+  pos([gen gen+1]) = pos([gen+1 gen]); % update membership permutation
 end
 
 varargout{1} = braidlab.braid(bs,nn);
