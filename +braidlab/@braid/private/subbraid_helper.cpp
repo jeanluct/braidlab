@@ -25,19 +25,23 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-#include <cmath>
-#include "mex.h"
 
 #include <utility>
+#include "mex.h"
+
+void printvector( const int *v, int L ) {
+  for (size_t k = 0; k< L; k++) printf("%d ", v[k]);
+  printf("\n");
+}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+
 
   const mxArray *p_braid = prhs[0];
   const mxArray *p_perm = prhs[1];
   const mxArray *p_keepstr = prhs[2];
   const mxArray *p_storeind = prhs[3];
-
   
   // Get debug level global variable.
   mxArray *dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
@@ -45,6 +49,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (dbglvl_ptr != NULL)
     if (mxGetM(dbglvl_ptr) != 0)
       dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
+
+  if (dbglvl >= 1)
+    printf("Using MEX subbraid.\n");
 
   const int *word = (int *)mxGetData(p_braid); // braid word
   mwIndex *perm = (mwIndex *)mxGetData(p_perm); // store permutations
@@ -61,13 +68,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int *bs = (int *)mxGetData(plhs[0]);
 
   plhs[1] = mxCreateNumericMatrix(1,L,mxINT32_CLASS,mxREAL);
-  int *is = (int *)mxGetData(plhs[1]);
+  int *is;
+  if (storeind)
+    is = (int *)mxGetData(plhs[1]);
 
   mwIndex ind;
   int mygen;
-  mwIndex bsL;
+  mwIndex bsL = 0;
   int sgen;
 
+  
   // main algorithm loop
   // go through the full braid,
   // and infer if its generators reflect on kept strands,
@@ -84,20 +94,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       // of strands that is kept
       sgen = 0;
       for ( mwIndex n = 0; n < N; n++ ) {
-        if ( !keepstr[n] )
+        if ( !keepstr[n] ) {
           continue;
+        }
         else {
-          if ( perm[ind-1] == perm[n] )
+          if ( perm[ind-1] == perm[n] ) {
             break;
-          else
+          }
+          else {
             sgen++;
+          }
         }
       }
 
       // store subbraid generator and index of crossing
       // in matlab convention
       bs[bsL] = (int) ( mygen >= 0 ? (sgen+1) : -(sgen+1) );
-      is[bsL] = (int) (i+1);
+      if (storeind)
+        is[bsL] = (int) (i+1);
       bsL++;
     }
 
@@ -106,4 +120,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     std::swap<mxLogical>( keepstr[ind-1], keepstr[ind] );    
   }
 
+  mxSetN( plhs[0], bsL );
+  mxSetN( plhs[1], bsL );  
+
 }
+
+

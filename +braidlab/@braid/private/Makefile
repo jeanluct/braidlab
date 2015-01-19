@@ -42,7 +42,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX)
+all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX) subbraid_helper.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -56,8 +56,6 @@ endif
 		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
 	$(MEX) $(MEXFLAGS) $^ \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
-
-
 
 tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 	cd $(TRAINS_DIR); \

@@ -43,6 +43,17 @@ function [varargout] = subbraid(b,s)
     error('BRAIDLAB:braid:subbraid:badstring', ...
           'Substring out of range.')
   end
+  
+  %% determine if MEX implementation should be used
+  global BRAIDLAB_braid_nomex
+  if ~exist('BRAIDLAB_braid_nomex','var') || ...
+        isempty(BRAIDLAB_braid_nomex) || ...
+        BRAIDLAB_braid_nomex == false
+    usematlab = false;
+  else
+    usematlab = true;
+  end
+  
 
   nn = length(s);
 
@@ -52,11 +63,33 @@ function [varargout] = subbraid(b,s)
   % store membership of p in s, as logicals
   keepstr = ismember(perm, s);
 
-  % execute the subroutine to extract subbraid
-  [bs, is] = subbraid_m( b.word, perm, keepstr, nargout > 1 )
-  
-  [bs_c, is_c] = subbraid_helper( b.word, perm, keepstr, nargout > 1 )
 
+  isIndexReturn = nargout > 1;
+  
+  %% MEX implementation of algorithm
+  if ~usematlab
+    try
+      if nargout > 1
+        [bs, is] = subbraid_helper( b.word, perm, keepstr, isIndexReturn );
+      else
+        bs = subbraid_helper( b.word, perm, keepstr, isIndexReturn );    
+      end
+    catch me
+      warning(me.identifier, [ me.message ...
+                          ' Reverting to Matlab subbraid'] );
+      usematlab = true;
+    end
+  end
+  
+  %% Matlab implementation of algorithm
+  if usematlab
+      if nargout > 1
+        [bs, is] = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+      else
+        bs = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+      end
+  end
+  
   varargout{1} = braidlab.braid(bs,nn);
   if nargout > 1, varargout{2} = is; end
 
