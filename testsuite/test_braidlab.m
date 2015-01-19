@@ -74,3 +74,7 @@ suite = TestSuite.fromFolder(tcfolder);
 %suite = TestSuite.fromFile([tcfolder 'taffyTest.m']);
 runner = TestRunner.withTextOutput;
 res = runner.run(suite);
+
+disp('Unsetting global variables BRAIDLAB_*_nomex');
+clear global BRAIDLAB_loop_nomex
+clear global BRAIDLAB_braid_nomex

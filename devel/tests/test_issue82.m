@@ -46,3 +46,7 @@ catch me
     disp(me)
 end
 
+disp('Unsetting global variable BRAIDLAB_braid_nomex');
+clear global BRAIDLAB_braid_nomex
+
+
