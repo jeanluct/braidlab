@@ -31,60 +31,69 @@ function [varargout] = subbraid(b,s)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if isempty(s)
-  error('BRAIDLAB:braid:subbraid:badstring', ...
-        'Specify some substrings.')
-end
-
-if min(s) < 1 || max(s) > b.n
-  error('BRAIDLAB:braid:subbraid:badstring', ...
-        'Substring out of range.')
-end
-
-nn = length(s);
-
-% keeps colors of strings during permutations
-p = 1:b.n; 
-
-% store membership of p in s, as logicals
-pos = ismember(p, s);
-
-% execute the subroutine to extract subbraid
-[bs, is] = subbraid_m( b.word, p, pos, nargout > 1 );
-
-varargout{1} = braidlab.braid(bs,nn);
-if nargout > 1, varargout{2} = is; end
-
-end
-
-function [bs, is] = subbraid_m( word, p, pos, storeindices )
-%% SUBBRAID_M Extract generators.
-
-% subbraid word
-bs = [];
-
-% indices of subbraid generators in the original braid
-is = [];
-
-for i = 1:length(word)
-  
-  %% determine if the generator permutes strings that are kept
-  mygen = word(i);
-  ind = abs(mygen); % generator index
-  
-  if pos(ind) && pos(ind+1) 
-    % Of the substrings, find the order of the one we just switched.
-    % This gives the unsigned generator for the subbraid.
-    sgen = find(p(pos) == p(ind));
-    
-    % Restore sign and append to list.
-    bs = [bs sign(mygen)*sgen]; %#ok<AGROW>
-                                % Optionally also keep track of which generators we kept.  This is
-                                % used by the subclass databraid.
-    if storeindices, is = [is i]; end %#ok<AGROW>
+  if isempty(s)
+    error('BRAIDLAB:braid:subbraid:badstring', ...
+          'Specify some substrings.')
   end
-  p([ind ind+1]) = p([ind+1 ind]); % update permutation
-  pos([ind ind+1]) = pos([ind+1 ind]); % update membership permutation
-end
+  
+  % ensure input is unique and sorted
+  s = unique(s); 
+
+  if min(s) < 1 || max(s) > b.n
+    error('BRAIDLAB:braid:subbraid:badstring', ...
+          'Substring out of range.')
+  end
+
+  nn = length(s);
+
+  % keeps colors of strings during permutations as integers
+  perm = cast(1:b.n, 'like', b.word); 
+
+  % store membership of p in s, as logicals
+  keepstr = ismember(perm, s);
+
+  % execute the subroutine to extract subbraid
+  [bs, is] = subbraid_m( b.word, perm, keepstr, nargout > 1 )
+  
+  [bs_c, is_c] = subbraid_helper( b.word, perm, keepstr, nargout > 1 )
+
+  varargout{1} = braidlab.braid(bs,nn);
+  if nargout > 1, varargout{2} = is; end
 
 end
+
+function [bs, is] = subbraid_m( word, perm, keepstr, storeind )
+%% SUBBRAID_M Extract generators.
+  
+  validateattributes( storeind, {'logical'}, {} );
+
+  % subbraid word 
+  bs = cast([],'like',word);
+
+  % indices of subbraid generators in the original braid
+  is = cast([], 'like', word);
+
+  for i = 1:length(word)
+    
+    mygen = word(i);
+    ind = abs(mygen); % generator index
+
+    %% determine if the generator permutes strings that are kept    
+    if keepstr(ind) && keepstr(ind+1) 
+      % Of the substrings, find the order of the one we just switched.
+      % This gives the unsigned generator for the subbraid.
+      sgen = find(perm(keepstr) == perm(ind), 1);
+      
+      % Restore sign and append to list.
+      bs = [bs sign(mygen)*sgen]; %#ok<AGROW>
+      
+      % Optionally also keep track of which generators we kept. This
+      % is used by the subclass databraid.
+      if storeind, is = [is i]; end %#ok<AGROW>
+    end
+    perm([ind ind+1]) = perm([ind+1 ind]); % update permutation
+    keepstr([ind ind+1]) = keepstr([ind+1 ind]); % update membership permutation
+  end
+  
+end
+
