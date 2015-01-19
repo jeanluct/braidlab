@@ -49,16 +49,27 @@ p = 1:b.n;
 % store membership of p in s, as logicals
 pos = ismember(p, s);
 
+% execute the subroutine to extract subbraid
+[bs, is] = subbraid_m( b.word, p, pos, nargout > 1 );
+
+varargout{1} = braidlab.braid(bs,nn);
+if nargout > 1, varargout{2} = is; end
+
+end
+
+function [bs, is] = subbraid_m( word, p, pos, storeindices )
+%% SUBBRAID_M Extract generators.
+
 % subbraid word
 bs = [];
 
 % indices of subbraid generators in the original braid
 is = [];
 
-for i = 1:length(b)
-    
+for i = 1:length(word)
+  
   %% determine if the generator permutes strings that are kept
-  mygen = b.word(i);
+  mygen = word(i);
   ind = abs(mygen); % generator index
   
   if pos(ind) && pos(ind+1) 
@@ -68,13 +79,12 @@ for i = 1:length(b)
     
     % Restore sign and append to list.
     bs = [bs sign(mygen)*sgen]; %#ok<AGROW>
-    % Optionally also keep track of which generators we kept.  This is
-    % used by the subclass databraid.
-    if nargout > 1, is = [is i]; end %#ok<AGROW>
+                                % Optionally also keep track of which generators we kept.  This is
+                                % used by the subclass databraid.
+    if storeindices, is = [is i]; end %#ok<AGROW>
   end
   p([ind ind+1]) = p([ind+1 ind]); % update permutation
   pos([ind ind+1]) = pos([ind+1 ind]); % update membership permutation
 end
 
-varargout{1} = braidlab.braid(bs,nn);
-if nargout > 1, varargout{2} = is; end
+end
