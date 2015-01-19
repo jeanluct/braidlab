@@ -58,21 +58,22 @@ is = [];
 for i = 1:length(b)
     
   %% determine if the generator permutes strings that are kept
-  gen = abs(b.word(i)); % unsigned generator
+  mygen = b.word(i);
+  ind = abs(mygen); % generator index
   
-  if pos(gen) && pos(gen+1) 
+  if pos(ind) && pos(ind+1) 
     % Of the substrings, find the order of the one we just switched.
     % This gives the unsigned generator for the subbraid.
-    sgen = find(p(pos) == p(gen));
+    sgen = find(p(pos) == p(ind));
     
     % Restore sign and append to list.
-    bs = [bs sign(b.word(i))*sgen]; %#ok<AGROW>
+    bs = [bs sign(mygen)*sgen]; %#ok<AGROW>
     % Optionally also keep track of which generators we kept.  This is
     % used by the subclass databraid.
     if nargout > 1, is = [is i]; end %#ok<AGROW>
   end
-  p([gen gen+1]) = p([gen+1 gen]); % update permutation
-  pos([gen gen+1]) = pos([gen+1 gen]); % update membership permutation
+  p([ind ind+1]) = p([ind+1 ind]); % update permutation
+  pos([ind ind+1]) = pos([ind+1 ind]); % update membership permutation
 end
 
 varargout{1} = braidlab.braid(bs,nn);
