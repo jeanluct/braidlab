@@ -31,52 +31,102 @@ function [varargout] = subbraid(b,s)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-if isempty(s)
-  error('BRAIDLAB:braid:subbraid:badstring', ...
-        'Specify some substrings.')
-end
-
-if min(s) < 1 || max(s) > b.n
-  error('BRAIDLAB:braid:subbraid:badstring', ...
-        'Substring out of range.')
-end
-
-nn = length(s);
-
-% keeps colors of strings during permutations
-p = 1:b.n; 
-
-% subbraid word
-bs = [];
-
-% indices of subbraid generators in the original braid
-is = [];
-
-for i = 1:length(b)
-    
-  %% determine if the generator permutes strings that are kept
-  gen = abs(b.word(i)); % unsigned generator
-  
-  if any(p(gen) == s) && any(p(gen+1) == s)
-    % The current generator involves two of our substrings.
-    % Find the position of all sub-strings in p.
-    pos = ismember(p,s); % p(pos) contains only retained strings
-    
-    p(pos)
-    intersect(p,s)
-    
-    % Of the substrings, find the order of the one we just switched.
-    % This gives the unsigned generator for the subbraid.
-    sgen = find(p(pos) == p(gen))
-    
-    % Restore sign and append to list.
-    bs = [bs sign(b.word(i))*sgen]; %#ok<AGROW>
-    % Optionally also keep track of which generators we kept.  This is
-    % used by the subclass databraid.
-    if nargout > 1, is = [is i]; end %#ok<AGROW>
+  if isempty(s)
+    error('BRAIDLAB:braid:subbraid:badstring', ...
+          'Specify some substrings.')
   end
-  p([gen gen+1]) = p([gen+1 gen]); % update permutation
+  
+  % ensure input is unique and sorted
+  s = unique(s); 
+
+  if min(s) < 1 || max(s) > b.n
+    error('BRAIDLAB:braid:subbraid:badstring', ...
+          'Substring out of range.')
+  end
+  
+  %% determine if MEX implementation should be used
+  global BRAIDLAB_braid_nomex
+  if ~exist('BRAIDLAB_braid_nomex','var') || ...
+        isempty(BRAIDLAB_braid_nomex) || ...
+        BRAIDLAB_braid_nomex == false
+    usematlab = false;
+  else
+    usematlab = true;
+  end
+  
+
+  nn = length(s);
+
+  % keeps colors of strings during permutations as integers
+  perm = cast(1:b.n, 'like', b.word); 
+
+  % store membership of p in s, as logicals
+  keepstr = ismember(perm, s);
+
+
+  isIndexReturn = nargout > 1;
+  
+  %% MEX implementation of algorithm
+  if ~usematlab
+    try
+      if nargout > 1
+        [bs, is] = subbraid_helper( b.word, perm, keepstr, isIndexReturn );
+      else
+        bs = subbraid_helper( b.word, perm, keepstr, isIndexReturn );    
+      end
+    catch me
+      warning(me.identifier, [ me.message ...
+                          ' Reverting to Matlab subbraid'] );
+      usematlab = true;
+    end
+  end
+  
+  %% Matlab implementation of algorithm
+  if usematlab
+      if nargout > 1
+        [bs, is] = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+      else
+        bs = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+      end
+  end
+  
+  varargout{1} = braidlab.braid(bs,nn);
+  if nargout > 1, varargout{2} = is; end
+
 end
 
-varargout{1} = braidlab.braid(bs,nn);
-if nargout > 1, varargout{2} = is; end
+function [bs, is] = subbraid_m( word, perm, keepstr, storeind )
+%% SUBBRAID_M Extract generators.
+  
+  validateattributes( storeind, {'logical'}, {} );
+
+  % subbraid word 
+  bs = cast([],'like',word);
+
+  % indices of subbraid generators in the original braid
+  is = cast([], 'like', word);
+
+  for i = 1:length(word)
+    
+    mygen = word(i);
+    ind = abs(mygen); % generator index
+
+    %% determine if the generator permutes strings that are kept    
+    if keepstr(ind) && keepstr(ind+1) 
+      % Of the substrings, find the order of the one we just switched.
+      % This gives the unsigned generator for the subbraid.
+      sgen = find(perm(keepstr) == perm(ind), 1);
+      
+      % Restore sign and append to list.
+      bs = [bs sign(mygen)*sgen]; %#ok<AGROW>
+      
+      % Optionally also keep track of which generators we kept. This
+      % is used by the subclass databraid.
+      if storeind, is = [is i]; end %#ok<AGROW>
+    end
+    perm([ind ind+1]) = perm([ind+1 ind]); % update permutation
+    keepstr([ind ind+1]) = keepstr([ind+1 ind]); % update membership permutation
+  end
+  
+end
+
