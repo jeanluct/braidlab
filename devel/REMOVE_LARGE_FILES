@@ -7,6 +7,9 @@
 
 # http://naleid.com/blog/2012/01/17/finding-and-purging-big-files-from-git-history
 
+echo "Do not run this, you fool!"
+exit 1
+
 # Get list of largest blobs.
 git rev-list --objects --all | sort -k 2 >| allfileshas.txt
 git gc && git verify-pack -v .git/objects/pack/pack-*.idx | egrep "^\w+ blob\W+[0-9]+ [0-9]+ [0-9]+$" | sort -k 3 -n -r >| bigobjects.txt
