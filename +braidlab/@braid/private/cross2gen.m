@@ -1,4 +1,4 @@
-function [gen,tcr,cross_cell] = cross2gen(XYtraj,t)
+function [gen,tcr,cross_cell] = cross2gen(XYtraj,t,delta)
 %CROSS2GEN   Convert a physical braid to a list of braid generators.
 %
 %   The order of each particle is determined according to its first (X)
@@ -75,12 +75,12 @@ for I = 1:n
     % angle).
     dXtraj = Xtraj1 - Xtraj2;
 
-    % Use relative precision to test equality (same as C++ code).
-    nearcoinc = find(areEqual(Xtraj1, Xtraj2, 10));
+    % Use absolute precision to test equality.
+    nearcoinc = find(abs(dXtraj) < delta);
 
     if ~isempty(nearcoinc)
-      % Use relative precision to test equality (same as C++ code).
-      if any(areEqual(Ytraj1(nearcoinc),Ytraj2(nearcoinc),10))
+      % Use absolute precision to test equality.
+      if any(abs(Ytraj1(nearcoinc)-Ytraj2(nearcoinc)) < delta)
         error('BRAIDLAB:braid:colorbraiding:coincidentparticles', ...
               mat2str([I J]) )
       else

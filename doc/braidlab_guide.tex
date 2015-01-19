@@ -53,8 +53,8 @@
 % Commands
 %
 
-\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
-%\newcommand{\jlt}[1]{}
+%\newcommand{\jlt}[1]{\textcolor{red}{(#1)}}
+\newcommand{\jlt}[1]{}
 
 \newcommand{\braidlab}{\texttt{braidlab}}%{\lstinline{braidlab}}
 \newcommand{\braid}{\texttt{braid}}%{\lstinline{braid}}
@@ -241,7 +241,7 @@ characterize the braid group for~$\nn$ strings, denoted~$B_\nn$.
 
 
 \subsection{Constructing a braid from orbit data}
-\label{sec:braidfromdata}
+\label{sec:braidfromorbitdata}
 
 \index{braid!from data|(}%
 %
@@ -611,8 +611,8 @@ each entry containing a \lstinline{laurpoly} object:
 
 ans(z) = + 1 - z^(-1)
 \end{lstlisting}
-Another option is to use Matlab's symbolic toolbox:
-\index{Matlab!symbolic toolbox}%
+Instead of \lstinline{laurpoly} objects, we can use Matlab's symbolic
+toolbox: \index{Matlab!symbolic toolbox}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> B = burau(braid([1 -2]),sym('t'))
 
@@ -625,6 +625,26 @@ where now \lstinline{B} is a matrix of \lstinline{sym} objects:
 
 ans = 1 - 1/t
 \end{lstlisting}
+
+\index{braid!Lawrence--Krammer representation|(}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|(}%
+Another well-known homological representation of braid groups is the
+Lawrence--Krammer representation \citep{Lawrence1990,Bigelow2001}.  It is
+given in terms of two parameters, usually denoted~$t$ and~$q$:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> K = lk(braid([1 -2]),sym('t'),sym('q'))
+
+K = [ -(q-1)^2/q - q*t*(q-1),  -(q-1)/q,  (q^2-q+1)/q^2]
+    [                 -q^2*t,         0,              0]
+    [           -(q-1)/(q*t),  -1/(q*t),  (q-1)/(q^2*t)]
+\end{lstlisting}
+In this case there we cannot use \lstinline{laurpoly} entries, since the
+representation involves Laurent polynomials in two symbols.  For this reason,
+and because its size grows more rapidly with the number of strings (matrices
+of dimension $\tfrac12\nn(\nn-1)$), the Lawrence--Krammer representation is
+very slow to compute for large braids. %
+\index{braid!Lawrence--Krammer representation|)}%
+\index{braid class@\braid\ class!lk@\lstinline{lk}|)}%
 
 The reduced Burau matrix of a braid can be used to compute the
 \emph{Alexander--Conway polynomial} (or Alexander polynomial for short) %
@@ -1058,7 +1078,7 @@ ordering of the crossing times.
   \lstinline{databraid} objects to \lstinline{braid} objects; however, this
   should be avoided in favor of the appropriate concept for
   \hbox{\lstinline{databraid}s},
-  the Finite Time Braiding Exponent (FTBE) \citep{Thiffeault2005,Budisic2014}.
+  the Finite Time Braiding Exponent (FTBE) \citep{Thiffeault2005,Budisic2015}.
   A \lstinline{databraid}~$b_T$ recorded over a time interval of length~$T$
   has an FTBE defined by
   \begin{equation}
@@ -1800,7 +1820,13 @@ rotation.  (There are several videos of taffy pullers on
 \href{http://www.youtube.com/watch?v=6QkGp2qBbn4}{YouTube}.)
 
 Let's use \braidlab\ to analyze the rod motion.  From the folder
-\lstinline{doc/examples}, run the command %
+\lstinline{doc/examples}, run the command%
+%
+\footnote{When using the parallel code, the generator sequences in this
+  section may sometimes differ from run-to-run, due to the simultaneous
+  crossings.  However, the braids themselves are still equal, after the
+  relations~\eqref{eq:relations} are taken into account.}
+%
 \index{taffy@\lstinline{taffy}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = taffy('3rods')
@@ -1912,17 +1938,24 @@ constructing braids.  If we give an optional projection angle %
 of~$\pi/2$ to \lstinline{taffy}:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2)
-Error using colorbraiding
-Coincident projection coordinate; change projection angle
-   (type help braid.braid).
+Error using braidlab.braid/colorbraiding
+Paths of particles 2 and 1 have a coincident projection.
+Try changing the projection angle.
 \end{lstlisting}
 This corresponds to using the $y$ (vertical) axis to compute the braid, but as
 we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
 the rods are initially perfectly aligned along that axis.  The braid obtained
 would depend sensitively on numerical roundoff when comparing the rod
-projections.  Instead of attempting to construct the braid, \braidlab\ returns
-an error and asks the user to modify the projection axis.  A tiny change in
-the projection line is sufficient to break the symmetry:
+projections.%
+%
+\footnote{\braidlab\ uses a property \lstinline{BraidAbsTol} to determine when
+  coordinates are close enough to be considered coincident, with a default
+  value of~$10^{-10}$.  See Section~\ref{sec:prop} for how to set global
+  properties.}
+%
+Instead of attempting to construct the braid, \braidlab\ returns an error and
+asks the user to modify the projection axis.  A tiny change in the projection
+line is sufficient to break the symmetry:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> taffy('4rods',pi/2 + .01)
 
@@ -1975,7 +2008,7 @@ b = < 1 -2 >
 \end{figure}
 %
 The braids \lstinline{a} and \lstinline{b} are shown in
-Fig.~\ref{fig:subbraid}; their entropy is %
+Fig.~\ref{fig:subbraid}; their entropies are %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
 \index{braid!entropy|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
@@ -2107,6 +2140,7 @@ To see the properties available and their current values, use the
 ans =         GenRotDir: 1
           GenLoopActDir: 'lr'
        GenPlotOverUnder: 1
+            BraidAbsTol: 1.0000e-10
            BraidPlotDir: 'bt'
     LoopCoordsBasePoint: 'right'
 \end{lstlisting}
@@ -2136,7 +2170,8 @@ values.
 The development of \braidlab\ was supported by the US National Science
 Foundation, under grants DMS-0806821 and CMMI-1233935.  The authors thank
 Michael Allshouse and Margaux Filippi for extensive testing and comments.
-Michael Allshouse also contributed some of the code.  James Puckett and Karen
+Michael Allshouse also contributed some of the code.  Alexander Flanagan
+helped with testing and the taffy puller research.  James Puckett and Karen
 Daniels provided the test data from their granular medium
 experiments~\citep{Puckett2012}.  \braidlab\ uses Toby Hall's \emph{Train}
 \citep{HallTrain}; Jae Choon Cha's \emph{CBraid} \citep{CBraid}; Juan
@@ -2228,9 +2263,10 @@ Either way, after the cloning finishes type
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make
 \end{lstlisting}
-to compile the MEX files.  Note that you can still use \braidlab\ even if
+to compile the MEX files.  (If for some reasone you need to recompile, run
+\lstinline{make clean} first.)  Note that you can still use \braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
-or run (much) more slowly.
+or run (much) more slowly. %
 \index{Matlab!MEX files|)}
 
 \index{GMP|(}%
@@ -2309,27 +2345,42 @@ try
 $ which gcc-4.7
 \end{lstlisting}
 to see if a path to the command exists.  If it does, you have an earlier
-compiler installed and you can proceed to build \braidlab\ as described in
-Section~\ref{sec:cloning} above, replacing the \lstinline{make} command with
+compiler installed and you can skip to the next paragraph.  If the
+\lstinline{which} command above didn't return anything, you can try to install
+an older version of GCC:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ make CC=gcc-4.7 CXX=g++-4.7
-\end{lstlisting}
-Note that this only works with Matlab R2014a or later.  Earlier versions of
-Matlab also require editing of a file called \lstinline{mexopts.sh}.
-
-If the \lstinline{which} command above didn't return anything, you can try to
-install an older version of GCC:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get install gcc-4.7 g++4.7
+$ sudo apt-get install gcc-4.7 g++-4.7
 \end{lstlisting}
 This last line is for Ubuntu and Debian Linux distributions.  Note that this
-will \emph{not} overwrite the default compiler.
+will \emph{not} overwrite the default compiler.  If your Linux distribution
+doesn't allow you to easily install the required compiler, you could always
+\href{https://gcc.gnu.org/releases.html}{compile and install it from scratch!}
+That's fairly tedious, though.
 
-If your Linux distribution doesn't allow you to easily install the required
-compiler, you could always \href{https://gcc.gnu.org/releases.html}{compile
-  and install it from scratch!}  That's fairly tedious, though. %
+Assuming that you now have a Matlab-supported compiler installed, you need to
+tell MEX to use it.  If you're lucky, this could be as easy as typing
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ mex -setup cpp
+\end{lstlisting}
+but typically this will just lead to Matlab using the wrong compiler anyways.
+In that case you can try and download
+\href{http://github.com/jeanluct/braidlab/raw/develop/devel/gcc-alternatives}{this
+  script}, then run it:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ bash ./gcc-alternatives
+\end{lstlisting}
+You will be prompted for your password (assuming you have administrator
+privileges), and then asked to select a compiler version.  You should then be
+able to compile \braidlab.  You can later switch back to your original
+compiler with the command 
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ sudo update-alternatives --config gcc
+\end{lstlisting}
+
 \index{GCC compiler|)}%
 \index{Linux|)}%
 

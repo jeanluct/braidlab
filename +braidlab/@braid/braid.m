@@ -234,10 +234,7 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Bad array size.')
           end
         else
-          % Store word as row vector.
-          if size(b,1) > size(b,2)
-            b = b.';
-          end
+          b = b(:).';   % Store word as row vector.
           br.word = b;
           if nargin < 2
             br.n = max(abs(b))+1;

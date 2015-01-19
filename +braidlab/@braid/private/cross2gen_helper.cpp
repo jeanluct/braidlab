@@ -33,8 +33,9 @@
 // Use the group relations to shorten a braid word as much as
 // possible.
 
-#include "cross2gen_helper.hpp"
 #include "mex.h"
+#include "cross2gen_helper.hpp"
+
 
 /*
 *** Inputs:
@@ -47,6 +48,12 @@ gen      - nG x 1 vector of generators in the braid
 tgen     - nG x 1 vector of timesteps ast which the generators were detected
 
 */
+
+#define p_XY (prhs[0])
+#define p_t (prhs[1])
+#define p_AbsTol (prhs[2])
+#define p_Nthreads (prhs[3])
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   // read off global debug level
@@ -55,31 +62,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   }
 
-  // read off number of threads that are requested
-  size_t NThreadsRequested;
-  if (nrhs >= 3) {
-    if( !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) ||
-        !(mxGetM(prhs[2])==1 && mxGetN(prhs[2])==1) ) {
-      mexErrMsgIdAndTxt( "BRAIDLAB:braid:cross2gen_helper:threadsinput",
-                         "Number of threads must be "
-                         "noncomplex scalar double.");
-    }
-
-    NThreadsRequested = (size_t) mxGetScalar(prhs[2]);
-    if (1 <= BRAIDLAB_debuglvl)  {
-      printf("cross2gen_helper: Number of threads requested %d\n",
-             NThreadsRequested );
-    }
-  }
-  else {
-    NThreadsRequested = 0;
-  }
+  if (nrhs < 2)
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:input",
+                      "2 arguments required.");
 
 #ifdef BRAIDLAB_NOTHREADING
   if (2 <= BRAIDLAB_debuglvl)  {
     printf("\nBRAIDLAB_NOTHREADING defined\n");
   }
 #endif
+
+  // read off number of threads that are requested
+  size_t NThreadsRequested;
+  if (nrhs >= 3) {
+    NThreadsRequested = (size_t) mxGetScalar(p_Nthreads);
+  }
+  else {
+    NThreadsRequested = 0;
+  }
+
+  if (1 <= BRAIDLAB_debuglvl)  {
+    printf("cross2gen_helper: Number of threads requested %d\n",
+           NThreadsRequested );
+  }
 
 #ifdef BRAIDLAB_NOTHREADING
   if (NThreadsRequested > 1) {
@@ -100,19 +105,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 #endif
 
+  double AbsTol;
+
+  AbsTol = mxGetScalar(p_AbsTol);
+
+  if ( AbsTol <= 0 )
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:abstolnonpositive",
+                      "AbsTol must be a positive number.");
+
+
   Timer tictoc(1);
 
-  if (nrhs < 2)
-    mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:input",
-                      "2 arguments required.");
-
-  Real3DMatrix trj = Real3DMatrix( prhs[0] );
+  Real3DMatrix trj = Real3DMatrix( p_XY );
   if ( trj.C() != 2 ) {
     mexErrMsgIdAndTxt("BRAIDLAB:braid:cross2gen_helper:input",
                       "Trajectory should have 2 columns.");
   }
 
-  RealVector t = RealVector( prhs[1] );
+  RealVector t = RealVector( p_t );
 
   if ( trj.R() != t.N() ) {
     mexErrMsgIdAndTxt(
@@ -120,9 +130,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         "Trajectory matrix and time vector should have same number of rows.");
   }
 
+  if (2 <= BRAIDLAB_debuglvl)  {
+    printf("Trajectories:\n");
+    trj.print();
+  }
+
+
   tictoc.tic();
   std::pair< std::vector<int>, std::vector<double> >
-    retval = cross2gen( trj, t, NThreadsRequested );
+  // apply pairwise crossing generator
+    retval = cross2gen( trj, t, AbsTol, NThreadsRequested );
   tictoc.toc("Algorithm");
 
   tictoc.tic();

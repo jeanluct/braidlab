@@ -61,10 +61,8 @@ function [varargout] = colorbraiding(XY,t,proj)
 import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex
-useMatlabVersion = (exist('BRAIDLAB_braid_nomex','var') && ...
-                    ~isempty(BRAIDLAB_braid_nomex) && ...
-                    all(BRAIDLAB_braid_nomex));
+global BRAIDLAB_braid_nomex;
+useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
 if any(isnan(XY) | isinf(XY))
   error('BRAIDLAB:braid:colorbraiding:badarg',...
@@ -80,6 +78,8 @@ if nargin < 3
   % Default projection line is X axis.
   proj = 0;
 end
+
+delta = braidlab.prop('BraidAbsTol');
 
 % Rotate coordinates according to angle proj.  Note that since the
 % projection line is supposed to be rotated counterclockwise by proj, we
@@ -98,30 +98,34 @@ debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
 % tcr - times of generator occurrence
 
 try % trapping to ensure proper identification of strands
-  
+
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:noMEX', 'Matlab version forced');
+    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
+                        'forced']);
+
+    debugmsg('Using MEX algorithm')
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = cross2gen_helper(XYtraj,t,Nthreads);
+    [gen,tcr] = cross2gen_helper(XYtraj,t,delta,Nthreads);
 
   catch me
-    if ~strcmpi(me.identifier, 'BRAIDLAB:NOMEX')
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
+    debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = cross2gen(XYtraj,t);
+      [gen,tcr,~] = cross2gen(XYtraj,t,delta);
     end
   end
 
 catch me
-  
+
   % Identify particles causing the error using IDX vector
   % and re-throw the error with appropriate reporting
   switch(me.identifier)
     case 'BRAIDLAB:braid:colorbraiding:coincidentparticles'
-      
+
       localPair = eval(me.message);
       sortedPair = idx(localPair);
 
@@ -171,7 +175,7 @@ global BRAIDLAB_threads
 if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
   % use the global variable to set the number of threads
   Nthreads = ceil(BRAIDLAB_threads);
-  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ... 
+  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ...
                     'BRAIDLAB_threads to: %d.'],Nthreads));
 else
   % try to autodetect the optimal number of threads (== number of cores)

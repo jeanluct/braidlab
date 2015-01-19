@@ -12,7 +12,12 @@
 // http://stackoverflow.com/questions/3944505/detecting-signed-overflow-in-c-c?rq=1
 
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault
+//   Braidlab: a Matlab package for analyzing data using braids
+//
+//   http://github.com/jeanluct/braidlab
+//
+//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -29,7 +34,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
 
 template <class T>
 inline void mexerr(T a, T b, std::string p)

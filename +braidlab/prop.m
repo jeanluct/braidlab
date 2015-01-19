@@ -31,12 +31,16 @@ function [varargout] = prop(varargin)
 %   The default is bottom-to-top ('bt'), but popular conventions also
 %   include 'tb' and 'lr'.
 %
+%   * BraidAbsTol [{1e-10}] - The absolute tolerance used to determine
+%   coincident coordinates when constructing a braid from data.  Set this to
+%   a conservative estimate of typical errors in your dataset.
+%
 %   * LoopCoordsBasePoint ['left' | {'right'} | 'dehornoy'] - The position
 %   of the basepoint when defining the loop coordinates of a braid using
 %   braid.loopcoords.  The option 'dehornoy' sets the basepoint to 'left'
 %   and also sets 'GenRotDir' to -1.  See braid.loopcoords.
 %
-%   See also BRAID, BRAID.LOOPCOORDS, BRAID.MTIMES, LOOP.
+%   See also BRAID, BRAID.BRAID, BRAID.LOOPCOORDS, BRAID.MTIMES, LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -89,6 +93,8 @@ if nargin == 1
     varargout{1} = pr.GenPlotOverUnder;
    case {'braidplotdir'}
     varargout{1} = pr.BraidPlotDir;
+   case {'braidabstol'}
+    varargout{1} = pr.BraidAbsTol;
    case {'loopcoordsbasepoint'}
     varargout{1} = pr.LoopCoordsBasePoint;
    otherwise
@@ -104,6 +110,7 @@ parser.addParameter('genloopactdir', [],  @(s) ischar(s) && ...
 parser.addParameter('genplotoverunder', [], @(x) x == true || x == false);
 parser.addParameter('braidplotdir', [], @(s) ischar(s) && ...
                    any(strcmpi(s,{'bt','tb','lr','rl'})));
+parser.addParameter('braidabstol', [], @(x) x >= 0);
 parser.addParameter('loopcoordsbasepoint', [], @(s) ischar(s) && ...
                    any(strcmpi(s,{'left','right','dehornoy'})));
 
@@ -122,6 +129,9 @@ if ~isempty(params.genplotoverunder)
 end
 if ~isempty(params.braidplotdir)
   pr.BraidPlotDir = params.braidplotdir;
+end
+if ~isempty(params.braidabstol)
+  pr.BraidAbsTol = params.braidabstol;
 end
 if ~isempty(params.loopcoordsbasepoint)
   if strcmpi(params.loopcoordsbasepoint,'dehornoy')
@@ -150,4 +160,5 @@ pr.GenRotDir = 1;
 pr.GenLoopActDir = 'lr';
 pr.GenPlotOverUnder = true;
 pr.BraidPlotDir = 'bt';
+pr.BraidAbsTol = 1e-10;
 pr.LoopCoordsBasePoint = 'right';

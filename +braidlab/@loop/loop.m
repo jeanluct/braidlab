@@ -246,8 +246,7 @@ classdef loop < matlab.mixin.CustomDisplay
                 'Array of coordinates must have 1 or 2 dimensions.')
         end
         if isvector(c)
-          % Store coordinates as row vector.
-          if size(c,1) > size(c,2), c = c.'; end
+          c = c(:).';   % Store coordinates as row vector.
         end
         if mod(size(c,2),2)
           error('BRAIDLAB:loop:loop:oddlength', ...

@@ -9,8 +9,14 @@
 // Responds to MATLAB global variable:
 // BRAIDLAB_debuglvl  -- sets the level of logging output from the code
 //
+
 // <LICENSE
-//   Copyright (c) 2013, 2014 Jean-Luc Thiffeault, Marko Budisic
+//   Braidlab: a Matlab package for analyzing data using braids
+//
+//   http://github.com/jeanluct/braidlab
+//
+//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
 //
@@ -27,9 +33,6 @@
 //   You should have received a copy of the GNU General Public License
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
-
-// Use the group relations to shorten a braid word as much as
-// possible.
 
 #ifndef BRAIDLAB_CROSS2GEN_HELPER_HPP
 #define BRAIDLAB_CROSS2GEN_HELPER_HPP
@@ -79,10 +82,9 @@
                                  // https://github.com/progschj/ThreadPool
 #endif
 
-#include "areEqual.hpp"
+#define ABSTOL_TIME (1e-14)
 
 #include "mex.h"
-
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -133,6 +135,18 @@ public:
   // access matrix elements using matrix( r, c, s) syntax
   double operator()( const mwIndex row, const mwIndex col, const mwIndex spn )
     const;
+
+  // print 3D matrix, each 2D slice at a time
+  void print() {
+    for ( size_t s = 0; s < S(); s++ ) {
+      printf("Slice %d: \n",s);
+      for ( size_t r = 0; r < R(); r++ ) {
+        for ( size_t c = 0; c < C(); c++ )
+          printf("%.3f\t", (*this)(r, c, s) );
+        printf("\n");
+      }
+    }
+  }
 
   // access sizes
   mwSize R(void) const { return _R; }
@@ -210,13 +224,13 @@ public:
   // The next line is for gcc >= 4.8 (c++11 I think).
   // using std::logic_error::logic_error;
   // Explicitly declare and define the constructor instead.
-  PWXexception(const std::string& __arg, mwIndex I, mwIndex J) : 
+  PWXexception(const std::string& __arg, mwIndex I, mwIndex J) :
     std::logic_error(__arg), L(I), R(J) {};
 
   int code;
-  
+
   mwIndex L, R; // particles causing the error
- 
+
   // return code of the Matlab error that should be reported
   const char* id() {
     switch (code) {
@@ -231,20 +245,6 @@ public:
     }
   }
 
-  // virtual const char* what() const throw()
-  // {
-  //   switch (code) {
-  //   case 1:
-  //     return "Error in interpolating crossing time. Interpolated time-point is not within the interval determined by input.";
-  //   case 2:
-  //     return "X coordinates of two trajectories are coincident. Try changing the projection angle.";
-  //   case 3:
-  //     return "X and Y coordinates of two trajectories are coincident. Trajectories have to be distinct at every time.";
-  //   default:
-  //     return "Unknown error. This should never happen!";
-  //   }
-  // }
-  
 };
 
 class ThreadSafeExceptionList {
@@ -284,14 +284,16 @@ public:
   // inputs: _XYtraj (trajectory) _t (time)
   // output: storage
   PairCrossings( Real3DMatrix& _XYtraj,
-                 RealVector& _t, 
-                 std::list<PWX>& crossingStorage, 
-                 std::list<PWXexception>& errorStorage) 
+                 RealVector& _t,
+                 std::list<PWX>& crossingStorage,
+                 std::list<PWXexception>& errorStorage,
+                 const double aAbsTol)
     : listOfCrossings(crossingStorage),
       listOfErrors(errorStorage),
       XYtraj(_XYtraj),
       t(_t),
-      Nstrings(_XYtraj.S()) {}
+      Nstrings(_XYtraj.S()),
+      AbsTol(aAbsTol) {}
 
   // run the calculation on T threads
   void run( size_t T = 1 );
@@ -306,6 +308,7 @@ private:
   Real3DMatrix& XYtraj;
   RealVector& t;
   mwSize Nstrings;
+  double AbsTol;
 
 };
 
@@ -384,7 +387,7 @@ private:
   .first  - true if crossing occured
   .second  - crossing data containing crossing information
 
-  Throws PWXexception in case input trajectories 
+  Throws PWXexception in case input trajectories
   overlap in X or XY coordinates.
 */
 std::pair<bool,PWX> isCrossing( mwIndex ti, mwIndex I, mwIndex J,
@@ -405,30 +408,24 @@ public:
 };
 
 
-// check if a and b are within D-th representable number of each other
-bool areEqual( double a, double b, int D);
-
 /*
   Check that coordinates of trajectories I and J do not coincide at
-  time-index ti.  
+  time-index ti.
 
-  Returns 0 if 
+  Returns 0 if
   X coordinates do not coincide (everything is OK).
 
-  Returns 1 if 
+  Returns 1 if
   only X coordinates coincide for a pair of strings. This means a
-  different projection angle will fix things. 
+  different projection angle will fix things.
 
   Returns 2 if
   both X and Y coordinates coincide, this is a true trajectory
-  intersection, which means that the braid is undefined. 
-
-  Equality is checked by a custom areEqual function checks equality 
-  within 10 float-representable increments (or as set by the last argument).
+  intersection, which means that the braid is undefined.
 */
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const mwIndex I, const mwIndex J,
-                         const int precision = 10);
+                         const double AbsTol);
 
 // signum function
 template <typename T> int sgn(T val);
@@ -438,7 +435,8 @@ template <typename T> int sgn(T val);
 //////////////////////////// DEFINITIONS  ////////////////////////////
 
 std::pair< std::vector<int>, std::vector<double> >
-cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
+cross2gen( Real3DMatrix& XYtraj, RealVector& t,
+           const double AbsTol, size_t Nthreads )
 {
   Timer tictoc( 1 );
   tictoc.tic();
@@ -452,7 +450,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   std::list<PWX> crossings;
   std::list<PWXexception> crossingErrors;
 
-  PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors );
+  PairCrossings pairCrosser( XYtraj, t, crossings, crossingErrors, AbsTol );
 
   pairCrosser.run(Nthreads);
   tictoc.toc("cross2gen_helper: pairwise crossing detection", true);
@@ -460,7 +458,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
   // there were crossingErrors in pairwise detection
   if (! crossingErrors.empty() ) {
     int count  = 1;
-    // output individual errors 
+    // output individual errors
     if (1 <= BRAIDLAB_debuglvl)  {
       mexPrintf("List of all crossingErrors encountered:\n");
       for( std::list<PWXexception>::iterator e = crossingErrors.begin();
@@ -497,8 +495,6 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
 
   Strings stringSet(Nstrings);
 
-  //  return retval;
-
   // Cycle through all crossings, apply them to the strands
   bool notcrossed;
   std::list<PWX>::iterator blockStart = crossings.begin();
@@ -511,9 +507,12 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t, size_t Nthreads )
     // at the same time
     blockEnd = blockStart;
     blockEnd++;
-    while ( areEqual( blockStart->t,blockEnd->t,2 ) ) {// within 2-float numbers
+    // all times within ABSTOL_TIME are considered to being concurrent
+    // blockEnd is the first non-concurrent crossing
+    while ( std::abs(blockStart->t - blockEnd->t) < ABSTOL_TIME ) {
       blockEnd++;
     }
+
 
     // apply the crossings to the permutation vector and update the braid
     bool success = stringSet.applyCrossings(blockStart, blockEnd);
@@ -565,13 +564,16 @@ double Real3DMatrix::operator()
 {
   if ( !( row < _R) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Row index out of bounds");
+                      "Row index out of bounds "
+                      "(Remember: zero indexing used)");
   if ( !( col < _C) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Column index out of bounds");
+                      "Column index out of bounds "
+                      "(Remember: zero indexing used)");
   if ( !( spn < _S) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
-                      "Span index out of bounds");
+                      "Span index out of bounds "
+                      "(Remember: zero indexing used)");
 
   return data[(spn*_C + col)*_R + row];
 }
@@ -626,17 +628,25 @@ void PairCrossings::detectCrossings( mwIndex I ) {
       ...I...J...  J is_I_on_Left changes between two steps, it's
       an indication that the crossing happened.
     */
+
+    try {
+      assertNotCoincident( XYtraj, 0, I, J, AbsTol );
+    }
+    catch( PWXexception& e ) {
+      listOfErrors.push_back( e );
+    }
     // loop over rows
     for (mwIndex ti = 0; ti < XYtraj.R()-1; ti++) {
 
       // does a crossing occur at time-index ti between trajectories I and J?
       try {
 
-        // Check that coordinates do not coincide.
-        assertNotCoincident( XYtraj, ti, I, J );
+        // Check that end-points do not coincide
+        // (beginning was checked in previous iteration)
+        assertNotCoincident( XYtraj, ti+1, I, J, AbsTol );
 
         // first element is true if crossing occurs
-        // second element stores data about crossing 
+        // second element stores data about crossing
         std::pair<bool, PWX> interpCross = isCrossing( ti, I, J, XYtraj, t );
 
         // interpolated crossing stored in PWX structure interpCross
@@ -746,38 +756,47 @@ bool Strings::applyCrossings
   ( std::list<PWX>::iterator start, std::list<PWX>::iterator end )
 {
 
+  mxAssert( distance(start, end) > 0,
+            "Block has to contain at least one crossing" );
+
+  if (3 <= BRAIDLAB_debuglvl)  {
+    printf("Concurrent block size: %d\n", distance(start, end) );
+  }
+
   // single crossing was sent -- if it cannot be applied successfuly,
   // there is no way to figure out what went wrong
-  if ( distance(start, end) <= 1) {
+  if ( distance(start, end) == 1) {
     return applyCrossing(*start);
   }
+  else {
 
-  double blockTime = start->t; // check that all crossings have the same time
+    double blockStartTime = start->t;
 
-  // Multiple crossings were sent -- cycle through all of them and try
-  // to apply them sequentially and whittle the block to size zero.
-  // Every time we successfully apply a crossing, remove it from the list
-  // and re-start the application from the beginning.
-  // Reaching the end of the list means that in that pass, no applications
-  // were successful, so the list is inconsistent.
-  std::list<PWX> concurrentBlock( start, end );
-  std::list<PWX>::iterator it = concurrentBlock.begin();
-  while ( it != concurrentBlock.end() ) {
+    // Multiple crossings were sent -- cycle through all of them and try
+    // to apply them sequentially and whittle the block to size zero.
+    // Every time we successfully apply a crossing, remove it from the list
+    // and re-start the application from the beginning.
+    // Reaching the end of the list means that in that pass, no applications
+    // were successful, so the list is inconsistent.
+    std::list<PWX> concurrentBlock( start, end );
+    std::list<PWX>::iterator it = concurrentBlock.begin();
+    while ( it != concurrentBlock.end() ) {
 
-    mxAssert(areEqual(blockTime,it->t,2),
-       "The block of crossings should have the same time (up to 2 representable doubles).");
+      mxAssert(std::abs(blockStartTime - it->t) < ABSTOL_TIME,
+               "Entire block should be roughly concurrent.");
 
-    if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
-      concurrentBlock.erase(it);
-      it = concurrentBlock.begin();
+      if ( applyCrossing( *it ) ) { // success -- remove crossing and restart
+        concurrentBlock.erase(it);
+        it = concurrentBlock.begin();
+      }
+      else { // not successful -- try the next
+        it++;
+      }
     }
-    else { // not successful -- try the next
-      it++;
-    }
+
+    // only empty list is a success
+    return concurrentBlock.empty();
   }
-
-  // only empty list is a success
-  return !concurrentBlock.empty();
 
 }
 
@@ -803,12 +822,9 @@ void Strings::getTime( std::vector<double>& data ) {
 
 }
 
-
 // Attempt to apply a pairwise crossing to the list
 // Successful if two strings were next to each other
 bool Strings::applyCrossing( const PWX& cross ) {
-
-  //  printf("Crossing time: %f\n", cross.t);
 
   std::pair<bool, mwIndex> success = switchByColor( cross.L, cross.R );
   if (success.first) {
@@ -919,12 +935,13 @@ template <typename T> int sgn(T val) {
 // throws PWXexception otherwise
 void assertNotCoincident(const Real3DMatrix& XYtraj, const mwIndex ti,
                          const mwIndex I, const mwIndex J,
-                         const int precision)
+                         const double AbsTol)
 {
   int code = 0;
-  if ( areEqual(XYtraj(ti, 0, I), XYtraj(ti, 0, J), precision ) ) { // X
+
+  if ( std::abs(XYtraj(ti, 0, I) - XYtraj(ti, 0, J)) < AbsTol ) { // X
     code = 2; // for code explanation, see PWXexception
-    if ( areEqual(XYtraj(ti, 1, I), XYtraj(ti, 1, J), precision ) ) { // Y
+    if ( std::abs(XYtraj(ti, 1, I) - XYtraj(ti, 1, J)) < AbsTol ) { // Y
       code = 3; // for code explanation, see PWXexception
     }
   }

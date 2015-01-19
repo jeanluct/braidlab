@@ -41,6 +41,7 @@ endif
 
 MEX = mex
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
+# C++0x is needed for parallel code.
 CXXFLAGS = $(CFLAGS) -std=c++0x
 MEXFLAGS  = -largeArrayDims -O
 
