@@ -1,4 +1,9 @@
 ------------------------------------------------------------------------
+x.x [2015-xx-xx]
+
+* braid.subbraid now has a C++ implementation.
+
+------------------------------------------------------------------------
 3.1 [2015-01-11]
 
 * The function braidlab.prop can be used to set global properties,
