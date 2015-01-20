@@ -43,7 +43,7 @@
 // LICENSE>
 
 // function that switches the type of length computation
-// throws BRAIDLAB:entropy_helper:badlengthflag if
+// throws BRAIDLAB:braid:entropy_helper:badlengthflag if
 // passed length flag is unsupported
 double looplength( mwSize N, double *a, double *b, char lengthFlag);
 
@@ -55,9 +55,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (dbglvl_ptr != NULL)
     if (mxGetM(dbglvl_ptr) != 0)
       dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
-
-  if (dbglvl >= 1)
-    printf("Using MEX entropy.\n");
 
   const mxArray *braidwordA = prhs[0];
   const int *braidword = (int *)mxGetData(braidwordA); // braidwordA contains int32's.
@@ -78,12 +75,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const mwSize N = mxGetN(uA);
   if (mxGetM(uA) != 1)
     {
-      mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badarg",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
                         "Only one loop at a time.");
     }
   if (N % 2 != 0)
     {
-      mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badarg",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
                         "u argument should have even number of columns.");
     }
   // Refers to generators, so don't need to be mwIndex/mwSize.
@@ -201,13 +198,13 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag) {
     break;
 
   default:
-    mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlengthflag",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlengthflag",
                       "Supported flags: 0 (l2), 1 (intaxis), 2 (minlength).");
     break;
   }
 
   if (retval < 0)
-    mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlength",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlength",
                       "Loop length must never be negative.");
 
   return retval;
