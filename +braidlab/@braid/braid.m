@@ -272,6 +272,12 @@ classdef braid < matlab.mixin.CustomDisplay
       if ~all(value)
         error('BRAIDLAB:braid:setword:badarg','Generators cannot be zero.')
       end
+      if any(isnan(value))
+        error('BRAIDLAB:braid:setword:badarg','Generators cannot be NaN.')
+      end
+      if any(isinf(value))
+        error('BRAIDLAB:braid:setword:badarg','Generators cannot be inf.')
+      end
       obj.word = int32(value);
       % Make sure the empty word is 0 by 0.
       if isempty(obj.word), obj.word = int32([]); end

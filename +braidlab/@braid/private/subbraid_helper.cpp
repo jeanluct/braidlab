@@ -1,6 +1,5 @@
 // MEX implementation of subbraid algorithm.
 
-//
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
@@ -36,13 +35,11 @@ void printvector( const int *v, int L ) {
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-
-
   const mxArray *p_braid = prhs[0];
   const mxArray *p_perm = prhs[1];
   const mxArray *p_keepstr = prhs[2];
   const mxArray *p_storeind = prhs[3];
-  
+
   // Get debug level global variable.
   mxArray *dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
   int dbglvl = 0;
@@ -80,7 +77,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // number of generators
   mwSize L = mxGetNumberOfElements( p_braid );
   mwSize N = mxGetNumberOfElements( p_perm );
-  
+
   // create output braid of max length
   // output subbraid
   plhs[0] = mxCreateNumericMatrix(1,L,mxINT32_CLASS,mxREAL);
@@ -96,7 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mwIndex bsL = 0;
   int sgen;
 
-  
+
   // main algorithm loop
   // go through the full braid,
   // and infer if its generators reflect on kept strands,
@@ -105,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // current generator
     mygen = word[i];
 
-    // index of first strand in generator 
+    // index of first strand in generator
     ind = ( mygen >= 0 ? mygen : -mygen );
 
     if ( keepstr[ind-1] && keepstr[ind] ) {
@@ -140,8 +137,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
 
   mxSetN( plhs[0], bsL );
-  mxSetN( plhs[1], bsL );  
-
+  mxSetN( plhs[1], bsL );
 }
-
-
