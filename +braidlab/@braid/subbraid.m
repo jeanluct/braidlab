@@ -54,7 +54,6 @@ function [varargout] = subbraid(b,s)
     usematlab = true;
   end
   
-
   nn = length(s);
 
   % keeps colors of strings during permutations as integers
@@ -64,15 +63,15 @@ function [varargout] = subbraid(b,s)
   keepstr = ismember(perm, s);
 
 
-  isIndexReturn = nargout > 1;
+  doesReturnIndex = nargout > 1;
   
   %% MEX implementation of algorithm
   if ~usematlab
     try
       if nargout > 1
-        [bs, is] = subbraid_helper( b.word, perm, keepstr, isIndexReturn );
+        [bs, is] = subbraid_helper( b.word, perm, keepstr, doesReturnIndex );
       else
-        bs = subbraid_helper( b.word, perm, keepstr, isIndexReturn );    
+        bs = subbraid_helper( b.word, perm, keepstr, doesReturnIndex );    
       end
     catch me
       warning(me.identifier, [ me.message ...
@@ -84,11 +83,12 @@ function [varargout] = subbraid(b,s)
   %% Matlab implementation of algorithm
   if usematlab
       if nargout > 1
-        [bs, is] = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+        [bs, is] = subbraid_m( b.word, perm, keepstr, doesReturnIndex );
       else
-        bs = subbraid_m( b.word, perm, keepstr, isIndexReturn );
+        bs = subbraid_m( b.word, perm, keepstr, doesReturnIndex );
       end
   end
+  
   
   varargout{1} = braidlab.braid(bs,nn);
   if nargout > 1, varargout{2} = is; end
