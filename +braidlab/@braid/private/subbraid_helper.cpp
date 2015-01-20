@@ -53,8 +53,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (dbglvl >= 1)
     printf("Using MEX subbraid.\n");
 
+  if (!mxIsInt32(p_braid) ||
+      (mxGetM(p_braid) != 1) ) 
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
+                        "word should be int32 row-vectors.");
+
+  if (!mxIsInt32(p_perm) ||
+      (mxGetM(p_perm) != 1) ) 
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
+                        "perm should be int32 row-vectors.");
+
+  if (!mxIsLogical(p_keepstr) ||
+      (mxGetM(p_keepstr) != 1) ) 
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
+                        "keepstr should be logical row-vectors.");
+
+  if (!mxIsLogicalScalar(p_storeind))
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
+                        "storeind should be logical scalar.");
+  
   const int *word = (int *)mxGetData(p_braid); // braid word
-  mwIndex *perm = (mwIndex *)mxGetData(p_perm); // store permutations
+  int *perm = (int *)mxGetData(p_perm); // store permutations
   mxLogical *keepstr = mxGetLogicals(p_keepstr); // is string kept?
   bool storeind = mxIsLogicalScalarTrue(p_storeind); // retain time
 
@@ -116,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     // update permutation
-    std::swap<mwIndex>( perm[ind-1], perm[ind] );
+    std::swap<int>( perm[ind-1], perm[ind] );
     std::swap<mxLogical>( keepstr[ind-1], keepstr[ind] );    
   }
 
