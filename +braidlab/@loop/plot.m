@@ -50,14 +50,15 @@ function plot(varargin)
 
 % With 'Components' option, LineColor and LineStyle set automatically.
 optionNames = [
-    'LineColor        '
-    'LineStyle        '
-    'LineWidth        '
-    'PunctureColor    '
-    'PunctureEdgeColor'
-    'PunctureSize     '
-    'PuncturePositions'
-    'Components       '
+    'LineColor             '
+    'LineStyle             '
+    'LineWidth             '
+    'PunctureColor         '
+    'PunctureBasepointColor'    
+    'PunctureEdgeColor     '
+    'PunctureSize          '
+    'PuncturePositions     '
+    'Components            '
     ];
 
 names = lower(optionNames);
@@ -138,8 +139,7 @@ if isempty(options.LineWidth); options.LineWidth = 2; end
 if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
 if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
 if isempty(options.Components); options.Components = false; end
-
-options.PunctureBasepointColor = 'g';
+if isempty(options.PunctureBasepointColor); options.PunctureBasepointColor = 'g'; end
 
 %% Get the coordinates of the loop, convert to crossing numbers.
 
