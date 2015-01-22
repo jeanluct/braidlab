@@ -59,7 +59,7 @@ optionNames = [
     'PunctureSize          '
     'PuncturePositions     '
     'Components            '
-    ];
+              ];
 
 names = lower(optionNames);
 m = size(names,1);
@@ -91,7 +91,7 @@ if ~isscalar(L)
 end
 
 argin_index = 2; % The first argument needs to be the loop, so the
-                   % second index will be the first property name
+                 % second index will be the first property name
 
 val = 0; % We do not expect the next argument to be a value
 
@@ -109,8 +109,9 @@ while argin_index <= nargin
     if isempty(j)                       % if no matches
       error('BRAIDLAB:loop:plot:invalidpropname', ...
             'Invalid property ''%s''.',arg);
-    elseif length(j) > 1                % if more than one match
-      % Check for any exact matches (in case any names are subsets of others)
+    elseif length(j) > 1                % if more than one match 
+      
+      %Check for any exact matches (in case any names are subsets of others)
       k = strmatch(lowArg,names,'exact'); %#ok<MATCH3>
       if length(k) == 1
         j = k;
@@ -449,8 +450,6 @@ if ~holdstate
   axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
 
-end
-
 function joinpoints( mine, next, positions, gaps, options )
 %% joinpoints( mine, next, positions, gaps, options )
 %
@@ -479,53 +478,53 @@ function joinpoints( mine, next, positions, gaps, options )
 % checking is not bullet proof.
 
 
-  dp = next(1) - mine(1); % index distance between punctures
-  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
-         'Requests one or two consecutive punctures');
+dp = next(1) - mine(1); % index distance between punctures
+assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
+        'Requests one or two consecutive punctures');
 
-  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
-          'Vertex indices must be nonzero') ;
+assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
+        'Vertex indices must be nonzero') ;
 
-  if dp == 0
-    %% Draw semicircles
+if dp == 0
+  %% Draw semicircles
 
-    assert( abs(mine(2)) == abs(next(2)) && ...
-            sign(mine(2)) ~= sign(next(2)),...
-            'BRAIDLAB:loop:plot:joinpoints',...
-            ['For semicircles, vertex indices must be equal value, ' ...
-             'opposite sign']);
+  assert( abs(mine(2)) == abs(next(2)) && ...
+          sign(mine(2)) ~= sign(next(2)),...
+          'BRAIDLAB:loop:plot:joinpoints',...
+          ['For semicircles, vertex indices must be equal value, ' ...
+           'opposite sign']);
 
-    order = abs(mine(2));      % order of the loop from the puncture
-    rad = order*gaps(mine(1)); % semi circle radius
-    cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
+  order = abs(mine(2));      % order of the loop from the puncture
+  rad = order*gaps(mine(1)); % semi circle radius
+  cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
 
-    loop_curve_x = cirsign*linspace(0,rad,50);
-    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
-    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    if options.Components
-      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-           'Color', options.LineColor,'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    else
-      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-           options.LineColor,'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    end
-
+  loop_curve_x = cirsign*linspace(0,rad,50);
+  loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
+  loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
+  if options.Components
+    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         'Color', options.LineColor,'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
   else
-    %% Draw straight lines
-    y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
-    y2 = next(2)*gaps(next(1))+positions(next(1),2);
-    if options.Components
-      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-           'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    else
-      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-           options.LineColor, 'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    end
+    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         options.LineColor,'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
+  end
+
+else
+  %% Draw straight lines
+  y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
+  y2 = next(2)*gaps(next(1))+positions(next(1),2);
+  if options.Components
+    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+         'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
+  else
+    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+         options.LineColor, 'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
   end
 end
+
