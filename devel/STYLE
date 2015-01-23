@@ -12,7 +12,7 @@ GENERAL
 
 * No tabs; always use spaces instead.
 * Delete extra whitespace at the end of lines, or at the end of files.
-* Every file should end with a linebreak.
+* Every file should end with a linebreak (but no extra blank lines at the end).
 * Break lines at 78 characters unless there is a compelling reason not
   to (e.g., long URL).
 * Indentation in blocks is two spaces.
