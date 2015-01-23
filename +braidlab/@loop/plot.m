@@ -15,11 +15,12 @@ function plot(L, varargin)
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
+%   BasePointColor     The color of the basepoint puncture, if any.
 %   Components         [true/false] Plot connected components in
 %                      different colors.  LineColor and LineStyle are ignored.
 %
 %   This is a method for the LOOP class.
-%   See also LOOP.
+%   See also LOOP, LOOP.LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -65,7 +66,7 @@ parser.addParameter('LineStyle', '-', @ischar);
 parser.addParameter('LineWidth', 2, @isfinite);
 parser.addParameter('LineColor', 'b', iscolor);
 parser.addParameter('PunctureColor', 'r', iscolor);
-parser.addParameter('BasepointColor', 'g', iscolor);  
+parser.addParameter('BasePointColor', 'g', iscolor);  
 parser.addParameter('PunctureEdgeColor', 'k', iscolor);
 parser.addParameter('PunctureSize', [], @isfinite);
 parser.addParameter('PuncturePositions', [], @isnumeric);
@@ -190,7 +191,7 @@ if prad > 0
 
   for p = 1:n
     if p == L.basepoint
-      pc = options.BasepointColor;
+      pc = options.BasePointColor;
     else
       pc = options.PunctureColor;
     end
@@ -473,4 +474,3 @@ else
          'LineStyle',options.LineStyle)
   end
 end
-
