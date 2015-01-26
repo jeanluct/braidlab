@@ -78,6 +78,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        br.tcross = br.tcross(:).';   % Store tcross as row vector.
         check_tcross(br);
         return
       elseif ismatrix(XY)
@@ -88,6 +89,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        br.tcross = br.tcross(:).';   % Store tcross as row vector.
         check_tcross(br);
         return
       elseif nargin < 2
@@ -116,6 +118,7 @@ classdef databraid < braidlab.braid
       end
       [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
       br.word = b.word;
+      br.tcross = br.tcross(:).';   % Store tcross as row vector.
       br.n = b.n;
     end
 
