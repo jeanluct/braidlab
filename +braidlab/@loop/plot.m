@@ -11,6 +11,7 @@ function plot(L, varargin)
 %   LineWidth          The line width used to draw the loop.
 %   PunctureColor      The color of the punctures.
 %   PunctureEdgeColor  The color of the boundary of the punctures.
+%   PunctureEdgeWidth  The width of the boundary of the punctures.
 %   PunctureSize       The size of the punctures.
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
@@ -68,6 +69,7 @@ parser.addParameter('LineColor', 'b', iscolor);
 parser.addParameter('PunctureColor', 'r', iscolor);
 parser.addParameter('BasePointColor', 'g', iscolor);  
 parser.addParameter('PunctureEdgeColor', 'k', iscolor);
+parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
 parser.addParameter('PunctureSize', [], @isfinite);
 parser.addParameter('PuncturePositions', [], @isnumeric);
 
@@ -199,7 +201,8 @@ if prad > 0
           [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
           puncture_position(p,2) + ...
           [puncture_boundary_y_top puncture_boundary_y_bottom], ...
-          pc,'EdgeColor',options.PunctureEdgeColor)
+          pc,'EdgeColor',options.PunctureEdgeColor, ...
+          'LineWidth',options.PunctureEdgeWidth)
   end
 end
 
