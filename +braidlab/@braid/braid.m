@@ -82,6 +82,11 @@ classdef braid < matlab.mixin.CustomDisplay
     %   crossings (generators).  The K generators are chosen uniformly in
     %   [-(N-1):-1 1:N-1].
     %
+    %   B = BRAID('Normal',N,K) returns a random braid of N strings with K
+    %   crossings (generators).  The indices generators are chosen using the
+    %   binomial distribution with p=1/2 over [1:N-1] and the sign is chosen
+    %   uniformly at random.
+    %
     %   B = BRAID('HalfTwist',N) or BRAID('Delta',N) returns the word D in
     %   Artin generators representing the positive half-twist (Delta) for
     %   the braid group with N strings.
@@ -201,6 +206,10 @@ classdef braid < matlab.mixin.CustomDisplay
           br.n = secnd;
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
+         case {'normal','binomal','norm','binom'}
+          br.n = secnd;
+          k = third;
+          br.word = (-1).^randi(2,1,k) .* (1+binornd( br.n-2, 1/2, 1,k ));
          otherwise
           % Maybe the string specifies a knot.
           try
