@@ -75,7 +75,8 @@ classdef loop < matlab.mixin.CustomDisplay
     %   L = LOOP(D) creates a loop object L from a vector of Dynnikov
     %   coordinates D.  D must have 2*N-4 elements, where N is the number of
     %   punctures.  Here, loop means a "topological loop", or more precisely
-    %   an equivalence class of simple closed multicurves under isotopy.
+    %   an equivalence class of simple closed multicurves under isotopy. Empty
+    %   matrix D results in an error.
     %
     %   L = LOOP(D), where D is a matrix with 2*N-4 columns, creates a
     %   scalar loop object containing a vector of loops, with loop.coords =
@@ -244,6 +245,10 @@ classdef loop < matlab.mixin.CustomDisplay
         if ndims(c) > 2 %#ok<ISMAT>
           error('BRAIDLAB:loop:loop:badarg', ...
                 'Array of coordinates must have 1 or 2 dimensions.')
+        end
+        if isempty(c)
+          error('BRAIDLAB:loop:loop:emptycoord', ...
+                'Loop coordinate array cannot be empty.')
         end
         if isvector(c)
           c = c(:).';   % Store coordinates as row vector.
