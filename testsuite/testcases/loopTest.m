@@ -274,6 +274,41 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(intersec(l(2)),inters(2,:));
     end
 
+    function test_braid_on_nloops(testCase)
+
+      B = braidlab.braid([2,1,-1,-2,3]);
+      Coords = [1,0,-1,1; 2,1,1,1; -1,1,-2,3];
+      Nloops = size(Coords,1);
+
+      % First compute using matlab algorithm, one-by-one
+      global BRAIDLAB_braid_nomex
+      oldSetting = BRAIDLAB_braid_nomex;
+      BRAIDLAB_braid_nomex = true;
+
+
+      INmatlab = cell(Nloops, 1);
+      for k = 1:Nloops
+        INmatlab{k} = braidlab.loop(Coords(k,:));
+      end
+      for k = 1:Nloops
+        OUTmatlab{k} = B*INmatlab{k};
+      end
+
+      OUTmatlabMat = zeros(Nloops, size(Coords,2));
+      for k = 1:Nloops
+        OUTmatlabMat(k,:) = OUTmatlab{k}.coords;
+      end
+
+      % Next, compute using standard algorithm
+      BRAIDLAB_braid_nomex = oldSetting;
+
+      INmat = braidlab.loop(Coords);
+      OUTmat = B*INmat;
+
+      % Compare the two
+      testCase.verifyTrue( all( OUTmatlabMat(:) == OUTmat.coords(:) ) );
+    end
+
     function test_braid_on_loop_action(testCase)
 
       for emptyMatrix = { [], zeros(1,0) }
