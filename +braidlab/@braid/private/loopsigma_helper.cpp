@@ -35,9 +35,9 @@
 // LICENSE>
 
 #define P_SIGMA_IDX prhs[0]
-#define P_LOOP prhs[1]
+#define P_LOOP_IN prhs[1]
 
-#define P_LOOPOUT plhs[0]
+#define P_LOOP_OUT plhs[0]
 #define P_OPSIGN  plhs[1]
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
@@ -46,41 +46,47 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
                       "2 input arguments required.");
   }
 
-  // Dimensions of P_LOOP.
-  const mwSize Ncoord = mxGetN(P_LOOP), Nloops = mxGetM(P_LOOP);
+  // Dimensions of P_LOOP_IN.
+  const mwSize Ncoord = mxGetN(P_LOOP_IN);
+  const mwSize Nloops = mxGetM(P_LOOP_IN);
 
-  const int *sigma_idx = (int *)mxGetData(P_SIGMA_IDX); // P_SIGMA_IDX contains int32's.
-  const mwSize Ngen = std::max(mxGetM(P_SIGMA_IDX),mxGetN(P_SIGMA_IDX));
+  const mwSize Ngen = mxGetNumberOfElements(P_SIGMA_IDX);
 
-  mxArray *opSign = 0;
+  mxArray *opSign = NULL;
   if (nlhs > 1) {
     const int maxOpSign = 5;
     P_OPSIGN = mxCreateDoubleMatrix(Nloops,maxOpSign*Ngen,mxREAL);
     opSign = P_OPSIGN;
   }
+  else {
+    P_OPSIGN = NULL; opSign = NULL;
+  }
 
-  switch( mxGetClassID( P_LOOP ) ) {
+  switch( mxGetClassID( P_LOOP_IN ) ) {
 
   case mxDOUBLE_CLASS: {
-    P_LOOPOUT = mxCreateNumericMatrix(Nloops, Ncoord, mxDOUBLE_CLASS, mxREAL);
-    loopsigma_helper_common<double>(Ngen,sigma_idx,P_LOOP,P_LOOPOUT,opSign);
+    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxDOUBLE_CLASS, mxREAL);
+    Braid<double> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run();
     break; }
   case mxSINGLE_CLASS: {
-    P_LOOPOUT = mxCreateNumericMatrix(Nloops, Ncoord, mxSINGLE_CLASS, mxREAL);
-    loopsigma_helper_common<float>(Ngen,sigma_idx,P_LOOP,P_LOOPOUT,opSign);
+    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxSINGLE_CLASS, mxREAL);
+    Braid<float> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run();
     break; }
   case mxINT32_CLASS: {
-    P_LOOPOUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT32_CLASS, mxREAL);
-    loopsigma_helper_common<int>(Ngen,sigma_idx,P_LOOP,P_LOOPOUT,opSign);
+    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT32_CLASS, mxREAL);
+    Braid<int> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run();
     break; }
   case mxINT64_CLASS: {
-    P_LOOPOUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT64_CLASS, mxREAL);
-    loopsigma_helper_common<long long int>(Ngen,sigma_idx,P_LOOP,P_LOOPOUT,opSign);
+    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT64_CLASS, mxREAL);
+    Braid<long long int> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run();
     break; }
 #ifdef BRAIDLAB_USE_GMP
   case mxCELL_CLASS: {
     // Cell array of strings, to be converted to multiprecision objects.
-
     // Array for Matlab mxArray subscripts.
     mwSize nsubs = 2;
     mwIndex *subs = (mwIndex *)mxCalloc(nsubs,sizeof(mwIndex));
@@ -97,13 +103,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
         subs[0] = l;
         subs[1] = k;
-        mwIndex idx = mxCalcSingleSubscript(P_LOOP,nsubs,subs);
+        mwIndex idx = mxCalcSingleSubscript(P_LOOP_IN,nsubs,subs);
         loopIn[k*Nloops+l] =
-          mpz_class(mxArrayToString(mxGetCell(P_LOOP,idx)));
+          mpz_class(mxArrayToString(mxGetCell(P_LOOP_IN,idx)));
       }
     }
 
     // Act on coordinates with braid.
+    const int* sigma_idx = static_cast<const int*>(mxGetData(P_SIGMA_IDX));
     loopsigma_helper_gmp(Ngen,sigma_idx,Nloops,Ncoord,loopIn,loopOut,opSign);
 
     // Vector of array dimensions.
@@ -111,16 +118,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     dims[0] = Nloops;
     dims[1] = Ncoord;
     // Allocate output cell array.
-    P_LOOPOUT = mxCreateCellArray(nsubs,dims);
+    P_LOOP_OUT = mxCreateCellArray(nsubs,dims);
 
     // Convert mpz_class objects back to strings, store in cell array.
     for (mwIndex l = 0; l < Nloops; ++l) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
         subs[0] = l;
         subs[1] = k;
-        mwIndex idx = mxCalcSingleSubscript(P_LOOPOUT,nsubs,subs);
+        mwIndex idx = mxCalcSingleSubscript(P_LOOP_OUT,nsubs,subs);
         mxArray *s = mxCreateString(loopOut[k*Nloops+l].get_str().c_str());
-        mxSetCell(P_LOOPOUT,idx,s);
+        mxSetCell(P_LOOP_OUT,idx,s);
       }
     }
     mxFree(dims);
@@ -131,7 +138,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 #endif
   default: {
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badtype",
-                      "Unknown variable type '%s'.",mxGetClassName(P_LOOP) );
+                      "Unknown variable type '%s'.",mxGetClassName(P_LOOP_IN));
   }
   }
 }
