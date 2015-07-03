@@ -34,6 +34,8 @@ function [varargout] = loopsigma(sigma_idx,lp)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+import braidlab.util.debugmsg
+
 % set to true to use Matlab instead of C++ version of the algorithm
 global BRAIDLAB_braid_nomex;
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
@@ -48,12 +50,17 @@ end
 
 % If MEX file is available, use that.
 if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
-  if isa(lp,'double') || isa(lp,'single') || isa(lp,'int32') || isa(lp,'int64')
+
+  if isa(lp,'double') || ...
+        isa(lp,'single') || ...
+        isa(lp,'int32') || ...
+        isa(lp,'int64')
+    debugmsg('Using MEX loopsigma with Matlab data structures.')
     [varargout{1:nargout}] = loopsigma_helper(sigma_idx,lp);
     return
 
   elseif isa(lp,'vpi')
-
+    debugmsg('Using MEX loopsigma with VPI.')
     % Convert u to cell of strings to pass to C++ file.
     ustr = cell(size(lp));
     for i = 1:size(lp,1)
@@ -89,6 +96,8 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     end
   end
 end
+
+debugmsg('Using Matlab loopsigma.')
 
 n = size(lp,2)/2 + 2;
 a = lp(:,1:n-2); b = lp(:,(n-1):end);
