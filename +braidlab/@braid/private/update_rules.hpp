@@ -39,7 +39,7 @@ template <typename T> inline int sign(T x)
 
 template <typename T>
 inline void update_rules(const int Ngen, const int n, const int *braidword,
-                         T *a, T *b, int* pn = 0)
+                         T *a, T *b, int* opSign = 0)
 {
   const int N = 2*(n-2);
 
@@ -50,7 +50,7 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
   // Copy initial row data
   for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
 
-  const int maxpn = 5;
+  const int maxopSign = 5;
 
   for (int j = 0; j < Ngen; ++j) // Loop over generators.
     {
@@ -62,10 +62,10 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
               bp[1] = sumg( a[1] , pos(b[1]) );
               ap[1] = sumg( -b[1] , pos(bp[1]) );
 
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[1]);
-                  pn[1*Ngen + j] = sign(bp[1]);
+                  opSign[0*Ngen + j] = sign(b[1]);
+                  opSign[1*Ngen + j] = sign(bp[1]);
                 }
             }
           else if (i == n-1)
@@ -73,10 +73,10 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
               bp[n-2] = sumg( a[n-2] , neg(b[n-2]) );
               ap[n-2] = sumg( -b[n-2] , neg(bp[n-2]) );
 
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[n-2]);
-                  pn[1*Ngen + j] = sign(bp[n-2]);
+                  opSign[0*Ngen + j] = sign(b[n-2]);
+                  opSign[1*Ngen + j] = sign(bp[n-2]);
                 }
             }
           else
@@ -87,13 +87,13 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
               ap[i] = sumg(sumg(a[i],-neg(b[i])),-neg(sumg(neg(b[i-1]),-c)));
               bp[i] = sumg( b[i-1] , -neg(c) );
 
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[i]);
-                  pn[1*Ngen + j] = sign(b[i-1]);
-                  pn[2*Ngen + j] = sign(c);
-                  pn[3*Ngen + j] = sign(pos(b[i]) + c);
-                  pn[4*Ngen + j] = sign(neg(b[i-1]) - c);
+                  opSign[0*Ngen + j] = sign(b[i]);
+                  opSign[1*Ngen + j] = sign(b[i-1]);
+                  opSign[2*Ngen + j] = sign(c);
+                  opSign[3*Ngen + j] = sign(pos(b[i]) + c);
+                  opSign[4*Ngen + j] = sign(neg(b[i-1]) - c);
                 }
             }
         }
@@ -103,10 +103,10 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
             {
               bp[1] = sumg( -a[1] , pos(b[1]) );
               ap[1] = sumg( b[1] , -pos(bp[1]) );
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[1]);
-                  pn[1*Ngen + j] = sign(bp[1]);
+                  opSign[0*Ngen + j] = sign(b[1]);
+                  opSign[1*Ngen + j] = sign(bp[1]);
                 }
             }
           else if (i == n-1)
@@ -114,10 +114,10 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
               bp[n-2] = sumg( -a[n-2] , neg(b[n-2]) );
               ap[n-2] = sumg( b[n-2] , -neg(bp[n-2]) );
 
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[n-2]);
-                  pn[1*Ngen + j] = sign(bp[n-2]);
+                  opSign[0*Ngen + j] = sign(b[n-2]);
+                  opSign[1*Ngen + j] = sign(bp[n-2]);
                 }
             }
           else
@@ -128,13 +128,13 @@ inline void update_rules(const int Ngen, const int n, const int *braidword,
               ap[i] = sumg(sumg(a[i] , neg(b[i])) , neg(sumg(neg(b[i-1]) , d)));
               bp[i] = sumg( b[i-1] , pos(d) );
 
-              if (pn != 0)
+              if (opSign != 0)
                 {
-                  pn[0*Ngen + j] = sign(b[i]);
-                  pn[1*Ngen + j] = sign(b[i-1]);
-                  pn[2*Ngen + j] = sign(pos(b[i]) - d);
-                  pn[3*Ngen + j] = sign(d);
-                  pn[4*Ngen + j] = sign(neg(b[i-1]) + d);
+                  opSign[0*Ngen + j] = sign(b[i]);
+                  opSign[1*Ngen + j] = sign(b[i-1]);
+                  opSign[2*Ngen + j] = sign(pos(b[i]) - d);
+                  opSign[3*Ngen + j] = sign(d);
+                  opSign[4*Ngen + j] = sign(neg(b[i-1]) + d);
                 }
             }
         }

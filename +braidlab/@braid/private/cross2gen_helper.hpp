@@ -133,7 +133,7 @@ public:
   Real3DMatrix( const mxArray *in );
 
   // access matrix elements using matrix( r, c, s) syntax
-  double operator()( const mwIndex row, const mwIndex col, const mwIndex spn )
+  double operator()( const mwIndex row, const mwIndex col, const mwIndex lay )
     const;
 
   // print 3D matrix, each 2D slice at a time
@@ -560,7 +560,7 @@ Real3DMatrix::Real3DMatrix( const mxArray *in ) : data( mxGetPr(in) ) {
 
 // access elements
 double Real3DMatrix::operator()
-  (const mwIndex row, const mwIndex col, const mwIndex spn ) const
+  (const mwIndex row, const mwIndex col, const mwIndex lay ) const
 {
   if ( !( row < _R) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
@@ -570,12 +570,12 @@ double Real3DMatrix::operator()
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Column index out of bounds "
                       "(Remember: zero indexing used)");
-  if ( !( spn < _S) )
+  if ( !( lay < _S) )
     mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:out_of_bounds",
                       "Span index out of bounds "
                       "(Remember: zero indexing used)");
 
-  return data[(spn*_C + col)*_R + row];
+  return data[(lay*_C + col)*_R + row];
 }
 
 // constructor from MATLAB

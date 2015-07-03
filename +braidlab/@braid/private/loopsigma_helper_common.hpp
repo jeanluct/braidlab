@@ -29,9 +29,9 @@
 // LICENSE>
 
 template <class T>
-inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
+inline void loopsigma_helper_common(const mwSize Ngen, const int *sigma_idx,
                                     const mxArray *uA,
-                                    mxArray *uoA, mxArray *pnA = 0)
+                                    mxArray *uoA, mxArray *opSignA = 0)
 {
   const T *u = (T *)mxGetPr(uA);
 
@@ -49,14 +49,14 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
   T *a = new T[N/2] - 1;
   T *b = new T[N/2] - 1;
 
-  // If pnA has been allocated, we'll record the pos/neg operations.
-  int *pn1 = 0;
-  double *pn = 0;
-  const int maxpn = 5;
-  if (pnA != 0)
+  // If opSignA has been allocated, we'll record the pos/neg operations.
+  int *opSign1 = 0;
+  double *opSign = 0;
+  const int maxopSign = 5;
+  if (opSignA != 0)
     {
-      pn1 = new int[maxpn*Ngen](); // Allocate and set to zero.
-      pn = (double *)mxGetPr(pnA);
+      opSign1 = new int[maxopSign*Ngen](); // Allocate and set to zero.
+      opSign = (double *)mxGetPr(opSignA);
     }
 
   // Create an mxArray for the output data.
@@ -71,8 +71,8 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
           b[k] = u[(k-1+N/2)*Nr+l];
         }
 
-      // Act with the braid sequence in ii onto the coordinates a,b.
-      update_rules(Ngen, n, ii, a, b, pn1);
+      // Act with the braid sequence in sigma_idx onto the coordinates a,b.
+      update_rules(Ngen, n, sigma_idx, a, b, opSign1);
 
       for (mwIndex k = 1; k <= N/2; ++k)
         {
@@ -82,13 +82,13 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
         }
 
       // Copy the pos/neg results to output array.
-      if (pnA != 0)
+      if (opSignA != 0)
         {
-          for (mwIndex k = 0; k < maxpn; ++k)
+          for (mwIndex k = 0; k < maxopSign; ++k)
             {
               for (mwIndex j = 0; j < Ngen; ++j)
                 {
-                  pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
+                  opSign[k*Ngen*Nr + j*Nr + l] = opSign1[k*Ngen + j];
                 }
             }
         }
@@ -97,17 +97,17 @@ inline void loopsigma_helper_common(const mwSize Ngen, const int *ii,
   delete[] (a+1);
   delete[] (b+1);
 
-  if (pnA != 0) delete[] pn1;
+  if (opSignA != 0) delete[] opSign1;
 
   return;
 }
 
 
 #ifdef BRAIDLAB_USE_GMP
-inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
+inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
                                  const mwSize Nr, const mwSize N,
                                  const mpz_class *u,
-                                 mpz_class *uo, mxArray *pnA = 0)
+                                 mpz_class *uo, mxArray *opSignA = 0)
 {
   // Refers to generators, so don't need to be mwIndex/mwSize.
   const int n = (int)(N/2 + 2);
@@ -116,14 +116,14 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
   mpz_class *a = new mpz_class[N/2] - 1;
   mpz_class *b = new mpz_class[N/2] - 1;
 
-  // If pnA has been allocated, we'll record the pos/neg operations.
-  int *pn1 = 0;
-  double *pn = 0;
-  const int maxpn = 5;
-  if (pnA != 0)
+  // If opSignA has been allocated, we'll record the pos/neg operations.
+  int *opSign1 = 0;
+  double *opSign = 0;
+  const int maxopSign = 5;
+  if (opSignA != 0)
     {
-      pn1 = new int[maxpn*Ngen](); // Allocate and set to zero.
-      pn = (double *)mxGetPr(pnA);
+      opSign1 = new int[maxopSign*Ngen](); // Allocate and set to zero.
+      opSign = (double *)mxGetPr(opSignA);
     }
 
   for (mwIndex l = 0; l < Nr; ++l) // Loop over rows of u.
@@ -135,8 +135,8 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
           b[k] = u[(k-1+N/2)*Nr+l];
         }
 
-      // Act with the braid sequence in ii onto the coordinates a,b.
-      update_rules(Ngen, n, ii, a, b, pn1);
+      // Act with the braid sequence in sigma_idx onto the coordinates a,b.
+      update_rules(Ngen, n, sigma_idx, a, b, opSign1);
 
       for (mwIndex k = 1; k <= N/2; ++k)
         {
@@ -146,13 +146,13 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
         }
 
       // Copy the pos/neg results to output array.
-      if (pnA != 0)
+      if (opSignA != 0)
         {
-          for (mwIndex k = 0; k < maxpn; ++k)
+          for (mwIndex k = 0; k < maxopSign; ++k)
             {
               for (mwIndex j = 0; j < Ngen; ++j)
                 {
-                  pn[k*Ngen*Nr + j*Nr + l] = pn1[k*Ngen + j];
+                  opSign[k*Ngen*Nr + j*Nr + l] = opSign1[k*Ngen + j];
                 }
             }
         }
@@ -161,7 +161,7 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *ii,
   delete[] (a+1);
   delete[] (b+1);
 
-  if (pnA != 0) delete[] pn1;
+  if (opSignA != 0) delete[] opSign1;
 
   return;
 }
