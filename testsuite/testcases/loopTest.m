@@ -285,7 +285,6 @@ classdef loopTest < matlab.unittest.TestCase
       oldSetting = BRAIDLAB_braid_nomex;
       BRAIDLAB_braid_nomex = true;
 
-
       INmatlab = cell(Nloops, 1);
       for k = 1:Nloops
         INmatlab{k} = braidlab.loop(Coords(k,:));
@@ -299,7 +298,7 @@ classdef loopTest < matlab.unittest.TestCase
         OUTmatlabMat(k,:) = OUTmatlab{k}.coords;
       end
 
-      % Next, compute using standard algorithm
+      % Next, compute using pre-set algorithm (whichever requested externally)
       BRAIDLAB_braid_nomex = oldSetting;
 
       INmat = braidlab.loop(Coords);
