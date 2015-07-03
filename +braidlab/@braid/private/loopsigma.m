@@ -34,6 +34,10 @@ function [varargout] = loopsigma(sigma_idx,lp)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+% set to true to use Matlab instead of C++ version of the algorithm
+global BRAIDLAB_braid_nomex;
+useMatlabVersion = any(BRAIDLAB_braid_nomex);
+
 if isempty(sigma_idx)
   varargout{1} = lp;
   if nargout > 1
@@ -43,7 +47,7 @@ if isempty(sigma_idx)
 end
 
 % If MEX file is available, use that.
-if exist('loopsigma_helper','file') == 3
+if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
   if isa(lp,'double') || isa(lp,'single') || isa(lp,'int32') || isa(lp,'int64')
     [varargout{1:nargout}] = loopsigma_helper(sigma_idx,lp);
     return
