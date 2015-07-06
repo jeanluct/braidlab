@@ -276,7 +276,7 @@ classdef loopTest < matlab.unittest.TestCase
 
     function test_braid_on_nloops(testCase)
 
-      B = braidlab.braid([2,1,-1,-2,3]);
+      B = braidlab.braid([2,1,-1,-2,-1],4);
       Coords = [1,0,-1,1; 2,1,1,1; -1,1,-2,3];
       Nloops = size(Coords,1);
 
@@ -307,6 +307,41 @@ classdef loopTest < matlab.unittest.TestCase
       % Compare the two
       testCase.verifyTrue( all( OUTmatlabMat(:) == OUTmat.coords(:) ) );
     end
+
+    function test_braid_on_nloops_withbasepoints(testCase)
+
+      B = braidlab.braid([2,1,-1,-2,-1],4);
+      Coords = [1,0,-1,1; 2,1,1,1; -1,1,-2,3];
+      Nloops = size(Coords,1);
+
+      % First compute using matlab algorithm, one-by-one
+      global BRAIDLAB_braid_nomex
+      oldSetting = BRAIDLAB_braid_nomex;
+      BRAIDLAB_braid_nomex = true;
+
+      INmatlab = cell(Nloops, 1);
+      for k = 1:Nloops
+        INmatlab{k} = braidlab.loop(Coords(k,:),'Basepoint');
+      end
+      for k = 1:Nloops
+        OUTmatlab{k} = B*INmatlab{k};
+      end
+
+      OUTmatlabMat = zeros(Nloops, size(Coords,2));
+      for k = 1:Nloops
+        OUTmatlabMat(k,:) = OUTmatlab{k}.coords;
+      end
+
+      % Next, compute using pre-set algorithm (whichever requested externally)
+      BRAIDLAB_braid_nomex = oldSetting;
+
+      INmat = braidlab.loop(Coords,'Basepoint');
+      OUTmat = B*INmat;
+
+      % Compare the two
+      testCase.verifyTrue( all( OUTmatlabMat(:) == OUTmat.coords(:) ) );
+    end
+
 
     function test_braid_on_loop_action(testCase)
 
