@@ -14,7 +14,7 @@ b = int32((-1).^randi(2,1,k) .* randi(n-1,1,k));
 
 fprintf('\nAction of braid on loops (vectors)... ')
 tic
-l2 = loopsigma_helper(b,l,n);
+l2 = transpose( loopsigma_helper(b,transpose(l),n) );
 t1 = toc;
 fprintf(' (%f seconds)\n',t1)
 

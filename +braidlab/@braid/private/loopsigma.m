@@ -67,21 +67,26 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
         isa(loop_in,'int64')
     debugmsg('Using MEX loopsigma with Matlab data structures.');
 
+    % storing loops in columns is more efficient for memory fetching
+    loop_in = transpose(loop_in);
     if nargout > 1
       [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc);
     else
       loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc);
     end
+    loop_out = transpose(loop_out);
 
     return
 
   elseif isa(loop_in,'vpi')
     debugmsg('Using MEX loopsigma with VPI.')
     % Convert u to cell of strings to pass to C++ file.
-    ustr = cell(size(loop_in));
-    for i = 1:size(loop_in,1)
-      for j = 1:size(loop_in,2)
-        ustr{i,j} = strtrim(num2str(loop_in(i,j)));
+    Nloops = size(loop_in,1);
+    Ncoord = size(loop_in,2);
+    loop_str = cell(size(loop_in));
+    for loops = 1:Nloops
+      for coords = 1:Ncoord
+        loop_str{coords,loops} = strtrim(num2str(loop_in(loops,coords)));
       end
     end
 
@@ -89,7 +94,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     % (multiprecision).  It will return an error if it wasn't.
     compiled_with_gmp = true;
     try
-      [loop_out, opSign] = loopsigma_helper(sigma_idx,ustr,Npunc);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_str,Npunc);
     catch err
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;
@@ -100,14 +105,13 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
 
     if compiled_with_gmp
       % Convert cell of strings back to vpi.
-      uvpi = vpi(zeros(size(loop_in)));
-      for i = 1:size(loop_in,1)
-        for j = 1:size(loop_in,2)
-          uvpi(i,j) = vpi(loop_out{i,j});
+      coord_vpi = vpi(zeros(size(loop_in)));
+      for coords = 1:Ncoord
+        for loops = 1:Nloops
+          coord_vpi(loops,coords) = vpi(loop_out{coords,loops});
         end
       end
-
-      loop_out = uvpi;
+      loop_out = coord_vpi;
       return
     end
   end

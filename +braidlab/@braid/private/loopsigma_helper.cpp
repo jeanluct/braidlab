@@ -9,6 +9,8 @@
 #endif
 
 // Helper function for loopsigma
+//
+// ** ASSUMES THAT LOOPS ARE STORED COLUMNWISE **
 
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
@@ -49,9 +51,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   const mwSize Npunc = static_cast<int>( mxGetScalar( P_NPUNC ) );
 
-  // Dimensions of P_LOOP_IN.
-  const mwSize Ncoord = mxGetN(P_LOOP_IN);
-  const mwSize Nloops = mxGetM(P_LOOP_IN);
+  // Dimensions of P_LOOP_IN - loops stored column-wise
+  const mwSize Ncoord = mxGetM(P_LOOP_IN);
+  const mwSize Nloops = mxGetN(P_LOOP_IN);
 
   if ( Npunc > Ncoord/2+2 )
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:incompatible",
@@ -69,34 +71,32 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     P_OPSIGN = NULL; opSign = NULL;
   }
 
-  switch( mxGetClassID( P_LOOP_IN ) ) {
+
+  P_LOOP_OUT = mxDuplicateArray(P_LOOP_IN);
+
+  switch( mxGetClassID( P_LOOP_OUT ) ) {
 
   case mxDOUBLE_CLASS: {
-    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxDOUBLE_CLASS, mxREAL);
-    Braid<double> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    BraidInPlace<double> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
     braid.run();
     break; }
   case mxSINGLE_CLASS: {
-    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxSINGLE_CLASS, mxREAL);
-    Braid<float> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    BraidInPlace<float> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
     braid.run();
     break; }
   case mxINT32_CLASS: {
-    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT32_CLASS, mxREAL);
-    Braid<int> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    BraidInPlace<int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
     braid.run();
     break; }
   case mxINT64_CLASS: {
-    P_LOOP_OUT = mxCreateNumericMatrix(Nloops, Ncoord, mxINT64_CLASS, mxREAL);
-    Braid<long long int> braid(P_LOOP_IN, P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    BraidInPlace<long long int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
     braid.run();
     break; }
 #ifdef BRAIDLAB_USE_GMP
   case mxCELL_CLASS: {
     // Cell array of strings, to be converted to multiprecision objects.
     // Array for Matlab mxArray subscripts.
-    mwSize nsubs = 2;
-    mwIndex *subs = (mwIndex *)mxCalloc(nsubs,sizeof(mwIndex));
+    mwIndex subs[2];
 
     // Pointer to input data.
     const mxArray *loop = prhs[1];
@@ -108,8 +108,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Convert cell of mxArray strings to mpz_class objects.
     for (mwIndex l = 0; l < Nloops; ++l) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
-        subs[0] = l;
-        subs[1] = k;
+        subs[0] = k;
+        subs[1] = l;
         mwIndex idx = mxCalcSingleSubscript(P_LOOP_IN,nsubs,subs);
         loopIn[k*Nloops+l] =
           mpz_class(mxArrayToString(mxGetCell(P_LOOP_IN,idx)));
@@ -121,24 +121,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     loopsigma_helper_gmp(Ngen,sigma_idx,Nloops,Ncoord,loopIn,loopOut,opSign);
 
     // Vector of array dimensions.
-    mwSize *dims = (mwSize *)mxCalloc(nsubs,sizeof(mwSize));
-    dims[0] = Nloops;
-    dims[1] = Ncoord;
+    mwSize dims[2] = {Nloops, Ncoord};
     // Allocate output cell array.
     P_LOOP_OUT = mxCreateCellArray(nsubs,dims);
 
     // Convert mpz_class objects back to strings, store in cell array.
     for (mwIndex l = 0; l < Nloops; ++l) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
-        subs[0] = l;
-        subs[1] = k;
+        subs[0] = k;
+        subs[1] = l;
         mwIndex idx = mxCalcSingleSubscript(P_LOOP_OUT,nsubs,subs);
         mxArray *s = mxCreateString(loopOut[k*Nloops+l].get_str().c_str());
         mxSetCell(P_LOOP_OUT,idx,s);
       }
     }
-    mxFree(dims);
-    mxFree(subs);
     delete[] loopIn;
     delete[] loopOut;
     break; }

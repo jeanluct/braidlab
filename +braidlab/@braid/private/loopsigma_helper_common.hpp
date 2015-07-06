@@ -1,6 +1,8 @@
 #ifndef BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
 #define BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
 
+#undef BRAIDLAB_USE_GMP
+
 #include "mex.h"
 #include "update_rules.hpp"
 
@@ -31,20 +33,19 @@
 ////////////////// DECLARATIONS  /////////////////////////
 
 template <class T>
-class Braid {
+class BraidInPlace {
 
 public:
 
-  Braid(const mxArray* P_LOOP_IN, mxArray *P_LOOP_OUT,
-        const mxArray *P_SIGMA_IDX, mxArray *P_OPSIGN);
-  ~Braid();
+  BraidInPlace(mxArray *P_LOOP,
+               const mxArray *P_SIGMA_IDX, mxArray *P_OPSIGN);
+  ~BraidInPlace();
   void run();
   void applyToLoop(const mwIndex l);
 
 private:
-  // input and output matrices
-  const T *loop_in;
-  T *loop_out;
+  // storage
+  T *loop;
   double *opSign;
 
   // are we storing opSign or not?
@@ -63,30 +64,23 @@ private:
   const int Ngen;
   const int* sigma_idx;
 
-  // arrays used for in-place application of generators
-  mxArray* P_A;
-  mxArray* P_B;
-  T *a; T *b;
-
   // array used for storage of operation signs on a single loop
   mxArray* P_OPSIGN1;
   int *opSign1;
 
-  const int maxopSign;
+  const mwSize maxopSign;
 
 };
 
 //////////////////////////// DEFINITIONS  ////////////////////////////
 template <class T>
-Braid<T>::Braid(const mxArray *P_LOOP_IN,
-                mxArray *P_LOOP_OUT,
+BraidInPlace<T>::BraidInPlace(mxArray *P_LOOP,
                 const mxArray *P_SIGMA_IDX,
                 mxArray *P_OPSIGN) :
   //initializer lists
-  loop_in( static_cast<const T *>(mxGetData(P_LOOP_IN)) ),
-  loop_out( static_cast<T *>(mxGetData(P_LOOP_OUT)) ),
-  Nloops(mxGetM(P_LOOP_IN)),
-  Ncoord(mxGetN(P_LOOP_IN)),
+  loop( static_cast<T *>(mxGetData(P_LOOP)) ),
+  Nloops(mxGetN(P_LOOP)),
+  Ncoord(mxGetM(P_LOOP)),
   Npunc(Ncoord/2 + 2),
   sigma_idx( static_cast<const int *>(mxGetData(P_SIGMA_IDX)) ),
   Ngen(mxGetNumberOfElements(P_SIGMA_IDX)),
@@ -99,50 +93,33 @@ Braid<T>::Braid(const mxArray *P_LOOP_IN,
                       "input loop coordinates should have an"
                       "even number of columns.");
 
-  // Make 1-indexed arrays
-  mwSize dims[] = {Ncoord/2, 1};
-  P_A = mxCreateNumericArray( 2, dims, mxGetClassID(P_LOOP_IN), mxREAL );
-  P_B = mxCreateNumericArray( 2, dims, mxGetClassID(P_LOOP_IN), mxREAL );
-  a = static_cast<T *>(mxGetData(P_A)) - 1;
-  b = static_cast<T *>(mxGetData(P_B)) - 1;
-
   // If P_OPSIGN has been allocated, we'll record the pos/neg operations.
   if (isOpSignUsed) {
-    dims[0] = maxopSign*Ngen;
+    mwSize dims[2] = {maxopSign*Ngen,1};
     P_OPSIGN1 = mxCreateNumericArray( 2, dims, mxINT32_CLASS, mxREAL );
     opSign1 = static_cast<int *>(mxGetData(P_OPSIGN1));
-    opSign = (double *)mxGetPr(P_OPSIGN);
+    opSign = mxGetPr(P_OPSIGN);
   }
 
 }
 
 template <class T>
-Braid<T>::~Braid( ) {
+BraidInPlace<T>::~BraidInPlace( ) {
 
-  mxDestroyArray(P_A);
-  mxDestroyArray(P_B);
-  if (isOpSignUsed)
+  if (isOpSignUsed && P_OPSIGN1 != NULL)
     mxDestroyArray(P_OPSIGN1);
 
 }
 
 template <class T>
-void Braid<T>::applyToLoop(const mwIndex l) {
+void BraidInPlace<T>::applyToLoop(const mwIndex l) {
 
-  // Copy initial row data.
-  for (mwIndex k = 1; k <= Ncoord/2; ++k) {
-    a[k] = loop_in[(k-1    )*Nloops+l];
-    b[k] = loop_in[(k-1+Ncoord/2)*Nloops+l];
-  }
+  // Create 1-indexed pointers to the appropriate place
+  T* a = &loop[(0-1    )+l*Ncoord];
+  T* b = &loop[(0-1+Ncoord/2)+l*Ncoord];
 
   // Act with the braid sequence in sigma_idx onto the coordinates a,b.
   update_rules<T>(Ngen, Npunc, sigma_idx, a, b, opSign1);
-
-  for (mwIndex k = 1; k <= Ncoord/2; ++k) {
-    // Copy final a and b to row of output array.
-    loop_out[(k-1    )*Nloops+l] = a[k];
-    loop_out[(k-1+Ncoord/2)*Nloops+l] = b[k];
-  }
 
   // Copy the pos/neg results to output array.
   if (isOpSignUsed) {
@@ -155,7 +132,8 @@ void Braid<T>::applyToLoop(const mwIndex l) {
 }
 
 template <class T>
-void Braid<T>::run() {
+void BraidInPlace<T>::run() {
+
   // run through every loop
   for (mwIndex l = 0; l < Nloops; ++l) {
     applyToLoop(l);
