@@ -41,8 +41,11 @@ inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
   const int Ncoord = 2*(Npunc-2);
 
   // Make 1-indexed arrays.
-  T *a_tmp = new T[Ncoord/2] - 1;
-  T *b_tmp = new T[Ncoord/2] - 1;
+  T a_storage[Ncoord/2];
+  T b_storage[Ncoord/2];
+
+  T *a_tmp = &a_storage[0] - 1;
+  T *b_tmp = &b_storage[0] - 1;
 
   // Copy initial row data
   for (mwIndex k = 1; k <= Ncoord/2; ++k) {
@@ -124,8 +127,6 @@ inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
     }
   }
 
-  delete[] (a_tmp+1);
-  delete[] (b_tmp+1);
 }
 
 #endif // BRAIDLAB_UPDATE_RULES_HPP
