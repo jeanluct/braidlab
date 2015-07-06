@@ -53,10 +53,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   const mwSize Ncoord = mxGetN(P_LOOP_IN);
   const mwSize Nloops = mxGetM(P_LOOP_IN);
 
-  if ( !( Ncoord == (2*Npunc - 4) || Ncoord == (2*Npunc - 2)) )
+  if ( Npunc > Ncoord/2+2 )
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:incompatible",
-                      "Incompatible # of punctures and # of "
-                      "Dynnikov coordinates in a loop." );
+                      "Too many punctures in the braid." );
 
   const mwSize Ngen = mxGetNumberOfElements(P_SIGMA_IDX);
 
