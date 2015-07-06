@@ -1,17 +1,19 @@
-function [loop_out, opSign] = loopsigma(sigma_idx,loop_in)
+function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
 %LOOPSIGMA   Act on a loop with a braid group generator sigma.
 %
-%   LOOP_OUT = LOOPSIGMA(SIGMA_IDX,LOOP_IN) acts on the loop LOOP_IN (encoded in Dynnikov
-%   coordinates) with the braid generator whose indices are stored in SIGMA_IDX,
-%   and returns the new loop.  SIGMA_IDX can be a positive or negative integer
-%   (inverse generator), and can be specified as a vector, in which case all
-%   the generators are applied to the loop sequentially from left to right.
+%   LOOP_OUT = LOOPSIGMA(SIGMA_IDX,LOOP_IN, NPUNC) acts on the loop LOOP_IN
+%   (encoded in Dynnikov coordinates) with the braid generator whose indices
+%   are stored in SIGMA_IDX, and returns the new loop.  SIGMA_IDX can be a
+%   positive or negative integer (inverse generator), and can be specified as
+%   a vector, in which case all the generators are applied to the loop
+%   sequentially from left to right.  NPUNC is the number of punctures in the
+%   braid.
 %
 %   [LOOP_OUT, OPSIGN] = LOOPSIGMA(...) additionaly returns the signs of
 %   operations, which can be used to determine linear action of the braid.
 %
-%   LOOP_IN is specified as a row vector, or a matrix whose each row corresponds
-%   to a separate loop.
+%   LOOP_IN is specified as a row vector, or a matrix whose each row
+%   corresponds to a separate loop.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -37,6 +39,8 @@ function [loop_out, opSign] = loopsigma(sigma_idx,loop_in)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+assert(nargin >= 3, 'Not enough arguments');
+
 import braidlab.util.debugmsg
 
 % set to true to use Matlab instead of C++ version of the algorithm
@@ -52,6 +56,7 @@ if isempty(sigma_idx)
 end
 
 validateattributes( sigma_idx, {'int32'}, {'vector'} );
+validateattributes( Npunc, {'numeric'}, {'positive'} );
 
 % If MEX file is available, use that.
 if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
@@ -61,11 +66,13 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
         isa(loop_in,'int32') || ...
         isa(loop_in,'int64')
     debugmsg('Using MEX loopsigma with Matlab data structures.');
+
     if nargout > 1
-      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc);
     else
-      loop_out = loopsigma_helper(sigma_idx,loop_in);
+      loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc);
     end
+
     return
 
   elseif isa(loop_in,'vpi')
@@ -82,7 +89,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     % (multiprecision).  It will return an error if it wasn't.
     compiled_with_gmp = true;
     try
-      [loop_out, opSign] = loopsigma_helper(sigma_idx,ustr);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,ustr,Npunc);
     catch err
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;

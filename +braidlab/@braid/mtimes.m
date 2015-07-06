@@ -81,10 +81,10 @@ elseif isa(b2,'braidlab.loop')
     b1.word = b1.word(end:-1:1);
   end
   if nargout < 2
-    out = loopsigma(b1.word,b2.coords);
+    out = loopsigma(b1.word,b2.coords,b1.n);
     out = braidlab.loop(out,'bp',b2.basepoint);
   else
-    [out, opsigns] = loopsigma(b1.word,b2.coords);
+    [out, opsigns] = loopsigma(b1.word,b2.coords,b1.n);
     out = braidlab.loop(out,'bp',b2.basepoint);
     varargout{1} = linact(b1,opsigns,size(b2(1).coords,2));
   end

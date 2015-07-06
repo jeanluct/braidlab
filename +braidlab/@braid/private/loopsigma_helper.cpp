@@ -36,19 +36,27 @@
 
 #define P_SIGMA_IDX prhs[0]
 #define P_LOOP_IN prhs[1]
+#define P_NPUNC prhs[2]
 
 #define P_LOOP_OUT plhs[0]
 #define P_OPSIGN  plhs[1]
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-  if (nrhs < 2) {
+  if (nrhs < 3) {
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
-                      "2 input arguments required.");
+                      "3 input arguments required.");
   }
+
+  const mwSize Npunc = static_cast<int>( mxGetScalar( P_NPUNC ) );
 
   // Dimensions of P_LOOP_IN.
   const mwSize Ncoord = mxGetN(P_LOOP_IN);
   const mwSize Nloops = mxGetM(P_LOOP_IN);
+
+  if ( !( Ncoord == (2*Npunc - 4) || Ncoord == (2*Npunc - 2)) )
+    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:incompatible",
+                      "Incompatible # of punctures and # of "
+                      "Dynnikov coordinates in a loop." );
 
   const mwSize Ngen = mxGetNumberOfElements(P_SIGMA_IDX);
 

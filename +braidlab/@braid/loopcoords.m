@@ -114,14 +114,15 @@ switch lower(conv)
 end
 
 try
-  l = braidlab.loop(loopsigma(w,htyp(l.coords)),'bp',l.basepoint);
+  lcoord = loopsigma(w,htyp(l.coords),b.n);
+  l = braidlab.loop(lcoord,'bp',l.basepoint);
 catch err
   % Only try VPI if type wasn't explicitly specified.
   if notypespec && strcmp(err.identifier,'BRAIDLAB:braid:sumg:overflow')
     warning('BRAIDLAB:braid:loopcoords:overflow',...
             'loopcoords overflowed... using VPI.')
     braidlab.util.checkvpi
-    l = braidlab.loop(loopsigma(w,vpi(l.coords)),'bp',l.basepoint);
+    l = braidlab.loop(loopsigma(w,vpi(l.coords),b.n),'bp',l.basepoint);
   else
     rethrow(err)
   end
