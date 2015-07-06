@@ -38,107 +38,105 @@ template <typename T> inline int sign(T x)
 
 
 template <typename T>
-inline void update_rules(const int Ngen, const int n, const int *braidword,
+inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
                          T *a, T *b, int* opSign = 0)
 {
-  const int N = 2*(n-2);
+  const int Ncoord = 2*(Npunc-2);
 
   // Make 1-indexed arrays.
-  T *ap = new T[N/2] - 1;
-  T *bp = new T[N/2] - 1;
+  T *ap = new T[Ncoord/2] - 1;
+  T *bp = new T[Ncoord/2] - 1;
 
   // Copy initial row data
-  for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
+  for (mwIndex k = 1; k <= Ncoord/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
 
-  const int maxopSign = 5;
-
-  for (int j = 0; j < Ngen; ++j) // Loop over generators.
+  for (int g = 0; g < Ngen; ++g) // Loop over generators.
     {
-      int i = abs(braidword[j]);
-      if (braidword[j] > 0)
+      int idx = abs(braidword[g]);
+      if (braidword[g] > 0)
         {
-          if (i == 1)
+          if (idx == 1)
             {
               bp[1] = sumg( a[1] , pos(b[1]) );
               ap[1] = sumg( -b[1] , pos(bp[1]) );
 
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[1]);
-                  opSign[1*Ngen + j] = sign(bp[1]);
+                  opSign[0*Ngen + g] = sign(b[1]);
+                  opSign[1*Ngen + g] = sign(bp[1]);
                 }
             }
-          else if (i == n-1)
+          else if (idx == Npunc-1)
             {
-              bp[n-2] = sumg( a[n-2] , neg(b[n-2]) );
-              ap[n-2] = sumg( -b[n-2] , neg(bp[n-2]) );
+              bp[Npunc-2] = sumg( a[Npunc-2] , neg(b[Npunc-2]) );
+              ap[Npunc-2] = sumg( -b[Npunc-2] , neg(bp[Npunc-2]) );
 
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[n-2]);
-                  opSign[1*Ngen + j] = sign(bp[n-2]);
+                  opSign[0*Ngen + g] = sign(b[Npunc-2]);
+                  opSign[1*Ngen + g] = sign(bp[Npunc-2]);
                 }
             }
           else
             {
-              T c = sumg(sumg(a[i-1],-a[i]) , sumg(-pos(b[i]),neg(b[i-1])));
-              ap[i-1] = sumg(sumg(a[i-1],-pos(b[i-1])),-pos(sumg(pos(b[i]),c)));
-              bp[i-1] = sumg( b[i] , neg(c) );
-              ap[i] = sumg(sumg(a[i],-neg(b[i])),-neg(sumg(neg(b[i-1]),-c)));
-              bp[i] = sumg( b[i-1] , -neg(c) );
+              T c = sumg(sumg(a[idx-1],-a[idx]) , sumg(-pos(b[idx]),neg(b[idx-1])));
+              ap[idx-1] = sumg(sumg(a[idx-1],-pos(b[idx-1])),-pos(sumg(pos(b[idx]),c)));
+              bp[idx-1] = sumg( b[idx] , neg(c) );
+              ap[idx] = sumg(sumg(a[idx],-neg(b[idx])),-neg(sumg(neg(b[idx-1]),-c)));
+              bp[idx] = sumg( b[idx-1] , -neg(c) );
 
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[i]);
-                  opSign[1*Ngen + j] = sign(b[i-1]);
-                  opSign[2*Ngen + j] = sign(c);
-                  opSign[3*Ngen + j] = sign(pos(b[i]) + c);
-                  opSign[4*Ngen + j] = sign(neg(b[i-1]) - c);
+                  opSign[0*Ngen + g] = sign(b[idx]);
+                  opSign[1*Ngen + g] = sign(b[idx-1]);
+                  opSign[2*Ngen + g] = sign(c);
+                  opSign[3*Ngen + g] = sign(pos(b[idx]) + c);
+                  opSign[4*Ngen + g] = sign(neg(b[idx-1]) - c);
                 }
             }
         }
-      else if (braidword[j] < 0)
+      else if (braidword[g] < 0)
         {
-          if (i == 1)
+          if (idx == 1)
             {
               bp[1] = sumg( -a[1] , pos(b[1]) );
               ap[1] = sumg( b[1] , -pos(bp[1]) );
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[1]);
-                  opSign[1*Ngen + j] = sign(bp[1]);
+                  opSign[0*Ngen + g] = sign(b[1]);
+                  opSign[1*Ngen + g] = sign(bp[1]);
                 }
             }
-          else if (i == n-1)
+          else if (idx == Npunc-1)
             {
-              bp[n-2] = sumg( -a[n-2] , neg(b[n-2]) );
-              ap[n-2] = sumg( b[n-2] , -neg(bp[n-2]) );
+              bp[Npunc-2] = sumg( -a[Npunc-2] , neg(b[Npunc-2]) );
+              ap[Npunc-2] = sumg( b[Npunc-2] , -neg(bp[Npunc-2]) );
 
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[n-2]);
-                  opSign[1*Ngen + j] = sign(bp[n-2]);
+                  opSign[0*Ngen + g] = sign(b[Npunc-2]);
+                  opSign[1*Ngen + g] = sign(bp[Npunc-2]);
                 }
             }
           else
             {
-              T d = sumg(sumg(a[i-1], -a[i]) , sumg(pos(b[i]), -neg(b[i-1])));
-              ap[i-1] = sumg(sumg(a[i-1],pos(b[i-1])),pos(sumg(pos(b[i]),-d)));
-              bp[i-1] = sumg( b[i] , -pos(d) );
-              ap[i] = sumg(sumg(a[i] , neg(b[i])) , neg(sumg(neg(b[i-1]) , d)));
-              bp[i] = sumg( b[i-1] , pos(d) );
+              T d = sumg(sumg(a[idx-1], -a[idx]) , sumg(pos(b[idx]), -neg(b[idx-1])));
+              ap[idx-1] = sumg(sumg(a[idx-1],pos(b[idx-1])),pos(sumg(pos(b[idx]),-d)));
+              bp[idx-1] = sumg( b[idx] , -pos(d) );
+              ap[idx] = sumg(sumg(a[idx] , neg(b[idx])) , neg(sumg(neg(b[idx-1]) , d)));
+              bp[idx] = sumg( b[idx-1] , pos(d) );
 
               if (opSign != 0)
                 {
-                  opSign[0*Ngen + j] = sign(b[i]);
-                  opSign[1*Ngen + j] = sign(b[i-1]);
-                  opSign[2*Ngen + j] = sign(pos(b[i]) - d);
-                  opSign[3*Ngen + j] = sign(d);
-                  opSign[4*Ngen + j] = sign(neg(b[i-1]) + d);
+                  opSign[0*Ngen + g] = sign(b[idx]);
+                  opSign[1*Ngen + g] = sign(b[idx-1]);
+                  opSign[2*Ngen + g] = sign(pos(b[idx]) - d);
+                  opSign[3*Ngen + g] = sign(d);
+                  opSign[4*Ngen + g] = sign(neg(b[idx-1]) + d);
                 }
             }
         }
-      for (mwIndex k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
+      for (mwIndex k = 1; k <= Ncoord/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
     }
 
   delete[] (ap+1);
