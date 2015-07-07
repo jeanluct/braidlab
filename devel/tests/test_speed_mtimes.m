@@ -1,9 +1,3 @@
-dbmex on
-global BRAIDLAB_debuglvl
-BRAIDLAB_debuglvl = 0
-
-braidlab.util.debugmsg('Initializing braid and loop')
-
 Lcoord = [1,1; 0,1; 1, 0; 0,-1; 3,2];
 Bcoord = [1,-2];
 
@@ -24,8 +18,6 @@ for g = 1:NGpoints
     L = braidlab.loop(repmat(Lcoord,ceil([NL/size(Lcoord,1),1])));
     B = braidlab.braid(repmat(Bcoord, ceil([1, NG/numel(Bcoord)])));
 
-    braidlab.util.debugmsg('Multiplying')
-
     clear getAvailableThreadNumber
     global BRAIDLAB_threads
     BRAIDLAB_threads = 1;
@@ -41,8 +33,8 @@ for g = 1:NGpoints
 end
 timeR = timeM ./ timeS;
 
-h=plot( Generators(:), timeR );
-labels = arrayfun( @(n)sprintf('Loops %d', n), Loops,'uniformoutput',false );
+h=loglog( Generators(:), timeR );
+labels = arrayfun( @(n)sprintf('%d loops', n), Loops,'uniformoutput',false );
 [h.DisplayName] = deal(labels{:});
 xlabel('# generators');
 ylabel('Multithreaded speedup');
