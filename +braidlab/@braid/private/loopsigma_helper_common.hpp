@@ -1,8 +1,6 @@
 #ifndef BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
 #define BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
 
-#undef BRAIDLAB_USE_GMP
-
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
@@ -232,8 +230,13 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
   const int n = (int)(Ncoord/2 + 2);
 
   // Make 1-indexed arrays.
-  mpz_class *a = new mpz_class[Ncoord/2] - 1;
-  mpz_class *b = new mpz_class[Ncoord/2] - 1;
+  mpz_class* a_storage =
+    static_cast<mpz_class *>( mxMalloc(sizeof(mpz_class)*Ncoord/2) );
+  mpz_class* b_storage =
+    static_cast<mpz_class *>( mxMalloc(sizeof(mpz_class)*Ncoord/2) );
+
+  mpz_class *a = a_storage - 1;
+  mpz_class *b = b_storage - 1;
 
   // If P_OPSIGN has been allocated, we'll record the pos/neg operations.
   int *opSign1 = 0;
@@ -241,7 +244,7 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
   const int maxopSign = 5;
   if (P_OPSIGN != 0)
     {
-      opSign1 = new int[maxopSign*Ngen](); // Allocate and set to zero.
+      opSign1 = static_cast<int *>( mxCalloc( maxopSign*Ngen, sizeof(int) ) );
       opSign = (double *)mxGetPr(P_OPSIGN);
     }
 
@@ -278,10 +281,11 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
         }
     }
 
-  delete[] (a+1);
-  delete[] (b+1);
+  mxFree(a_storage);
+  mxFree(b_storage);
 
-  if (P_OPSIGN != 0) delete[] opSign1;
+  if (P_OPSIGN != 0)
+    mxFree(opSign1);
 
   return;
 }

@@ -111,15 +111,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     const mxArray *loop = prhs[1];
 
     // Allocate input and output GMP multiprecision array.
-    mpz_class *loopIn = new mpz_class[Ncoord*Nloops];
-    mpz_class *loopOut = new mpz_class[Ncoord*Nloops];
+    mpz_class *loopIn =
+      static_cast<mpz_class *>(mxMalloc(sizeof(mpz_class)*Ncoord*Nloops));
+    mpz_class *loopOut =
+      static_cast<mpz_class *>(mxMalloc(sizeof(mpz_class)*Ncoord*Nloops));
 
     // Convert cell of mxArray strings to mpz_class objects.
     for (mwIndex l = 0; l < Nloops; ++l) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
         subs[0] = k;
         subs[1] = l;
-        mwIndex idx = mxCalcSingleSubscript(P_LOOP_IN,nsubs,subs);
+        mwIndex idx = mxCalcSingleSubscript(P_LOOP_IN,2,subs);
         loopIn[k*Nloops+l] =
           mpz_class(mxArrayToString(mxGetCell(P_LOOP_IN,idx)));
       }
@@ -132,20 +134,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Vector of array dimensions.
     mwSize dims[2] = {Nloops, Ncoord};
     // Allocate output cell array.
-    P_LOOP_OUT = mxCreateCellArray(nsubs,dims);
+    P_LOOP_OUT = mxCreateCellArray(2,dims);
 
     // Convert mpz_class objects back to strings, store in cell array.
     for (mwIndex l = 0; l < Nloops; ++l) {
       for (mwIndex k = 0; k < Ncoord; ++k) {
         subs[0] = k;
         subs[1] = l;
-        mwIndex idx = mxCalcSingleSubscript(P_LOOP_OUT,nsubs,subs);
+        mwIndex idx = mxCalcSingleSubscript(P_LOOP_OUT,2,subs);
         mxArray *s = mxCreateString(loopOut[k*Nloops+l].get_str().c_str());
         mxSetCell(P_LOOP_OUT,idx,s);
       }
     }
-    delete[] loopIn;
-    delete[] loopOut;
+    mxFree(loopIn);
+    mxFree(loopOut);
     break; }
 #endif
   default: {
