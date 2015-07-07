@@ -31,7 +31,7 @@
 template <typename T> inline T pos(T x) { return (x > 0 ? x : 0); }
 template <typename T> inline T neg(T x) { return (x < 0 ? x : 0); }
 
-template <typename T> inline int sign(T x) {
+template <typename T>  int sign(T x) {
   return ( x > 0 ? 1 : (x < 0 ? -1 : 0) );
 }
 
@@ -41,11 +41,11 @@ inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
   const int Ncoord = 2*(Npunc-2);
 
   // Make 1-indexed arrays.
-  T a_storage[Ncoord/2];
-  T b_storage[Ncoord/2];
+  T *a_storage = static_cast<T *>( mxMalloc( sizeof(T)*Ncoord/2 ) );
+  T *b_storage = static_cast<T *>( mxMalloc( sizeof(T)*Ncoord/2 ) );
 
-  T *a_tmp = &a_storage[0] - 1;
-  T *b_tmp = &b_storage[0] - 1;
+  T *a_tmp = a_storage - 1;
+  T *b_tmp = b_storage - 1;
 
   // Copy initial row data
   for (mwIndex k = 1; k <= Ncoord/2; ++k) {
@@ -126,6 +126,9 @@ inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
       b[k] = b_tmp[k];
     }
   }
+
+  mxFree(a_storage);
+  mxFree(b_storage);
 
 }
 
