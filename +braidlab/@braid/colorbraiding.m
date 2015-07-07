@@ -59,6 +59,7 @@ function [varargout] = colorbraiding(XY,t,proj)
 % LICENSE>
 
 import braidlab.util.debugmsg
+import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
 global BRAIDLAB_braid_nomex;
@@ -156,41 +157,3 @@ function XYr = rotate_data_clockwise(XY,proj)
 XYr = zeros(size(XY));
 XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
 XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
-
-
-% =========================================================================
-function Nthreads = getAvailableThreadNumber
-%%GETAVAILABLETHREADNUMBER
-%
-% Determines number of threads used in C++ code.
-%
-% - First tries to honor global BRAIDLAB_threads.
-% - If it is invalid/not available, tries to set number of threads to number
-% of available cores.
-% - If number of cores cannot be detected, defaults to one thread.
-
-import braidlab.util.debugmsg
-global BRAIDLAB_threads
-
-if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
-  % use the global variable to set the number of threads
-  Nthreads = ceil(BRAIDLAB_threads);
-  debugmsg(sprintf(['colorbraiding: Number of threads set by ' ...
-                    'BRAIDLAB_threads to: %d.'],Nthreads));
-else
-  % try to autodetect the optimal number of threads (== number of cores)
-  try
-    import java.lang.Runtime;
-    r=Runtime.getRuntime;
-    Nthreads=r.availableProcessors;
-
-    debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
-                      'java.lang.Runtime.'], Nthreads));
-    % 'feature' fails - auto set number of threads to 1
-  catch
-    Nthreads = 1;
-    warning('BRAIDLAB:braid:colorbraiding:autosetthreadsfails', ...
-            ['Number of processor cores cannot be detected. Number of ' ...
-             'threads set to 1.'])
-  end
-end
