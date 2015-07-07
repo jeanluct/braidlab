@@ -42,6 +42,7 @@ function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
 assert(nargin >= 3, 'Not enough arguments');
 
 import braidlab.util.debugmsg
+import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
 global BRAIDLAB_braid_nomex;
@@ -58,6 +59,9 @@ end
 validateattributes( sigma_idx, {'int32'}, {'vector'} );
 validateattributes( Npunc, {'numeric'}, {'positive'} );
 
+% retrieve the number of threads usable
+Nthreads = getAvailableThreadNumber();
+
 % If MEX file is available, use that.
 if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
 
@@ -70,9 +74,9 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     % storing loops in columns is more efficient for memory fetching
     loop_in = transpose(loop_in);
     if nargout > 1
-      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
     else
-      loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc);
+      loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
     end
     loop_out = transpose(loop_out);
 
@@ -94,7 +98,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     % (multiprecision).  It will return an error if it wasn't.
     compiled_with_gmp = true;
     try
-      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_str,Npunc);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_str,Npunc,Nthreads);
     catch err
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;

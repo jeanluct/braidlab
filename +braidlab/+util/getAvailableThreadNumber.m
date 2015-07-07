@@ -46,7 +46,6 @@ if ~isempty(ComputedThreads)
                     ' Run ''clear getAvailableThreadNumber'' ',...
                     ' to recompute'],ComputedThreads),2);
 else
-
   if ~(isempty(BRAIDLAB_threads) || BRAIDLAB_threads <= 0)
     % use the global variable to set the number of threads
     ComputedThreads = ceil(BRAIDLAB_threads);

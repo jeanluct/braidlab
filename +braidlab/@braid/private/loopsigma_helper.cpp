@@ -39,16 +39,25 @@
 #define P_SIGMA_IDX prhs[0]
 #define P_LOOP_IN prhs[1]
 #define P_NPUNC prhs[2]
+#define P_NTHREADS prhs[3]
 
 #define P_LOOP_OUT plhs[0]
 #define P_OPSIGN  plhs[1]
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-  if (nrhs < 3) {
-    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
-                      "3 input arguments required.");
+
+  // read off global debug level
+  mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (isDebug) {
+    BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
   }
 
+  if (nrhs < 4) {
+    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
+                      "4 input arguments required.");
+  }
+
+  const size_t Nthreads = static_cast<size_t>( mxGetScalar(P_NTHREADS) );
   const mwSize Npunc = static_cast<int>( mxGetScalar( P_NPUNC ) );
 
   // Dimensions of P_LOOP_IN - loops stored column-wise
@@ -78,19 +87,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
   case mxDOUBLE_CLASS: {
     BraidInPlace<double> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
-    braid.run();
+    braid.run(Nthreads);
     break; }
   case mxSINGLE_CLASS: {
     BraidInPlace<float> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
-    braid.run();
+    braid.run(Nthreads);
     break; }
   case mxINT32_CLASS: {
     BraidInPlace<int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
-    braid.run();
+    braid.run(Nthreads);
     break; }
   case mxINT64_CLASS: {
     BraidInPlace<long long int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
-    braid.run();
+    braid.run(Nthreads);
     break; }
 #ifdef BRAIDLAB_USE_GMP
   case mxCELL_CLASS: {

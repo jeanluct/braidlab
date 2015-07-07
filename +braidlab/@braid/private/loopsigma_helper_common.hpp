@@ -3,9 +3,6 @@
 
 #undef BRAIDLAB_USE_GMP
 
-#include "mex.h"
-#include "update_rules.hpp"
-
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
@@ -30,6 +27,50 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+
+////////////////// PREAMBLE  /////////////////////////
+
+#include <functional>
+#include "mex.h"
+#include "update_rules.hpp"
+
+int BRAIDLAB_debuglvl = -1; // set externally after the include
+
+// real GCC feature list:
+// https://gcc.gnu.org/projects/cxx0x.html
+#if ( (defined __GNUC__) && (!defined __clang__) )
+
+#define GCCVERSION (__GNUC__ * 10000            \
+                    + __GNUC_MINOR__ * 100      \
+                    + __GNUC_PATCHLEVEL__)
+
+# if ( (!defined BRAIDLAB_NOTHREADING) &&           \
+       ( GCCVERSION < 40600) ) // less than GCC 4.5
+# define BRAIDLAB_NOTHREADING
+# endif
+#endif // gcc
+
+// CLANG: feature list:
+// http://clang.llvm.org/cxx_status.html
+#if (defined __clang__)
+
+#define CLANGVERSION (__clang_major__ * 10000   \
+                      + __clang_minor__ * 100   \
+                      + __clang_patchlevel__)
+
+# if ( (!defined BRAIDLAB_NOTHREADING) &&               \
+       (CLANGVERSION < 30300) ) // less than Clang 3.3
+# define BRAIDLAB_NOTHREADING
+# endif
+
+#endif // clang
+
+#ifndef BRAIDLAB_NOTHREADING
+#include <mutex>
+#include "ThreadPool_nofuture.h" // (c) Jakob Progsch
+                                 // https://github.com/progschj/ThreadPool
+#endif
+
 ////////////////// DECLARATIONS  /////////////////////////
 
 template <class T>
@@ -40,7 +81,7 @@ public:
   BraidInPlace(mxArray *P_LOOP,
                const mxArray *P_SIGMA_IDX, mxArray *P_OPSIGN);
   ~BraidInPlace();
-  void run();
+  void run(size_t NThreadsRequested = 1);
   void applyToLoop(const mwIndex l);
 
 private:
@@ -69,6 +110,7 @@ private:
   int *opSign1;
 
   const mwSize maxopSign;
+
 
 };
 
@@ -101,6 +143,7 @@ BraidInPlace<T>::BraidInPlace(mxArray *P_LOOP,
     opSign = mxGetPr(P_OPSIGN);
   }
 
+
 }
 
 template <class T>
@@ -132,14 +175,52 @@ void BraidInPlace<T>::applyToLoop(const mwIndex l) {
 }
 
 template <class T>
-void BraidInPlace<T>::run() {
+void BraidInPlace<T>::run(size_t NThreadsRequested) {
 
-  // run through every loop
-  for (mwIndex l = 0; l < Nloops; ++l) {
-    applyToLoop(l);
+#ifndef BRAIDLAB_NOTHREADING
+  // restrict the number of threads if there are less jobs than available
+  // threads
+  NThreadsRequested = NThreadsRequested > Nloops ? Nloops : NThreadsRequested;
+#else
+  NThreadsRequested = 1;
+#endif
+  if ( NThreadsRequested == 0 ) {
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:colorbraiding:numthreadsnotpositive",
+                      "Number of threads requested must be positive");
   }
-}
 
+  // unthreaded version
+  if (NThreadsRequested == 1) {
+    if (1 <= BRAIDLAB_debuglvl)  {
+      printf("loopsigma_helper: multiplication running UNTHREADED.\n" );
+      mexEvalString("pause(0.001);"); //flush
+    }
+    for (mwIndex l = 0; l < Nloops; ++l) {
+      applyToLoop(l);
+    }
+  }
+#ifndef BRAIDLAB_NOTHREADING
+  else {   // threaded version
+    if (1 <= BRAIDLAB_debuglvl)  {
+      printf("loopsigma_helper: multiplication running THREADED (%d threads).\n",
+             NThreadsRequested);
+      mexEvalString("pause(0.001);"); //flush
+    }
+    // scheduler for threads
+    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
+
+    // std::bind creates a function reference to a member function
+    // needed here b/c passing references to member functions
+    // requires explicit object to be referred
+    auto funApplyToLoop = std::bind(&BraidInPlace<T>::applyToLoop,
+                                    this, std::placeholders::_1);
+
+    for (mwIndex l = 0; l < Nloops; ++l) {
+      pool.enqueue( funApplyToLoop, l);
+    }
+  }
+#endif
+}
 
 #ifdef BRAIDLAB_USE_GMP
 inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
