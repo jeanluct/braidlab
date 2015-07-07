@@ -668,7 +668,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 #ifndef BRAIDLAB_NOTHREADING
   // each tasks is one "row" of the (I,J) pairing matrix
   // ensure that we do not call more workers than we have tasks
-  NThreadsRequested = std::min( NThreadsRequested, Nstrings );
+  NThreadsRequested = NThreadsRequested < Nstrings ? NThreadsRequested : Nstrings;
 #else
   NThreadsRequested = 1;
 #endif
