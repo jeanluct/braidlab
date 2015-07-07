@@ -7,16 +7,16 @@ braidlab.util.debugmsg('Initializing braid and loop')
 Lcoord = [1,1; 0,1; 1, 0; 0,-1; 3,2];
 Bcoord = [1,-2];
 
-Npoints = 10;
-Generators = ceil(logspace(1,4.5,Npoints));
-Loops = ceil(logspace(1,4,Npoints));
+NGpoints = 10;
+NLpoints = 5;
+Generators = ceil(logspace(1,6,NGpoints));
+Loops = ceil(logspace(1,5,NLpoints));
 
+timeS = nan([NGpoints, NLpoints]);
+timeM = timeS;
 
-timeS = nan([Npoints, Npoints]);
-timeM = nan([Npoints, Npoints]);
-
-for g = 1:Npoints
-  for l = 1:Npoints
+for g = 1:NGpoints
+  for l = 1:NLpoints
 
     NL = Loops(l);
     NG = Generators(g);
@@ -45,5 +45,5 @@ h=plot( Generators(:), timeR );
 labels = arrayfun( @(n)sprintf('Loops %d', n), Loops,'uniformoutput',false );
 [h.DisplayName] = deal(labels{:});
 xlabel('# generators');
-ylabel('Runtime');
+ylabel('Multithreaded speedup');
 legend('Location','Best');
