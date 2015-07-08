@@ -1,4 +1,7 @@
-Lcoord = [1,1; 0,1; 1, 0; 0,-1; 3,2];
+Npunc = 10;
+rng(0);
+Lcoord = randi( 5, 2*Npunc-4 );
+
 Bcoord = [1,-2];
 
 Generators = 10.^(1:.5:5);
@@ -10,8 +13,6 @@ NLpoints = numel(Loops);
 timeS = nan([NGpoints, NLpoints]);
 timeM = timeS;
 
-
-
 for g = 1:NGpoints
   for l = 1:NLpoints
 
@@ -19,7 +20,7 @@ for g = 1:NGpoints
     NG = Generators(g);
     fprintf('Running: #loops %8d \t braid length %8d\t...\t', int64(NL), int64(NG) );
     L = braidlab.loop(repmat(Lcoord,ceil([NL/size(Lcoord,1),1])));
-    B = braidlab.braid(repmat(Bcoord, ceil([1, NG/numel(Bcoord)])));
+    B = braidlab.braid(repmat(Bcoord, ceil([1, NG/numel(Bcoord)])), Npunc);
 
     clear getAvailableThreadNumber
     global BRAIDLAB_threads
@@ -44,6 +45,9 @@ legend('Location','Best');
 
 clear getAvailableThreadNumber
 clear global BRAIDLAB_threads
+Nthreads=braidlab.util.getAvailableThreadNumber(); 
 txt = sprintf('Multiplication speedup using the default number of %d threads', ...
-        braidlab.util.getAvailableThreadNumber() );
+       Nthreads );
+   
+ylim([0,Nthreads]);
 title(txt);
