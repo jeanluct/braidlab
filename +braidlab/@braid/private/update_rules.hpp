@@ -1,6 +1,8 @@
 #ifndef BRAIDLAB_UPDATE_RULES_HPP
 #define BRAIDLAB_UPDATE_RULES_HPP
 
+#include <vector>
+
 #include "mex.h"
 #include "sumg.hpp"
 
@@ -31,118 +33,119 @@
 template <typename T> inline T pos(T x) { return (x > 0 ? x : 0); }
 template <typename T> inline T neg(T x) { return (x < 0 ? x : 0); }
 
-template <typename T> inline int sign(T x)
-{
+template <typename T>  int sign(T x) {
   return ( x > 0 ? 1 : (x < 0 ? -1 : 0) );
 }
 
 
+// with pre-allocated temp storage
 template <typename T>
-inline void update_rules(const int Ngen, const int n, const int *braidword,
-                         T *a, T *b, int* opSign = 0)
-{
-  const int N = 2*(n-2);
+void inline update_rules(const int Ngen, const int Npunc, const int *braidword,
+                         T *a, T *b, T *a_tmp, T *b_tmp, int* opSign = 0) {
 
-  // Make 1-indexed arrays.
-  T *ap = new T[N/2] - 1;
-  T *bp = new T[N/2] - 1;
+  const int Ncoord = 2*(Npunc-2);
 
   // Copy initial row data
-  for (mwIndex k = 1; k <= N/2; ++k) { ap[k] = a[k]; bp[k] = b[k]; }
+  for (mwIndex k = 1; k <= Ncoord/2; ++k) {
+    a_tmp[k] = a[k];
+    b_tmp[k] = b[k];
+  }
 
-  const int maxopSign = 5;
-
-  for (int j = 0; j < Ngen; ++j) // Loop over generators.
-    {
-      int i = abs(braidword[j]);
-      if (braidword[j] > 0)
-        {
-          if (i == 1)
-            {
-              bp[1] = sumg( a[1] , pos(b[1]) );
-              ap[1] = sumg( -b[1] , pos(bp[1]) );
-
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[1]);
-                  opSign[1*Ngen + j] = sign(bp[1]);
-                }
-            }
-          else if (i == n-1)
-            {
-              bp[n-2] = sumg( a[n-2] , neg(b[n-2]) );
-              ap[n-2] = sumg( -b[n-2] , neg(bp[n-2]) );
-
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[n-2]);
-                  opSign[1*Ngen + j] = sign(bp[n-2]);
-                }
-            }
-          else
-            {
-              T c = sumg(sumg(a[i-1],-a[i]) , sumg(-pos(b[i]),neg(b[i-1])));
-              ap[i-1] = sumg(sumg(a[i-1],-pos(b[i-1])),-pos(sumg(pos(b[i]),c)));
-              bp[i-1] = sumg( b[i] , neg(c) );
-              ap[i] = sumg(sumg(a[i],-neg(b[i])),-neg(sumg(neg(b[i-1]),-c)));
-              bp[i] = sumg( b[i-1] , -neg(c) );
-
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[i]);
-                  opSign[1*Ngen + j] = sign(b[i-1]);
-                  opSign[2*Ngen + j] = sign(c);
-                  opSign[3*Ngen + j] = sign(pos(b[i]) + c);
-                  opSign[4*Ngen + j] = sign(neg(b[i-1]) - c);
-                }
-            }
+  for (int g = 0; g < Ngen; ++g) { // Loop over generators.
+    int idx = abs(braidword[g]);
+    if (braidword[g] > 0) {
+      if (idx == 1) {
+        b_tmp[1] = sumg( a[1] , pos(b[1]) );
+        a_tmp[1] = sumg( -b[1] , pos(b_tmp[1]) );
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[1]);
+          opSign[1*Ngen + g] = sign(b_tmp[1]);
         }
-      else if (braidword[j] < 0)
-        {
-          if (i == 1)
-            {
-              bp[1] = sumg( -a[1] , pos(b[1]) );
-              ap[1] = sumg( b[1] , -pos(bp[1]) );
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[1]);
-                  opSign[1*Ngen + j] = sign(bp[1]);
-                }
-            }
-          else if (i == n-1)
-            {
-              bp[n-2] = sumg( -a[n-2] , neg(b[n-2]) );
-              ap[n-2] = sumg( b[n-2] , -neg(bp[n-2]) );
-
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[n-2]);
-                  opSign[1*Ngen + j] = sign(bp[n-2]);
-                }
-            }
-          else
-            {
-              T d = sumg(sumg(a[i-1], -a[i]) , sumg(pos(b[i]), -neg(b[i-1])));
-              ap[i-1] = sumg(sumg(a[i-1],pos(b[i-1])),pos(sumg(pos(b[i]),-d)));
-              bp[i-1] = sumg( b[i] , -pos(d) );
-              ap[i] = sumg(sumg(a[i] , neg(b[i])) , neg(sumg(neg(b[i-1]) , d)));
-              bp[i] = sumg( b[i-1] , pos(d) );
-
-              if (opSign != 0)
-                {
-                  opSign[0*Ngen + j] = sign(b[i]);
-                  opSign[1*Ngen + j] = sign(b[i-1]);
-                  opSign[2*Ngen + j] = sign(pos(b[i]) - d);
-                  opSign[3*Ngen + j] = sign(d);
-                  opSign[4*Ngen + j] = sign(neg(b[i-1]) + d);
-                }
-            }
+      }
+      else if (idx == Npunc-1) {
+        b_tmp[Npunc-2] = sumg( a[Npunc-2] , neg(b[Npunc-2]) );
+        a_tmp[Npunc-2] = sumg( -b[Npunc-2] , neg(b_tmp[Npunc-2]) );
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[Npunc-2]);
+          opSign[1*Ngen + g] = sign(b_tmp[Npunc-2]);
         }
-      for (mwIndex k = 1; k <= N/2; ++k) { a[k] = ap[k]; b[k] = bp[k]; }
+      }
+      else {
+        T c = sumg(sumg(a[idx-1],-a[idx]) , sumg(-pos(b[idx]),neg(b[idx-1])));
+        a_tmp[idx-1] = sumg(sumg(a[idx-1],-pos(b[idx-1])),-pos(sumg(pos(b[idx]),c)));
+        b_tmp[idx-1] = sumg( b[idx] , neg(c) );
+        a_tmp[idx] = sumg(sumg(a[idx],-neg(b[idx])),-neg(sumg(neg(b[idx-1]),-c)));
+        b_tmp[idx] = sumg( b[idx-1] , -neg(c) );
+
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[idx]);
+          opSign[1*Ngen + g] = sign(b[idx-1]);
+          opSign[2*Ngen + g] = sign(c);
+          opSign[3*Ngen + g] = sign(pos(b[idx]) + c);
+          opSign[4*Ngen + g] = sign(neg(b[idx-1]) - c);
+        }
+      }
+    }
+    else if (braidword[g] < 0) {
+      if (idx == 1) {
+        b_tmp[1] = sumg( -a[1] , pos(b[1]) );
+        a_tmp[1] = sumg( b[1] , -pos(b_tmp[1]) );
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[1]);
+          opSign[1*Ngen + g] = sign(b_tmp[1]);
+        }
+      }
+      else if (idx == Npunc-1) {
+        b_tmp[Npunc-2] = sumg( -a[Npunc-2] , neg(b[Npunc-2]) );
+        a_tmp[Npunc-2] = sumg( b[Npunc-2] , -neg(b_tmp[Npunc-2]) );
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[Npunc-2]);
+          opSign[1*Ngen + g] = sign(b_tmp[Npunc-2]);
+        }
+      }
+      else {
+        T d = sumg(sumg(a[idx-1], -a[idx]) , sumg(pos(b[idx]), -neg(b[idx-1])));
+        a_tmp[idx-1] = sumg(sumg(a[idx-1],pos(b[idx-1])),pos(sumg(pos(b[idx]),-d)));
+        b_tmp[idx-1] = sumg( b[idx] , -pos(d) );
+        a_tmp[idx] = sumg(sumg(a[idx] , neg(b[idx])) , neg(sumg(neg(b[idx-1]) , d)));
+        b_tmp[idx] = sumg( b[idx-1] , pos(d) );
+
+        if (opSign != 0) {
+          opSign[0*Ngen + g] = sign(b[idx]);
+          opSign[1*Ngen + g] = sign(b[idx-1]);
+          opSign[2*Ngen + g] = sign(pos(b[idx]) - d);
+          opSign[3*Ngen + g] = sign(d);
+          opSign[4*Ngen + g] = sign(neg(b[idx-1]) + d);
+        }
+      }
     }
 
-  delete[] (ap+1);
-  delete[] (bp+1);
+
+    for (mwIndex k = 1; k <= Ncoord/2; ++k) {
+      a[k] = a_tmp[k];
+      b[k] = b_tmp[k];
+    }
+
+  }
+
+}
+
+// without pre-allocated temp storage
+template <typename T>
+void update_rules(const int Ngen, const int Npunc, const int *braidword,
+                  T *a, T *b, int* opSign = 0) {
+
+  const int Ncoord = 2*(Npunc-2);
+
+  // Make 1-indexed arrays.
+  std::vector<T> a_storage (Ncoord/2);
+  std::vector<T> b_storage (Ncoord/2);
+
+  T *a_tmp = a_storage.data()-1;
+  T *b_tmp = b_storage.data()-1;
+
+  update_rules( Ngen, Npunc, braidword, a, b, a_tmp, b_tmp, opSign );
+
 }
 
 #endif // BRAIDLAB_UPDATE_RULES_HPP

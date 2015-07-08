@@ -64,7 +64,7 @@ tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
-	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp
+	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp ThreadPool_nofuture.h ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 

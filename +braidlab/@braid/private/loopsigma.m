@@ -1,14 +1,19 @@
-function [varargout] = loopsigma(sigma_idx,lp)
+function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
 %LOOPSIGMA   Act on a loop with a braid group generator sigma.
 %
-%   UP = LOOPSIGMA(SIGMA_IDX,LP) acts on the loop LP (encoded in Dynnikov
-%   coordinates) with the braid generator whose indices are stored in SIGMA_IDX,
-%   and returns the new loop.  SIGMA_IDX can be a positive or negative integer
-%   (inverse generator), and can be specified as a vector, in which case all
-%   the generators are applied to the loop sequentially from left to right.
+%   LOOP_OUT = LOOPSIGMA(SIGMA_IDX,LOOP_IN, NPUNC) acts on the loop LOOP_IN
+%   (encoded in Dynnikov coordinates) with the braid generator whose indices
+%   are stored in SIGMA_IDX, and returns the new loop.  SIGMA_IDX can be a
+%   positive or negative integer (inverse generator), and can be specified as
+%   a vector, in which case all the generators are applied to the loop
+%   sequentially from left to right.  NPUNC is the number of punctures in the
+%   braid.
 %
-%   LP is specified as a row vector, or a matrix whose each row corresponds
-%   to a separate loop.
+%   [LOOP_OUT, OPSIGN] = LOOPSIGMA(...) additionaly returns the signs of
+%   operations, which can be used to determine linear action of the braid.
+%
+%   LOOP_IN is specified as a row vector, or a matrix whose each row
+%   corresponds to a separate loop.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -34,27 +39,58 @@ function [varargout] = loopsigma(sigma_idx,lp)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
+assert(nargin >= 3, 'Not enough arguments');
+
+import braidlab.util.debugmsg
+import braidlab.util.getAvailableThreadNumber
+
+% set to true to use Matlab instead of C++ version of the algorithm
+global BRAIDLAB_braid_nomex;
+useMatlabVersion = any(BRAIDLAB_braid_nomex);
+
 if isempty(sigma_idx)
-  varargout{1} = lp;
+  loop_out = loop_in;
   if nargout > 1
-    varargout{2} = reshape([],[size(lp,1) 0]);
+    opSign = reshape([],[size(loop_in,1) 0]);
   end
   return
 end
 
+validateattributes( sigma_idx, {'int32'}, {'vector'} );
+validateattributes( Npunc, {'numeric'}, {'positive'} );
+
+% retrieve the number of threads usable
+Nthreads = getAvailableThreadNumber();
+
 % If MEX file is available, use that.
-if exist('loopsigma_helper','file') == 3
-  if isa(lp,'double') || isa(lp,'single') || isa(lp,'int32') || isa(lp,'int64')
-    [varargout{1:nargout}] = loopsigma_helper(sigma_idx,lp);
+if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
+
+  if isa(loop_in,'double') || ...
+        isa(loop_in,'single') || ...
+        isa(loop_in,'int32') || ...
+        isa(loop_in,'int64')
+    debugmsg('Using MEX loopsigma with Matlab data structures.');
+
+    % storing loops in columns is more efficient for memory fetching
+    loop_in = transpose(loop_in);
+    if nargout > 1
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
+    else
+      loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
+    end
+    loop_out = transpose(loop_out);
+
     return
 
-  elseif isa(lp,'vpi')
-
+  elseif isa(loop_in,'vpi')
+    debugmsg('Using MEX loopsigma with VPI.')
     % Convert u to cell of strings to pass to C++ file.
-    ustr = cell(size(lp));
-    for i = 1:size(lp,1)
-      for j = 1:size(lp,2)
-        ustr{i,j} = strtrim(num2str(lp(i,j)));
+    Nloops = size(loop_in,1);
+    Ncoord = size(loop_in,2);
+    loop_str = cell(Ncoord, Nloops);
+    for loops = 1:Nloops
+      for coords = 1:Ncoord
+        loop_str{coords,loops} = strtrim(num2str(loop_in(loops,coords)));
       end
     end
 
@@ -62,7 +98,7 @@ if exist('loopsigma_helper','file') == 3
     % (multiprecision).  It will return an error if it wasn't.
     compiled_with_gmp = true;
     try
-      [varargout{1:nargout}] = loopsigma_helper(sigma_idx,ustr);
+      [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_str,Npunc,Nthreads);
     catch err
       if strcmp(err.identifier,'BRAIDLAB:loopsigma_helper:badtype')
         compiled_with_gmp = false;
@@ -73,21 +109,22 @@ if exist('loopsigma_helper','file') == 3
 
     if compiled_with_gmp
       % Convert cell of strings back to vpi.
-      uvpi = vpi(zeros(size(lp)));
-      for i = 1:size(lp,1)
-        for j = 1:size(lp,2)
-          uvpi(i,j) = vpi(varargout{1}{i,j});
+      coord_vpi = vpi(zeros(size(loop_in)));
+      for coords = 1:Ncoord
+        for loops = 1:Nloops
+          coord_vpi(loops,coords) = vpi(loop_out{coords,loops});
         end
       end
-
-      varargout{1} = uvpi;
+      loop_out = coord_vpi;
       return
     end
   end
 end
 
-n = size(lp,2)/2 + 2;
-a = lp(:,1:n-2); b = lp(:,(n-1):end);
+debugmsg('Using Matlab loopsigma.')
+
+n = size(loop_in,2)/2 + 2;
+a = loop_in(:,1:n-2); b = loop_in(:,(n-1):end);
 ap = a; bp = b;
 
 pos = @(x)max(x,0); neg = @(x)min(x,0);
@@ -95,7 +132,9 @@ pos = @(x)max(x,0); neg = @(x)min(x,0);
 % If nargout > 1, record the state of pos/neg operators.
 % There are at most maxopSign such choices for each generator.
 maxopSign = 5;
-if nargout > 1, opSign = zeros(size(lp,1),length(sigma_idx),maxopSign); end
+if nargout > 1
+  opSign = zeros(size(loop_in,1),length(sigma_idx),maxopSign);
+end
 
 for j = 1:length(sigma_idx)
   i = abs(sigma_idx(j));
@@ -172,9 +211,8 @@ for j = 1:length(sigma_idx)
   end
   a = ap; b = bp;
 end
-varargout{1} = [ap bp];
+loop_out = [ap bp];
 
 if nargout > 1
-  opSign = reshape(opSign,[size(lp,1) maxopSign*length(sigma_idx)]);
-  varargout{2} = opSign;
+  opSign = reshape(opSign,[size(loop_in,1) maxopSign*length(sigma_idx)]);
 end
