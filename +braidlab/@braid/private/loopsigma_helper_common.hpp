@@ -206,7 +206,7 @@ void BraidInPlace<T>::applyToLoop(const mwIndex l) {
   tempAB& mytmp = tmp[std::this_thread::get_id()];
 #else
   tempAB& mytmp = tmp[0];
-#end
+#endif
 
   if (mytmp.first.empty())
     mytmp.first.resize(Ncoord/2);
