@@ -1,6 +1,8 @@
 #ifndef BRAIDLAB_UPDATE_RULES_HPP
 #define BRAIDLAB_UPDATE_RULES_HPP
 
+#include <vector>
+
 #include "mex.h"
 #include "sumg.hpp"
 
@@ -41,11 +43,11 @@ void update_rules(const int Ngen, const int Npunc, const int *braidword,
   const int Ncoord = 2*(Npunc-2);
 
   // Make 1-indexed arrays.
-  T *a_storage = static_cast<T *>( mxMalloc( sizeof(T)*Ncoord/2 ) );
-  T *b_storage = static_cast<T *>( mxMalloc( sizeof(T)*Ncoord/2 ) );
+  std::vector<T> a_storage (Ncoord/2);
+  std::vector<T> b_storage (Ncoord/2);
 
-  T *a_tmp = a_storage - 1;
-  T *b_tmp = b_storage - 1;
+  T *a_tmp = a_storage.data()-1;
+  T *b_tmp = b_storage.data()-1;
 
   // Copy initial row data
   for (mwIndex k = 1; k <= Ncoord/2; ++k) {
@@ -121,14 +123,14 @@ void update_rules(const int Ngen, const int Npunc, const int *braidword,
         }
       }
     }
+
+
     for (mwIndex k = 1; k <= Ncoord/2; ++k) {
       a[k] = a_tmp[k];
       b[k] = b_tmp[k];
     }
-  }
 
-  mxFree(a_storage);
-  mxFree(b_storage);
+  }
 
 }
 
