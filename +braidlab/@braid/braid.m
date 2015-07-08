@@ -186,7 +186,7 @@ classdef braid < matlab.mixin.CustomDisplay
           end
           br.n = n;
           if n == 6
-            br.word = [5:-1:1 5 4 3 5 4];
+            br.word = int32([5:-1:1 5 4 3 5 4]);
             return
           end
           L = (n-1):-1:1;
@@ -218,7 +218,7 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
-      elseif max(size(size(b))) == 3
+      elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
           error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
@@ -237,14 +237,14 @@ classdef braid < matlab.mixin.CustomDisplay
             warning('BRAIDLAB:braid:braid:onetraj', ...
                     [ 'Creating trivial braid from single ' ...
                       'trajectory (did you mean that?).' ])
-            br.word = [];
+            br.word = int32([]);
             br.n = 1;
           else
             error('BRAIDLAB:braid:braid:badarg','Bad array size.')
           end
         else
           b = b(:).';   % Store word as row vector.
-          br.word = b;
+          br.word = int32(b);
           if nargin < 2
             br.n = max(abs(b))+1;
           else
@@ -252,6 +252,9 @@ classdef braid < matlab.mixin.CustomDisplay
           end
         end
       end
+
+      assert( isa(br.word,'int32'), 'BRAIDLAB:braid:braid:int32',...
+              'Word was not set to int32 somewhere!' );
     end % function braid
 
     function obj = set.n(obj,value)
@@ -276,18 +279,21 @@ classdef braid < matlab.mixin.CustomDisplay
 
     % Make sure it's an int32, internally.
     function obj = set.word(obj,value)
-      if ~all(value)
-        error('BRAIDLAB:braid:setword:badarg','Generators cannot be zero.')
+      if isempty(value)
+        % Make sure the empty word is 0 by 0.
+        obj.word = int32([]);
+      else
+        try
+          validateattributes(value, {'numeric'},...
+                             {'nonzero','nonnan','finite'} );
+          % needed b/c of a bug in validateattributes
+          assert( all(value ~= 0) )
+          obj.word = int32(value);
+        catch e
+          error('BRAIDLAB:braid:setword:badarg',...
+                'Generators have to be nonzero, non-NaN and finite.')
+        end
       end
-      if any(isnan(value))
-        error('BRAIDLAB:braid:setword:badarg','Generators cannot be NaN.')
-      end
-      if any(isinf(value))
-        error('BRAIDLAB:braid:setword:badarg','Generators cannot be inf.')
-      end
-      obj.word = int32(value);
-      % Make sure the empty word is 0 by 0.
-      if isempty(obj.word), obj.word = int32([]); end
     end
 
     function ee = eq(b1,b2)
