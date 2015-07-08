@@ -37,17 +37,11 @@ template <typename T>  int sign(T x) {
   return ( x > 0 ? 1 : (x < 0 ? -1 : 0) );
 }
 
+
+// with pre-allocated temp storage
 template <typename T>
-void update_rules(const int Ngen, const int Npunc, const int *braidword,
-                  T *a, T *b, int* opSign = 0) {
-  const int Ncoord = 2*(Npunc-2);
-
-  // Make 1-indexed arrays.
-  std::vector<T> a_storage (Ncoord/2);
-  std::vector<T> b_storage (Ncoord/2);
-
-  T *a_tmp = a_storage.data()-1;
-  T *b_tmp = b_storage.data()-1;
+void inline update_rules(const int Ngen, const int Npunc, const int *braidword,
+                         T *a, T *b, T *a_tmp, T *b_tmp, const int Ncoord, int* opSign = 0) {
 
   // Copy initial row data
   for (mwIndex k = 1; k <= Ncoord/2; ++k) {
@@ -131,6 +125,24 @@ void update_rules(const int Ngen, const int Npunc, const int *braidword,
     }
 
   }
+
+}
+
+// without pre-allocated temp storage
+template <typename T>
+void update_rules(const int Ngen, const int Npunc, const int *braidword,
+                  T *a, T *b, int* opSign = 0) {
+
+  const int Ncoord = 2*(Npunc-2);
+
+  // Make 1-indexed arrays.
+  std::vector<T> a_storage (Ncoord/2);
+  std::vector<T> b_storage (Ncoord/2);
+
+  T *a_tmp = a_storage.data()-1;
+  T *b_tmp = b_storage.data()-1;
+
+  update_rules( Ngen, Npunc, braidword, a, b, a_tmp, b_tmp, Ncoord, opSign );
 
 }
 
