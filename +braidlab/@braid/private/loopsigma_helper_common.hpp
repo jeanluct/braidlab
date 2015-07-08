@@ -29,6 +29,10 @@
 ////////////////// PREAMBLE  /////////////////////////
 
 #include <functional>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+
 #include "mex.h"
 #include "update_rules.hpp"
 
@@ -117,6 +121,10 @@ private:
 
   const mwSize maxopSign;
 
+  typedef std::pair< std::vector<T>, std::vector<T> > tempAB;
+
+  std::unordered_map< std::thread::id, tempAB > tmp;
+
 
 };
 
@@ -190,12 +198,24 @@ void BraidInPlace<T>::applyToLoop(const mwIndex l) {
   // Create 1-indexed pointers to the appropriate place
   T* a = &loop[l*Ncoord];
   T* b = &loop[Ncoord/2+l*Ncoord];
-
   a--;
   b--;
 
+  // retrieve temporary storage based on thread ID
+  tempAB& mytmp = tmp[std::this_thread::get_id()];
+
+  if (mytmp.first.empty())
+    mytmp.first.resize(Ncoord/2);
+  if (mytmp.second.empty())
+    mytmp.second.resize(Ncoord/2);
+
+  // create 1-indexed temporary pointers
+  T* a_tmp = mytmp.first.data() - 1;
+  T* b_tmp = mytmp.second.data() - 1;
+
   // Act with the braid sequence in sigma_idx onto the coordinates a,b.
-  update_rules<T>(Ngen, Npunc, sigma_idx, a, b, opSign1);
+  update_rules<T>(Ngen, Npunc, sigma_idx, a, b,
+                  a_tmp, b_tmp, opSign1);
 
   // Copy the pos/neg results to output array.
   if (isOpSignUsed) {

@@ -41,7 +41,9 @@ template <typename T>  int sign(T x) {
 // with pre-allocated temp storage
 template <typename T>
 void inline update_rules(const int Ngen, const int Npunc, const int *braidword,
-                         T *a, T *b, T *a_tmp, T *b_tmp, const int Ncoord, int* opSign = 0) {
+                         T *a, T *b, T *a_tmp, T *b_tmp, int* opSign = 0) {
+
+  const int Ncoord = 2*(Npunc-2);
 
   // Copy initial row data
   for (mwIndex k = 1; k <= Ncoord/2; ++k) {
@@ -142,7 +144,7 @@ void update_rules(const int Ngen, const int Npunc, const int *braidword,
   T *a_tmp = a_storage.data()-1;
   T *b_tmp = b_storage.data()-1;
 
-  update_rules( Ngen, Npunc, braidword, a, b, a_tmp, b_tmp, Ncoord, opSign );
+  update_rules( Ngen, Npunc, braidword, a, b, a_tmp, b_tmp, opSign );
 
 }
 
