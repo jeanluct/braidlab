@@ -274,38 +274,50 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyEqual(intersec(l(2)),inters(2,:));
     end
 
-    function test_braid_on_nloops(testCase)
+    function test_braid_test_mex(testCase)
+    % makes sure that the output of the Matlab algorithm matches
+    % the output of the mex algorithm for all different types of data
 
       B = braidlab.braid([2,1,-1,-2,-1],4);
       Coords = [1,0,-1,1; 2,1,1,1; -1,1,-2,3];
       Nloops = size(Coords,1);
 
-      % First compute using matlab algorithm, one-by-one
-      global BRAIDLAB_braid_nomex
-      oldSetting = BRAIDLAB_braid_nomex;
-      BRAIDLAB_braid_nomex = true;
 
-      INmatlab = cell(Nloops, 1);
-      for k = 1:Nloops
-        INmatlab{k} = braidlab.loop(Coords(k,:));
+
+      %
+      for types = {'int32','double','vpi', 'int64'}
+
+        t = types{1};
+
+        % First compute using matlab algorithm and default data, one-by-one
+        global BRAIDLAB_braid_nomex
+        oldSetting = BRAIDLAB_braid_nomex;
+        BRAIDLAB_braid_nomex = true;
+
+        INmatlab = cell(Nloops, 1);
+        for k = 1:Nloops
+          INmatlab{k} = braidlab.loop(Coords(k,:));
+        end
+        for k = 1:Nloops
+          OUTmatlab{k} = B*INmatlab{k};
+        end
+
+        OUTmatlabMat = zeros(Nloops, size(Coords,2));
+        for k = 1:Nloops
+          OUTmatlabMat(k,:) = OUTmatlab{k}.coords;
+        end
+
+        % Next, compute using pre-set algorithm (whichever requested externally)
+        BRAIDLAB_braid_nomex = oldSetting;
+
+        INmex = braidlab.loop(Coords,t);
+        OUTmex = B*INmex;
+
+        % Compare the two
+        testCase.verifyTrue( ...
+            all( double(OUTmatlabMat(:)) == double(OUTmex.coords(:)) ), ...
+            sprintf('Testing type %s',t) );
       end
-      for k = 1:Nloops
-        OUTmatlab{k} = B*INmatlab{k};
-      end
-
-      OUTmatlabMat = zeros(Nloops, size(Coords,2));
-      for k = 1:Nloops
-        OUTmatlabMat(k,:) = OUTmatlab{k}.coords;
-      end
-
-      % Next, compute using pre-set algorithm (whichever requested externally)
-      BRAIDLAB_braid_nomex = oldSetting;
-
-      INmat = braidlab.loop(Coords);
-      OUTmat = B*INmat;
-
-      % Compare the two
-      testCase.verifyTrue( all( OUTmatlabMat(:) == OUTmat.coords(:) ) );
     end
 
     function test_braid_on_nloops_withbasepoints(testCase)
