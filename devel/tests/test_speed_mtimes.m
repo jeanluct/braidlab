@@ -1,20 +1,23 @@
 Lcoord = [1,1; 0,1; 1, 0; 0,-1; 3,2];
 Bcoord = [1,-2];
 
-NGpoints = 10;
-NLpoints = 5;
-Generators = ceil(logspace(1,6,NGpoints));
-Loops = ceil(logspace(1,5,NLpoints));
+Generators = 10.^(1:.5:5);
+Loops = 10.^(1:1:4);
+
+NGpoints = numel(Generators);
+NLpoints = numel(Loops);
 
 timeS = nan([NGpoints, NLpoints]);
 timeM = timeS;
+
+
 
 for g = 1:NGpoints
   for l = 1:NLpoints
 
     NL = Loops(l);
     NG = Generators(g);
-
+    fprintf('Running: #loops %8d \t braid length %8d\t...\t', int64(NL), int64(NG) );
     L = braidlab.loop(repmat(Lcoord,ceil([NL/size(Lcoord,1),1])));
     B = braidlab.braid(repmat(Bcoord, ceil([1, NG/numel(Bcoord)])));
 
@@ -24,18 +27,23 @@ for g = 1:NGpoints
     tic; LU = B*L; timeS(g,l) = toc;
 
     clear getAvailableThreadNumber
-    clear('global','BRAIDLAB_threads')
+    clear global BRAIDLAB_threads
     tic; LT = B*L; timeM(g,l) = toc;
 
-    fprintf('Done: Nloops %d \t Ngen %d\n', NL, NG );
-
+    fprintf('done.\n');
   end
 end
-timeR = timeM ./ timeS;
+timeR = timeS ./ timeM;
 
-h=loglog( Generators(:), timeR );
+h=semilogx( Generators(:), timeR, '-o' );
 labels = arrayfun( @(n)sprintf('%d loops', n), Loops,'uniformoutput',false );
 [h.DisplayName] = deal(labels{:});
-xlabel('# generators');
-ylabel('Multithreaded speedup');
+xlabel('Braid length');
+ylabel('Single threaded/multi threaded exec. time');
 legend('Location','Best');
+
+clear getAvailableThreadNumber
+clear global BRAIDLAB_threads
+txt = sprintf('Multiplication speedup using the default number of %d threads', ...
+        braidlab.util.getAvailableThreadNumber() );
+title(txt);
