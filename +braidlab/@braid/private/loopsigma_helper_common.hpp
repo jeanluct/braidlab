@@ -65,8 +65,8 @@ int BRAIDLAB_debuglvl = -1; // set externally after the include
 
 #ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
-#include "ThreadPool_nofuture.h" // (c) Jakob Progsch
-                                 // https://github.com/progschj/ThreadPool
+#include "ThreadPool.h" // (c) Jakob Progsch
+                        // https://github.com/progschj/ThreadPool
 #endif
 
 ////////////////// DECLARATIONS  /////////////////////////
