@@ -36,8 +36,8 @@ template <typename T>  int sign(T x) {
 }
 
 template <typename T>
-inline void update_rules(const int Ngen, const int Npunc, const int *braidword,
-                         T *a, T *b, int* opSign = 0) {
+void update_rules(const int Ngen, const int Npunc, const int *braidword,
+                  T *a, T *b, int* opSign = 0) {
   const int Ncoord = 2*(Npunc-2);
 
   // Make 1-indexed arrays.

@@ -221,19 +221,19 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
 }
 
 #ifdef BRAIDLAB_USE_GMP
-inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
-                                 const mwSize Nloops, const mwSize Ncoord,
-                                 const mpz_class *loop_in,
-                                 mpz_class *loop_out, mxArray *P_OPSIGN = 0)
+void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
+                          const mwSize Nloops, const mwSize Ncoord,
+                          const mpz_class *loop_in,
+                          mpz_class *loop_out, mxArray *P_OPSIGN = 0)
 {
   // Refers to generators, so don't need to be mwIndex/mwSize.
   const int n = (int)(Ncoord/2 + 2);
 
   // Make 1-indexed arrays.
   mpz_class* a_storage =
-    static_cast<mpz_class *>( mxMalloc(sizeof(mpz_class)*Ncoord/2) );
+    static_cast<mpz_class *>( mxCalloc(Ncoord/2,sizeof(mpz_class)) );
   mpz_class* b_storage =
-    static_cast<mpz_class *>( mxMalloc(sizeof(mpz_class)*Ncoord/2) );
+    static_cast<mpz_class *>( mxCalloc(Ncoord/2,sizeof(mpz_class)) );
 
   mpz_class *a = a_storage - 1;
   mpz_class *b = b_storage - 1;
@@ -254,8 +254,8 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
       // Copy initial row data.
       for (mwIndex k = 1; k <= Ncoord/2; ++k)
         {
-          a[k] = loop_in[(k-1    )*Nloops+l];
-          b[k] = loop_in[(k-1+Ncoord/2)*Nloops+l];
+          a[k] = loop_in[(k-1    ) +Ncoord*l];
+          b[k] = loop_in[(k-1+Ncoord/2) + Ncoord*l];
         }
 
       // Act with the braid sequence in sigma_idx onto the coordinates a,b.
@@ -264,8 +264,8 @@ inline void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
       for (mwIndex k = 1; k <= Ncoord/2; ++k)
         {
           // Copy final a and b to row of output array.
-          loop_out[(k-1    )*Nloops+l] = a[k];
-          loop_out[(k-1+Ncoord/2)*Nloops+l] = b[k];
+          loop_out[(k-1    ) + Ncoord*l] = a[k];
+          loop_out[(k-1+Ncoord/2) + Ncoord*l] = b[k];
         }
 
       // Copy the pos/neg results to output array.

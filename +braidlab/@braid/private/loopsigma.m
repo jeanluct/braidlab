@@ -87,7 +87,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     % Convert u to cell of strings to pass to C++ file.
     Nloops = size(loop_in,1);
     Ncoord = size(loop_in,2);
-    loop_str = cell(size(loop_in));
+    loop_str = cell(Ncoord, Nloops);
     for loops = 1:Nloops
       for coords = 1:Ncoord
         loop_str{coords,loops} = strtrim(num2str(loop_in(loops,coords)));
