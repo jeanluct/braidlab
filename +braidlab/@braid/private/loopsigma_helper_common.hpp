@@ -202,7 +202,11 @@ void BraidInPlace<T>::applyToLoop(const mwIndex l) {
   b--;
 
   // retrieve temporary storage based on thread ID
+#ifndef BRAIDLAB_NOTHREADING
   tempAB& mytmp = tmp[std::this_thread::get_id()];
+#else
+  tempAB& mytmp = tmp[0];
+#end
 
   if (mytmp.first.empty())
     mytmp.first.resize(Ncoord/2);
