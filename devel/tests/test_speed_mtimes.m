@@ -1,4 +1,4 @@
-Npunc = 10;
+Npunc = 300;
 rng(0);
 Lcoord = randi( 5, 2*Npunc-4 );
 
@@ -12,7 +12,7 @@ NLpoints = numel(Loops);
 
 timeS = nan([NGpoints, NLpoints]);
 timeM = timeS;
-
+tic
 for g = 1:NGpoints
   for l = 1:NLpoints
 
@@ -34,6 +34,7 @@ for g = 1:NGpoints
     fprintf('done.\n');
   end
 end
+toc
 timeR = timeS ./ timeM;
 
 h=semilogx( Generators(:), timeR, '-o' );
@@ -45,9 +46,9 @@ legend('Location','Best');
 
 clear getAvailableThreadNumber
 clear global BRAIDLAB_threads
-Nthreads=braidlab.util.getAvailableThreadNumber(); 
-txt = sprintf('Multiplication speedup using the default number of %d threads', ...
-       Nthreads );
-   
+Nthreads=braidlab.util.getAvailableThreadNumber();
+txt = sprintf('Multiplication speedup on %d punctures using the default number of %d threads', ...
+       Npunc, Nthreads );
+
 ylim([0,Nthreads]);
 title(txt);
