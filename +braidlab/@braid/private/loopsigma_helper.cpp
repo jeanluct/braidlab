@@ -1,12 +1,14 @@
 #include <cmath>
 #include <cstdio>
 #include <string>
-#include "mex.h"
 
 #ifdef BRAIDLAB_USE_GMP
 #include <iostream>
+#include <vector>
 #include <gmpxx.h>
 #endif
+
+#include "mex.h"
 
 #include "loopsigma_helper_common.hpp"
 
@@ -46,8 +48,8 @@
 #define P_LOOP_OUT plhs[0]
 #define P_OPSIGN  plhs[1]
 
-void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class *& loopIn);
-void convertGMPToCellLoop( mpz_class *& loopOut, mxArray* cellLoop );
+void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn);
+void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop );
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
@@ -69,8 +71,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   const mwSize Ncoord = mxGetM(P_LOOP_IN);
   const mwSize Nloops = mxGetN(P_LOOP_IN);
 
-  printf("Sizes: M: %d, N: %d\n", Ncoord, Nloops);
-  mexEvalString("pause(0.1)");
 
   if ( Npunc > Ncoord/2+2 )
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:incompatible",
@@ -113,28 +113,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   case mxCELL_CLASS: {
 
     // convert input to MultiPrecision class
-    mpz_class *loopIn = NULL;
-    convertCellLoopToGMP( P_LOOP_IN, loopIn );
+    std::vector<mpz_class> loop (Ncoord*Nloops);
+    convertCellLoopToGMP( P_LOOP_IN, loop.data() );
+    BraidInPlace<mpz_class> braid(loop.data() , Nloops, Ncoord, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
 
-    printf("Input converted\n"); mexEvalString("pause(1);");
+    convertGMPToCellLoop( loop.data(), P_LOOP_OUT );
 
-    // create output storage
-    mpz_class *loopOut =
-      static_cast<mpz_class *>(mxCalloc(Ncoord*Nloops, sizeof(mpz_class) ));
-
-    printf("Output converted\n"); mexEvalString("pause(1);");
-
-    // get the braid generators
-    const int* sigma_idx = static_cast<const int*>(mxGetData(P_SIGMA_IDX));
-
-    // Act on coordinates with braid.
-    printf("About to process\n"); mexEvalString("pause(1);");
-    loopsigma_helper_gmp(Ngen,sigma_idx,Nloops,Ncoord,loopIn,loopOut,opSign);
-
-    convertGMPToCellLoop( loopOut, P_LOOP_OUT );
-
-    mxFree(loopIn);
-    mxFree(loopOut);
     break; }
 #endif
   default: {
@@ -144,7 +129,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 }
 
-void convertGMPToCellLoop( mpz_class *& loopOut, mxArray* cellLoop ) {
+void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop ) {
 
   const mwSize Ncoord = mxGetM(cellLoop);
   const mwSize Nloops = mxGetN(cellLoop);
@@ -165,23 +150,10 @@ void convertGMPToCellLoop( mpz_class *& loopOut, mxArray* cellLoop ) {
 
 }
 
-void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class *& loopIn) {
+void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn) {
 
   const mwSize Ncoord = mxGetM(cellLoop);
   const mwSize Nloops = mxGetN(cellLoop);
-
-  // if there was something already assigned to loopIn, memory has to be
-  // freed first
-  if ( loopIn != NULL) {
-    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:memoryleak",
-                      "Potential memory leak in convertCellLoopToGMP");
-  }
-
-  // Allocate input and output GMP multiprecision array.
-  printf("Size of mpz_class %d\n", sizeof(mpz_class)) ;
-  loopIn = static_cast<mpz_class *>(mxCalloc(Ncoord*Nloops,sizeof(mpz_class)));
-
-  mxAssert( loopIn != NULL, "OOOPS" );
 
   // Array for Matlab mxArray subscripts.
   mwIndex subs[2];
@@ -193,7 +165,6 @@ void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class *& loopIn) {
       // rows - coordinate, column - loop
       subs[0] = k; subs[1] = l;
       idx = mxCalcSingleSubscript(cellLoop,2,subs);
-      printf("Size of mpz_class %d\n", sizeof(mpz_class)) ;
       loopIn[k+l*Ncoord] =
         mpz_class(mxArrayToString(mxGetCell(cellLoop,idx)));
     }

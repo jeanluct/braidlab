@@ -78,11 +78,19 @@ public:
 
   BraidInPlace(mxArray *P_LOOP,
                const mxArray *P_SIGMA_IDX, mxArray *P_OPSIGN);
+
+  BraidInPlace(T *T_LOOP, int T_LOOPS, int T_COORD,
+               const mxArray *P_SIGMA_IDX,
+               mxArray *P_OPSIGN);
+
   ~BraidInPlace();
   void run(size_t NThreadsRequested = 1);
   void applyToLoop(const mwIndex l);
 
 private:
+
+  void initOpSign(mxArray *P_OPSIGN);
+
   // storage
   T *loop;
   double *opSign;
@@ -119,14 +127,40 @@ BraidInPlace<T>::BraidInPlace(mxArray *P_LOOP,
                 mxArray *P_OPSIGN) :
   //initializer lists
   loop( static_cast<T *>(mxGetData(P_LOOP)) ),
-  Nloops(mxGetN(P_LOOP)),
-  Ncoord(mxGetM(P_LOOP)),
-  Npunc(Ncoord/2 + 2),
-  sigma_idx( static_cast<const int *>(mxGetData(P_SIGMA_IDX)) ),
-  Ngen(mxGetNumberOfElements(P_SIGMA_IDX)),
+  opSign(NULL),
   isOpSignUsed(P_OPSIGN != NULL),
-  opSign(NULL), opSign1(NULL),
+  Ncoord(mxGetM(P_LOOP)),
+  Nloops(mxGetN(P_LOOP)),
+  Npunc(mxGetM(P_LOOP)/2 + 2),
+  Ngen(mxGetNumberOfElements(P_SIGMA_IDX)),
+  sigma_idx( static_cast<const int *>(mxGetData(P_SIGMA_IDX)) ),
+  opSign1(NULL),
   maxopSign(5){
+
+  initOpSign(P_OPSIGN);
+}
+
+template <class T>
+BraidInPlace<T>::BraidInPlace(T *T_LOOP, int T_LOOPS, int T_COORD,
+                const mxArray *P_SIGMA_IDX,
+                mxArray *P_OPSIGN) :
+  //initializer lists
+  loop( T_LOOP ),
+  opSign(NULL),
+  isOpSignUsed(P_OPSIGN != NULL),
+  Ncoord(T_COORD),
+  Nloops(T_LOOPS),
+  Npunc(T_COORD/2 + 2),
+  Ngen(mxGetNumberOfElements(P_SIGMA_IDX)),
+  sigma_idx( static_cast<const int *>(mxGetData(P_SIGMA_IDX)) ),
+  opSign1(NULL),
+  maxopSign(5){
+
+  initOpSign(P_OPSIGN);
+}
+
+template <class T>
+void BraidInPlace<T>::initOpSign(mxArray *P_OPSIGN) {
 
   if (Ncoord % 2 != 0)
     mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badarg",
@@ -140,8 +174,6 @@ BraidInPlace<T>::BraidInPlace(mxArray *P_LOOP,
     opSign1 = static_cast<int *>(mxGetData(P_OPSIGN1));
     opSign = mxGetPr(P_OPSIGN);
   }
-
-
 }
 
 template <class T>
@@ -156,8 +188,11 @@ template <class T>
 void BraidInPlace<T>::applyToLoop(const mwIndex l) {
 
   // Create 1-indexed pointers to the appropriate place
-  T* a = &loop[(0-1    )+l*Ncoord];
-  T* b = &loop[(0-1+Ncoord/2)+l*Ncoord];
+  T* a = &loop[l*Ncoord];
+  T* b = &loop[Ncoord/2+l*Ncoord];
+
+  a--;
+  b--;
 
   // Act with the braid sequence in sigma_idx onto the coordinates a,b.
   update_rules<T>(Ngen, Npunc, sigma_idx, a, b, opSign1);
@@ -220,75 +255,5 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
 #endif
 }
 
-#ifdef BRAIDLAB_USE_GMP
-void loopsigma_helper_gmp(const mwSize Ngen, const int *sigma_idx,
-                          const mwSize Nloops, const mwSize Ncoord,
-                          const mpz_class *loop_in,
-                          mpz_class *loop_out, mxArray *P_OPSIGN = 0)
-{
-  // Refers to generators, so don't need to be mwIndex/mwSize.
-  const int n = (int)(Ncoord/2 + 2);
-
-  // Make 1-indexed arrays.
-  mpz_class* a_storage =
-    static_cast<mpz_class *>( mxCalloc(Ncoord/2,sizeof(mpz_class)) );
-  mpz_class* b_storage =
-    static_cast<mpz_class *>( mxCalloc(Ncoord/2,sizeof(mpz_class)) );
-
-  mpz_class *a = a_storage - 1;
-  mpz_class *b = b_storage - 1;
-
-  // If P_OPSIGN has been allocated, we'll record the pos/neg operations.
-  int *opSign1 = 0;
-  double *opSign = 0;
-  const int maxopSign = 5;
-  if (P_OPSIGN != 0)
-    {
-      opSign1 = static_cast<int *>( mxCalloc( maxopSign*Ngen, sizeof(int) ) );
-      opSign = (double *)mxGetPr(P_OPSIGN);
-    }
-
-  // this is where the parallelization should come in
-  for (mwIndex l = 0; l < Nloops; ++l) // Loop over rows of u.
-    {
-      // Copy initial row data.
-      for (mwIndex k = 1; k <= Ncoord/2; ++k)
-        {
-          a[k] = loop_in[(k-1    ) +Ncoord*l];
-          b[k] = loop_in[(k-1+Ncoord/2) + Ncoord*l];
-        }
-
-      // Act with the braid sequence in sigma_idx onto the coordinates a,b.
-      update_rules(Ngen, n, sigma_idx, a, b, opSign1);
-
-      for (mwIndex k = 1; k <= Ncoord/2; ++k)
-        {
-          // Copy final a and b to row of output array.
-          loop_out[(k-1    ) + Ncoord*l] = a[k];
-          loop_out[(k-1+Ncoord/2) + Ncoord*l] = b[k];
-        }
-
-      // Copy the pos/neg results to output array.
-      if (P_OPSIGN != 0)
-        {
-          for (mwIndex k = 0; k < maxopSign; ++k)
-            {
-              for (mwIndex j = 0; j < Ngen; ++j)
-                {
-                  opSign[k*Ngen*Nloops + j*Nloops + l] = opSign1[k*Ngen + j];
-                }
-            }
-        }
-    }
-
-  mxFree(a_storage);
-  mxFree(b_storage);
-
-  if (P_OPSIGN != 0)
-    mxFree(opSign1);
-
-  return;
-}
-#endif // BRAIDLAB_USE_GMP
 
 #endif // BRAIDLAB_LOOPSIGMA_HELPER_COMMON_HPP
