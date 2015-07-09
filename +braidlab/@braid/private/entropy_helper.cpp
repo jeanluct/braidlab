@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <algorithm>
 #include "mex.h" // overloads printf -> mexPrintf
+
 #include "update_rules.hpp"
 // implementations of loop length calculations
 #include "../../@loop/private/loop_helper.hpp"
@@ -47,14 +48,15 @@
 // passed length flag is unsupported
 double looplength( mwSize N, double *a, double *b, char lengthFlag);
 
+int BRAIDLAB_debuglvl = -1;
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   // Get debug level global variable.
-  mxArray *dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
-  int dbglvl = 0;
-  if (dbglvl_ptr != NULL)
-    if (mxGetM(dbglvl_ptr) != 0)
-      dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
+  mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (isDebug) {
+    BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
+  }
 
   const mxArray *braidwordA = prhs[0];
   const int *braidword = (int *)mxGetData(braidwordA); // braidwordA contains int32's.
@@ -89,8 +91,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
-  double *a = new double[N/2] - 1;
-  double *b = new double[N/2] - 1;
+  std::vector<double> a_storage(N/2);
+  std::vector<double> b_storage(N/2);
+
+  double *a = a_storage.data() - 1;
+  double *b = b_storage.data() - 1;
 
   for (mwIndex k = 1; k <= N/2; ++k)
     {
@@ -135,7 +140,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       entr = std::log(currentLength);
 
-      if (dbglvl >= 2)
+      if (BRAIDLAB_debuglvl >= 2)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 
@@ -152,7 +157,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       else if (nconv > 0)
         {
           // Reset consecutive convergence counter.
-          if (dbglvl >= 1)
+          if (BRAIDLAB_debuglvl >= 1)
             printf("Converged %d time(s) in a row (< %d)\n",nconv,nconvreq);
           nconv = 0;
         }
@@ -168,13 +173,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   double *uo = mxGetPr(plhs[2]);
   // Copy final a and b to row of output array.
   for (mwIndex k = 1; k <= N/2; ++k) { uo[k-1] = a[k]; uo[k-1+N/2] = b[k]; }
-
-  delete[] (a+1);
-  delete[] (b+1);
-
-  if (dbglvl_ptr != NULL)
-    if (mxGetM(dbglvl_ptr) != 0)
-      mxDestroyArray(dbglvl_ptr);
 
   return;
 }
