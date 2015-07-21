@@ -1,7 +1,15 @@
 ------------------------------------------------------------------------
 x.x [2015-xx-xx]
 
+* braid.mtimes acting on loops is now multithreaded.
+
+* braid.braid can generate normally-distrivuted random braids 
+
 * braid.subbraid now has a C++ implementation.
+
+* loop.plot takes the option 'BasePointColor'.
+
+* Various bugfixes.
 
 ------------------------------------------------------------------------
 3.1 [2015-01-11]

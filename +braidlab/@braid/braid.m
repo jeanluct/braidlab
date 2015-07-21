@@ -83,9 +83,9 @@ classdef braid < matlab.mixin.CustomDisplay
     %   [-(N-1):-1 1:N-1].
     %
     %   B = BRAID('Normal',N,K) returns a random braid of N strings with K
-    %   crossings (generators).  The indices generators are chosen using the
-    %   binomial distribution with p=1/2 over [1:N-1] and the sign is chosen
-    %   uniformly at random.
+    %   crossings (generators).  The indices of the generators are chosen
+    %   from the binomial distribution with p=1/2 over [1:N-1] and the sign
+    %   is chosen uniformly at random.
     %
     %   B = BRAID('HalfTwist',N) or BRAID('Delta',N) returns the word D in
     %   Artin generators representing the positive half-twist (Delta) for
