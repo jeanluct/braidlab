@@ -70,6 +70,18 @@ if any(isnan(XY) | isinf(XY))
         'Data contains NaNs or Infs.')
 end
 
+validateattributes(t,{'numeric'},...
+                   {'real','finite','vector','increasing', 'nonnan'},...
+                   'BRAIDLAB.braid.colorbraiding','t',2 );
+
+validateattributes(XY,{'numeric'},...
+                   {'real','finite','nonnan','nrows',numel(t)},...
+                   'BRAIDLAB.braid.colorbraiding','XY',1 );
+
+validateattributes(proj,{'numeric'},...
+                   {'real','finite','scalar','nonnan','nonempty'},...
+                   'BRAIDLAB.braid.colorbraiding','proj',3 );
+
 debugmsg(['colorbraiding Part 1: Initialize parameters for crossing' ...
           ' analysis']);
 tic
@@ -127,7 +139,9 @@ catch me
   switch(me.identifier)
     case 'BRAIDLAB:braid:colorbraiding:coincidentparticles'
 
-      localPair = eval(me.message);
+      % strtok splits the [ ind, ind ] part of the string
+      % and text explanation of what happened
+      localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
       error(me.identifier, ...
@@ -136,7 +150,9 @@ catch me
 
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
-      localPair = eval(me.message);
+      % strtok splits the [ ind, ind ] part of the string
+      % and text explanation of what happened        
+      localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
       error(me.identifier, ...
