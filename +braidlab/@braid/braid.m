@@ -226,6 +226,15 @@ classdef braid < matlab.mixin.CustomDisplay
           % Use a zero projection angle.
           secnd = 0;
         end
+
+        validateattributes(b,{'numeric'},...
+                           {'real','finite','nonnan','nrows',numel(t)},...
+                           'BRAIDLAB.braid','trajectory matrix');
+
+        validateattributes(secnd,{'numeric'},...
+                           {'real','finite','scalar','nonnan','nonempty'},...
+                           'BRAIDLAB.databraid','projection angle');
+
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
