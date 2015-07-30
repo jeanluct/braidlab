@@ -472,9 +472,11 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
 
     // first error is invoked as a MATLAB error
     std::stringstream report;
+
     report << "[";
     report << crossingErrors.begin()->L << " ";
-    report << crossingErrors.begin()->R << "]";
+    report << crossingErrors.begin()->R << "] | ";
+    report << crossingErrors.begin()->what();
 
     mexErrMsgIdAndTxt(crossingErrors.begin()->id(), report.str().c_str() );
   }

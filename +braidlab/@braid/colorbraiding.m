@@ -139,7 +139,9 @@ catch me
   switch(me.identifier)
     case 'BRAIDLAB:braid:colorbraiding:coincidentparticles'
 
-      localPair = eval(me.message);
+      % strtok splits the [ ind, ind ] part of the string
+      % and text explanation of what happened
+      localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
       error(me.identifier, ...
@@ -148,7 +150,9 @@ catch me
 
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
-      localPair = eval(me.message);
+      % strtok splits the [ ind, ind ] part of the string
+      % and text explanation of what happened        
+      localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
       error(me.identifier, ...
