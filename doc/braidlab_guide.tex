@@ -202,7 +202,7 @@ Fig.~\ref{fig:sbdiag}.  A braid written in terms of generators as
 in~\eqref{eq:sbdiag} is called an \emph{algebraic braid}.
 \index{braid!algebraic|)}%
 
-% 
+%
 \begin{figure}
   \begin{center}
     \subfigure[]{
@@ -1096,7 +1096,7 @@ ordering of the crossing times.
 
 \index{crossing!times|)}%
 
-\index{databraid class@\lstinline{databraid} class|)}% 
+\index{databraid class@\lstinline{databraid} class|)}%
 \index{databraid class@\lstinline{databraid} class!ftbe@\lstinline{ftbe}}%
 \index{Finite Time Braiding Exponent (FTBE)|)}
 
@@ -2145,17 +2145,64 @@ See \lstinline{help prop} for more information on properties and allowed
 values.
 \index{prop@\lstinline{prop}|)}
 
+\section{Troubleshooting braidlab}
+\label{sec:troubleshooting}
+
+If \braidlab\ is behaving unexpectedly, or reporting an error that you cannot
+explain, it is possible that there is an internal error in the code, or an
+unintentionally-problematic way that you use \braidlab. Tips in this paragraph will help you identify the cause of the problem and alert the developers that the issue exists.
+
+\subsection{Global flags}
+\label{sec:global-flags}
+
+There are several flags that you can use to help the identify the root
+of the problem:
+\begin{itemize}
+\item \lstinline{BRAIDLAB_braid_nomex}\index{prop@\lstinline{BRAIDLAB_braid_nomex}|)}: set to \lstinline{true} to \emph{disable} MEX (C++) versions of algorithms converting trajectories to a \lstinline{braid} or \lstinline{databraid}.
+\item \lstinline{BRAIDLAB_loop_nomex}\index{prop@\lstinline{BRAIDLAB_loop_nomex}|)}: set to \lstinline{true} to \emph{disable} MEX (C++) versions of algorithms that apply braid generators to loops.
+\item \lstinline{BRAIDLAB_threads}\index{prop@\lstinline{BRAIDLAB_threads}|)}: set to \lstinline{1} to disable parallel MEX algorithms, or to a larger integer to fix the number of used parallel processing threads.
+\item \lstinline{BRAIDLAB_debuglvl}\index{prop@\lstinline{BRAIDLAB_debuglvl}|)}: set to  \lstinline{1, 2, 3, 4} to progressively increase the amount of output produced by \braidlab. \emph{Warning:} setting this flag to any positive number may result in an overwhelming amount of output lines.
+\end{itemize}
+
+All the flags are set through MATLAB's \lstinline{global} variables as follows.
+To set the global value of the flag \lstinline{BRAIDLAB_flagname} to \lstinline{true}, issue the following set of commands \emph{before} you run your code.
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> global BRAIDLAB_name
+>> BRAIDLAB_name = true;
+\end{lstlisting}
+When you are done troubleshooting the code, clear the flag by calling
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> clear global BRAIDLAB_name
+\end{lstlisting}
+
+\subsection{Reporting issues and suggestions}
+\label{sec:reporting-issues}
+
+We appreciate your feedback on how to improve \braidlab. Before reporting a bug, please make sure that you are using the most recent version, as the bugs are continually fixed and new features added.
+
+To inform the developers of a problem with \braidlab, unexpected behavior, or a suggestion for an improvement, please use the interface on our Github repository:
+\begin{center}\url{http://github.com/jeanluct/braidlab/issues} \end{center}
+
+There you can view the list of currently known issues and find out if anyone else has witnessed the same problem as you. If not, submit the new ticket and include:
+\begin{itemize}
+\item The current version of \braidlab. If you are updating \braidlab{} using \lstinline{git}, please copy-paste the output of \lstinline{git log -1} run in your \braidlab{} folder. If you have downloaded \braidlab{} manually, please let us know when you downloaded the version you are using.
+\item A minimal example re-creating the problem. You can also attach any data files to the Github ticket which would help us identify the problem.
+\item Output of Matlab command window during the behavior of the error. Two Matlab commands are particularly useful for this purpose: \\\lstinline{diary} command which saves the output of all commands between \lstinline{diary FILENAME} and \lstinline{diary off} to a text file,\\ \lstinline{[msg, id] = lasterr} and \lstinline{[msg, id] = lastwarn} that return the text and the identifier of the last error/warning issued by Matlab.
+\item Any other information about what you are trying to achieve: before we fix the problem, we may be able to suggest a way to circumvent the bug.
+\end{itemize}
+
+We will also respond to your requests by e-mail; however, using the Github issues interface helps us keep track of issues and their resolution more reliably.
 
 \section*{Acknowledgments}
 \addcontentsline{toc}{section}{Acknowledgments}
 
 The development of \braidlab\ was supported by the US National Science
-Foundation, under grants DMS-0806821 and CMMI-1233935.  The authors thank
+Foundation, under grants DMS-0806821 and CMMI-1233935. The authors thank
 Michael Allshouse and Margaux Filippi for extensive testing and comments.
-Michael Allshouse also contributed some of the code.  Alexander Flanagan
-helped with testing and the taffy puller research.  James Puckett and Karen
+Michael Allshouse also contributed some of the code. Alexander Flanagan
+helped with testing and the taffy puller research. James Puckett and Karen
 Daniels provided the test data from their granular medium
-experiments~\citep{Puckett2012}.  \braidlab\ uses Toby Hall's \emph{Train}
+experiments~\citep{Puckett2012}; \braidlab\ uses Toby Hall's \emph{Train}
 \citep{HallTrain}; Jae Choon Cha's \emph{CBraid} \citep{CBraid}; Juan
 Gonz\'{a}lez-Meneses's \emph{Braiding} \citep{Braiding}; John D'Errico's
 \emph{Variable Precision Integer Arithmetic} \citep{vpi}; Markus Buehren's
@@ -2306,7 +2353,7 @@ making sure the path is set properly (Section~\ref{sec:path}).
 Note that running the testsuite requires Matlab version 2013a or later.
 
 
-\subsection{Troubleshooting}
+\subsection{Troubleshooting the installation process}
 \label{sec:trouble}
 \index{installing \braidlab!troubleshooting|(}
 
@@ -2357,7 +2404,7 @@ $ bash ./gcc-alternatives
 You will be prompted for your password (assuming you have administrator
 privileges), and then asked to select a compiler version.  You should then be
 able to compile \braidlab.  You can later switch back to your original
-compiler with the command 
+compiler with the command
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ sudo update-alternatives --config gcc
@@ -2434,13 +2481,13 @@ path.
 
 Another solution is to make sure that the Matlab executable directory appears
 early in bash's path variable. For Matlab R2014b on Mac OS~X %
-\index{OS X}% 
+\index{OS X}%
 and under \lstinline{bash} shell this reads
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ export PATH=/Applications/MATLAB_R2014b.app/bin:$PATH
 \end{lstlisting}
-or under \lstinline{tcsh} shell (now the default in Mac OS~X) 
+or under \lstinline{tcsh} shell (now the default in Mac OS~X)
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ setenv PATH /Applications/MATLAB_R2014b.app/bin:$PATH

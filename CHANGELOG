@@ -3,7 +3,7 @@ x.x [2015-xx-xx]
 
 * braid.mtimes acting on loops is now multithreaded.
 
-* braid.braid can generate normally-distrivuted random braids 
+* braid.braid can generate normally-distributed random braids
 
 * braid.subbraid now has a C++ implementation.
 

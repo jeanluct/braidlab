@@ -8,9 +8,7 @@ loop.plot('Components') and other options
 loop.getgraph
 loop.loop('Enum')
 loop.l2norm
-debugmsg & BRAIDLAB_debuglvl
-BRAIDLAB_threads
-BRAIDLAB_braid_nomex // global variable - if true, then only Matlab versions of algorithms are used
+debugmsg
 
 @cfbraid class
 loop pre-allocation (see devel/test/loop_speedtest)
