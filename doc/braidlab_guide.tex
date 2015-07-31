@@ -2167,13 +2167,17 @@ of the problem:
 All the flags are set through MATLAB's \lstinline{global} variables as follows.
 To set the global value of the flag \lstinline{BRAIDLAB_flagname} to \lstinline{true}, issue the following set of commands \emph{before} you run your code.
 \begin{lstlisting}[frame=single,framerule=0pt]
->> global BRAIDLAB_name
->> BRAIDLAB_name = true;
+>> global BRAIDLAB_flagname
+>> BRAIDLAB_flagname = true;
 \end{lstlisting}
-When you are done troubleshooting the code, clear the flag by calling
+At this point, any change in the flag value, e.g.,
+\lstinline{BRAIDLAB_flagname = false}, will be reflected in \braidlab's
+operation. When you are done troubleshooting the code, clear the flag by
+calling
 \begin{lstlisting}[frame=single,framerule=0pt]
->> clear global BRAIDLAB_name
+>> clear global BRAIDLAB_flagname
 \end{lstlisting}
+to restore the default state of \braidlab.
 
 \subsection{Reporting issues and suggestions}
 \label{sec:reporting-issues}
