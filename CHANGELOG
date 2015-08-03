@@ -9,6 +9,9 @@ x.x [2015-xx-xx]
 
 * loop.plot takes the option 'BasePointColor'.
 
+* Added troubleshooting appendix to braidlab guide, which describes
+  global flags and issue reporting.
+
 * Various bugfixes.
 
 ------------------------------------------------------------------------
