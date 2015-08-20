@@ -82,8 +82,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding Part 1: Initialize parameters for crossing' ...
-          ' analysis']);
+debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
 tic
 n = size(XY,3); % number of punctures
 
@@ -105,7 +104,7 @@ if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 % Sort all the trajectories trajectories according to IDX:
 XYtraj = XY(:,:,idx);
 
-debugmsg(sprintf('colorbraiding Part 1: took %f msec',toc*1000));
+debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -166,10 +165,3 @@ end
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
-
-% =========================================================================
-function XYr = rotate_data_clockwise(XY,proj)
-
-XYr = zeros(size(XY));
-XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
-XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
