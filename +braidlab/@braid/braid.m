@@ -218,6 +218,12 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
+      elseif isa(b,'function_handle')
+        % b is a function handle.  Create the braid from ODE.
+	% The secnd argument is the timespan.
+	% The third argument is the initial positions.
+	% TODO: projection angle, options to ODE45.
+        br = braidlab.braid.colorbraiding(b,secnd,third);
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
@@ -488,6 +494,7 @@ classdef braid < matlab.mixin.CustomDisplay
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
     [varargout] = colorbraiding(XY,t,proj)
+    [varargout] = colorbraiding_ODE(func,tspan,XY0)
   end % methods block
 
 end % braid classdef
