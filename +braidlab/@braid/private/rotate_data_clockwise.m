@@ -1,8 +1,5 @@
-function varargout = loopsigma_helper(varargin) %#ok<STOUT>
-%LOOPSIGMA_HELPER   See loopsigma_helper.cpp.
-%
-%   This M-file is invoked only when the corresponding MEX function
-%   does not exist.
+function XYr = rotate_data_clockwise(XY,proj)
+%ROTATE_DATA_CLOCKWISE   Rotate data clockwise, surprisingly.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -25,7 +22,10 @@ function varargout = loopsigma_helper(varargin) %#ok<STOUT>
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http:%www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-throwAsCaller(braidlab.util.NoMEXException(mfilename));
+XYr = zeros(size(XY));
+
+XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
