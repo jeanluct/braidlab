@@ -1,27 +1,27 @@
 function [assignment, cost] = assignmentoptimal(distMatrix)
 %ASSIGNMENTOPTIMAL    Compute optimal assignment by Munkres algorithm
-%		ASSIGNMENTOPTIMAL(DISTMATRIX) computes the optimal assignment (minimum
-%		overall costs) for the given rectangular distance or cost matrix, for
-%		example the assignment of tracks (in rows) to observations (in
-%		columns). The result is a column vector containing the assigned column
-%		number in each row (or 0 if no assignment could be done).
+%  ASSIGNMENTOPTIMAL(DISTMATRIX) computes the optimal assignment (minimum
+%  overall costs) for the given rectangular distance or cost matrix, for
+%  example the assignment of tracks (in rows) to observations (in
+%  columns). The result is a column vector containing the assigned column
+%  number in each row (or 0 if no assignment could be done).
 %
-%		[ASSIGNMENT, COST] = ASSIGNMENTOPTIMAL(DISTMATRIX) returns the
-%		assignment vector and the overall cost.
+%  [ASSIGNMENT, COST] = ASSIGNMENTOPTIMAL(DISTMATRIX) returns the
+%  assignment vector and the overall cost.
 %
-%		The distance matrix may contain infinite values (forbidden
-%		assignments). Internally, the infinite values are set to a very large
-%		finite number, so that the Munkres algorithm itself works on
-%		finite-number matrices. Before returning the assignment, all
-%		assignments with infinite distance are deleted (i.e. set to zero).
+%  The distance matrix may contain infinite values (forbidden
+%  assignments). Internally, the infinite values are set to a very large
+%  finite number, so that the Munkres algorithm itself works on
+%  finite-number matrices. Before returning the assignment, all
+%  assignments with infinite distance are deleted (i.e. set to zero).
 %
-%		A description of Munkres algorithm (also called Hungarian algorithm)
-%		can easily be found on the web.
+%  A description of Munkres algorithm (also called Hungarian algorithm)
+%  can easily be found on the web.
 %
-%		<a href="assignment.html">assignment.html</a>  <a href="http://www.mathworks.com/matlabcentral/fileexchange/6543">File Exchange</a>  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EVW2A4G2HBVAU">Donate via PayPal</a>
+%  <a href="assignment.html">assignment.html</a>  <a href="http://www.mathworks.com/matlabcentral/fileexchange/6543">File Exchange</a>  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EVW2A4G2HBVAU">Donate via PayPal</a>
 %
-%		Markus Buehren
-%		Last modified 05.07.2011
+%  Markus Buehren
+%  Last modified 05.07.2011
 
 % save original distMatrix for cost computation
 originalDistMatrix = distMatrix;
@@ -44,14 +44,14 @@ if ~isempty(infiniteIndex)
 		infValue = abs(10 * maxFiniteValue * nOfRows * nOfColumns);
 	else
 		infValue = 10;
-	end
-	if isempty(infValue)
-		% all elements are infinite
-		assignment = zeros(nOfRows, 1);
-		cost       = 0;
-		return
-	end	
-	distMatrix(infiniteIndex) = infValue;
+ end
+ if isempty(infValue)
+   % all elements are infinite
+   assignment = zeros(nOfRows, 1);
+   cost       = 0;
+   return
+ end
+ distMatrix(infiniteIndex) = infValue;
 end
 
 % memory allocation
@@ -63,13 +63,13 @@ primeMatrix    = zeros(nOfRows, nOfColumns);
 % preliminary steps
 if nOfRows <= nOfColumns
 	minDim = nOfRows;
-	
+
 	% find the smallest element of each row
 	minVector = min(distMatrix, [], 2);
-	
+
 	% subtract the smallest element of each row from the row
 	distMatrix = distMatrix - repmat(minVector, 1, nOfColumns);
-	
+
 	% Steps 1 and 2
 	for row = 1:nOfRows
 		for col = find(distMatrix(row,:)==0)
@@ -77,19 +77,19 @@ if nOfRows <= nOfColumns
 				starMatrix(row, col) = 1;
 				coveredColumns(col)  = 1;
 				break
-			end
-		end
-	end
-	
+   end
+  end
+ end
+
 else % nOfRows > nOfColumns
 	minDim = nOfColumns;
-	
+
 	% find the smallest element of each column
 	minVector = min(distMatrix);
-	
+
 	% subtract the smallest element of each column from the column
 	distMatrix = distMatrix - repmat(minVector, nOfRows, 1);
-	
+
 	% Steps 1 and 2
 	for col = 1:nOfColumns
 		for row = find(distMatrix(:,col)==0)'
@@ -98,10 +98,10 @@ else % nOfRows > nOfColumns
 				coveredColumns(col)  = 1;
 				coveredRows(row)     = 1;
 				break
-			end
-		end
-	end
-	coveredRows(:) = 0; % was used auxiliary above
+   end
+  end
+ end
+ coveredRows(:) = 0; % was used auxiliary above
 end
 
 if sum(coveredColumns) == minDim
@@ -151,12 +151,12 @@ function [assignment, distMatrix, starMatrix, primeMatrix, coveredColumns, cover
 
 zerosFound = 1;
 while zerosFound
-	
-	zerosFound = 0;		
+
+	zerosFound = 0;
 	for col = find(~coveredColumns)
 		for row = find(~coveredRows')
 			if distMatrix(row,col) == 0
-				
+
 				primeMatrix(row, col) = 1;
 				starCol = find(starMatrix(row,:));
 				if isempty(starCol)
@@ -168,10 +168,10 @@ while zerosFound
 					coveredColumns(starCol) = 0;
 					zerosFound              = 1;
 					break % go on in next column
-				end
-			end
-		end
-	end
+    end
+   end
+  end
+ end
 end
 
 % move to step 5
@@ -190,18 +190,18 @@ while ~isempty(starRow)
 
 	% unstar the starred zero
 	newStarMatrix(starRow, starCol) = 0;
-	
+
 	% find primed zero in row
 	primeRow = starRow;
 	primeCol = find(primeMatrix(primeRow, :));
-	
+
 	% star the primed zero
 	newStarMatrix(primeRow, primeCol) = 1;
-	
+
 	% find starred zero in column
 	starCol = primeCol;
 	starRow = find(starMatrix(:, starCol));
-	
+
 end
 starMatrix = newStarMatrix;
 
@@ -231,5 +231,3 @@ distMatrix(:, uncoveredColumnsIndex) = distMatrix(:, uncoveredColumnsIndex) - h;
 
 % move to step 3
 [assignment, distMatrix, starMatrix, primeMatrix, coveredColumns, coveredRows] = step3__(distMatrix, starMatrix, primeMatrix, coveredColumns, coveredRows, minDim);
-
-
