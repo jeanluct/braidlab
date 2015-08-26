@@ -5,7 +5,7 @@ import glob
 EXECS = ['frontend.cpp','train.cpp']
 
 env.Append(CCFLAGS = ['-Wall','-O3','-ffast-math'],
-           LIBS = 'trains',
+           LIBS = ['trains','ntl'],
            LIBPATH = '../lib',
            CPPPATH = '..')
 
@@ -19,4 +19,4 @@ env.NoClean(lib)
 
 # Build executables.
 for prog in EXECS:
-    env.Program(prog, LIBS = 'trains')
+    env.Program(prog)

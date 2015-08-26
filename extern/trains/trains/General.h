@@ -26,7 +26,7 @@
 
 
 // Turn on/off the charpoly command (no need to link NTL if off).
-#undef __CHARPOLY
+#define __CHARPOLY
 
 
 
