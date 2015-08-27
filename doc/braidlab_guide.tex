@@ -1046,7 +1046,10 @@ ans = 870.9010
       887.0089
 \end{lstlisting}
 \index{tcross@\lstinline{tcross}|)}%
-Storing crossing times enables us to truncate generators in a \lstinline{databraid} by retaining only those with crossing times within a desired interval (see \lstinline{databraid.trunc}). There are always exactly as many crossing times as generators in the braid.
+Storing crossing times enables us to truncate generators in a
+\lstinline{databraid} by retaining only those with crossing times within a
+desired interval (see \lstinline{databraid.trunc}). There are always exactly
+as many crossing times as generators in the braid. %
 \index{databraid class@\lstinline{databraid} class!trunc@\lstinline{trunc}}%
 \index{crossing!times|)}%
 
@@ -1093,12 +1096,12 @@ ordering of the crossing times.
   of the disk with $n$ \index{punctures} punctures (see
   Section~\ref{sec:loopcoords}), and~$b_{T} \ell$ is that loop transformed by
   a single application of the braid.  Here~$\lvert\cdot\rvert$ is a measure of
-  the length of the loop. Unless specified otherwise, \braidlab\
-  calculates \(T\) as the time elapsed between the last and first crossing in
-  the braid. This duration could be much smaller than the length of
-  trajectories analyzed, e.g.,  when no crossings occur toward the beginning or
-  the end of trajectories. To set the custom value of \(T\) and other
-  options, see documentation of the method \lstinline{databraid.ftbe}.
+  the length of the loop. Unless specified otherwise, \braidlab\ calculates
+  \(T\) as the time elapsed between the first and last crossing in the
+  braid. This duration could be much smaller than the length of trajectories
+  analyzed, e.g., when no crossings occur near the beginning or the end of
+  trajectories.  To set the custom value of \(T\) and other options, see
+  documentation of the method \lstinline{databraid.ftbe}.
 \end{itemize}
 
 \index{databraid class@\lstinline{databraid} class|)}%
