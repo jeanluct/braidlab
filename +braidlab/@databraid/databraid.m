@@ -78,6 +78,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        br.tcross = br.tcross(:).';   % Store tcross as row vector.
         check_tcross(br);
         return
       elseif ismatrix(XY)
@@ -88,6 +89,7 @@ classdef databraid < braidlab.braid
         else
           br.tcross = 1:length(br.word);
         end
+        br.tcross = br.tcross(:).';   % Store tcross as row vector.
         check_tcross(br);
         return
       elseif nargin < 2
@@ -114,8 +116,23 @@ classdef databraid < braidlab.braid
         error('BRAIDLAB:databraid:databraid:badarg', ...
               'Too many input arguments.')
       end
+
+      validateattributes(t,{'numeric'},...
+                         {'real','finite','vector','increasing', 'nonnan'},...
+                         'BRAIDLAB.databraid','t');
+
+      validateattributes(XY,{'numeric'},...
+                         {'real','finite','nonnan','nrows',numel(t)},...
+                         'BRAIDLAB.databraid','XY');
+
+      validateattributes(proj,{'numeric'},...
+                         {'real','finite','scalar','nonnan','nonempty'},...
+                         'BRAIDLAB.databraid','proj');
+
       [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
+
       br.word = b.word;
+      br.tcross = br.tcross(:).';   % Store tcross as row vector.
       br.n = b.n;
     end
 

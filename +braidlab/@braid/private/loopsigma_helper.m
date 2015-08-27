@@ -29,4 +29,3 @@ function varargout = loopsigma_helper(varargin) %#ok<STOUT>
 % LICENSE>
 
 throwAsCaller(braidlab.util.NoMEXException(mfilename));
-

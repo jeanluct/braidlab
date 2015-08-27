@@ -14,7 +14,7 @@ function e = psiroots(n,flag)
 %   R. Venzke, "Braid forcing, hyperbolic geometry, and pseudo-Anosov
 %   sequences of low entropy," PhD Thesis (2008).
 %
-%   See also BRAID, BRAID.BRAID.
+%   See also BRAID, BRAID.BRAID, POLYVAL.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids

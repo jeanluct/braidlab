@@ -1,14 +1,20 @@
 #include <cmath>
 #include <cstdio>
 #include <string>
-#include "mex.h"
-#include "loopsigma_helper_common.hpp"
+
 #ifdef BRAIDLAB_USE_GMP
 #include <iostream>
+#include <vector>
 #include <gmpxx.h>
 #endif
 
+#include "mex.h"
+
+#include "loopsigma_helper_common.hpp"
+
 // Helper function for loopsigma
+//
+// ** ASSUMES THAT LOOPS ARE STORED COLUMNWISE **
 
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
@@ -34,114 +40,134 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+#define P_SIGMA_IDX prhs[0]
+#define P_LOOP_IN prhs[1]
+#define P_NPUNC prhs[2]
+#define P_NTHREADS prhs[3]
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-  if (nrhs < 2)
-    {
-      mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
-                        "2 input arguments required.");
-    }
+#define P_LOOP_OUT plhs[0]
+#define P_OPSIGN  plhs[1]
 
-  // Figure out the type in mxArray uA by calling Matlab's "class" function.
-  const mxArray *uA = prhs[1];
-  mxArray *lhs[1];
-  mexCallMATLAB(1, lhs, 1, (mxArray **)(&uA), "class");
-  std::string typ = mxArrayToString(lhs[0]);
+void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn);
+void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop );
 
-  // Dimensions of uA.
-  const mwSize N = mxGetN(uA), Nr = mxGetM(uA);
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-  const mxArray *iiA = prhs[0];
-  const int *ii = (int *)mxGetData(iiA); // iiA contains int32's.
-  const mwSize Ngen = std::max(mxGetM(iiA),mxGetN(iiA));
+  // read off global debug level
+  mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (isDebug) {
+    BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
+  }
 
-  mxArray *pnA = 0;
-  if (nlhs > 1)
-    {
-      const int maxpn = 5;
-      plhs[1] = mxCreateDoubleMatrix(Nr,maxpn*Ngen,mxREAL);
-      pnA = plhs[1];
-    }
+  if (nrhs < 4) {
+    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:nargin",
+                      "4 input arguments required.");
+  }
 
-  if (typ == "double")
-    {
-      plhs[0] = mxCreateNumericMatrix(Nr, N, mxDOUBLE_CLASS, mxREAL);
-      loopsigma_helper_common<double>(Ngen,ii,uA,plhs[0],pnA);
-    }
-  else if (typ == "single")
-    {
-      plhs[0] = mxCreateNumericMatrix(Nr, N, mxSINGLE_CLASS, mxREAL);
-      loopsigma_helper_common<float>(Ngen,ii,uA,plhs[0],pnA);
-    }
-  else if (typ == "int32")
-    {
-      plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT32_CLASS, mxREAL);
-      loopsigma_helper_common<int>(Ngen,ii,uA,plhs[0],pnA);
-    }
-  else if (typ == "int64")
-    {
-      plhs[0] = mxCreateNumericMatrix(Nr, N, mxINT64_CLASS, mxREAL);
-      loopsigma_helper_common<long long int>(Ngen,ii,uA,plhs[0],pnA);
-    }
+  const size_t Nthreads = static_cast<size_t>( mxGetScalar(P_NTHREADS) );
+  const int Npunc = static_cast<int>( mxGetScalar( P_NPUNC ) );
+
+  // Dimensions of P_LOOP_IN - loops stored column-wise
+  const mwSize Ncoord = mxGetM(P_LOOP_IN);
+  const mwSize Nloops = mxGetN(P_LOOP_IN);
+
+
+  if ( Npunc > Ncoord/2+2 )
+    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:incompatible",
+                      "Too many punctures in the braid." );
+
+  const mwSize Ngen = mxGetNumberOfElements(P_SIGMA_IDX);
+
+  mxArray *opSign = NULL;
+  if (nlhs > 1) {
+    const int maxOpSign = 5;
+    P_OPSIGN = mxCreateDoubleMatrix(Nloops,maxOpSign*Ngen,mxREAL);
+    opSign = P_OPSIGN;
+  }
+  else {
+    P_OPSIGN = NULL; opSign = NULL;
+  }
+
+  // Allocate output cell array.
+  P_LOOP_OUT = mxDuplicateArray(P_LOOP_IN);
+
+  switch( mxGetClassID( P_LOOP_OUT ) ) {
+
+  case mxDOUBLE_CLASS: {
+    BraidInPlace<double> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
+    break; }
+  case mxSINGLE_CLASS: {
+    BraidInPlace<float> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
+    break; }
+  case mxINT32_CLASS: {
+    BraidInPlace<int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
+    break; }
+  case mxINT64_CLASS: {
+    BraidInPlace<long long int> braid(P_LOOP_OUT, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
+    break; }
 #ifdef BRAIDLAB_USE_GMP
-  else if (typ == "cell")
-    {
-      // Cell array of strings, to be converted to multiprecision objects.
+  case mxCELL_CLASS: {
 
-      // Array for Matlab mxArray subscripts.
-      mwSize nsubs = 2;
-      mwIndex *subs = (mwIndex *)mxCalloc(nsubs,sizeof(mwIndex));
+    // convert input to MultiPrecision class
+    std::vector<mpz_class> loop (Ncoord*Nloops);
+    convertCellLoopToGMP( P_LOOP_IN, loop.data() );
+    BraidInPlace<mpz_class> braid(loop.data() , Nloops, Ncoord, P_SIGMA_IDX, P_OPSIGN);
+    braid.run(Nthreads);
 
-      // Pointer to input data.
-      const mxArray *uA = prhs[1];
+    convertGMPToCellLoop( loop.data(), P_LOOP_OUT );
 
-      // Allocate input and output GMP multiprecision array.
-      mpz_class *u = new mpz_class[N*Nr];
-      mpz_class *uo = new mpz_class[N*Nr];
-
-      // Convert cell of mxArray strings to mpz_class objects.
-      for (mwIndex l = 0; l < Nr; ++l)
-        {
-          for (mwIndex k = 0; k < N; ++k)
-            {
-              subs[0] = l; subs[1] = k;
-              mwIndex idx = mxCalcSingleSubscript(uA,nsubs,subs);
-              mxArray *cA = mxGetCell(uA,idx);
-              u[k*Nr+l] = mpz_class(mxArrayToString(cA));
-            }
-        }
-
-      // Act on coordinates with braid.
-      loopsigma_helper_gmp(Ngen,ii,Nr,N,u,uo,pnA);
-
-      // Vector of array dimensions.
-      mwSize *dims = (mwSize *)mxCalloc(nsubs,sizeof(mwSize));
-      dims[0] = Nr; dims[1] = N;
-      // Allocate output cell array.
-      plhs[0] = mxCreateCellArray(nsubs,dims);
-
-      // Convert mpz_class objects back to strings, store in cell array.
-      for (mwIndex l = 0; l < Nr; ++l)
-        {
-          for (mwIndex k = 0; k < N; ++k)
-            {
-              subs[0] = l; subs[1] = k;
-              mwIndex idx = mxCalcSingleSubscript(plhs[0],nsubs,subs);
-              mxArray *s = mxCreateString(uo[k*Nr+l].get_str().c_str());
-              mxSetCell(plhs[0],idx,s);
-            }
-        }
-
-      mxFree(dims);
-      mxFree(subs);
-      delete[] u;
-      delete[] uo;
-    }
+    break; }
 #endif
-  else
-    {
-      mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badtype",
-                        "Unknown variable type '%s'.",typ.c_str());
+  default: {
+    mexErrMsgIdAndTxt("BRAIDLAB:loopsigma_helper:badtype",
+                      "Unknown variable type '%s'.",mxGetClassName(P_LOOP_IN));
+  }
+  }
+}
+
+void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop ) {
+
+  const mwSize Ncoord = mxGetM(cellLoop);
+  const mwSize Nloops = mxGetN(cellLoop);
+
+  mwIndex subs[2];
+  mwIndex idx;
+  mxArray* s;
+  // Convert mpz_class objects back to strings, store in cell array.
+  for (mwIndex l = 0; l < Nloops; ++l) {
+    for (mwIndex k = 0; k < Ncoord; ++k) {
+      subs[0] = k;
+      subs[1] = l;
+      idx = mxCalcSingleSubscript(cellLoop,2,subs);
+      s = mxCreateString(loopOut[k+Ncoord*l].get_str().c_str());
+      mxSetCell(cellLoop,idx,s);
     }
+  }
+
+}
+
+void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn) {
+
+  const mwSize Ncoord = mxGetM(cellLoop);
+  const mwSize Nloops = mxGetN(cellLoop);
+
+  // Array for Matlab mxArray subscripts.
+  mwIndex subs[2];
+  mwIndex idx;
+
+  // Convert cell of mxArray strings to mpz_class objects.
+  for (unsigned int l = 0; l < Nloops; l++) {
+    for (unsigned int k = 0; k < Ncoord; k++) {
+      // rows - coordinate, column - loop
+      subs[0] = k; subs[1] = l;
+      idx = mxCalcSingleSubscript(cellLoop,2,subs);
+      loopIn[k+l*Ncoord] =
+        mpz_class(mxArrayToString(mxGetCell(cellLoop,idx)));
+    }
+  }
+
 }

@@ -1,4 +1,4 @@
-function plot(varargin)
+function plot(L, varargin)
 %PLOT   Plot a loop.
 %   PLOT(L) plots a representative of the equivalence class
 %   defined by the loop L.
@@ -11,15 +11,17 @@ function plot(varargin)
 %   LineWidth          The line width used to draw the loop.
 %   PunctureColor      The color of the punctures.
 %   PunctureEdgeColor  The color of the boundary of the punctures.
+%   PunctureEdgeWidth  The width of the boundary of the punctures.
 %   PunctureSize       The size of the punctures.
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
+%   BasePointColor     The color of the basepoint puncture, if any.
 %   Components         [true/false] Plot connected components in
 %                      different colors.  LineColor and LineStyle are ignored.
 %
 %   This is a method for the LOOP class.
-%   See also LOOP.
+%   See also LOOP, LOOP.LOOP.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -46,125 +48,50 @@ function plot(varargin)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-%% List of option names that can be used
 
-% With 'Components' option, LineColor and LineStyle set automatically.
-optionNames = [
-    'LineColor        '
-    'LineStyle        '
-    'LineWidth        '
-    'PunctureColor    '
-    'PunctureEdgeColor'
-    'PunctureSize     '
-    'PuncturePositions'
-    'Components       '
-    ];
+parser = inputParser;
 
-names = lower(optionNames);
-m = size(names,1);
+%% Specify parameters
 
-%% Creation of the options structure
+% First argument is always a loop
+parser.addRequired('L', @(x)isa(x,'braidlab.loop') )
 
-options = [];
+% Function that checks for valid color inputs
+iscolor = @(a) (ischar(a) && numel(a)==1) || ...
+          (all(isfinite(a) & a >= 0) && ...
+           numel(a) >= 3 && numel(a) <= 4);
 
-for j = 1:m
-  options.(deblank(optionNames(j,:))) = [];
-end
 
-%% Check that the number of input arguments is valid
+% List of option names that can be used
+parser.addParameter('LineStyle', '-', @ischar);
+parser.addParameter('LineWidth', 2, @isfinite);
+parser.addParameter('LineColor', 'b', iscolor);
+parser.addParameter('PunctureColor', 'r', iscolor);
+parser.addParameter('BasePointColor', 'g', iscolor);  
+parser.addParameter('PunctureEdgeColor', 'k', iscolor);
+parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
+parser.addParameter('PunctureSize', [], @isfinite);
+parser.addParameter('PuncturePositions', [], @isnumeric);
 
-% Must be of the form L then option name then option value
+% With 'Components' option, LineColor and LineStyle set automatically
+parser.addParameter('Components', false, @islogical);
 
-if rem(nargin,2) ~= 1
-  error('BRAIDLAB:loop:plot:oddarg', ...
-        'Number of inputs must be odd.');
-end
+parser.parse( L, varargin{:} );
+options = parser.Results;
 
-%% Assigning input options
+%%% Process options
 
-L = varargin{1};
+%%
+% Extract loop properties useful for plotting
+%
+% n - number of punctures
+% b_coord - b coordinates
+% M_coord, N_coord - "above", "below" intersection numbers
+[n, b_coord, M_coord, N_coord] = getcoords( L );
 
-if ~isscalar(L)
-  error('BRAIDLAB:loop:plot:onlyscalar', ...
-        'Can only plot scalar loop, not array of loops.');
-end
-
-argin_index = 2; % The first argument needs to be the loop, so the
-                   % second index will be the first property name
-
-val = 0; % We do not expect the next argument to be a value
-
-while argin_index <= nargin
-  arg = varargin{argin_index};
-
-  if ~val
-    if ~ischar(arg)
-      error('BRAIDLAB:loop:plot:notaprop', ...
-            'Argument %d should be a string.',argin_index);
-    end
-
-    lowArg = lower(arg);
-    j = strmatch(lowArg,names); %#ok<MATCH2>
-    if isempty(j)                       % if no matches
-      error('BRAIDLAB:loop:plot:invalidpropname', ...
-            'Invalid property ''%s''.',arg);
-    elseif length(j) > 1                % if more than one match
-      % Check for any exact matches (in case any names are subsets of others)
-      k = strmatch(lowArg,names,'exact'); %#ok<MATCH3>
-      if length(k) == 1
-        j = k;
-      else
-        matches = deblank(optionNames(j(1),:));
-        for k = j(2:length(j))'
-          matches = [matches ', ' deblank(optionNames(k,:))]; %#ok<AGROW>
-        end
-        error('BRAIDLAB:loop:plot:ambiguouspropname', ...
-              'Property %s is ambiguous; matches %s.',arg,matches);
-      end
-    end
-    val = 1;                      % we expect a value next
-
-  else
-    options.(deblank(optionNames(j,:))) = arg;
-    val = 0;
-
-  end
-  argin_index = argin_index + 1;
-end
-
-if isempty(options.LineColor); options.LineColor = 'b'; end
-if isempty(options.LineStyle); options.LineStyle = '-'; end
-if isempty(options.LineWidth); options.LineWidth = 2; end
-if isempty(options.PunctureColor); options.PunctureColor = 'r'; end
-if isempty(options.PunctureEdgeColor); options.PunctureEdgeColor = 'k'; end
-if isempty(options.Components); options.Components = false; end
-
-options.PunctureBasepointColor = 'g';
-
-%% Get the coordinates of the loop, convert to crossing numbers.
-
-% Convert to double, since some scaling is done.
-
-n = L.totaln;
-
-% Get the b coordinates.
-b_coord = double(L.b);
-
-% Convert Dynnikov coding to intersection numbers.
-[mu,nu] = L.intersec;
-mu = double(mu); nu = double(nu);
-
-% Extend the coordinates to include the punctures at either end.
-% This effectively introduces two extra nu-lines outside the end punctures,
-% that never have any crossings on them
-b_coord = [-nu(1)/2 b_coord nu(end)/2];
-
-% Convert to older P,M,N notation
-% intersections above punctures
-M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
-% intersections below punctures
-N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
-
+%% Compute components and assign colors to them
+% If components are plotted separately, compute them and assign
+% unique colors
 if options.Components
   % cumulative sum of intersections, i.e., intersections at punctures
   % 1, then 1+2, then 1+2+3, ...
@@ -186,27 +113,25 @@ if options.Components
   end
 end
 
-%% Set the position of the punctures
+%% Set position of punctures
+% Check to make sure the number of coordinate pairs matches the number of
+% punctures in the loop coordinate
 
 % The default position of the punctures are the integers along the x-axis
-
 if isempty(options.PuncturePositions);
   options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 
+assert( n == size(options.PuncturePositions,1), ...
+        'BRAIDLAB:loop:plot:badlen',...
+        ['Number of puncture positions should match number of ' ...
+         'punctures.'] );
+assert( 2 == size(options.PuncturePositions,2), ...
+        'BRAIDLAB:loop:plot:badposformat',...
+        'Each puncture position should be a row of 2 elements.' );
+
 % sort the punctures based on the x coordinate
 puncture_position = sortrows(options.PuncturePositions);
-
-% Check to make sure the number of coordinate pairs matches the number of
-% punctures in the loop coordinate
-if n ~= length(puncture_position)
-  error('BRAIDLAB:loop:plot:badlen','Bad number of puncture positions.')
-end
-
-if 2 ~= size(puncture_position,2)
-  error('BRAIDLAB:loop:plot:badposformat', ...
-        'The input position format is incorrect.')
-end
 
 % Calculate the distance between punctures
 d =  hypot(diff(puncture_position(:,1)),diff(puncture_position(:,2)));
@@ -223,16 +148,12 @@ for i = 1:n-1
 end
 
 % Set the gap size to half the minimum distance between lines
-
 pgap = min(space_between_loop_lines)/2+zeros(n,1);
 
 %% Set the radius of the puncture
-
 % TODO: Keep punctures same size (need special gap near x-axis).
-
 % set the default puncture radius if no property value was input
-
-if isempty(options.PunctureSize);
+if isempty(options.PunctureSize)
   options.PunctureSize = .15*min(space_between_loop_lines);
   if isinf(options.PunctureSize)
     options.PunctureSize = .05;
@@ -240,7 +161,6 @@ if isempty(options.PunctureSize);
 end
 
 prad = options.PunctureSize;
-
 % check to make sure puncture radius is not so large that it hits the loop
 
 if prad > min(space_between_loop_lines)
@@ -273,7 +193,7 @@ if prad > 0
 
   for p = 1:n
     if p == L.basepoint
-      pc = options.PunctureBasepointColor;
+      pc = options.BasePointColor;
     else
       pc = options.PunctureColor;
     end
@@ -281,7 +201,8 @@ if prad > 0
           [puncture_boundary_x puncture_boundary_x(end:-1:1)], ...
           puncture_position(p,2) + ...
           [puncture_boundary_y_top puncture_boundary_y_bottom], ...
-          pc,'EdgeColor',options.PunctureEdgeColor)
+          pc,'EdgeColor',options.PunctureEdgeColor, ...
+          'LineWidth',options.PunctureEdgeWidth)
   end
 end
 
@@ -449,7 +370,35 @@ if ~holdstate
   axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
 
-end
+function [n, b_coord, M_coord, N_coord] = getcoords( L )
+%% getcoords( L )
+%
+% Extract loop properties useful for plotting
+%
+% n - number of punctures
+% b_coord - b coordinates
+% M_coord - "above" intersections
+% N_coord - "below" intersections
+
+n = L.totaln;
+
+% Get the b coordinates.
+b_coord = double(L.b);
+
+% Convert Dynnikov coding to intersection numbers.
+[mu,nu] = L.intersec;
+mu = double(mu); nu = double(nu);
+
+% Extend the coordinates to include the punctures at either end.
+% This effectively introduces two extra nu-lines outside the end punctures,
+% that never have any crossings on them
+b_coord = [-nu(1)/2 b_coord nu(end)/2];
+
+% Convert to older P,M,N notation
+% intersections above punctures
+M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
+% intersections below punctures
+N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 function joinpoints( mine, next, positions, gaps, options )
 %% joinpoints( mine, next, positions, gaps, options )
@@ -479,53 +428,52 @@ function joinpoints( mine, next, positions, gaps, options )
 % checking is not bullet proof.
 
 
-  dp = next(1) - mine(1); % index distance between punctures
-  assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
-         'Requests one or two consecutive punctures');
+dp = next(1) - mine(1); % index distance between punctures
+assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
+        'Requests one or two consecutive punctures');
 
-  assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
-          'Vertex indices must be nonzero') ;
+assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
+        'Vertex indices must be nonzero') ;
 
-  if dp == 0
-    %% Draw semicircles
+if dp == 0
+  %% Draw semicircles
 
-    assert( abs(mine(2)) == abs(next(2)) && ...
-            sign(mine(2)) ~= sign(next(2)),...
-            'BRAIDLAB:loop:plot:joinpoints',...
-            ['For semicircles, vertex indices must be equal value, ' ...
-             'opposite sign']);
+  assert( abs(mine(2)) == abs(next(2)) && ...
+          sign(mine(2)) ~= sign(next(2)),...
+          'BRAIDLAB:loop:plot:joinpoints',...
+          ['For semicircles, vertex indices must be equal value, ' ...
+           'opposite sign']);
 
-    order = abs(mine(2));      % order of the loop from the puncture
-    rad = order*gaps(mine(1)); % semi circle radius
-    cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
+  order = abs(mine(2));      % order of the loop from the puncture
+  rad = order*gaps(mine(1)); % semi circle radius
+  cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
 
-    loop_curve_x = cirsign*linspace(0,rad,50);
-    loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
-    loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-    if options.Components
-      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-           'Color', options.LineColor,'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    else
-      plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-           positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-           options.LineColor,'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    end
-
+  loop_curve_x = cirsign*linspace(0,rad,50);
+  loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
+  loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
+  if options.Components
+    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         'Color', options.LineColor,'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
   else
-    %% Draw straight lines
-    y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
-    y2 = next(2)*gaps(next(1))+positions(next(1),2);
-    if options.Components
-      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-           'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    else
-      plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-           options.LineColor, 'LineWidth',options.LineWidth, ...
-           'LineStyle',options.LineStyle)
-    end
+    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
+         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
+         options.LineColor,'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
+  end
+
+else
+  %% Draw straight lines
+  y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
+  y2 = next(2)*gaps(next(1))+positions(next(1),2);
+  if options.Components
+    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+         'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
+  else
+    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
+         options.LineColor, 'LineWidth',options.LineWidth, ...
+         'LineStyle',options.LineStyle)
   end
 end

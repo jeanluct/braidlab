@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <algorithm>
 #include "mex.h" // overloads printf -> mexPrintf
+
 #include "update_rules.hpp"
 // implementations of loop length calculations
 #include "../../@loop/private/loop_helper.hpp"
@@ -43,54 +44,67 @@
 // LICENSE>
 
 // function that switches the type of length computation
-// throws BRAIDLAB:entropy_helper:badlengthflag if
+// throws BRAIDLAB:braid:entropy_helper:badlengthflag if
 // passed length flag is unsupported
 double looplength( mwSize N, double *a, double *b, char lengthFlag);
+
+int BRAIDLAB_debuglvl = -1;
+
+#define P_BRAID   prhs[0]
+#define P_LOOP_IN prhs[1]
+#define P_MAXIT prhs[2]
+#define P_NCONV prhs[3]
+#define P_TOL prhs[4]
+#define P_LENGTHTYPE prhs[5]
+#define P_ISFUNDAMENTAL prhs[6]
+
+#define P_ENTROPY plhs[0]
+#define P_ITERATES plhs[1]
+#define P_LOOP_OUT plhs[2]
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   // Get debug level global variable.
-  mxArray *dbglvl_ptr = mexGetVariable("global", "BRAIDLAB_debuglvl");
-  int dbglvl = 0;
-  if (dbglvl_ptr != NULL)
-    if (mxGetM(dbglvl_ptr) != 0)
-      dbglvl = (int)mxGetPr(dbglvl_ptr)[0];
+  mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
+  if (isDebug) {
+    BRAIDLAB_debuglvl = (int) mxGetScalar(isDebug);
+  }
 
-  const mxArray *braidwordA = prhs[0];
-  const int *braidword = (int *)mxGetData(braidwordA); // braidwordA contains int32's.
-  const mxArray *uA = prhs[1];
-  const double *u = mxGetPr(uA);
+  const int *braidword = (int *)mxGetData(P_BRAID); // P_BRAID contains int32's.
+  const double *u = mxGetPr(P_LOOP_IN);
 
-  const int maxit = (int)mxGetScalar(prhs[2]);
-  const int nconvreq = (int)mxGetScalar(prhs[3]);
-  const double tol = mxGetScalar(prhs[4]);
+  const int maxit = (int)mxGetScalar(P_MAXIT);
+  const int nconvreq = (int)mxGetScalar(P_NCONV);
+  const double tol = mxGetScalar(P_TOL);
 
   const char lengthFlag =
-    static_cast<char>( mxGetScalar(prhs[5]) );
+    static_cast<char>( mxGetScalar(P_LENGTHTYPE) );
 
-  const bool isFundamental = ( mxGetScalar(prhs[6]) > 0 );
+  const bool isFundamental = ( mxGetScalar(P_ISFUNDAMENTAL) > 0 );
 
-  const mwSize Ngen = std::max(mxGetM(braidwordA),mxGetN(braidwordA));
+  const mwSize Ngen = std::max(mxGetM(P_BRAID),mxGetN(P_BRAID));
 
-  const mwSize N = mxGetN(uA);
-  if (mxGetM(uA) != 1)
+  const mwSize N = mxGetN(P_LOOP_IN);
+  if (mxGetM(P_LOOP_IN) != 1)
     {
-      mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badarg",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
                         "Only one loop at a time.");
     }
   if (N % 2 != 0)
     {
-      mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badarg",
-                        "u argument should have even number of columns.");
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
+                        "loop argument should have even number of columns.");
     }
-  // Refers to generators, so don't need to be mwIndex/mwSize.
 
   // number of loop punctures (including boundary point)
   const int n = (int)(N/2 + 2);
 
   // Make 1-indexed arrays.
-  double *a = new double[N/2] - 1;
-  double *b = new double[N/2] - 1;
+  std::vector<double> a_storage(N/2);
+  std::vector<double> b_storage(N/2);
+
+  double *a = a_storage.data() - 1;
+  double *b = b_storage.data() - 1;
 
   for (mwIndex k = 1; k <= N/2; ++k)
     {
@@ -135,7 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       entr = std::log(currentLength);
 
-      if (dbglvl >= 2)
+      if (BRAIDLAB_debuglvl >= 2)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 
@@ -152,7 +166,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       else if (nconv > 0)
         {
           // Reset consecutive convergence counter.
-          if (dbglvl >= 1)
+          if (BRAIDLAB_debuglvl >= 1)
             printf("Converged %d time(s) in a row (< %d)\n",nconv,nconvreq);
           nconv = 0;
         }
@@ -160,21 +174,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       entr0 = entr;
     }
 
-  plhs[0] = mxCreateDoubleScalar(entr);
-  plhs[1] = mxCreateDoubleScalar(it);
+  P_ENTROPY = mxCreateDoubleScalar(entr);
+  P_ITERATES = mxCreateDoubleScalar(it);
 
   // Create an mxArray for the output data.
-  plhs[2] = mxCreateDoubleMatrix(1, N, mxREAL);
-  double *uo = mxGetPr(plhs[2]);
+  P_LOOP_OUT = mxCreateDoubleMatrix(1, N, mxREAL);
+  double *uo = mxGetPr(P_LOOP_OUT);
   // Copy final a and b to row of output array.
   for (mwIndex k = 1; k <= N/2; ++k) { uo[k-1] = a[k]; uo[k-1+N/2] = b[k]; }
-
-  delete[] (a+1);
-  delete[] (b+1);
-
-  if (dbglvl_ptr != NULL)
-    if (mxGetM(dbglvl_ptr) != 0)
-      mxDestroyArray(dbglvl_ptr);
 
   return;
 }
@@ -198,13 +205,13 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag) {
     break;
 
   default:
-    mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlengthflag",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlengthflag",
                       "Supported flags: 0 (l2), 1 (intaxis), 2 (minlength).");
     break;
   }
 
   if (retval < 0)
-    mexErrMsgIdAndTxt("BRAIDLAB:entropy_helper:badlength",
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlength",
                       "Loop length must never be negative.");
 
   return retval;

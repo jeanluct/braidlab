@@ -197,6 +197,7 @@ paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
 
 braidlab.util.debugmsg( paramstring, 1);
 
+%% MEX implementation
 if ~usematlab
   try
     % Only works on double precision numbers.
@@ -225,6 +226,7 @@ if ~usematlab
   end
 end
 
+%% MATLAB implementation
 if usematlab
 
   nconv = 0;

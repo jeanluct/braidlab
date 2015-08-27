@@ -1,4 +1,28 @@
 ------------------------------------------------------------------------
+3.2 [2015-08-27]
+
+* braid.mtimes acting on loops is now multithreaded.
+
+* braid.braid can generate normally-distributed random braids
+
+* braid.subbraid now has a C++ implementation.
+
+* loop.plot takes the option 'BasePointColor'.
+
+* Added troubleshooting appendix to braidlab guide, which describes
+  global flags and issue reporting.
+
+* Bugfix: prevent creation of empty loop with loop([]), or equivalently a
+  loop with two punctures with loop(2), or a loop with one puncture and a
+  basepoint with loop(1,'BasePoint').
+
+* Bugfix: disallow passing of nonincreasing time vector to databraid.
+
+* Bugfix: disallow inf and NaN when creating braid from generator list.
+
+* Various other small bugfixes.
+
+------------------------------------------------------------------------
 3.1 [2015-01-11]
 
 * The function braidlab.prop can be used to set global properties,

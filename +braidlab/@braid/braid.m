@@ -82,6 +82,11 @@ classdef braid < matlab.mixin.CustomDisplay
     %   crossings (generators).  The K generators are chosen uniformly in
     %   [-(N-1):-1 1:N-1].
     %
+    %   B = BRAID('Normal',N,K) returns a random braid of N strings with K
+    %   crossings (generators).  The indices of the generators are chosen
+    %   from the binomial distribution with p=1/2 over [1:N-1] and the sign
+    %   is chosen uniformly at random.
+    %
     %   B = BRAID('HalfTwist',N) or BRAID('Delta',N) returns the word D in
     %   Artin generators representing the positive half-twist (Delta) for
     %   the braid group with N strings.
@@ -181,7 +186,7 @@ classdef braid < matlab.mixin.CustomDisplay
           end
           br.n = n;
           if n == 6
-            br.word = [5:-1:1 5 4 3 5 4];
+            br.word = int32([5:-1:1 5 4 3 5 4]);
             return
           end
           L = (n-1):-1:1;
@@ -201,6 +206,10 @@ classdef braid < matlab.mixin.CustomDisplay
           br.n = secnd;
           k = third;
           br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
+         case {'normal','binomal','norm','binom'}
+          br.n = secnd;
+          k = third;
+          br.word = (-1).^randi(2,1,k) .* (1+binornd( br.n-2, 1/2, 1,k ));
          otherwise
           % Maybe the string specifies a knot.
           try
@@ -209,7 +218,7 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
-      elseif max(size(size(b))) == 3
+      elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
           error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
@@ -217,6 +226,15 @@ classdef braid < matlab.mixin.CustomDisplay
           % Use a zero projection angle.
           secnd = 0;
         end
+
+        validateattributes(b,{'numeric'},...
+                           {'real','finite','nonnan'},...
+                           'BRAIDLAB.braid','trajectory array');
+
+        validateattributes(secnd,{'numeric'},...
+                           {'real','finite','scalar','nonnan','nonempty'},...
+                           'BRAIDLAB.databraid','projection angle');
+
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
@@ -228,17 +246,14 @@ classdef braid < matlab.mixin.CustomDisplay
             warning('BRAIDLAB:braid:braid:onetraj', ...
                     [ 'Creating trivial braid from single ' ...
                       'trajectory (did you mean that?).' ])
-            br.word = [];
+            br.word = int32([]);
             br.n = 1;
           else
             error('BRAIDLAB:braid:braid:badarg','Bad array size.')
           end
         else
-          % Store word as row vector.
-          if size(b,1) > size(b,2)
-            b = b.';
-          end
-          br.word = b;
+          b = b(:).';   % Store word as row vector.
+          br.word = int32(b);
           if nargin < 2
             br.n = max(abs(b))+1;
           else
@@ -246,13 +261,14 @@ classdef braid < matlab.mixin.CustomDisplay
           end
         end
       end
+
+      assert( isa(br.word,'int32'), 'BRAIDLAB:braid:braid:int32',...
+              'Word was not set to int32 somewhere!' );
     end % function braid
 
     function obj = set.n(obj,value)
       if isempty(value), return; end
-      if value < 1
-        error('BRAIDLAB:braid:setn:badarg','Need at least one string.')
-      end
+      validateattributes( value, {'numeric'}, {'positive'} );
       if ~isempty(obj.word)
         if value < max(abs(obj.word))+1
           error('BRAIDLAB:braid:setn:badarg', ...
@@ -265,19 +281,28 @@ classdef braid < matlab.mixin.CustomDisplay
     function value = get.n(obj)
       if isempty(obj.word)
         value = double(max(1,obj.privaten));
-        return
+      else
+        value = double(max(max(abs(obj.word))+1,obj.privaten));
       end
-      value = double(max(max(abs(obj.word))+1,obj.privaten));
     end
 
     % Make sure it's an int32, internally.
     function obj = set.word(obj,value)
-      if ~all(value)
-        error('BRAIDLAB:braid:setword:badarg','Generators cannot be zero.')
+      if isempty(value)
+        % Make sure the empty word is 0 by 0.
+        obj.word = int32([]);
+      else
+        try
+          validateattributes(value, {'numeric'},...
+                             {'nonzero','nonnan','finite'} );
+          % needed b/c of a bug in validateattributes
+          assert( all(value ~= 0) )
+          obj.word = int32(value);
+        catch e
+          error('BRAIDLAB:braid:setword:badarg',...
+                'Generators have to be nonzero, non-NaN and finite.')
+        end
       end
-      obj.word = int32(value);
-      % Make sure the empty word is 0 by 0.
-      if isempty(obj.word), obj.word = int32([]); end
     end
 
     function ee = eq(b1,b2)

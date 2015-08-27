@@ -1,3 +1,6 @@
+function XYr = rotate_data_clockwise(XY,proj)
+%ROTATE_DATA_CLOCKWISE   Rotate data clockwise, surprisingly.
+
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
@@ -21,10 +24,8 @@
 %   You should have received a copy of the GNU General Public License
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
-%
-% Get latest braidlab release from 'git tag'.  Release tags are of the form
-% 'release-1.3.4.5'.
-%
-% Need to run 'pdflatex -shell-escape' to allow shell commands.
-%\input{"| git tag | grep release | cut -b 9-13 | tail -1 | sed 's/ *$//g'"}
-3.2
+
+XYr = zeros(size(XY));
+
+XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);

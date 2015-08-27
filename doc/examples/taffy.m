@@ -62,7 +62,7 @@ switch lower(ptype)
   % For 4 rods, co-rotating.
   % This is the 'real' 4-pronged taffy puller.
   %
-  % The rods on the small-radius trajctories behave as a fixed rod.
+  % The rods on the small-radius trajectories behave as a fixed rod.
   n = 4;
   z = zeros(npts,n);
   r0 = .5*r;

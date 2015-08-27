@@ -26,6 +26,7 @@ function br = sort_sim_tcross(br)
 % LICENSE>
 
 dt = diff(br.tcross);
+dt = dt(:).';
 
 runs = diff(find([1,dt,1]));  % Find run lengths of simultaneous crossing times
 starts = find([1,dt]);        % Find where they start

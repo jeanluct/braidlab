@@ -9,8 +9,8 @@ function [varargout] = linact(b,l,N)
 %
 %   [M,L2] = LINACT(B,L) also returns the loop L2 = B*L.
 %
-%   M = LINACT(B,PN,N) uses instead a vector PN of pos/neg operations in the
-%   piecewise-linear action, as given by [~,PN] = B*L for some loop L.  The
+%   M = LINACT(B,OPSIGN,N) uses instead a vector OPSIGN of pos/neg operations in the
+%   piecewise-linear action, as given by [~,OPSIGN] = B*L for some loop L.  The
 %   loop dimension N defaults to 2*B.n-2.
 %
 %   This is a method for the BRAID class.
@@ -40,22 +40,22 @@ function [varargout] = linact(b,l,N)
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
 
-maxpn = 5;
+maxopSign = 5;
 
 if nargin < 2, l = braidlab.loop(b.n,'bp'); end
 
 if isa(l,'braidlab.loop')
   if isscalar(l)
-    [l2,pn] = b*l; %#ok<RHSFN>
-    varargout{1} = update_rules_matrix(b,pn,size(l.coords,2));
+    [l2,opSign] = b*l; %#ok<RHSFN>
+    varargout{1} = update_rules_matrix(b,opSign,size(l.coords,2));
     if nargout > 1, varargout{2} = l2; end
   else
     error('BRAIDLAB:braid:linact:novector','Does not vectorize over loops.')
   end
 elseif isnumeric(l)
   if min(size(l)) == 1
-    if length(l) ~= maxpn*length(b)
-      error('BRAIDLAB:braid:linact:badarg','Bad length for PN.')
+    if length(l) ~= maxopSign*length(b)
+      error('BRAIDLAB:braid:linact:badarg','Bad length for OPSIGN.')
     end
 
     if nargin < 3, N = 2*b.n-2; end
@@ -72,9 +72,9 @@ elseif isnumeric(l)
 
     if nargout > 1
       error('BRAIDLAB:braid:linact:badout', ...
-            'Cannot return second loop argument for PN input.');
+            'Cannot return second loop argument for OPSIGN input.');
     end
   else
-    error('BRAIDLAB:braid:linact:novector','Does not vectorize over PN.')
+    error('BRAIDLAB:braid:linact:novector','Does not vectorize over OPSIGN.')
   end
 end
