@@ -1046,7 +1046,10 @@ ans = 870.9010
       887.0089
 \end{lstlisting}
 \index{tcross@\lstinline{tcross}|)}%
-There are always exactly as many crossing times as generators in the braid.
+Storing crossing times enables us to truncate generators in a \lstinline{databraid} by retaining only those with crossing times within a desired interval (see \lstinline{databraid.trunc}). There are always exactly as many crossing times as generators in the braid.
+\index{databraid class@\lstinline{databraid} class!trunc@\lstinline{trunc}}%
+\index{crossing!times|)}%
+
 Many operations that can be done to a \lstinline{braid} also work on a
 \lstinline{databraid}, with a few differences:
 \begin{itemize}
@@ -1097,8 +1100,6 @@ ordering of the crossing times.
   the end of trajectories. To set the custom value of \(T\) and other
   options, see documentation of the method \lstinline{databraid.ftbe}.
 \end{itemize}
-
-\index{crossing!times|)}%
 
 \index{databraid class@\lstinline{databraid} class|)}%
 \index{databraid class@\lstinline{databraid} class!ftbe@\lstinline{ftbe}}%
