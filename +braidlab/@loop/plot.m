@@ -148,7 +148,10 @@ for i = 1:n-1
 end
 
 % Set the gap size to half the minimum distance between lines
+% iss129: maybe this is a nice default (not sure), but allow override.
+% Also, should use the puncture radius itself as the first gap.
 pgap = min(space_between_loop_lines)/2+zeros(n,1);
+%pgap = .1+zeros(n,1);
 
 %% Set the radius of the puncture
 % TODO: Keep punctures same size (need special gap near x-axis).
