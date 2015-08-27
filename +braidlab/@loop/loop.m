@@ -86,7 +86,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %   array used in its construction (usually double by default).  For
     %   example, to construct a loop of 64-bit integers, use LOOP(int64(D)).
     %
-    %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
+    %   L = LOOP(N) where N is an integer (N>2) creates a loop object L with
     %   N punctures.  The loop L is a (nonoriented) generating set for the
     %   fundamental group of the sphere with N-1 punctures, with the Nth
     %   puncture serving as the basepoint.  This sort of object is
@@ -97,11 +97,12 @@ classdef loop < matlab.mixin.CustomDisplay
     %   a large number of loops.
     %
     %   L = LOOP(N,'BasePoint') or LOOP(N,M,'BasePoint') adds a basepoint
-    %   puncture so the resulting loop has N+1 punctures.  The loop L is a
-    %   (nonoriented) generating set for the fundamental group of the sphere
-    %   with N punctures, with the extra puncture serving as the basepoint.
-    %   This sort of object is convenient when looking for growth of loops
-    %   under braid action, or for testing for braid equality.
+    %   puncture so the resulting loop has N+1 punctures (N>1).  The loop L
+    %   is a (nonoriented) generating set for the fundamental group of the
+    %   sphere with N punctures, with the extra puncture serving as the
+    %   basepoint.  This sort of object is convenient when looking for
+    %   growth of loops under braid action, or for testing for braid
+    %   equality.
     %
     %   L = LOOP(...,'BasePoint',B) specifies the basepoint to be puncture
     %   B, with 0 <= B <= N.  B=0 means no basepoint.
