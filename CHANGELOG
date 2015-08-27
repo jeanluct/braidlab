@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
-x.x [2015-xx-xx]
+3.2 [2015-08-27]
 
 * braid.mtimes acting on loops is now multithreaded.
 
@@ -12,7 +12,15 @@ x.x [2015-xx-xx]
 * Added troubleshooting appendix to braidlab guide, which describes
   global flags and issue reporting.
 
-* Various bugfixes.
+* Bugfix: prevent creation of empty loop with loop([]), or equivalently a
+  loop with two punctures with loop(2), or a loop with one puncture and a
+  basepoint with loop(1,'BasePoint').
+
+* Bugfix: disallow passing of nonincreasing time vector to databraid.
+
+* Bugfix: disallow inf and NaN when creating braid from generator list.
+
+* Various other small bugfixes.
 
 ------------------------------------------------------------------------
 3.1 [2015-01-11]
