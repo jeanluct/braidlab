@@ -87,11 +87,10 @@ classdef loop < matlab.mixin.CustomDisplay
     %   example, to construct a loop of 64-bit integers, use LOOP(int64(D)).
     %
     %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
-    %   N+1 punctures.  The loop L is a (nonoriented) generating set for the
-    %   fundamental group of the sphere with N punctures, with the extra
+    %   N punctures.  The loop L is a (nonoriented) generating set for the
+    %   fundamental group of the sphere with N-1 punctures, with the Nth
     %   puncture serving as the basepoint.  This sort of object is
-    %   convenient when looking for growth of loops under braid action, or
-    %   for testing for braid equality.
+    %   convenient when looking for growth of loops under braid action.
     %
     %   L = LOOP(N,M) where N and M are integers creates a loop object L
     %   with M identical loops.  This can be used to pre-allocate memory for
@@ -203,9 +202,13 @@ classdef loop < matlab.mixin.CustomDisplay
       if isscalar(c) && ~isa(c,'braidlab.loop')
         % Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
-        if c < 2
+        if nobase && c < 3
           error('BRAIDLAB:loop:loop:toofewpunc', ...
-                'Need at least two punctures.');
+                'Need at least three punctures.');
+        end
+        if ~nobase && c < 2
+          error('BRAIDLAB:loop:loop:toofewpunc', ...
+                'Need at least two punctures in addition to basepoint.');
         end
         if nobase
           n1 = c-2;
