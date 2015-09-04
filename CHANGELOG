@@ -1,4 +1,11 @@
 ------------------------------------------------------------------------
+Unreleased
+
+* braid constructor issues a warning when creating a braid from data
+  consisting of unclosed orbits.  Use braid(closure(XY)) to suppress the
+  warning.
+
+------------------------------------------------------------------------
 3.2 [2015-08-27]
 
 * braid.mtimes acting on loops is now multithreaded.
