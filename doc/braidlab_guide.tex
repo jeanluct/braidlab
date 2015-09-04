@@ -899,13 +899,16 @@ data, but projected along the~$X$ direction.  To construct a braid
 from this data, we simply execute %
 \index{braid class@\braid\ class!length@\lstinline{length}}
 \begin{lstlisting}[frame=single,framerule=0pt]
+>> warning('Off','BRAIDLAB:braid:colorbraiding:notclosed')
 >> b = braid(XY);
 >> b.length
 
 ans = 894
 \end{lstlisting}
-This is a very long braid!  But Figure~\ref{fig:testdata_trajs} suggests that
-this is misleading: many of the crossings %
+This is a very long braid!  (We've temporarily turned off a warning about the
+data not being closed; we'll see what it's about in
+Section~\ref{sec:projection}.)  But Figure~\ref{fig:testdata_trajs} suggests
+that this is misleading: many of the crossings %
 \index{crossing}%
 are `wiggles' that cancel each other out.  Indeed, if we attempt to shorten
 the braid: %
@@ -964,11 +967,16 @@ conjugacy: %
 ans = 0
 \end{lstlisting}
 \index{braid class@\braid\ class!compact@\lstinline{compact}|)}%
-The braids are not conjugate.  This is because our trajectories do not
-form a `true' braid: the final points do not correspond exactly with
-the initial points, as a set.  If we truly want a
-rotationally-conjugate braid out of our data, we need to enforce a
-closure method: %
+The braids are not conjugate.  This is because our trajectories do not form a
+`true' braid: the final points do not correspond exactly with the initial
+points, as a set.  This is the reason why we turned off a warning in
+Section~\ref{sec:braidfromdataex}: \braidlab\ warns us when we're trying to
+create a braid from data that doesn't `join up.'  The class
+\lstinline{databraid} described in Section~\ref{sec:databraid} does not issue
+this warning, since it is meant for noisy real-world data.
+
+If we truly want a rotationally-conjugate braid out of our data, we need to
+enforce a closure method: %
 \index{braid!closure|(}%
 \index{braid class@\braid\ class!closure@\lstinline{closure}|(}%
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
