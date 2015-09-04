@@ -235,7 +235,7 @@ classdef braid < matlab.mixin.CustomDisplay
                            {'real','finite','scalar','nonnan','nonempty'},...
                            'BRAIDLAB.databraid','projection angle');
 
-        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
+        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
@@ -487,7 +487,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
-    [varargout] = colorbraiding(XY,t,proj)
+    [varargout] = colorbraiding(XY,t,proj,checkclosure)
   end % methods block
 
 end % braid classdef

@@ -1,4 +1,4 @@
-function [varargout] = colorbraiding(XY,t,proj)
+function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %COLORBRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -71,7 +71,7 @@ if any(isnan(XY) | isinf(XY))
 end
 
 validateattributes(t,{'numeric'},...
-                   {'real','finite','vector','increasing', 'nonnan'},...
+                   {'real','finite','vector','increasing','nonnan'},...
                    'BRAIDLAB.braid.colorbraiding','t',2 );
 
 validateattributes(XY,{'numeric'},...
@@ -104,15 +104,17 @@ if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 % Sort all the trajectories trajectories according to IDX:
 XY = XY(:,:,idx);
 
-% Check if the final points are close enough to the initial points.
-% Otherwise this could be an error with the user's data.
-% Force them to call 'closure(XY)' first.
-XYstart = squeeze(XY(1,:,:)).';
-XYend = sortrows(squeeze(XY(end,:,:)).');
-if any(sqrt(sum((XYstart - XYend).^2,2)) > delta)
-  error('BRAIDLAB:braid:colorbraiding:notclosed',...
-        ['The trajectories do not form a closed braid. ' ...
-         'Call ''closure'' on the data first.']);
+if checkclosure
+  % Check if the final points are close enough to the initial points (setwise).
+  % Otherwise this could be an error with the user's data.
+  % Force them to call 'closure(XY)' first.
+  XYstart = squeeze(XY(1,:,:)).';
+  XYend = sortrows(squeeze(XY(end,:,:)).');
+  if any(sqrt(sum((XYstart - XYend).^2,2)) > delta)
+    error('BRAIDLAB:braid:colorbraiding:notclosed',...
+	  ['The trajectories do not form a closed braid. ' ...
+	   'Call ''closure'' on the data first.']);
+  end
 end
 
 debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
