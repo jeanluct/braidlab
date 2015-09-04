@@ -127,8 +127,8 @@ classdef braidTest < matlab.unittest.TestCase
       rng(1);
       XY = braidlab.randomwalk(4,2,1);
       % The data doesn't close, so braid creation errors.
-      testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:colorbraiding:notclosed');
+      testCase.verifyWarning(@() braidlab.braid(XY), ...
+                             'BRAIDLAB:braid:colorbraiding:notclosed');
       b = braidlab.braid(braidlab.closure(XY));
       testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
