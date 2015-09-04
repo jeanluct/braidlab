@@ -102,7 +102,7 @@ if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 % X coord; IDX contains the indices of the sort.
 [~,idx] = sortrows(squeeze(XY(1,:,:)).');
 % Sort all the trajectories trajectories according to IDX:
-XYtraj = XY(:,:,idx);
+XY = XY(:,:,idx);
 
 debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 
@@ -119,7 +119,7 @@ try % trapping to ensure proper identification of strands
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = cross2gen_helper(XYtraj,t,delta,Nthreads);
+    [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
@@ -127,7 +127,7 @@ try % trapping to ensure proper identification of strands
     else
     debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = cross2gen(XYtraj,t,delta);
+      [gen,tcr,~] = cross2gen(XY,t,delta);
     end
   end
 
