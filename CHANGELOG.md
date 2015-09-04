@@ -7,7 +7,7 @@
   warning.
 
 
-## [3.2] (2015-08-27)
+## [3.2] - 2015-08-27
 
 * braid.mtimes acting on loops is now multithreaded.
 
@@ -31,7 +31,7 @@
 * Various other small bugfixes.
 
 
-## [3.1] (2015-01-11)
+## [3.1] - 2015-01-11
 
 * The function braidlab.prop can be used to set global properties,
   such as the way braids are plotted and the direction of rotation for
@@ -67,7 +67,7 @@
 * Some bugfixes.
 
 
-## [3.0.1] (2014-12-16)
+## [3.0.1] - 2014-12-16
 
 * Improve installation instructions in guide.
 
@@ -83,7 +83,7 @@
 * Makefile detects Linux 32-bit architecture.
 
 
-## [3.0] (2014-12-09)
+## [3.0] - 2014-12-09
 
 * Move from BitBucket/Mercurial to GitHub/Git, to stay with the times.
 
@@ -145,7 +145,7 @@
 * And of course, many bugfixes and small tweaks...
 
 
-## [2.1] (2014-10-02)
+## [2.1] - 2014-10-02
 
 * Simplify the linear action code: instead of braid.linact use an
   optional return argument for braid.mtimes.  braid.cycle now does
@@ -166,7 +166,7 @@
 * Renamed the guide and posted on arXiv.
 
 
-## [2.0] (2014-09-24)
+## [2.0] - 2014-09-24
 
 * Complete rewrite of the Makefiles to simplify them and make them
   compatible with Matlab 2014a (which broke a lot of things).  The
@@ -245,7 +245,7 @@ Several improvements to the method braid.entropy:
   not used widely.
 
 
-## [1.0.5] (2014-01-31)
+## [1.0.5] - 2014-01-31
 
 * Constructors for Rupert Venzke's psi-family of low-entropy braids.
 
@@ -263,7 +263,7 @@ Several improvements to the method braid.entropy:
 * A few more small bugfixes.
 
 
-## [1.0.4] (2014-01-03)
+## [1.0.4] - 2014-01-03
 
 * The databraid class records crossing times of a dataset.
 
@@ -272,7 +272,7 @@ Several improvements to the method braid.entropy:
 * bugfix in testsuite.
 
 
-## [1.0.3] (2013-12-20)
+## [1.0.3] - 2013-12-20
 
 * The braidlab guide has been updated and expanded, and now has a
   table of contents and a detailed index.
@@ -286,7 +286,7 @@ Several improvements to the method braid.entropy:
   checks on the particle trajectories.
 
 
-## [1.0.2] (2013-12-13)
+## [1.0.2] - 2013-12-13
 
 * loopTest.m in testsuite.
 
@@ -295,7 +295,7 @@ Several improvements to the method braid.entropy:
 * First public release.
 
 
-## [1.0.1] (2013-12-12)
+## [1.0.1] - 2013-12-12
 
 * Check for overflow of loop coordinates.
 
@@ -304,7 +304,7 @@ Several improvements to the method braid.entropy:
 * Improved support for VPI (Variable Precision Integers).
 
 
-## 1.0 (2013-10-02)
+## 1.0 - 2013-10-02
 
 First release of braidlab.
 
