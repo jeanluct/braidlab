@@ -85,7 +85,7 @@ else
       end
     end
     % Solve the optimal assignment problem.
-    perm = assignmentoptimal(D);
+    perm = braidlab.util.assignmentoptimal(D);
     XYnew(1,:,:) = XY(1,:,perm);
 
    otherwise

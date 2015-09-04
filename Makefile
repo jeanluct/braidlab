@@ -59,6 +59,7 @@ MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 
 all: check-env
 	cd +braidlab/private; $(MAKE) all
+	cd +braidlab/+util; $(MAKE) all
 	cd +braidlab/@braid/private; $(MAKE) all
 	cd +braidlab/@loop/private; $(MAKE) all
 	cd +braidlab/@cfbraid/private; $(MAKE) all

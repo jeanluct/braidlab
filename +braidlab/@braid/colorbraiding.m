@@ -107,10 +107,23 @@ XY = XY(:,:,idx);
 if checkclosure
   % Check if the final points are close enough to the initial points (setwise).
   % Otherwise this could be an error with the user's data.
-  % Force them to call 'closure(XY)' first.
-  XYstart = squeeze(XY(1,:,:)).';
-  XYend = sortrows(squeeze(XY(end,:,:)).');
-  if any(sqrt(sum((XYstart - XYend).^2,2)) > delta)
+  % Suggest user call 'closure(XY)' first.
+  
+  % Use optimal assignment to match the ends.
+  % This piece of code is basically pasted from closure.m.
+  XY0 = squeeze(XY(1,:,:));
+  XY1 = sortrows(squeeze(XY(end,:,:))')';
+  % Create matrix of distances.
+  D = zeros(n,n);
+  for i = 1:n
+    for j = 1:n
+      D(i,j) = norm(XY1(:,i)-XY0(:,j));
+    end
+  end
+  % Solve the optimal assignment problem.
+  perm = braidlab.util.assignmentoptimal(D);
+
+  if any(sqrt(sum((XY0 - XY1(:,perm)).^2,1)) > delta)
     warning('BRAIDLAB:braid:colorbraiding:notclosed',...
             ['The trajectories do not form a closed braid.  ' ...
              'Consider calling ''closure'' on the data first.']);
