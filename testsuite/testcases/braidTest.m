@@ -58,6 +58,7 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.XYcoincend(2,:,2) = [1 0];
       testCase.XYcoincend(1,:,3) = [2 0];
       testCase.XYcoincend(2,:,3) = [2 0];
+      testCase.XYcoincend = braidlab.closure(testCase.XYcoincend);
 
     end
   end
@@ -116,18 +117,18 @@ classdef braidTest < matlab.unittest.TestCase
       % Changing the projection gets rid of the error.
       testCase.verifyTrue(braidlab.braid(XY,.1) == ...
                           braidlab.braid([],2));
-      
-      % coincidence at the end of interval - see github Iss #109
+
+      % Coincidence at the end of interval - see GitHub Iss #109.
       testCase.verifyError(@() braidlab.braid(testCase.XYcoincend), ...
                            'BRAIDLAB:braid:colorbraiding:coincidentprojection');
     end
 
     function test_braid_from_randomwalk(testCase)
       rng(1);
-      b = braidlab.braid(braidlab.randomwalk(4,2,1));
+      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)));
       testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
-      b = braidlab.braid(braidlab.randomwalk(4,2,1),pi/4);
+      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
       testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
     end
 
