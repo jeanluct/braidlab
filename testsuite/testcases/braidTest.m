@@ -48,7 +48,7 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.b3 = braid([1 -2 3 5 2 1 2 -1 -2 -1],7);
       testCase.id = braid([],7);
       testCase.pure = braid([1 -2 1 -2 1 -2]);
-      
+
       % trajectories with coincident coordinates
       % at the last time slice
       testCase.XYcoincend = zeros(2,2,3);
@@ -125,7 +125,11 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_from_randomwalk(testCase)
       rng(1);
-      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)));
+      XY = braidlab.randomwalk(4,2,1);
+      % The data doesn't close, so braid creation errors.
+      testCase.verifyError(@() braidlab.braid(XY), ...
+                           'BRAIDLAB:braid:colorbraiding:notclosed');
+      b = braidlab.braid(braidlab.closure(XY));
       testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
       b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
