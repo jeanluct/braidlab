@@ -123,7 +123,7 @@ if checkclosure
   % Solve the optimal assignment problem.
   perm = braidlab.util.assignmentoptimal(D);
 
-  if any(sqrt(sum((XY0 - XY1(:,perm)).^2,1)) > delta)
+  if any(sqrt(sum((XY0(:,perm) - XY1).^2,1)) > delta)
     warning('BRAIDLAB:braid:colorbraiding:notclosed',...
             ['The trajectories do not form a closed braid.  ' ...
              'Consider calling ''closure'' on the data first.']);
