@@ -123,7 +123,9 @@ private:
 
   typedef std::pair< std::vector<T>, std::vector<T> > tempAB;
 
-  std::unordered_map< std::thread::id, tempAB > tmp;
+  // temporary storage
+  std::mutex loopStorageMutex;
+  std::unordered_map< std::thread::id, tempAB > temporaryLoopStorage;
 
 
 };
@@ -202,20 +204,24 @@ void BraidInPlace<T>::applyToLoop(const mwIndex l) {
   b--;
 
   // retrieve temporary storage based on thread ID
+  // [.] syntax creates this storage if it doesn't exist
 #ifndef BRAIDLAB_NOTHREADING
-  tempAB& mytmp = tmp[std::this_thread::get_id()];
+  std::thread::id myId = std::this_thread::get_id();
+  loopStorageMutex.lock();
+  tempAB& myLoopStorage = temporaryLoopStorage[myId];
+  loopStorageMutex.unlock();
 #else
-  tempAB& mytmp = tmp[0];
+  tempAB& myLoopStorage = temporaryLoopStorage[0];
 #endif
 
-  if (mytmp.first.empty())
-    mytmp.first.resize(Ncoord/2);
-  if (mytmp.second.empty())
-    mytmp.second.resize(Ncoord/2);
+  if (myLoopStorage.first.empty())
+    myLoopStorage.first.resize(Ncoord/2);
+  if (myLoopStorage.second.empty())
+    myLoopStorage.second.resize(Ncoord/2);
 
   // create 1-indexed temporary pointers
-  T* a_tmp = mytmp.first.data() - 1;
-  T* b_tmp = mytmp.second.data() - 1;
+  T* a_tmp = myLoopStorage.first.data() - 1;
+  T* b_tmp = myLoopStorage.second.data() - 1;
 
   // Act with the braid sequence in sigma_idx onto the coordinates a,b.
   update_rules<T>(Ngen, Npunc, sigma_idx, a, b,
