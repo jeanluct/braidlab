@@ -67,7 +67,7 @@ parser.addParameter('LineStyle', '-', @ischar);
 parser.addParameter('LineWidth', 2, @isfinite);
 parser.addParameter('LineColor', 'b', iscolor);
 parser.addParameter('PunctureColor', 'r', iscolor);
-parser.addParameter('BasePointColor', 'g', iscolor);  
+parser.addParameter('BasePointColor', 'g', iscolor);
 parser.addParameter('PunctureEdgeColor', 'k', iscolor);
 parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
 parser.addParameter('PunctureSize', [], @isfinite);
@@ -78,6 +78,11 @@ parser.addParameter('Components', false, @islogical);
 
 parser.parse( L, varargin{:} );
 options = parser.Results;
+
+assert( size(L.coords,1) == 1, ...
+        'BRAIDLAB:loop:plot:multiloop',...
+        ['Argument cannot be a loop vector. ' ...
+         'Use plot(L(k)) to plot the k-th loop.'] );
 
 %%% Process options
 
