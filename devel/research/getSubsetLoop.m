@@ -1,4 +1,4 @@
-function [L, A, B] = getSubsetLoop( exclusionmatrix )
+function [L, A, B] = getSubsetLoop( varargin )
 %GETSUBSETLOOP Generate a loop enclosing punctures specified in the exclusion
 %matrix.
 %
@@ -69,10 +69,36 @@ function [L, A, B] = getSubsetLoop( exclusionmatrix )
 %
 %
 
+
+
 if nargin == 2
-  %% Generate the matrix
+  N = varargin{1};
+  exclusioncell = varargin{2};
+  %% Generate the exclusion matrix based on the exclusion list
 
+  validateattributes(N, {'numeric'},...
+                     {'scalar','finite','nonnan','>',2});
+  validateattributes(exclusioncell, {'cell'},{'vector'});
 
+  K = numel(exclusioncell);
+  exclusionmatrix = zeros(K,N);
+
+  for k = 1:numel(exclusioncell)
+    exclusionList = exclusioncell{k};
+    validateattributes(exclusionList, {'numeric'},...
+                       {'vector','finite','integer','nonnan'});
+    exclusionList = unique(exclusionList);
+
+    exclvector = zeros(1,N);
+    exclvector( abs(exclusionList(exclusionList < 0)) ) = -1;
+    exclvector( abs(exclusionList(exclusionList > 0)) ) = 1;
+
+    exclusionmatrix(k,:) = exclvector;
+
+  end
+
+else
+  exclusionmatrix = varargin{1};
 end
 
 validateattributes( exclusionmatrix, {'numeric'}, ...
