@@ -466,5 +466,14 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:braid:sumg:overflow')
     end
 
+    function test_loop_plot_for_loop_vector(testCase)
+
+    % loop vector containing two loops
+      lv = braidlab.loop([0 1 1 1; 0 0 1 1]);
+      testCase.verifyError(@()plot(lv),...
+                           'BRAIDLAB:loop:plot:multiloop');
+
+    end
+
   end
 end
