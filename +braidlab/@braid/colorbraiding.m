@@ -10,6 +10,11 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %
 %   [B,TCR] = COLORBRAIDING(XY,T) also returns the time of crossing (TCR).
 %
+%   [B,TCR,INITORDER] = COLORBRAIDING(XY,T) also returns the initial order of
+%   trajectories in the puncture set, e.g., if INITORDER(N) = K, trajectory
+%   XY(:,:,K) is assigned to puncture N, or XY(:,:,INITORDER) will sort
+%   trajectories into the same order as the punctures.
+%
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
 %
@@ -108,7 +113,7 @@ if checkclosure
   % Check if the final points are close enough to the initial points (setwise).
   % Otherwise this could be an error with the user's data.
   % Suggest user call 'closure(XY)' first.
-  
+
   % Use optimal assignment to match the ends.
   % This piece of code is basically pasted from closure.m.
   XY0 = squeeze(XY(1,:,:));
@@ -176,7 +181,7 @@ catch me
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
       % strtok splits the [ ind, ind ] part of the string
-      % and text explanation of what happened        
+      % and text explanation of what happened
       localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
@@ -190,4 +195,5 @@ catch me
 end
 
 varargout{1} = braidlab.braid(gen,n);
-if nargout > 1, varargout{2} = tcr; end
+if nargout >= 2, varargout{2} = tcr; end
+if nargout >= 3, varargout{3} = idx(:)'; end
