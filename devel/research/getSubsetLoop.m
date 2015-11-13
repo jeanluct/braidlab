@@ -1,5 +1,5 @@
 function [L, A, B] = getSubsetLoop( varargin )
-%GETSUBSETLOOP Generate a loop enclosing punctures specified in the exclusion
+%GETSUBSETLOOP Generate loops enclosing punctures specified in the exclusion
 %matrix.
 %
 % For contiguous punctures, generated loops are so-called "relaxed" loops,
@@ -69,7 +69,9 @@ function [L, A, B] = getSubsetLoop( varargin )
 %
 %
 
-
+if nargin == 0
+  error('At least one input needed');
+end
 
 if nargin == 2
   N = varargin{1};
@@ -121,23 +123,29 @@ for k = 1:K
 
   excvector = exclusionmatrix(k,:);
 
+  Nin = sum( excvector == 0 );
+
+  assert( Nin > 1 && Nin < N, 'Select at least 2 and at most N-1 punctures' );
+
   % find the first and last *included* element
   first = find( excvector == 0, 1, 'first');
   last = find( excvector == 0, 1, 'last');
 
   % the B coordinates determine the relaxed loop
   if first > 1
+    assert( first - 1 >= 1 && first - 1 <= N-2 );
     B( k, first-1 ) = -1;
   end
   if last < N
+    assert( last - 1 >= 1 && last - 1 <= N-2 );
     B( k, last-1 ) = 1;
   end
 
   % the A coordinates are set to +1 where exclusion should go above
   % and to -1 where exclusion should go below
   setvector = excvector;
-  setvector(first) = 0;
-  setvector(last) = 0;
+  setvector(1:first) = 0;
+  setvector(last:end) = 0;
 
   % the first and last puncture don't have a parallel in the setvector
   % so they are skipped (the loop always winds around them, not above or below)
