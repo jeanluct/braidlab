@@ -392,6 +392,14 @@ classdef braid < matlab.mixin.CustomDisplay
     function p = perm(obj)
     %PERM   Permutation corresponding to a braid.
     %
+    %   braidlab uses "passive" notation, i.e., if elements [A B C D] are
+    %   being permuted into [C A B D] this is denoted as [3 1 2 4].
+    %
+    %   In other words P = B.PERM yields a list of indices such that the
+    %   initial string of labels denoting strands S = 'ABCD' can be
+    %   transformed to the list of labels after application of the braid B by
+    %   indexing S(B.PERM).
+    %
     %   This is a method for the BRAID class.
     %   See also BRAID, BRAID.ISPURE.
       p = 1:obj.n;
