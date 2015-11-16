@@ -52,17 +52,17 @@ classdef databraid < braidlab.braid
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
     %   of time steps and N is the number of particles.
     %
-    %   DATABRAID(XY,T) specifies the times of the datapoints.  T defaults
+    %   B = DATABRAID(XY,T) specifies the times of the datapoints.  T defaults
     %   to 1:NSTEPS.
     %
-    %   DATABRAID(XY,T,PROJANG) or DATABRAID(XY,PROJANG) uses a projection
+    %   B = DATABRAID(XY,T,PROJANG) or DATABRAID(XY,PROJANG) uses a projection
     %   line with angle PROJANG (in radians) from the X axis to determine
     %   crossings.  The default is to project onto the X axis (PROJANG = 0).
     %
-    %   DATABRAID(BB,T) creates a databraid from a braid BB and crossing
+    %   B = DATABRAID(BB,T) creates a databraid from a braid BB and crossing
     %   times T.  T defaults to [1:length(BB)].
     %
-    %   DATABRAID(W,T) creates a databraid from a list of generators W and
+    %   B = DATABRAID(W,T) creates a databraid from a list of generators W and
     %   crossing times T.  T defaults to [1:length(BB)].
     %
     %   This is a method for the DATABRAID class.
@@ -130,7 +130,6 @@ classdef databraid < braidlab.braid
                          'BRAIDLAB.databraid','proj');
 
       [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj,false);
-
       br.word = b.word;
       br.tcross = br.tcross(:).';   % Store tcross as row vector.
       br.n = b.n;
