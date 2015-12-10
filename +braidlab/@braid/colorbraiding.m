@@ -108,7 +108,7 @@ if checkclosure
   % Check if the final points are close enough to the initial points (setwise).
   % Otherwise this could be an error with the user's data.
   % Suggest user call 'closure(XY)' first.
-  
+
   % Use optimal assignment to match the ends.
   % This piece of code is basically pasted from closure.m.
   XY0 = squeeze(XY(1,:,:));
@@ -176,7 +176,7 @@ catch me
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
       % strtok splits the [ ind, ind ] part of the string
-      % and text explanation of what happened        
+      % and text explanation of what happened
       localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 
@@ -191,3 +191,11 @@ end
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
+
+function XYr = rotate_data_clockwise(XY,proj)
+%ROTATE_DATA_CLOCKWISE   Rotate data clockwise, surprisingly.
+
+XYr = zeros(size(XY));
+
+XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
