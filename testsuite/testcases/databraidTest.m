@@ -26,15 +26,27 @@ classdef databraidTest < matlab.unittest.TestCase
 
   properties
     dbrtest
+    dbrnutest
   end
 
   methods (TestMethodSetup)
-    function create_databraid(testCase)
+    %% matrix version of inputs (for uniform sampled data)
+    function create_uniform_databraid(testCase)
       import braidlab.databraid
 
-      data = load('testdata','XY','ti');
+      data = load('testdata_matrix','XY','ti');
       testCase.dbrtest = databraid(data.XY,data.ti);
     end
+    % %% cell version of inputs (for non-uniform sampled data)
+    % function create_nonuniform_databraid(testCase)
+    %   import braidlab.databraid
+
+    %   % for now, these are the same trajectories as in the testdata_matrix
+    %   % except that they are packaged as cells
+    %   data = load('testdata_cell','XY','ti');
+    %   testCase.dbrnutest = databraid(data.XY,data.ti);
+    % end
+
   end
 
   methods (Test)
@@ -46,9 +58,6 @@ classdef databraidTest < matlab.unittest.TestCase
       % Not enough input arguments.
       testCase.verifyError(@() databraid, ...
                            'BRAIDLAB:databraid:databraid:badarg');
-      % Too many input arguments.
-      testCase.verifyError(@() databraid(1,1,1,1), ...
-                           'MATLAB:maxrhs');
       % Wrong number of crossing times.
       testCase.verifyError(@() databraid([1 2],1), ...
                            'BRAIDLAB:databraid:check_tcross:badtimes');
@@ -161,7 +170,7 @@ classdef databraidTest < matlab.unittest.TestCase
       bbb2 = braidlab.databraid([1 4 7 2 5 8],[1 1 1 2 2 2]);
       testCase.verifyTrue(bbb == bbb2);
     end
-    
+
     function test_databraid_subbraid(testCase)
 
     %% Test that Matlab and MEX subbraids return the same result
@@ -170,17 +179,17 @@ classdef databraidTest < matlab.unittest.TestCase
 
       global BRAIDLAB_braid_nomex
       flagstate = BRAIDLAB_braid_nomex;
-      
+
       BRAIDLAB_braid_nomex = false;
       subMat = testCase.dbrtest.subbraid(substrands);
       BRAIDLAB_braid_nomex = true;
       subMex = testCase.dbrtest.subbraid(substrands);
-      
+
       testCase.verifyTrue( lexeq(subMat,subMex) );
-      testCase.verifyEqual( subMat,subMex );      
-      
+      testCase.verifyEqual( subMat,subMex );
+
       % unset global flag
-      BRAIDLAB_braid_nomex = flagstate;      
+      BRAIDLAB_braid_nomex = flagstate;
       if isempty(flagstate)
         clear global BRAIDLAB_braid_nomex
       end
