@@ -46,16 +46,16 @@ classdef databraid < braidlab.braid
 
   methods
 
-    function br = databraid(XY,secnd,third)
+    function br = databraid(varargin)
     %DATABRAID   Construct a databraid object.
     %   B = DATABRAID(XY) constucts a databraid from a trajectory dataset XY.
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
     %   of time steps and N is the number of particles.
     %
     %   DATABRAID(XY,T) specifies the times of the datapoints.  T defaults
-    %   to 1:NSTEPS.
+    %   to 1:NSTEPS if omitted or if empty.
     %
-    %   DATABRAID(XY,T,PROJANG) or DATABRAID(XY,PROJANG) uses a projection
+    %   DATABRAID(XY,T,PROJANG) or DATABRAID(XY, [], PROJANG) uses a projection
     %   line with angle PROJANG (in radians) from the X axis to determine
     %   crossings.  The default is to project onto the X axis (PROJANG = 0).
     %
@@ -67,73 +67,70 @@ classdef databraid < braidlab.braid
     %
     %   This is a method for the DATABRAID class.
     %   See also DATABRAID, BRAID, BRAID.BRAID.
-      if nargin < 1
-        error('BRAIDLAB:databraid:databraid:badarg', ...
-              'Not enough input arguments.')
-      elseif isa(XY,'braidlab.braid')
-        br.word = XY.word;
-        br.n = XY.n;
-        if nargin > 1
-          br.tcross = secnd;
-        else
+
+    %% Parse for positional inputs
+      parser = inputParser;
+      parser.addRequired('First'); % generic input
+      parser.addOptional('t',[]);
+      parser.addOptional('proj',0,@isscalar);
+
+      try
+        parser.parse(varargin{:});
+        params = parser.Results;
+      catch me
+        m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                        'Invalid arguments');
+        m.addCause(me); % attach validator exception
+        throw(m);
+      end
+
+      %% Input is a databraid already
+      if isa(params.First,'braidlab.databraid')
+        br = params.First;
+        return
+      end
+
+      %% Input is a braid, we just need to add tcross to it
+      if isa(params.First,'braidlab.braid')
+        br.word = params.First.word;
+        br.n = params.First.n;
+        if ~isempty(params.t) % use input
+          br.tcross = params.t(:)';
+        else % use default
           br.tcross = 1:length(br.word);
         end
-        br.tcross = br.tcross(:).';   % Store tcross as row vector.
         check_tcross(br);
         return
-      elseif ismatrix(XY)
-        br.n = max(size(XY));
-        br.word = reshape(XY,[1 br.n]);
-        if nargin > 1
-          br.tcross = secnd;
-        else
-          br.tcross = 1:length(br.word);
-        end
-        br.tcross = br.tcross(:).';   % Store tcross as row vector.
-        check_tcross(br);
+      end
+
+      %% Input is a list of generators
+      if isvector(params.First)
+        % create a braid first
+        b = braidlab.braid( params.First );
+
+        % use databraid generator with braid input to create the databraid
+        br = braidlab.databraid(b, params.t);
         return
-      elseif nargin < 2
-        t = 1:size(XY,1);
-        proj = 0;
-      elseif nargin < 3
-        if isscalar(secnd)
-          % The argument secnd is interpreted as a projection line angle.
-          proj = secnd;
-          t = 1:size(XY,1);
-        else
-          % The argument secnd is interpreted as a list of times.
-          t = secnd;
-          proj = 0;
-        end
-      end
-      if nargin == 3
-        t = secnd;
-        proj = third;
-      end
-      if nargin > 3
-        % This never actually happens since only 3 named arguments.
-        % Leave in in case we switch to varargin format.
-        error('BRAIDLAB:databraid:databraid:badarg', ...
-              'Too many input arguments.')
       end
 
-      validateattributes(t,{'numeric'},...
-                         {'real','finite','vector','increasing', 'nonnan'},...
-                         'BRAIDLAB.databraid','t');
+      %% Input is a data set and will be passed onto colorbraiding
+      is3d = @(x)isnumeric(x) && (numel(size(x)) == 3);
+      if isempty(params.t)
+        assert( is3d(params.First),...
+                'BRAIDLAB:databraid:databraid:badarg',...
+                ['Default time vector can be generated only for'...
+                 'data in 3d array form'] );
+        params.t = 1:size(params.First,3);
+      end
 
-      validateattributes(XY,{'numeric'},...
-                         {'real','finite','nonnan','nrows',numel(t)},...
-                         'BRAIDLAB.databraid','XY');
+      [b,tcross] = braidlab.braid.colorbraiding(...
+          params.First,...
+          params.t,...
+          params.proj,...
+          false); % do not check for closure
 
-      validateattributes(proj,{'numeric'},...
-                         {'real','finite','scalar','nonnan','nonempty'},...
-                         'BRAIDLAB.databraid','proj');
-
-      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj,false);
-
-      br.word = b.word;
-      br.tcross = br.tcross(:).';   % Store tcross as row vector.
-      br.n = b.n;
+      % invoke braid-timevector constructor
+      br = braidlab.databraid( b, tcross );
     end
 
     function b = braid(db)
