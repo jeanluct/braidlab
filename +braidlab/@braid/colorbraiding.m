@@ -65,44 +65,84 @@ import braidlab.util.getAvailableThreadNumber
 global BRAIDLAB_braid_nomex;
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
-if any(isnan(XY) | isinf(XY))
+
+%% INPUT VALIDATION
+if xor( iscell(XY), iscell(t) )
   error('BRAIDLAB:braid:colorbraiding:badarg',...
-        'Data contains NaNs or Infs.')
+        'XY and t have to be both cells or both matrices.');
+else
+  inputsAreCells = iscell(XY) && iscell(t);
 end
 
-validateattributes(t,{'numeric'},...
-                   {'real','finite','vector','increasing','nonnan'},...
-                   'BRAIDLAB.braid.colorbraiding','t',2 );
+if inputsAreCells
+  assert( numel(XY) == numel(t), 'BRAIDLAB:braid:colorbraiding:badarg',...
+          'Cell inputs XY and t have to have same number of elements.' );
 
-validateattributes(XY,{'numeric'},...
-                   {'real','finite','nonnan','nrows',numel(t)},...
-                   'BRAIDLAB.braid.colorbraiding','XY',1 );
+  n = numel(XY); % number of punctures
 
-validateattributes(proj,{'numeric'},...
-                   {'real','finite','scalar','nonnan','nonempty'},...
-                   'BRAIDLAB.braid.colorbraiding','proj',3 );
+  % validate that each element of cell array is properly formatted
+  for idx = 1:n
+    try
+      validateXYandt( XY{idx}, t{idx}, true )
+    catch me
+      me.message = [me.message sprintf(' (element %d)', idx)];
+      throw(me)
+    end
+  end
+else
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
-tic
-n = size(XY,3); % number of punctures
+  n = size(XY,3); % number of punctures
 
+  % validate that the matrices are properly formed
+  validateXYandt( XY, t, false )
+end
+
+% validate projection angle
 if nargin < 3
   % Default projection line is X axis.
   proj = 0;
 end
+validateattributes(proj,{'numeric'},...
+                   {'real','finite','scalar','nonnan','nonempty'},...
+                   'BRAIDLAB.braid.colorbraiding','proj',3 );
 
+debugmsg('colorbraiding: Initialize parameters for crossing analysis');
+
+tic
 delta = braidlab.prop('BraidAbsTol');
 
-% Rotate coordinates according to angle proj.  Note that since the
+%% Rotate coordinates according to angle proj.
+% Note that since the
 % projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
-if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
+rotateToProj = @(xy_)rotate_data_clockwise(xy_, proj);
+if inputsAreCells
+  XY = cellfun( rotateToProj, XY, 'UniformOutput',false );
+else
+  XY = rotateToProj( XY );
+end
 
-% Sort the initial conditions from left to right according to their initial
-% X coord; IDX contains the indices of the sort.
-[~,idx] = sortrows(squeeze(XY(1,:,:)).');
+%%Sort the punctures according to X coordinates of initial conditions
+
+% Put initial conditions into a nx2 matrix
+if inputsAreCells
+  initialCondition = cellfun( @(v)v(1,:), XY, 'UniformOutput' );
+  initialCondition = cat( 1, initialCondition{:} );
+else
+  initialCondition = squeeze(XY(1,:,:)).';
+end
+
+% Sort the initial conditions matrix using first x then y coordinate;
+% IDX contains the indices of the sort.
+[~,idx] = sortrows(initialCondition);
+
 % Sort all the trajectories trajectories according to IDX:
-XY = XY(:,:,idx);
+if inputsAreCells
+  XY = XY{idx};
+else
+  XY = XY(:,:,idx);
+end
+initialCondition = initialCondition(idx,:);
 
 if checkclosure
   % Check if the final points are close enough to the initial points (setwise).
@@ -138,8 +178,10 @@ debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 try % trapping to ensure proper identification of strands
 
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
-                        'forced']);
+    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ...
+           'Matlab version forced');
+    assert(~inputsAreCells, 'BRAIDLAB:NOMEX', ...
+           'MEX version not implemented for cell inputs');
 
     debugmsg('Using MEX algorithm')
 
@@ -192,10 +234,34 @@ end
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
 
+function validateXYandt( XY, t, isflat )
+%VALIDATEXYANDT Validate that XY and t are well form matrices
+% and that XY is either 2d (isflat=true) or 3d (isflat=false)
+
+validateattributes(t,{'numeric'},...
+                   {'real','finite','vector','increasing','nonnan'},...
+                   'BRAIDLAB.braid.colorbraiding','t',2 );
+
+XYattr = {'real','finite','nonnan','nrows',numel(t)};
+if isflat
+  XYattr{end+1} = '2d';
+else
+  XYattr{end+1} = '3d';
+end
+
+validateattributes(XY,{'numeric'},XYattr,...
+                   'BRAIDLAB.braid.colorbraiding','XY',1 );
+
 function XYr = rotate_data_clockwise(XY,proj)
 %ROTATE_DATA_CLOCKWISE   Rotate data clockwise, surprisingly.
 
-XYr = zeros(size(XY));
+if proj == 0
+  XYr = XY;
+else
+  XYr = zeros(size(XY));
 
-XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
-XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
+  XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
+  XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
+end
+
+function S = getSlice( XY, n )
