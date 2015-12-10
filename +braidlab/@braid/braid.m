@@ -131,7 +131,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   This is a method for the BRAID class.
     %   See also BRAID, CFBRAID.
 
-      % Allow default empty braid: return trivial braid with one string.
+    % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
       if isa(b,'braidlab.annbraid')
         % This is a bit of a kludge.  annbraid needs a custom conversion
@@ -149,74 +149,61 @@ classdef braid < matlab.mixin.CustomDisplay
       elseif ischar(b)
         % First argument is a string.
         switch lower(b)
-         case {'halftwist','delta'}
-          br.n = secnd;
-          % D has size br.n*(br.n-1)/2. Could preallocate if speed important.
-          D = [];
-          for i = 1:br.n-1, D = [D br.n-1:-1:i]; end %#ok<AGROW>
-          br.word = D;
-         case {'fulltwist','delta2'}
-          br = braidlab.braid('halftwist',secnd);
-          br.word = [br.word br.word];
-         case {'hironakakin','hironaka-kin','hk'}
-          m = secnd;
-          if nargin < 3
-            if m < 5
-              error('BRAIDLAB:braid:braid:badarg', ...
-                    'Need at least five strings.')
-            end
-            if mod(m,2) == 1
-              n = (m+1)/2; %#ok<*PROP>
-              m = (m-3)/2;
+          case {'halftwist','delta'}
+            br.n = secnd;
+            % D has size br.n*(br.n-1)/2. Could preallocate if speed important.
+            D = [];
+            for i = 1:br.n-1, D = [D br.n-1:-1:i]; end %#ok<AGROW>
+            br.word = D;
+          case {'fulltwist','delta2'}
+            br = braidlab.braid('halftwist',secnd);
+            br.word = [br.word br.word];
+          case {'hironakakin','hironaka-kin','hk'}
+            m = secnd;
+            if nargin < 3
+              if m < 5
+                error('BRAIDLAB:braid:braid:badarg', ...
+                      'Need at least five strings.')
+              end
+              if mod(m,2) == 1
+                n = (m+1)/2; %#ok<*PROP>
+                m = (m-3)/2;
+              else
+                n = (m+2)/2;
+                m = (m-4)/2;
+              end
             else
-              n = (m+2)/2;
-              m = (m-4)/2;
+              n = third;
             end
-          else
-            n = third;
-          end
-          N = m+n+1;
-          br.n = N;
-          br.word = [1:m m:-1:1 1:N-1];
-         case {'venzkepsi','psi'}
-          % See page 1 of Venzke's thesis.
-          n = secnd;
-          if n < 5
-            error('BRAIDLAB:braid:braid:badarg','Need at least five strings.')
-          end
-          br.n = n;
-          if n == 6
-            br.word = int32([5:-1:1 5 4 3 5 4]);
-            return
-          end
-          L = (n-1):-1:1;
-          if mod(n,2) == 1
-            br.word = [L L -1 -2];
-          elseif mod(n,4) == 0
-            k = n/4;
-            br.word = [repmat(L,1,2*k+1) -1 -2];
-          elseif mod(n,8) == 2
-            k = (n-2)/8;
-            br.word = [repmat(L,1,2*k+1) -1 -2];
-          elseif mod(n,8) == 6
-            k = (n-6)/8;
-            br.word = [repmat(L,1,6*k+5) -1 -2];
-          end
-         case {'rand','random'}
-          br.n = secnd;
-          k = third;
-          br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
-         case {'normal','binomal','norm','binom'}
-          br.n = secnd;
-          k = third;
-          br.word = (-1).^randi(2,1,k) .* (1+binornd( br.n-2, 1/2, 1,k ));
-         otherwise
-          % Maybe the string specifies a knot.
-          try
-            br = knot2braid(b);
-          catch err
-            error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
-          end
+            N = m+n+1;
+            br.n = N;
+            br.word = [1:m m:-1:1 1:N-1];
+          case {'venzkepsi','psi'}
+            try
+              word = braidlab.braid.generateVenzke(secnd);
+            catch me
+              m = MException('BRAIDLAB:braid:braid:badarg',...
+                             ['Venzke: ' me.message]);
+              m.addCause(me);
+              throw(m)
+            end
+            br = braidlab.braid( word, secnd );
+
+          case {'rand','random'}
+            br.n = secnd;
+            k = third;
+            br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
+          case {'normal','binomal','norm','binom'}
+            br.n = secnd;
+            k = third;
+            br.word = (-1).^randi(2,1,k) .* (1+binornd( br.n-2, 1/2, 1,k ));
+          otherwise
+            % Maybe the string specifies a knot.
+            try
+              br = knot2braid(b);
+            catch err
+              error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
+            end
         end
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
@@ -266,194 +253,194 @@ classdef braid < matlab.mixin.CustomDisplay
               'Word was not set to int32 somewhere!' );
     end % function braid
 
-    function obj = set.n(obj,value)
-      if isempty(value), return; end
-      validateattributes( value, {'numeric'}, {'positive'} );
-      if ~isempty(obj.word)
-        if value < max(abs(obj.word))+1
-          error('BRAIDLAB:braid:setn:badarg', ...
-                'Too few strings for generators.')
+      function obj = set.n(obj,value)
+        if isempty(value), return; end
+        validateattributes( value, {'numeric'}, {'positive'} );
+        if ~isempty(obj.word)
+          if value < max(abs(obj.word))+1
+            error('BRAIDLAB:braid:setn:badarg', ...
+                  'Too few strings for generators.')
+          end
+        end
+        obj.privaten = double(value);
+      end
+
+      function value = get.n(obj)
+        if isempty(obj.word)
+          value = double(max(1,obj.privaten));
+        else
+          value = double(max(max(abs(obj.word))+1,obj.privaten));
         end
       end
-      obj.privaten = double(value);
-    end
 
-    function value = get.n(obj)
-      if isempty(obj.word)
-        value = double(max(1,obj.privaten));
-      else
-        value = double(max(max(abs(obj.word))+1,obj.privaten));
-      end
-    end
-
-    % Make sure it's an int32, internally.
-    function obj = set.word(obj,value)
-      if isempty(value)
-        % Make sure the empty word is 0 by 0.
-        obj.word = int32([]);
-      else
-        try
-          validateattributes(value, {'numeric'},...
-                             {'nonzero','nonnan','finite'} );
-          % needed b/c of a bug in validateattributes
-          assert( all(value ~= 0) )
-          obj.word = int32(value);
-        catch e
-          error('BRAIDLAB:braid:setword:badarg',...
-                'Generators have to be nonzero, non-NaN and finite.')
+      % Make sure it's an int32, internally.
+      function obj = set.word(obj,value)
+        if isempty(value)
+          % Make sure the empty word is 0 by 0.
+          obj.word = int32([]);
+        else
+          try
+            validateattributes(value, {'numeric'},...
+                               {'nonzero','nonnan','finite'} );
+            % needed b/c of a bug in validateattributes
+            assert( all(value ~= 0) )
+            obj.word = int32(value);
+          catch e
+            error('BRAIDLAB:braid:setword:badarg',...
+                  'Generators have to be nonzero, non-NaN and finite.')
+          end
         end
       end
-    end
 
-    function ee = eq(b1,b2)
-    %EQ   Test braids for equality.
-    %   EQ(B1,B2) or B1==B2 returns TRUE if the two braids B1 and B2 are
-    %   equal.  The algorithm uses Dynnikov coordinates (action on loops) to
-    %   determine braid equalitty.
-    %
-    %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
-    %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.LEXEQ, LOOP, LOOPCOORDS.
-      ee = b1.n == b2.n; if ~ee, return; end
-      if isempty(b1.word)
-        if isempty(b2.word)
-          ee = true;
-          return
+      function ee = eq(b1,b2)
+      %EQ   Test braids for equality.
+      %   EQ(B1,B2) or B1==B2 returns TRUE if the two braids B1 and B2 are
+      %   equal.  The algorithm uses Dynnikov coordinates (action on loops) to
+      %   determine braid equalitty.
+      %
+      %   Reference: P. Dehornoy, "Efficient solutions to the braid isotopy
+      %   problem," Discrete Applied Mathematics 156 (2008), 3091-3112.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.LEXEQ, LOOP, LOOPCOORDS.
+        ee = b1.n == b2.n; if ~ee, return; end
+        if isempty(b1.word)
+          if isempty(b2.word)
+            ee = true;
+            return
+          end
+        end
+        % Check if the loop coordinates are the same.
+        ee = all(loopcoords(b1) == loopcoords(b2));
+      end
+
+      function ee = lexeq(b1,b2)
+      %LEXEQ   Test braids for lexicographical equality.
+      %   LEXEQ(B1,B2) return TRUE if the words representing B1 and B2 in
+      %   terms of braid generators are equal, generator by generator.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.EQ, LOOP, LOOPCOORDS.
+        ee = b1.n == b2.n && length(b1) == length(b2);
+        if ee, ee = all(b1.word == b2.word); end
+      end
+
+      function ee = ne(b1,b2)
+      %NE   Test braids for inequality.
+      %   NE(B1,B2) or B1~=B2 returns ~EQ(B1,B2).
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.EQ.
+        ee = ~(b1 == b2);
+      end
+
+      function ee = istrivial(b)
+      %ISTRIVIAL   Return true if braid is the trivial braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.EQ.
+        if isempty(b.word), ee = true; return; end
+        ee = all(loopcoords(b) == loopcoords(braidlab.braid([],b.n)));
+      end
+
+      function ee = ispure(obj)
+      %ISPURE   Return true if braid is a pure braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.PERM.
+        ee = all(obj.perm == 1:obj.n);
+      end
+
+      function bm = mpower(b,m)
+      %MPOWER   Raise a braid to some positive or negative power.
+      %   C = B^N, where B is a braid and N is a positive integer, returns the
+      %   Nth power of the braid B, C = B*B*...*B (N times).
+      %
+      %   For negative N, the inverse of B is multiplied |N| times.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.INV, BRAID.MTIMES.
+        bm = braidlab.braid([],b.n);
+        if m > 0
+          bm.word = repmat(b.word,[1 m]);
+        elseif m < 0
+          bm.word = repmat(b.inv.word,[1 -m]);
         end
       end
-      % Check if the loop coordinates are the same.
-      ee = all(loopcoords(b1) == loopcoords(b2));
-    end
 
-    function ee = lexeq(b1,b2)
-    %LEXEQ   Test braids for lexicographical equality.
-    %   LEXEQ(B1,B2) return TRUE if the words representing B1 and B2 in
-    %   terms of braid generators are equal, generator by generator.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.EQ, LOOP, LOOPCOORDS.
-      ee = b1.n == b2.n && length(b1) == length(b2);
-      if ee, ee = all(b1.word == b2.word); end
-    end
-
-    function ee = ne(b1,b2)
-    %NE   Test braids for inequality.
-    %   NE(B1,B2) or B1~=B2 returns ~EQ(B1,B2).
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.EQ.
-      ee = ~(b1 == b2);
-    end
-
-    function ee = istrivial(b)
-    %ISTRIVIAL   Return true if braid is the trivial braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.EQ.
-      if isempty(b.word), ee = true; return; end
-      ee = all(loopcoords(b) == loopcoords(braidlab.braid([],b.n)));
-    end
-
-    function ee = ispure(obj)
-    %ISPURE   Return true if braid is a pure braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.PERM.
-      ee = all(obj.perm == 1:obj.n);
-    end
-
-    function bm = mpower(b,m)
-    %MPOWER   Raise a braid to some positive or negative power.
-    %   C = B^N, where B is a braid and N is a positive integer, returns the
-    %   Nth power of the braid B, C = B*B*...*B (N times).
-    %
-    %   For negative N, the inverse of B is multiplied |N| times.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.INV, BRAID.MTIMES.
-      bm = braidlab.braid([],b.n);
-      if m > 0
-        bm.word = repmat(b.word,[1 m]);
-      elseif m < 0
-        bm.word = repmat(b.inv.word,[1 -m]);
-      end
-    end
-
-    function bi = inv(b)
-    %INV   Inverse of a braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.MTIMES, BRAID.MPOWER.
-      bi = braidlab.braid(-fliplr(b.word),b.n);
-    end
-
-    function p = perm(obj)
-    %PERM   Permutation corresponding to a braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.ISPURE.
-      p = 1:obj.n;
-      for i = 1:length(obj.word)
-        s = abs(obj.word(i));
-        p([s s+1]) = p([s+1 s]);
-      end
-    end
-
-    function wr = writhe(obj)
-    %WRITHE   Writhe of a braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID.
-      wr = sum(sign(obj.word));
-    end
-
-    function str = char(b)
-    %CHAR   Convert braid to string.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.DISP.
-      if isempty(b.word)
-        str = 'e';
-      else
-        str = num2str(b.word);
+      function bi = inv(b)
+      %INV   Inverse of a braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.MTIMES, BRAID.MPOWER.
+        bi = braidlab.braid(-fliplr(b.word),b.n);
       end
 
-      str = ['< ' str ' >'];
-    end
+      function p = perm(obj)
+      %PERM   Permutation corresponding to a braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.ISPURE.
+        p = 1:obj.n;
+        for i = 1:length(obj.word)
+          s = abs(obj.word(i));
+          p([s s+1]) = p([s+1 s]);
+        end
+      end
 
-    function l = length(b)
-    %LENGTH   Length of a braid.
-    %   L = LENGTH(B) returns the number of generators in the current
-    %   internal representation of a braid.  Calling COMPACT(B) can reduce
-    %   this length, often dramatically when B is created from data.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.COMPACT.
-      l = length(b.word);
-    end
+      function wr = writhe(obj)
+      %WRITHE   Writhe of a braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID.
+        wr = sum(sign(obj.word));
+      end
 
-    function [c,i] = gencount(b)
-    %GENCOUNT   Count number of occurrences of each generator in a braid.
-    %   [C,I] = GENCOUNT(B) returns a vector C containing the generator
-    %   distribution of B, i.e., the number of occurrences of each braid
-    %   generator within the braid B.  The vector I contains the
-    %   corresponding generator indices.  In other words C(k) counts the
-    %   number of times the generator sigma_{I(k)} occurs in the braid.
-    %   Plotting I vs. C plots the generator distribution.
-    %
-    %   sum(C) is equal to length of the braid.
-    %
-    %   This is a method for the BRAID class.
-    %   See also BRAID, BRAID.LENGTH.
+      function str = char(b)
+      %CHAR   Convert braid to string.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.DISP.
+        if isempty(b.word)
+          str = 'e';
+        else
+          str = num2str(b.word);
+        end
 
-      highestIndex = (b.n-1);
-      i = double(-highestIndex:highestIndex);
-      c = hist(b.word,i);
-      i(highestIndex+1) = [];
-      c(highestIndex+1) = [];
-    end
+        str = ['< ' str ' >'];
+      end
+
+      function l = length(b)
+      %LENGTH   Length of a braid.
+      %   L = LENGTH(B) returns the number of generators in the current
+      %   internal representation of a braid.  Calling COMPACT(B) can reduce
+      %   this length, often dramatically when B is created from data.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.COMPACT.
+        l = length(b.word);
+      end
+
+      function [c,i] = gencount(b)
+      %GENCOUNT   Count number of occurrences of each generator in a braid.
+      %   [C,I] = GENCOUNT(B) returns a vector C containing the generator
+      %   distribution of B, i.e., the number of occurrences of each braid
+      %   generator within the braid B.  The vector I contains the
+      %   corresponding generator indices.  In other words C(k) counts the
+      %   number of times the generator sigma_{I(k)} occurs in the braid.
+      %   Plotting I vs. C plots the generator distribution.
+      %
+      %   sum(C) is equal to length of the braid.
+      %
+      %   This is a method for the BRAID class.
+      %   See also BRAID, BRAID.LENGTH.
+
+        highestIndex = (b.n-1);
+        i = double(-highestIndex:highestIndex);
+        c = hist(b.word,i);
+        i(highestIndex+1) = [];
+        c(highestIndex+1) = [];
+      end
 
   end % methods block
 
@@ -477,6 +464,36 @@ classdef braid < matlab.mixin.CustomDisplay
 
   end % methods block
 
+  % static methods
+  methods (Static = true)
+
+    function word = generateVenzke(n)
+    %GENERATEVENZKE Generate a Venzke braid word
+    % See page 1 of Venzke's thesis.
+      if n < 5
+        error('BRAIDLAB:braid:generatevenzke:badarg',...
+              'Need at least five strings.')
+      end
+      if n == 6
+        word = int32([5:-1:1 5 4 3 5 4]);
+        return
+      end
+      L = (n-1):-1:1;
+      if mod(n,2) == 1
+        word = [L L -1 -2];
+      elseif mod(n,4) == 0
+        k = n/4;
+        word = [repmat(L,1,2*k+1) -1 -2];
+      elseif mod(n,8) == 2
+        k = (n-2)/8;
+        word = [repmat(L,1,2*k+1) -1 -2];
+      elseif mod(n,8) == 6
+        k = (n-6)/8;
+        word = [repmat(L,1,6*k+5) -1 -2];
+      end
+      word = int32(word);
+    end
+  end
   %
   % Static methods defined in separate files.
   %
