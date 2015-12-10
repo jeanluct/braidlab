@@ -1,4 +1,4 @@
-function [varargout] = colorbraiding(XY,t,proj,checkclosure)
+function [varargout] = colorbraiding(varargin)
 %COLORBRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -65,6 +65,20 @@ import braidlab.util.getAvailableThreadNumber
 global BRAIDLAB_braid_nomex;
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
+is3d = @(x)isnumeric(x) && (numel(size(x)) == 3);
+
+parser = inputParser;
+parser.addRequired( 'XY', @(x)is3d(x) || iscell(x) );
+parser.addRequired( 't', @(x)isvector(x) || iscell(x) );
+parser.addOptional( 'proj', 0, @isscalar );
+parser.addOptional( 'checkclosure', false, @islogical );
+parser.parse(varargin{:});
+
+XY = parser.Results.XY;
+t = parser.Results.t;
+proj = parser.Results.proj;
+checkclosure = parser.Results.checkclosure;
+
 
 %% INPUT VALIDATION
 if xor( iscell(XY), iscell(t) )
@@ -72,6 +86,8 @@ if xor( iscell(XY), iscell(t) )
         'XY and t have to be both cells or both matrices.');
 else
   inputsAreCells = iscell(XY) && iscell(t);
+  assert(~inputsAreCells,'BRAIDLAB:notimplemented',...
+         'Cell-based inputs into colorbraiding not implemented');
 end
 
 if inputsAreCells

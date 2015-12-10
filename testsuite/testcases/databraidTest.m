@@ -34,7 +34,7 @@ classdef databraidTest < matlab.unittest.TestCase
     function create_uniform_databraid(testCase)
       import braidlab.databraid
 
-      data = load('testdata_matrix','XY','ti');
+      data = load('testdata','XY','ti');
       testCase.dbrtest = databraid(data.XY,data.ti);
     end
     % %% cell version of inputs (for non-uniform sampled data)

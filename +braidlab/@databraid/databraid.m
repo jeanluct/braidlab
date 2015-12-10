@@ -105,28 +105,11 @@ classdef databraid < braidlab.braid
 
       %% Input is a list of generators
       if isvector(params.First)
-        try
-          % test that the input is a valid sequence of generators
-          validateattributes( params.First, {'numeric'},...
-                              {'integer','finite','nonnan',...
-                              'nonempty','nonzero','real'},...
-                              'databraid/databraid','W');
-        catch me
-          m = MException('BRAIDLAB:databraid:databraid:badarg',...
-                         'Generator sequence not properly formed.');
-          m.addCause(me); % attach validator exception
-          throw(m);
-        end
+        % create a braid first
+        b = braidlab.braid( params.First );
 
-        % number of punctures has to accomodate all indices
-        br.word = params.First(:)';
-        br.n = max( abs(br.word) )+1;
-        if ~isempty(params.t) % use input
-          br.tcross = params.t(:)';
-        else % use default
-          br.tcross = 1:length(br.word);
-        end
-        check_tcross(br);
+        % use databraid generator with braid input to create the databraid
+        br = braidlab.databraid(b, params.t);
         return
       end
 
