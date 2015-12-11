@@ -43,9 +43,11 @@ classdef conjtestTest < matlab.unittest.TestCase
 
       testCase.b1 = braidlab.braid(XY);
       testCase.b1c = testCase.b1.compact;
-      testCase.verifyError(@() braidlab.braid(XY,pi/4), ...
-                           'BRAIDLAB:braid:colorbraiding:coincidentprojection');
-      testCase.b2 = braidlab.braid(XY,-pi/4 + 1e-8);
+      testCase.verifyThat(@() braidlab.braid(XY,[],pi/4), ...
+                          matlab.unittest.constraints.Throws('BRAIDLAB:braid:braid:badcurves',...
+                                 'CausedBy',...
+                                 {'BRAIDLAB:braid:colorbraiding:coincidentprojection'}) );      
+      testCase.b2 = braidlab.braid(XY,[],-pi/4 + 1e-8);
       testCase.b2c = testCase.b2.compact;
     end
   end
