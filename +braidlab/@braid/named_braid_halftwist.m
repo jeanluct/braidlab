@@ -3,7 +3,7 @@ function [W,N] = named_braid_halftwist(varargin)
 
 parser = inputParser;
 parser.addRequired('n', @(x)validateattributes(x, {'numeric'},...
-                                               {'integer','>=',5}) );
+                                               {'integer'}) );
 parser.parse(varargin{:});
 N = parser.Results.n;
 

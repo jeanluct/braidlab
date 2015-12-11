@@ -326,7 +326,7 @@ classdef braid < matlab.mixin.CustomDisplay
           case -1
             bm.word = repmat(b.inv.word,[1 -m]);
           otherwise
-            pass % do nothing
+            []; % do nothing
         end
       end
 
