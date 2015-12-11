@@ -93,7 +93,7 @@ classdef databraid < braidlab.braid
           br = params.First;
           return
         catch me
-          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+          m = MException( 'BRAIDLAB:databraid:databraid:baddatabraidarg', ...
                           'Databraid-to-databraid constructor failed.');
           throw(m.addCause(me)); % attach validator exception
         end
@@ -112,7 +112,7 @@ classdef databraid < braidlab.braid
           check_tcross(br);
           return
         catch me
-          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+          m = MException( 'BRAIDLAB:databraid:databraid:badbraidarg', ...
                           'Braid-to-databraid constructor failed.');
           throw(m.addCause(me)); % attach validator exception
         end
@@ -129,7 +129,7 @@ classdef databraid < braidlab.braid
           br = braidlab.databraid(b, params.Second);
           return
         catch me
-          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+          m = MException( 'BRAIDLAB:databraid:databraid:badwordarg', ...
                           'Braid word-to-databraid constructor failed.');
           throw(m.addCause(me)); % attach validator exception
         end
@@ -157,7 +157,7 @@ classdef databraid < braidlab.braid
           end
           parser.projangle = params.Third;
         catch me
-          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+          m = MException( 'BRAIDLAB:databraid:databraid:badcellarg', ...
                           'Cell-to-databraid constructor failed.');
           throw(m.addCause(me)); % attach validator exception
         end % try around data cell block
@@ -207,7 +207,7 @@ classdef databraid < braidlab.braid
           end
 
         catch me
-          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+          m = MException( 'BRAIDLAB:databraid:databraid:badarrayarg', ...
                           '3d-array-to-databraid constructor failed.');
           throw(m.addCause(me)); % attach validator exception
         end % try around data cell block
