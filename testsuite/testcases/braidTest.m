@@ -81,46 +81,59 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(b,braidlab.braid([-2 2 -3 -2 -3 -1 -4]));
 
       testCase.verifyError(@() braidlab.braid('garbage'), ...
-                           'BRAIDLAB:braid:braid:badarg');
+                           'BRAIDLAB:braid:named_braids:badarg');
 
       b = braidlab.braid('HironakaKin',3,1);
       testCase.verifyEqual(b,braidlab.braid([1 2 3 3 2 1 1 2 3 4]));
 
       testCase.verifyError(@() braidlab.braid('HironakaKin',4), ...
-                           'BRAIDLAB:braid:braid:badarg');
+                           'BRAIDLAB:braid:named_braids:badarg');
 
       testCase.verifyError(@() braidlab.braid('VenzkePsi',4), ...
-                           'BRAIDLAB:braid:braid:badarg');
+                           'BRAIDLAB:braid:named_braids:badarg');
 
       b = braidlab.braid('VenzkePsi',5);
       testCase.verifyEqual(b,braidlab.braid([4 3 2 1 4 3 2 1 -1 -2]));
       b = braidlab.braid('VenzkePsi',6);
       testCase.verifyEqual(b,braidlab.braid([5 4 3 2 1 5 4 3 5 4]));
 
+      import matlab.unittest.constraints.Throws
       % Too many input arguments for creating a braid from data.
-      testCase.verifyError(@() braidlab.braid(zeros(3,2,4),1,1), ...
-                           'BRAIDLAB:braid:braid:badarg');
+      testCase.verifyThat(@() braidlab.braid(zeros(3,2,4),1,1), ...
+                          Throws('BRAIDLAB:braid:braid:badcurves',...
+                                 'CausedBy',...
+                                 {['BRAIDLAB:braid:colorbraiding:' ...
+                          'badarg']}) );
+
 
       % Creating a braid from a two-dimensional array is assumed to be a
       % single-particle dataset.  Print a warning, though.
       testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
-                             'BRAIDLAB:braid:braid:onetraj');
+                             'BRAIDLAB:databraid:databraid:onetraj');
 
       % Two particles have a coincident position.
       XY = zeros(4,2,2);
-      testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:colorbraiding:coincidentparticles');
+      testCase.verifyThat(@() braidlab.braid(XY), ...
+                          Throws('BRAIDLAB:braid:braid:badcurves',...
+                                 'CausedBy',...
+                                 {'BRAIDLAB:braid:colorbraiding:coincidentparticles'}) );
+
       % Now they only coincide in the default projection.
       XY(:,2,2) = 2;
-      testCase.verifyError(@() braidlab.braid(XY), ...
-                           'BRAIDLAB:braid:colorbraiding:coincidentprojection');
+      testCase.verifyThat(@() braidlab.braid(XY), ...
+                          Throws('BRAIDLAB:braid:braid:badcurves',...
+                                 'CausedBy',...
+                                 {'BRAIDLAB:braid:colorbraiding:coincidentprojection'}) );
+
       % Changing the projection gets rid of the error.
-      testCase.verifyTrue(braidlab.braid(XY,.1) == ...
+      testCase.verifyTrue(braidlab.braid(XY,[],.1) == ...
                           braidlab.braid([],2));
 
       % Coincidence at the end of interval - see GitHub Iss #109.
-      testCase.verifyError(@() braidlab.braid(testCase.XYcoincend), ...
-                           'BRAIDLAB:braid:colorbraiding:coincidentprojection');
+      testCase.verifyThat(@() braidlab.braid(testCase.XYcoincend), ...
+                          Throws('BRAIDLAB:braid:braid:badcurves',...
+                                 'CausedBy',...
+                                 {'BRAIDLAB:braid:colorbraiding:coincidentprojection'}) );
     end
 
     function test_braid_from_randomwalk(testCase)
@@ -132,7 +145,7 @@ classdef braidTest < matlab.unittest.TestCase
       b = braidlab.braid(braidlab.closure(XY));
       testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
-      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
+      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),[],pi/4);
       testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
     end
 
