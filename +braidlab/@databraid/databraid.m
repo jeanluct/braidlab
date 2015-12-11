@@ -71,17 +71,20 @@ classdef databraid < braidlab.braid
     %% Parse for positional inputs
       parser = inputParser;
       parser.addRequired('First'); % generic input
-      parser.addOptional('t',[]);
-      parser.addOptional('proj',0,@isscalar);
+      parser.addOptional('t',[], @isnumeric);
+      parser.addOptional('proj',0, @isscalar);
+      parser.addParameter('CheckClosure',false, @islogical);
 
       try
         parser.parse(varargin{:});
         params = parser.Results;
+        if isempty(params.proj)
+          params.proj = 0;
+        end
       catch me
         m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
                         'Invalid arguments');
-        m.addCause(me); % attach validator exception
-        throw(m);
+        throw(m.addCause(me)); % attach validator exception
       end
 
       %% Input is a databraid already
@@ -104,13 +107,25 @@ classdef databraid < braidlab.braid
       end
 
       %% Input is a list of generators
-      if isvector(params.First)
+      if isvector(params.First) || isempty(params.First)
         % create a braid first
         b = braidlab.braid( params.First );
 
         % use databraid generator with braid input to create the databraid
         br = braidlab.databraid(b, params.t);
         return
+      end
+
+      %% Input has only a single trajectory
+      if ismatrix(params.First) || ( iscell(params.First) && ...
+                                     numel(params.First) == 1 )
+        % single trajectory always yields a trivial braid
+        warning('BRAIDLAB:databraid:databraid:onetraj',...
+                ['Single trajectory input (XY is a 2d matrix or'...
+                 'a single-element cell array).']);
+        br = braidlab.databraid([]);
+        return;
+
       end
 
       %% Input is a data set and will be passed onto colorbraiding
@@ -120,14 +135,14 @@ classdef databraid < braidlab.braid
                 'BRAIDLAB:databraid:databraid:badarg',...
                 ['Default time vector can be generated only for'...
                  'data in 3d array form'] );
-        params.t = 1:size(params.First,3);
+        params.t = 1:size(params.First,1);
       end
 
       [b,tcross] = braidlab.braid.colorbraiding(...
           params.First,...
           params.t,...
           params.proj,...
-          false); % do not check for closure
+          params.CheckClosure);
 
       % invoke braid-timevector constructor
       br = braidlab.databraid( b, tcross );

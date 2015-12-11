@@ -101,8 +101,9 @@ if inputsAreCells
     try
       validateXYandt( XY{idx}, t{idx}, true )
     catch me
-      me.message = [me.message sprintf(' (element %d)', idx)];
-      throw(me)
+      m = MException('BRAIDLAB:braid:colorbraiding:badarg',...
+                     'Improperly formed XY and t for trajectory %d', idx );
+      throw(m.addCause(me))
     end
   end
 else
@@ -110,7 +111,13 @@ else
   n = size(XY,3); % number of punctures
 
   % validate that the matrices are properly formed
-  validateXYandt( XY, t, false )
+  try
+    validateXYandt( XY, t, false )
+  catch me
+    m = MException('BRAIDLAB:braid:colorbraiding:badarg',...
+                   'Improperly formed XY and t');
+    throw(m.addCause(me))
+  end
 end
 
 % validate projection angle
@@ -209,7 +216,7 @@ try % trapping to ensure proper identification of strands
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')
+      debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XY,t,delta);
     end
@@ -254,11 +261,8 @@ function validateXYandt( XY, t, isflat )
 %VALIDATEXYANDT Validate that XY and t are well form matrices
 % and that XY is either 2d (isflat=true) or 3d (isflat=false)
 
-validateattributes(t,{'numeric'},...
-                   {'real','finite','vector','increasing','nonnan'},...
-                   'BRAIDLAB.braid.colorbraiding','t',2 );
 
-XYattr = {'real','finite','nonnan','nrows',numel(t)};
+XYattr = {'real','finite','nonnan'};
 if isflat
   XYattr{end+1} = '2d';
 else
@@ -267,6 +271,11 @@ end
 
 validateattributes(XY,{'numeric'},XYattr,...
                    'BRAIDLAB.braid.colorbraiding','XY',1 );
+
+validateattributes(t,{'numeric'},...
+                   {'real','finite','vector','increasing','nonnan',...
+                    'numel',size(XY,1) },...
+                   'BRAIDLAB.braid.colorbraiding','t',2 );
 
 function XYr = rotate_data_clockwise(XY,proj)
 %ROTATE_DATA_CLOCKWISE   Rotate data clockwise, surprisingly.
@@ -279,5 +288,3 @@ else
   XYr(:,1,:) =  cos(proj)*XY(:,1,:) + sin(proj)*XY(:,2,:);
   XYr(:,2,:) = -sin(proj)*XY(:,1,:) + cos(proj)*XY(:,2,:);
 end
-
-function S = getSlice( XY, n )

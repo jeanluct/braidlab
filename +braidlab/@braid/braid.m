@@ -57,7 +57,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   methods
 
-    function br = braid(b,secnd,third)
+    function br = braid(b,varargin)
     %BRAID   Construct a braid object.
     %   B = BRAID(W) creates a braid object B from a vector of generators W.
     %   B = BRAID(W,N) specifies the number of strings N of the braid group,
@@ -133,129 +133,85 @@ classdef braid < matlab.mixin.CustomDisplay
 
     % Allow default empty braid: return trivial braid with one string.
       if nargin == 0, return; end
+
+      %% Convert annular braid to a braid
       if isa(b,'braidlab.annbraid')
         % This is a bit of a kludge.  annbraid needs a custom conversion
         % to braid.  b.braid calls the right function (annbraid.braid),
         % but braid(b) doesn't.  That's ok, let's just do it here.
         % This needs to go here because b is then also a braid.
         br = b.braid;
-        return
-      elseif isa(b,'braidlab.braid')
-        br.n     = b.n;
-        br.word  = b.word;
-      elseif isa(b,'braidlab.cfbraid')
-        D = braidlab.braid('halftwist',b.n);
-        br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
-      elseif ischar(b)
-        % First argument is a string.
-        switch lower(b)
-          case {'halftwist','delta'}
-            br.n = secnd;
-            % D has size br.n*(br.n-1)/2. Could preallocate if speed important.
-            D = [];
-            for i = 1:br.n-1, D = [D br.n-1:-1:i]; end %#ok<AGROW>
-            br.word = D;
-          case {'fulltwist','delta2'}
-            br = braidlab.braid('halftwist',secnd);
-            br.word = [br.word br.word];
-          case {'hironakakin','hironaka-kin','hk'}
-            m = secnd;
-            if nargin < 3
-              if m < 5
-                error('BRAIDLAB:braid:braid:badarg', ...
-                      'Need at least five strings.')
-              end
-              if mod(m,2) == 1
-                n = (m+1)/2; %#ok<*PROP>
-                m = (m-3)/2;
-              else
-                n = (m+2)/2;
-                m = (m-4)/2;
-              end
-            else
-              n = third;
-            end
-            N = m+n+1;
-            br.n = N;
-            br.word = [1:m m:-1:1 1:N-1];
-          case {'venzkepsi','psi'}
-            try
-              word = braidlab.braid.generateVenzke(secnd);
-            catch me
-              m = MException('BRAIDLAB:braid:braid:badarg',...
-                             ['Venzke: ' me.message]);
-              m.addCause(me);
-              throw(m)
-            end
-            br = braidlab.braid( word, secnd );
-
-          case {'rand','random'}
-            br.n = secnd;
-            k = third;
-            br.word = (-1).^randi(2,1,k) .* randi(br.n-1,1,k);
-          case {'normal','binomal','norm','binom'}
-            br.n = secnd;
-            k = third;
-            br.word = (-1).^randi(2,1,k) .* (1+binornd( br.n-2, 1/2, 1,k ));
-          otherwise
-            % Maybe the string specifies a knot.
-            try
-              br = knot2braid(b);
-            catch err
-              error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
-            end
-        end
-      elseif ndims(b) == 3
-        % b is a 3-dim array of data.  secnd contains the projection angle.
-        if nargin > 2
-          error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
-        elseif nargin < 2
-          % Use a zero projection angle.
-          secnd = 0;
-        end
-
-        validateattributes(b,{'numeric'},...
-                           {'real','finite','nonnan'},...
-                           'BRAIDLAB.braid','trajectory array');
-
-        validateattributes(secnd,{'numeric'},...
-                           {'real','finite','scalar','nonnan','nonempty'},...
-                           'BRAIDLAB.databraid','projection angle');
-
-        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
-      else
-        if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
-          % b is neither a row vector or a column vector.  Hopefully the
-          % user means a one-particle dataset.  Perhaps he/she is trying to
-          % create several braids at once (which is not currently
-          % allowed).  By default, print a warning.
-          if size(b,2) == 2
-            warning('BRAIDLAB:braid:braid:onetraj', ...
-                    [ 'Creating trivial braid from single ' ...
-                      'trajectory (did you mean that?).' ])
-            br.word = int32([]);
-            br.n = 1;
-          else
-            error('BRAIDLAB:braid:braid:badarg','Bad array size.')
-          end
-        else
-          b = b(:).';   % Store word as row vector.
-          br.word = int32(b);
-          if nargin < 2
-            br.n = max(abs(b))+1;
-          else
-            br.n = secnd;
-          end
-        end
+        return % annbraid converted to braid
       end
 
-      assert( isa(br.word,'int32'), 'BRAIDLAB:braid:braid:int32',...
-              'Word was not set to int32 somewhere!' );
+      %% Copy of the braid
+      if isa(b,'braidlab.braid')
+        br.word = b.word;
+        br.n = b.n;
+        return % copy of input braid
+      end
+
+      %% Convert braid from left-canonical form to a "regular" braid
+      if isa(b,'braidlab.cfbraid')
+        D = braidlab.braid('halftwist',b.n);
+        br = D^b.delta * braidlab.braid(cell2mat(b.factors),b.n);
+        return % cfbraid converted to braid
+      end
+
+      %% Get a named braid
+      if ischar(b)
+        [W,N] = braidlab.braid.named_braids( b, varargin{:});
+        br = braidlab.braid(W,N);
+        return % named braid
+      end
+
+      %% Vector (or a single) generator
+      if isvector(b) || isscalar(b) || isempty(b)
+
+        % store the word
+        br.word = b(:).';
+        br.n = max(abs(br.word))+1; % minimal number of strands
+
+        if numel(varargin) == 1
+          % if valid index and larger than default
+          try
+            validateattributes( varargin{1}, {'numeric'},...
+                                {'scalar','>=',br.n,'finite',...
+                                'real','integer'} );
+          catch me
+            m = MException('BRAIDLAB:braid:braid:badarg',...
+                           'Invalid number of strands.');
+            throw(m.addCause(me));
+          end
+
+          br.n = int32(varargin{1});
+        end % numel(varargin)
+
+        return;
+      end % isvector(b)
+
+      %% trajectory data is either a cell or a 2d or 3d matrix
+      if iscell(b) || (isnumeric(b) && ndims(b) <= 3)
+        try
+          dbr = braidlab.databraid(b, varargin{:},'CheckClosure',true);
+        catch me
+          m = MException('BRAIDLAB:braid:braid:badcurves',...
+                         'Braid from trajectories failed.');
+          throw(m.addCause(me));
+        end
+        br = dbr.braid; % strip crossing times
+        return ; % converted databraid
+      end
+
+      %% if nothing works, fail
+      error('BRAIDLAB:braid:braid:badarg', ...
+            'Improper input into braid constructor');
+
     end % function braid
 
       function obj = set.n(obj,value)
         if isempty(value), return; end
-        validateattributes( value, {'numeric'}, {'positive'} );
+        validateattributes( value, {'numeric'}, {'positive','scalar','integer'} );
         if ~isempty(obj.word)
           if value < max(abs(obj.word))+1
             error('BRAIDLAB:braid:setn:badarg', ...
@@ -274,20 +230,23 @@ classdef braid < matlab.mixin.CustomDisplay
       end
 
       % Make sure it's an int32, internally.
-      function obj = set.word(obj,value)
-        if isempty(value)
+      function obj = set.word(obj,word)
+        if isempty(word)
           % Make sure the empty word is 0 by 0.
           obj.word = int32([]);
         else
           try
-            validateattributes(value, {'numeric'},...
-                               {'nonzero','nonnan','finite'} );
+            validateattributes( word, {'numeric'}, ...
+                                {'vector','nonzero','finite','nonnan',...
+                                'real','integer'});
             % needed b/c of a bug in validateattributes
-            assert( all(value ~= 0) )
-            obj.word = int32(value);
-          catch e
-            error('BRAIDLAB:braid:setword:badarg',...
-                  'Generators have to be nonzero, non-NaN and finite.')
+            assert( all(word ~= 0), 'One of the generators is zero' );
+            obj.word = int32(word);
+          catch me
+            m = MException('BRAIDLAB:braid:setword:badarg',...
+                           ['Generators have to be nonzero, non-NaN and ' ...
+                            'finite.']);
+            throw(m.addCause(me));
           end
         end
       end
@@ -360,11 +319,14 @@ classdef braid < matlab.mixin.CustomDisplay
       %
       %   This is a method for the BRAID class.
       %   See also BRAID, BRAID.INV, BRAID.MTIMES.
-        bm = braidlab.braid([],b.n);
-        if m > 0
-          bm.word = repmat(b.word,[1 m]);
-        elseif m < 0
-          bm.word = repmat(b.inv.word,[1 -m]);
+        bm = braidlab.braid([], b.n);
+        switch( sign(m) )
+          case 1
+            bm.word = repmat(b.word,[1 m]);
+          case -1
+            bm.word = repmat(b.inv.word,[1 -m]);
+          otherwise
+            pass % do nothing
         end
       end
 
@@ -448,7 +410,8 @@ classdef braid < matlab.mixin.CustomDisplay
   methods (Access = protected)
 
     function displayScalarObject(b)
-      c = char(b);
+      c = sprintf('[n = %d]  ',b.n); % print # strands
+      c = [c, char(b)]; % print generators
       sz = get(0, 'CommandWindowSize');
       wc = textwrap({c},sz(1)-4);
       for i = 1:length(wc)
@@ -465,42 +428,57 @@ classdef braid < matlab.mixin.CustomDisplay
   end % methods block
 
   % static methods
-  methods (Static = true)
+  methods (Static)
 
-    function word = generateVenzke(n)
-    %GENERATEVENZKE Generate a Venzke braid word
-    % See page 1 of Venzke's thesis.
-      if n < 5
-        error('BRAIDLAB:braid:generatevenzke:badarg',...
-              'Need at least five strings.')
+    function [W,N] = named_braids( name, varargin )
+    %NAMED_BRAIDS Selector of named braids
+    % First argument is a string selecting the name
+    %
+
+      try
+        switch lower(name)
+          case {'halftwist','delta'}
+            [W,N] = braidlab.braid.named_braid_halftwist(varargin{:});
+          case {'fulltwist','delta2'} % just double-up halftwist
+            [W,N] = braidlab.braid.named_braid_halftwist(varargin{:});
+            W = [W W];
+          case {'hironakakin','hironaka-kin','hk'}
+            [W, N] = braidlab.braid.named_braid_hk( varargin{:} );
+          case {'venzkepsi','psi'}
+            [W, N] = braidlab.braid.named_braid_venzke( varargin{:} );
+          case {'rand','random'}
+            [W,N] = braidlab.braid.named_braid_random( varargin{:} );
+          case {'normal','binomal','norm','binom'}
+            [W,N] = braidlab.braid.named_braid_binom( varargin{:} );
+          otherwise
+            [W, N] = braidlab.braid.knot2braid( name, varargin{:} );
+        end % switch
+      catch me
+        m = MException('BRAIDLAB:braid:named_braids:badarg',...
+                       'Named braid %s received incorrect arguments', name );
+        throw(m.addCause(me));
       end
-      if n == 6
-        word = int32([5:-1:1 5 4 3 5 4]);
-        return
-      end
-      L = (n-1):-1:1;
-      if mod(n,2) == 1
-        word = [L L -1 -2];
-      elseif mod(n,4) == 0
-        k = n/4;
-        word = [repmat(L,1,2*k+1) -1 -2];
-      elseif mod(n,8) == 2
-        k = (n-2)/8;
-        word = [repmat(L,1,2*k+1) -1 -2];
-      elseif mod(n,8) == 6
-        k = (n-6)/8;
-        word = [repmat(L,1,6*k+5) -1 -2];
-      end
-      word = int32(word);
-    end
+      W = int32(W);
+    end % named_braids
+
+    %
+    % Static methods defined in separate files.
+    %
+    % These methods do not need a braid object as a first argument.
+    %
+    % Need to execute 'clear classes' to register changes here.
+    %
+
+
+    [W, N] = named_braid_venzke(varargin) % Venzke braid word
+    [W, N] = named_braid_hk(varargin) % Hironaka-Kin braid word
+    [W, N] = named_braid_halftwist(varargin) % halftwist braid word
+    [W, N] = named_braid_random(varargin) % uniformly random braid word
+    [W, N] = named_braid_binom(varargin) % binomial random braid word
+
+    [W, N] = knot2braid(varargin) % braid words corresponding to knots
+
   end
-  %
-  % Static methods defined in separate files.
-  %
-  % These methods do not need a braid object as a first argument.
-  %
-  % Need to execute 'clear classes' to register changes here.
-  %
 
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})

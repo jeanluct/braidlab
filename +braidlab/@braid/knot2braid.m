@@ -1,6 +1,6 @@
-function b = knot2braid(K)
+function [W,N] = knot2braid(varargin)
 %KNOT2BRAID   Return a braid representative for a knot.
-%   B = KNOT2BRAID(K) returns a braid representative B for the knot K.
+%   [W,N] = KNOT2BRAID(K) returns a braid word W on N strands for the knot K.
 %   The knot is denoted in standard coding as '0_1', '3_1', '5_2', etc.
 %   Currently knots up to 8 crossings are represented.
 %
@@ -38,79 +38,85 @@ function b = knot2braid(K)
 
 import braidlab.braid
 
+parser = inputParser;
+parser.addRequired('K', @ischar);
+parser.parse(varargin{:});
+K = parser.Results.K;
+
 switch K
  case {'0_1','unknot'}
-  b = braid([1]); %#ok<NBRAK>
+  W = [1]; %#ok<NBRAK>
  case {'3_1','trefoil'}
-  b = braid([1 1 1]);
+  W = [1 1 1];
  case {'4_1','figure-eight','figure-8'}
-  b = braid([1 -2 1 -2]);
+  W = [1 -2 1 -2];
  case '5_1'
-  b = braid([1 1 1 1 1]);
+  W = [1 1 1 1 1];
  case '5_2'
-  b = braid([2 2 -1 2 1 1]);
+  W = [2 2 -1 2 1 1];
  case '6_1'
-  b = braid([1 -2 1 -3 2 -3 -2]);
+  W = [1 -2 1 -3 2 -3 -2];
  case '6_2'
-  b = braid([-1 2 -1 2 2 2]);
+  W = [-1 2 -1 2 2 2];
  case '6_3'
-  b = braid([-1 2 2 -1 -1 2]);
+  W = [-1 2 2 -1 -1 2];
  case '7_1'
-  b = braid([1 1 1 1 1 1 1]);
+  W = [1 1 1 1 1 1 1];
  case '7_2'
-  b = braid([-1 3 3 3 2 1 1 -3 2]);
+  W = [-1 3 3 3 2 1 1 -3 2];
  case '7_3'
-  b = braid([2 2 2 2 2 1 2 2 -1 -1]);
+  W = [2 2 2 2 2 1 2 2 -1 -1];
  case '7_4'
-  b = braid([3 3 -1 2 -3 2 1 1 2]);
+  W = [3 3 -1 2 -3 2 1 1 2];
  case '7_5'
-  b = braid([2 2 2 1 2 2 2 2 -1 -1]);
+  W = [2 2 2 1 2 2 2 2 -1 -1];
  case '7_6'
-  b = braid([-3 -1 2 1 1 -3 -2 -2 -2]);
+  W = [-3 -1 2 1 1 -3 -2 -2 -2];
  case '7_7'
-  b = braid([1 -3 2 -3 2 -1 2 -3 2]);
+  W = [1 -3 2 -3 2 -1 2 -3 2];
  case '8_1'
-  b = braid([1 -2 -3 2 1 -4 -4 -3 -2 4]);
+  W = [1 -2 -3 2 1 -4 -4 -3 -2 4];
  case '8_2'
-  b = braid([2 2 2 2 2 -1 2 -1]);
+  W = [2 2 2 2 2 -1 2 -1];
  case '8_3'
-  b = braid([1 2 -3 -4 -3 2 -1 3 3 2 4 -3 -2 -2]);
+  W = [1 2 -3 -4 -3 2 -1 3 3 2 4 -3 -2 -2];
  case '8_4'
-  b = braid([1 1 1 3 -2 -3 -3 1 -2]);
+  W = [1 1 1 3 -2 -3 -3 1 -2];
  case '8_5'
-  b = braid([1 1 1 -2 1 1 1 -2]);
+  W = [1 1 1 -2 1 1 1 -2];
  case '8_6'
-  b = braid([-3 -3 1 -2 1 3 -2 -2 -2]);
+  W = [-3 -3 1 -2 1 3 -2 -2 -2];
  case '8_7'
-  b = braid([-2 -2 1 -2 1 1 1 1]);
+  W = [-2 -2 1 -2 1 1 1 1];
  case '8_8'
-  b = braid([-1 2 1 1 -3 2 2 -3 -3]);
+  W = [-1 2 1 1 -3 2 2 -3 -3];
  case '8_9'
-  b = braid([2 2 2 -1 2 -1 -1 -1]);
+  W = [2 2 2 -1 2 -1 -1 -1];
  case '8_10'
-  b = braid([2 2 -1 -1 2 2 2 -1]);
+  W = [2 2 -1 -1 2 2 2 -1];
  case '8_11'
-  b = braid([1 -2 -2 3 -2 -3 -3 1 -2]);
+  W = [1 -2 -2 3 -2 -3 -3 1 -2];
  case '8_12'
-  b = braid([1 -2 3 -4 3 -4 2 1 -3 -2]);
+  W = [1 -2 3 -4 3 -4 2 1 -3 -2];
  case '8_13'
-  b = braid([1 1 2 -3 2 -1 -3 -3 2]);
+  W = [1 1 2 -3 2 -1 -3 -3 2];
  case '8_14'
-  b = braid([1 1 2 2 -1 -3 2 -3 2]);
+  W = [1 1 2 2 -1 -3 2 -3 2];
  case '8_15'
-  b = braid([1 1 1 2 3 -1 2 2 2 3 -2]);
+  W = [1 1 1 2 3 -1 2 2 2 3 -2];
  case '8_16'
-  b = braid([1 1 -2 1 1 -2 1 -2]);
+  W = [1 1 -2 1 1 -2 1 -2];
  case '8_17'
-  b = braid([2 -1 2 -1 2 2 -1 -1]);
+  W = [2 -1 2 -1 2 2 -1 -1];
  case '8_18'
-  b = braid([1 -2 1 -2 1 -2 1 -2]);  % Error in table.
+  W = [1 -2 1 -2 1 -2 1 -2];  % Error in table.
  case '8_19'
-  b = braid([1 2 1 2 1 2 2 1]);
+  W = [1 2 1 2 1 2 2 1];
  case '8_20'
-  b = braid([2 1 1 1 2 -1 -1 -1]);
+  W = [2 1 1 1 2 -1 -1 -1];
  case '8_21'
-  b = braid([2 2 2 1 2 2 -1 -1 2 -1]);
+  W = [2 2 2 1 2 2 -1 -1 2 -1];
  otherwise
   error('BRAIDLAB:braid:knot2braid:unknown','Unknown knot %s',K)
 end
+N = max(abs(W))+1;
