@@ -71,77 +71,154 @@ classdef databraid < braidlab.braid
     %% Parse for positional inputs
       parser = inputParser;
       parser.addRequired('First'); % generic input
-      parser.addOptional('t',[], @isnumeric);
-      parser.addOptional('proj',0, @isscalar);
+      parser.addOptional('Second',nan);
+      parser.addOptional('Third',nan);
       parser.addParameter('CheckClosure',false, @islogical);
-
       try
         parser.parse(varargin{:});
-        params = parser.Results;
-        if isempty(params.proj)
-          params.proj = 0;
-        end
       catch me
-        m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
-                        'Invalid arguments');
+        m = MException( 'BRAIDLAB:databraid:databraid:badparse', ...
+                        'Input parsing failed.');
         throw(m.addCause(me)); % attach validator exception
       end
 
+      params = parser.Results;
+
+      %% Decision tree for the parameters
+      isDefault = @(x)any(isnan(x)) || isempty(x);
+
       %% Input is a databraid already
       if isa(params.First,'braidlab.databraid')
-        br = params.First;
-        return
+        try
+          br = params.First;
+          return
+        catch me
+          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                          'Databraid-to-databraid constructor failed.');
+          throw(m.addCause(me)); % attach validator exception
+        end
       end
 
       %% Input is a braid, we just need to add tcross to it
       if isa(params.First,'braidlab.braid')
-        br.word = params.First.word;
-        br.n = params.First.n;
-        if ~isempty(params.t) % use input
-          br.tcross = params.t(:)';
-        else % use default
-          br.tcross = 1:length(br.word);
+        try
+          br.word = params.First.word;
+          br.n = params.First.n;
+          if ~isDefault(params.Second) % use input
+            br.tcross = params.Second(:)';
+          else % use default
+            br.tcross = 1:length(br.word);
+          end
+          check_tcross(br);
+          return
+        catch me
+          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                          'Braid-to-databraid constructor failed.');
+          throw(m.addCause(me)); % attach validator exception
         end
-        check_tcross(br);
-        return
       end
 
-      %% Input is a list of generators
+
+      %% Input is a list of generators (braid word)
       if isvector(params.First) || isempty(params.First)
-        % create a braid first
-        b = braidlab.braid( params.First );
+        try
+          % create a braid first
+          b = braidlab.braid( params.First );
 
-        % use databraid generator with braid input to create the databraid
-        br = braidlab.databraid(b, params.t);
-        return
+          % use databraid generator with braid input to create the databraid
+          br = braidlab.databraid(b, params.Second);
+          return
+        catch me
+          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                          'Braid word-to-databraid constructor failed.');
+          throw(m.addCause(me)); % attach validator exception
+        end
       end
 
-      %% Input has only a single trajectory
-      if ismatrix(params.First) || ( iscell(params.First) && ...
-                                     numel(params.First) == 1 )
-        % single trajectory always yields a trivial braid
-        warning('BRAIDLAB:databraid:databraid:onetraj',...
-                ['Single trajectory input (XY is a 2d matrix or'...
-                 'a single-element cell array).']);
-        br = braidlab.databraid([]);
-        return;
+      %% Physical braid input
+      %Input is neither a braid, a vector of generators, or a databraid
+      if iscell( params.First )
+        try
+          % cell-shaped First will require cell-shaped Second (time)
+          validateattributes( params.Second, {'cell'},...
+                              {'numel',numel(params.First)},...
+                              'braidlab.databraid.databraid','T',2);
 
-      end
+          if numel(params.First) == 1
+            % single trajectory always yields a trivial braid
+            warning('BRAIDLAB:databraid:databraid:onetraj',...
+                    'Single trajectory input (XY is a 1-cell array).');
+            br = braidlab.databraid([]);
+            return;
+          end
+          params.t = params.Second;
+          if isDefault( params.Third )
+            params.Third = 0;
+          end
+          parser.projangle = params.Third;
+        catch me
+          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                          'Cell-to-databraid constructor failed.');
+          throw(m.addCause(me)); % attach validator exception
+        end % try around data cell block
+      else % First is not a cell
+        try
+          validateattributes( params.First, {'numeric'},...
+                              {'finite','nonnan','real','nonempty'},...
+                              'braidlab.databraid.databraid','XY',1);
 
-      %% Input is a data set and will be passed onto colorbraiding
-      is3d = @(x)isnumeric(x) && (numel(size(x)) == 3);
-      if isempty(params.t)
-        assert( is3d(params.First),...
-                'BRAIDLAB:databraid:databraid:badarg',...
-                ['Default time vector can be generated only for'...
-                 'data in 3d array form'] );
-        params.t = 1:size(params.First,1);
-      end
+          assert(~isscalar(params.First),...
+                 'BRAIDLAB:databraid:databraid:XYnotScalar',...
+                 'XY cannot be a scalar');
+
+          if ismatrix(params.First)
+            % single trajectory always yields a trivial braid
+            warning('BRAIDLAB:databraid:databraid:onetraj',...
+                    'Single trajectory input (XY is a 2d matrix).');
+            br = braidlab.databraid([]);
+            return;
+          end % ismatrix
+
+          assert( numel(size(params.First)) <= 3,...
+                  'BRAIDLAB:databraid:databraid:non3d',...
+                  'Numeric XY cannot have more than 3d');
+
+          %% decision about second and third arguments
+          PP = [ isDefault(params.Second), isDefault(params.Third) ];
+          if all(PP == [true, true]) % both parameters default
+            params.projangle = 0;
+            params.t = 1:size(params.First,1);
+          elseif all(PP == [false,false]) % both parameters passed
+            params.t = params.Second;
+            params.projangle = params.Third;
+          elseif all(PP == [true,false]) % second default, third passed
+            params.projangle = params.Third;
+            params.t = 1:size(params.First,1);
+          else % second passed, third default
+
+            % if second parameter is an appropriately sized vector,
+            % it is a time vector
+            if size(params.First,1) == numel(params.Second)
+              params.t = params.Second;
+              params.projangle = 0.;
+            else
+              params.t = 1:size(params.First,1);
+              params.projangle = params.Third;
+            end
+          end
+
+        catch me
+          m = MException( 'BRAIDLAB:databraid:databraid:badarg', ...
+                          '3d-array-to-databraid constructor failed.');
+          throw(m.addCause(me)); % attach validator exception
+        end % try around data cell block
+      end % if iscell
+
 
       [b,tcross] = braidlab.braid.colorbraiding(...
           params.First,...
           params.t,...
-          params.proj,...
+          params.projangle,...
           params.CheckClosure);
 
       % invoke braid-timevector constructor
@@ -206,13 +283,16 @@ classdef databraid < braidlab.braid
     %   This is a method for the DATABRAID class.
     %   See also BRAID.MTIMES, DATABRAID, LOOP.
       if isa(b2,'braidlab.databraid')
-        if b1.tcross(end) > b2.tcross(1)
-          error('BRAIDLAB:databraid:mtimes:notchrono',...
-                'First braid must have earlier times than second.')
+        try
+          b12 = braidlab.databraid(...
+              braidlab.braid([b1.word b2.word],max(b1.n,b2.n)),...
+              [b1.tcross b2.tcross]);
+        catch me
+          m = MException('BRAIDLAB:databraid:mtimes:invalidproduct',...
+                         'Braid product cannot be formed');
+
+          throw(m.addCause(me));
         end
-        b12 = braidlab.databraid(...
-            braidlab.braid([b1.word b2.word],max(b1.n,b2.n)),...
-            [b1.tcross b2.tcross]);
       elseif isa(b2,'braidlab.loop')
         % Action of databraid on a loop.
         b12 = mtimes@braidlab.braid(b1,b2);
@@ -221,8 +301,8 @@ classdef databraid < braidlab.braid
 
     function bs = subbraid(b,s)
       ; %#ok<NOSEM>
-      % Do not put comments above the first line of code, so the help
-      % message from braid.subbraid is displayed.
+        % Do not put comments above the first line of code, so the help
+        % message from braid.subbraid is displayed.
 
       % Use the optional return argument ii for braid.subbraid, which gives
       % a list of the generators that were kept.

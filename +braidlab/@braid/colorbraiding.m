@@ -79,7 +79,6 @@ t = parser.Results.t;
 proj = parser.Results.proj;
 checkclosure = parser.Results.checkclosure;
 
-
 %% INPUT VALIDATION
 if xor( iscell(XY), iscell(t) )
   error('BRAIDLAB:braid:colorbraiding:badarg',...

@@ -29,6 +29,18 @@ classdef databraidTest < matlab.unittest.TestCase
     dbrnutest
   end
 
+  methods (Static)
+    function verifyErrorWithCause( obj, trigger, name, cause )
+      if ischar(cause)
+        cause = {cause};
+      end
+      obj.verifyThat( trigger, ...
+                      matlab.unittest.constraints.Throws(...
+                          name, 'CausedBy', cause ) );
+    end
+  end
+
+
   methods (TestMethodSetup)
     %% matrix version of inputs (for uniform sampled data)
     function create_uniform_databraid(testCase)
@@ -54,34 +66,38 @@ classdef databraidTest < matlab.unittest.TestCase
       import braidlab.databraid
 
       % TODO: here test different forms of constructor.
+      verifyBadArgWCause = @(f,c)databraidTest.verifyErrorWithCause( ...
+          testCase, f, 'BRAIDLAB:databraid:databraid:badarg',...
+          c );
 
       % Not enough input arguments.
       testCase.verifyError(@() databraid, ...
-                           'BRAIDLAB:databraid:databraid:badarg');
+                           'BRAIDLAB:databraid:databraid:badparse');
       % Wrong number of crossing times.
-      testCase.verifyError(@() databraid([1 2],1), ...
-                           'BRAIDLAB:databraid:check_tcross:badtimes');
+      verifyBadArgWCause(@() databraid([1 2],1), ...
+                         'BRAIDLAB:databraid:check_tcross:badtimes');
       % Decreasing crossing times.
-      testCase.verifyError(@() databraid([1 2],[1 0]), ...
-                           'BRAIDLAB:databraid:check_tcross:badtimes');
+      verifyBadArgWCause(@() databraid([1 2],[1 0]), ...
+                         'BRAIDLAB:databraid:check_tcross:badtimes');
       % Simultaneous times for noncommuting generators.
-      testCase.verifyError(@() databraid([1 2],[1 1]), ...
-                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
+      verifyBadArgWCause(@() databraid([1 2],[1 1]), ...
+                         'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
+
       % Simultaneous times for *commuting* generators is ok.
       databraid([1 3],[1 1]);
 
       % However all the generators have to pairwise commute.
       % This shouldn't work: see issue #94.
-      testCase.verifyError(@() databraid([4 1 3],[1 1 1]), ...
-                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
+      verifyBadArgWCause(@() databraid([4 1 3],[1 1 1]), ...
+                         'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
 
       % A more complicated example with two simultaneous blocks.  The first
       % has the generators [5 1 3], which is fine, the second [7 6], which
       % is not.
-      testCase.verifyError(@() ...
-                           databraid([ 1  2  3 5 1 3 4 5 6 7 6], ...
-                                     [-3 -2 -1 1 1 1 2 3 4 5 5]), ...
-                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes')
+      verifyBadArgWCause(@() ...
+                         databraid([ 1  2  3 5 1 3 4 5 6 7 6], ...
+                                   [-3 -2 -1 1 1 1 2 3 4 5 5]), ...
+                         'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
       % Replace 7 by 8: now [8 6] commute, and it's ok.
       databraid([1 2 3 5 1 3 4 5 6 8 6],[-3 -2 -1 1 1 1 2 3 4 5 5]);
     end
@@ -109,28 +125,37 @@ classdef databraidTest < matlab.unittest.TestCase
 
     function test_databraid_mtimes(testCase)
       import braidlab.databraid
+      import matlab.unittest.constraints.Throws
 
       % Here the last tcrossing ime of b1 is after the first crossing
       % time of b2.
       b1 = databraid([1 2],[1 3]);
       b2 = databraid([1 2],[2 4]);
-      testCase.verifyError(@() b1*b2,'BRAIDLAB:databraid:mtimes:notchrono');
+      databraidTest.verifyErrorWithCause(testCase, @()b1*b2, ...
+                           'BRAIDLAB:databraid:mtimes:invalidproduct',...
+                           'BRAIDLAB:databraid:check_tcross:badtimes');
 
       % This is ok: the last generator of b1 commutes with the first of
       % b2, even though they have the same crossing time.
       b1 = databraid([1 3],[1 2]);
       b2 = databraid([5 2],[2 3]);
       b12 = b1*b2; %#ok<NASGU>
-      % This is not ok: the generators at the ends don't commute.
+                   % This is not ok: the generators at the ends don't commute.
       b1 = databraid([1 3],[1 2]);
       b2 = databraid([4 2],[2 3]);
-      testCase.verifyError(@() b1*b2, ...
+
+      databraidTest.verifyErrorWithCause(testCase, @()b1*b2, ...
+                           'BRAIDLAB:databraid:mtimes:invalidproduct',...
                            'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
+
       % This shouldn't work: 6 and 5 don't commute.  See issue #98.
       b1 = databraid([1 5 3],[1 2 2]);
       b2 = databraid([6 2],[2 3]);
-      testCase.verifyError(@() b1*b2, ...
-                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes')
+
+      databraidTest.verifyErrorWithCause(testCase, @()b1*b2, ...
+                           'BRAIDLAB:databraid:mtimes:invalidproduct',...
+                           'BRAIDLAB:databraid:sort_sim_tcross:badsimtimes');
+
     end
 
     function test_databraid_ftbe(testCase)
@@ -141,7 +166,7 @@ classdef databraidTest < matlab.unittest.TestCase
     end
 
     function test_databraid_hidden(testCase)
-      % Make sure some hidden methods inherited from braid class give error.
+    % Make sure some hidden methods inherited from braid class give error.
       dbr = testCase.dbrtest;
       testCase.verifyError(@() mpower(dbr,2), ...
                            'BRAIDLAB:databraid:mpower:undefined');
@@ -154,14 +179,14 @@ classdef databraidTest < matlab.unittest.TestCase
     end
 
     function test_databraid_compact(testCase)
-      % See issue #95.
+    % See issue #95.
       b1 = compact(braidlab.databraid([1 2 -2 3],[1 2 3 4]));
       b2 = braidlab.databraid([1 3],[1 4]);
       testCase.verifyTrue(b1 == b2);
     end
 
     function test_databraid_tensor(testCase)
-      % See issue #93.
+    % See issue #93.
       b = braidlab.databraid([1 2]);
       bb = tensor(b,b);
       bb2 = braidlab.databraid([1 4 2 5],[1 1 2 2]);
