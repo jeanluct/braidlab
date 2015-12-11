@@ -184,18 +184,17 @@ classdef databraid < braidlab.braid
                   'Numeric XY cannot have more than 3d');
 
           %% decision about second and third arguments
-          PP = [ isDefault(params.Second), isDefault(params.Third) ];
-          if all(PP == [true, true]) % both parameters default
-            params.projangle = 0;
-            params.t = 1:size(params.First,1);
-          elseif all(PP == [false,false]) % both parameters passed
+          arePassed = [ ~isDefault(params.Second), ~isDefault(params.Third) ];
+          if all(arePassed == [true, true])
             params.t = params.Second;
             params.projangle = params.Third;
-          elseif all(PP == [true,false]) % second default, third passed
+          elseif all(arePassed == [false,false])
+            params.projangle = 0;
+            params.t = 1:size(params.First,1);
+          elseif all(arePassed == [false,true])
             params.projangle = params.Third;
             params.t = 1:size(params.First,1);
           else % second passed, third default
-
             % if second parameter is an appropriately sized vector,
             % it is a time vector
             if size(params.First,1) == numel(params.Second)
@@ -203,7 +202,7 @@ classdef databraid < braidlab.braid
               params.projangle = 0.;
             else
               params.t = 1:size(params.First,1);
-              params.projangle = params.Third;
+              params.projangle = params.Second;
             end
           end
 
