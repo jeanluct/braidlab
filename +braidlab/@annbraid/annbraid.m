@@ -100,7 +100,9 @@ classdef annbraid < braidlab.braid
         varargin{1} = [];
         varargin{2} = 2;
       end
-      obj = obj@braidlab.braid(varargin{:});
+      br = braidlab.braid(varargin{:});
+      obj.n = br.n;
+      obj.word = br.word;
     end
 
     % The annular strings are the strings without the basepoint.
