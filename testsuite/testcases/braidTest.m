@@ -126,7 +126,7 @@ classdef braidTest < matlab.unittest.TestCase
                                  {'BRAIDLAB:braid:colorbraiding:coincidentprojection'}) );
 
       % Changing the projection gets rid of the error.
-      testCase.verifyTrue(braidlab.braid(XY,[],.1) == ...
+      testCase.verifyTrue(braidlab.braid(XY,.1) == ...
                           braidlab.braid([],2));
 
       % Coincidence at the end of interval - see GitHub Iss #109.
@@ -145,7 +145,7 @@ classdef braidTest < matlab.unittest.TestCase
       b = braidlab.braid(braidlab.closure(XY));
       testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
-      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),[],pi/4);
+      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
       testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
     end
 
