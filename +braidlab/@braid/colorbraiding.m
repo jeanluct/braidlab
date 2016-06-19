@@ -1,4 +1,4 @@
-function [varargout] = colorbraiding(XY,t,proj)
+function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %COLORBRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -71,7 +71,7 @@ if any(isnan(XY) | isinf(XY))
 end
 
 validateattributes(t,{'numeric'},...
-                   {'real','finite','vector','increasing', 'nonnan'},...
+                   {'real','finite','vector','increasing','nonnan'},...
                    'BRAIDLAB.braid.colorbraiding','t',2 );
 
 validateattributes(XY,{'numeric'},...
@@ -102,7 +102,33 @@ if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 % X coord; IDX contains the indices of the sort.
 [~,idx] = sortrows(squeeze(XY(1,:,:)).');
 % Sort all the trajectories trajectories according to IDX:
-XYtraj = XY(:,:,idx);
+XY = XY(:,:,idx);
+
+if checkclosure
+  % Check if the final points are close enough to the initial points (setwise).
+  % Otherwise this could be an error with the user's data.
+  % Suggest user call 'closure(XY)' first.
+  
+  % Use optimal assignment to match the ends.
+  % This piece of code is basically pasted from closure.m.
+  XY0 = squeeze(XY(1,:,:));
+  XY1 = sortrows(squeeze(XY(end,:,:))')';
+  % Create matrix of distances.
+  D = zeros(n,n);
+  for i = 1:n
+    for j = 1:n
+      D(i,j) = norm(XY1(:,i)-XY0(:,j));
+    end
+  end
+  % Solve the optimal assignment problem.
+  perm = braidlab.util.assignmentoptimal(D);
+
+  if any(sqrt(sum((XY0(:,perm) - XY1).^2,1)) > delta)
+    warning('BRAIDLAB:braid:colorbraiding:notclosed',...
+            ['The trajectories do not form a closed braid.  ' ...
+             'Consider calling ''closure'' on the data first.']);
+  end
+end
 
 debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 
@@ -119,7 +145,7 @@ try % trapping to ensure proper identification of strands
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = cross2gen_helper(XYtraj,t,delta,Nthreads);
+    [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
@@ -127,7 +153,7 @@ try % trapping to ensure proper identification of strands
     else
     debugmsg('Using MATLAB algorithm')
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = cross2gen(XYtraj,t,delta);
+      [gen,tcr,~] = cross2gen(XY,t,delta);
     end
   end
 

@@ -13,4 +13,3 @@ debugmsg
 @cfbraid class
 loop pre-allocation (see devel/test/loop_speedtest)
 format loose/compact
-databraid.trunc

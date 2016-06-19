@@ -129,7 +129,7 @@ classdef databraid < braidlab.braid
                          {'real','finite','scalar','nonnan','nonempty'},...
                          'BRAIDLAB.databraid','proj');
 
-      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
+      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj,false);
 
       br.word = b.word;
       br.tcross = br.tcross(:).';   % Store tcross as row vector.
