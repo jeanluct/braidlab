@@ -162,4 +162,4 @@ if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end
 XY = zeros(npts,2,n);
 XY(:,1,:) = real(z); XY(:,2,:) = imag(z);
 
-b = braid(XY,[],projang);
+b = braid(XY,projang);
