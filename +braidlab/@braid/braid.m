@@ -223,7 +223,7 @@ classdef braid < matlab.mixin.CustomDisplay
 	% The secnd argument is the timespan.
 	% The third argument is the initial positions.
 	% TODO: projection angle, options to ODE45.
-        br = braidlab.braid.colorbraiding(b,secnd,third);
+        br = braidlab.braid.colorbraiding_ODE(b,secnd,third);
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2

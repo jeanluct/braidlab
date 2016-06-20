@@ -10,7 +10,6 @@ function [varargout] = colorbraiding_ODE(func,tspan,XY0)
 %
 %   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
-%                        Michael Allshouse <mallshouse@chaos.utexas.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -39,7 +38,7 @@ validateattributes(XY0,{'numeric'}, ...
                    {'real','finite','nonnan','nrows',2}, ...
                    'BRAIDLAB.braid.colorbraiding_ODE','XY0',3);
 
-n = size(XY0,1); % number of punctures
+n = size(XY0,2); % number of punctures
 
 %if nargin < 4
   % Default projection line is X axis.
@@ -52,3 +51,37 @@ n = size(XY0,1); % number of punctures
 % projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
 if proj ~= 0, XY0 = rotate_data_clockwise(XY0,proj); end
+
+debugmsg('colorbraiding_ODE: Search for crossings between pairs of strings');
+
+for I = 1:n
+  debugmsg([num2str(I) '/' num2str(n)],2) % Counter to monitor progress
+  for J = I+1:n
+    % Create extended function to integrate particles I & J together.
+    XY02 = [XY0(:,I);XY0(:,J)];
+    func2 = @(t,XY2) [func(t,XY2(1:2,:));func(t,XY2(3:4,:))];
+
+    % Integrate, recording events when the particles cross.
+    opts = [];
+    opts = odeset(opts,'Events',@paircross_event);
+    [~,~,tc,XY2c,cdir] = ode45(func2,tspan,XY02,opts);
+
+    dY = XY2c(:,2) - XY2c(:,4);
+    icrIJ = find(cdir == 1);
+    cross_cell{I,J} = [tc(icrIJ) sign(dY(icrIJ))];
+    icrJI = find(cdir == 2);
+    cross_cell{J,I} = [tc(icrJI) -sign(dY(icrJI))];
+  end
+end
+
+[gen,tcr] = sortcross2gen(n,sortcross(cross_cell));
+keyboard
+
+%==========================================================================
+function[value,isterminal,direction] = paircross_event(t,XY2)
+
+% Difference between the X coordinates of the two particles.
+value = (XY2(1) - XY2(3))*[1;1];
+isterminal = [0;0];
+% Record left-to-right and right-to-left interchanges separately.
+direction = [1;-1];
