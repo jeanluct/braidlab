@@ -75,7 +75,10 @@ for I = 1:n
 end
 
 [gen,tcr] = sortcross2gen(n,sortcross(cross_cell));
-keyboard
+%keyboard
+
+varargout{1} = braidlab.braid(gen,n);
+if nargout > 1, varargout{2} = tcr; end
 
 %==========================================================================
 function[value,isterminal,direction] = paircross_event(t,XY2)
