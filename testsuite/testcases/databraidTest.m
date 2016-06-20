@@ -3,7 +3,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -161,7 +161,7 @@ classdef databraidTest < matlab.unittest.TestCase
       bbb2 = braidlab.databraid([1 4 7 2 5 8],[1 1 1 2 2 2]);
       testCase.verifyTrue(bbb == bbb2);
     end
-    
+
     function test_databraid_subbraid(testCase)
 
     %% Test that Matlab and MEX subbraids return the same result
@@ -170,17 +170,17 @@ classdef databraidTest < matlab.unittest.TestCase
 
       global BRAIDLAB_braid_nomex
       flagstate = BRAIDLAB_braid_nomex;
-      
+
       BRAIDLAB_braid_nomex = false;
       subMat = testCase.dbrtest.subbraid(substrands);
       BRAIDLAB_braid_nomex = true;
       subMex = testCase.dbrtest.subbraid(substrands);
-      
+
       testCase.verifyTrue( lexeq(subMat,subMex) );
-      testCase.verifyEqual( subMat,subMex );      
-      
+      testCase.verifyEqual( subMat,subMex );
+
       % unset global flag
-      BRAIDLAB_braid_nomex = flagstate;      
+      BRAIDLAB_braid_nomex = flagstate;
       if isempty(flagstate)
         clear global BRAIDLAB_braid_nomex
       end

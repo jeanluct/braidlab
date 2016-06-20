@@ -9,7 +9,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
@@ -38,7 +38,7 @@
 
 ////////////////// DECLARATIONS  /////////////////////////
 
-/* print loop 
+/* print loop
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
@@ -153,7 +153,7 @@ T minlength(const int N, const T *a, const T *b) {
 template <class T>
 T intaxis(const int N, const T *a, const T *b) {
   // N - length(a) + length(b)
-  // n - number of punctures =  N/2 + 2 
+  // n - number of punctures =  N/2 + 2
   // a  - 1 x (n-2) == 1 x (N/2)
   // b  - 1 x (n-2) == 1 x (N/2)
 
@@ -163,7 +163,7 @@ T intaxis(const int N, const T *a, const T *b) {
   T sumDelA = static_cast<T>( 0 );
   T sumAbsB = static_cast<T>( 0 );
   T sumB = static_cast<T>( 0 );
-  T maxTerm = std::abs( a[1] ) 
+  T maxTerm = std::abs( a[1] )
     + std::max<T>( b[1], 0  ) + sumB;
 
   // MAIN LOOP
@@ -171,22 +171,22 @@ T intaxis(const int N, const T *a, const T *b) {
 
     if ( k > 1 )
       sumB += b[k-1];
-    
+
     if (k <= n-3)
       sumDelA += std::abs( a[k+1] - a[k] );
 
     sumAbsB += std::abs( b[k] );
 
-    maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k] ) 
-                           + std::max<T>( b[k], 0  ) 
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
                            + sumB );
   }
   // last term in sumB is not used to maxTerm, but it is for total sum
   sumB += b[n-2];
 
-  T retval = std::abs( a[1] ) + std::abs( a[n-2] ) + 
-    sumAbsB + sumDelA + maxTerm + 
+  T retval = std::abs( a[1] ) + std::abs( a[n-2] ) +
+    sumAbsB + sumDelA + maxTerm +
     std::abs( maxTerm - sumB  );
 
   return retval;
@@ -230,7 +230,7 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
 
     // two-element loop 2k-1 and 2k
     for ( i = 2*k-1; i <= 2*k ; i++ ) {
-      mu[i] = ( i % 2 == 0 ? a[k] : -a[k] ) + 
+      mu[i] = ( i % 2 == 0 ? a[k] : -a[k] ) +
         ( b[k] >= 0  ? nu[k]/2 : nu[k+1]/2 );
     }
   }
