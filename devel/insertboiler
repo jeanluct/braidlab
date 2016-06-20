@@ -47,7 +47,7 @@ export -f ibtag
 # Insert boilerplate for various file extensions.
 find $ROOTDIR -name "*.m" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
-find $ROOTDIR -name "*.cpp" -print0 | \
+find $ROOTDIR -name "*.[ch]pp" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "\/\/" "$@"' _
 find $ROOTDIR -name "*.c" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "" "$@"' _
