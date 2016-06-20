@@ -38,7 +38,7 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %                        Michael Allshouse <mallshouse@chaos.utexas.edu>
 %
@@ -108,7 +108,7 @@ if checkclosure
   % Check if the final points are close enough to the initial points (setwise).
   % Otherwise this could be an error with the user's data.
   % Suggest user call 'closure(XY)' first.
-  
+
   % Use optimal assignment to match the ends.
   % This piece of code is basically pasted from closure.m.
   XY0 = squeeze(XY(1,:,:));
@@ -176,7 +176,7 @@ catch me
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
       % strtok splits the [ ind, ind ] part of the string
-      % and text explanation of what happened        
+      % and text explanation of what happened
       localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 

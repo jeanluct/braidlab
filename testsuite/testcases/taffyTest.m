@@ -3,7 +3,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -42,7 +42,7 @@ classdef taffyTest < matlab.unittest.TestCase
   methods (TestMethodSetup)
     function create_taffy_braids(testCase)
       import braidlab.braid
-      
+
       testCase.b3rods = braid([-2 1 1 -2]);
       testCase.b4rods = braid([1 3 2 2 1 3]);
       testCase.b6rodsbad = braid([2 1 2 4 5 4 3 3 2 1 2 4 5 4]);

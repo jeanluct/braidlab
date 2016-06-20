@@ -5,7 +5,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic         <marko@math.wisc.edu>
 //
 //   This file is part of Braidlab.
@@ -51,24 +51,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     printf("Using MEX subbraid.\n");
 
   if (!mxIsInt32(p_braid) ||
-      (mxGetM(p_braid) != 1) ) 
+      (mxGetM(p_braid) != 1) )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
                         "word should be int32 row-vectors.");
 
   if (!mxIsInt32(p_perm) ||
-      (mxGetM(p_perm) != 1) ) 
+      (mxGetM(p_perm) != 1) )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
                         "perm should be int32 row-vectors.");
 
   if (!mxIsLogical(p_keepstr) ||
-      (mxGetM(p_keepstr) != 1) ) 
+      (mxGetM(p_keepstr) != 1) )
       mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
                         "keepstr should be logical row-vectors.");
 
   if (!mxIsLogicalScalar(p_storeind))
       mexErrMsgIdAndTxt("BRAIDLAB:braid:subbraid_helper:badarg",
                         "storeind should be logical scalar.");
-  
+
   const int *word = (int *)mxGetData(p_braid); // braid word
   int *perm = (int *)mxGetData(p_perm); // store permutations
   mxLogical *keepstr = mxGetLogicals(p_keepstr); // is string kept?
@@ -133,7 +133,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     // update permutation
     std::swap<int>( perm[ind-1], perm[ind] );
-    std::swap<mxLogical>( keepstr[ind-1], keepstr[ind] );    
+    std::swap<mxLogical>( keepstr[ind-1], keepstr[ind] );
   }
 
   mxSetN( plhs[0], bsL );
