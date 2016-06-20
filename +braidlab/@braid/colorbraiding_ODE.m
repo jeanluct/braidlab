@@ -8,7 +8,7 @@ function [varargout] = colorbraiding_ODE(func,tspan,XY0)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -40,6 +40,8 @@ validateattributes(XY0,{'numeric'}, ...
 
 n = size(XY0,2); % number of punctures
 
+cross_cell = cell(n); % Cell array for crossing times.
+
 %if nargin < 4
   % Default projection line is X axis.
   proj = 0;
@@ -67,15 +69,16 @@ for I = 1:n
     [~,~,tc,XY2c,cdir] = ode45(func2,tspan,XY02,opts);
 
     dY = XY2c(:,2) - XY2c(:,4);
+    % Crossings where I was to the left of J
     icrIJ = find(cdir == 1);
     cross_cell{I,J} = [tc(icrIJ) sign(dY(icrIJ))];
+    % Crossings where J was to the left of I
     icrJI = find(cdir == 2);
     cross_cell{J,I} = [tc(icrJI) -sign(dY(icrJI))];
   end
 end
 
 [gen,tcr] = sortcross2gen(n,sortcross(cross_cell));
-%keyboard
 
 varargout{1} = braidlab.braid(gen,n);
 if nargout > 1, varargout{2} = tcr; end
