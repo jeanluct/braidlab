@@ -1,8 +1,11 @@
 function b = test_colorbraiding_ODE()
 
+global BRAIDLAB_braid_nomex
+BRAIDLAB_braid_nomex = 1;
+
 import braidlab.*
 
-n = 3;
+n = 10;
 omega = 1;
 tmax = 20;
 
@@ -25,7 +28,7 @@ for i = 1:n
 end
 
 % Construct braid from discretized trajectories.
-b0 = databraid(XY);
+b0 = databraid(XY,t);
 
 % Construct braid directly from ODE.
 b = braid(f,[0 tmax],XY0);

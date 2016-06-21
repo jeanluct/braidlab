@@ -61,11 +61,11 @@ for I = 1:n
   for J = I+1:n
     % Create extended function to integrate particles I & J together.
     XY02 = [XY0(:,I);XY0(:,J)];
-    func2 = @(t,XY2) [func(t,XY2(1:2,:));func(t,XY2(3:4,:))];
+    func2 = @(t,XY2) [func(t,XY2(1:2));func(t,XY2(3:4))];
 
     % Integrate, recording events when the particles cross.
     opts = [];
-    opts = odeset(opts,'Events',@paircross_event);
+    opts = odeset(opts,'Events',@paircross_event,'AbsTol',1e-6,'RelTol',1e-6);
     [~,~,tc,XY2c,cdir] = ode45(func2,tspan,XY02,opts);
 
     dY = XY2c(:,2) - XY2c(:,4);
