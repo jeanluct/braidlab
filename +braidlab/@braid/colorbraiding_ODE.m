@@ -54,6 +54,12 @@ cross_cell = cell(n); % Cell array for crossing times.
 % rotate the data clockwise by proj.
 if proj ~= 0, XY0 = rotate_data_clockwise(XY0,proj); end
 
+% Sort the initial conditions from left to right according to their initial
+% X coord; IDX contains the indices of the sort.
+[~,idx] = sortrows(XY0.',1);
+% Sort all the trajectories trajectories according to IDX:
+XY0 = XY0(:,idx);
+
 debugmsg('colorbraiding_ODE: Search for crossings between pairs of strings');
 
 for I = 1:n
