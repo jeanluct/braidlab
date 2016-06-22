@@ -8,6 +8,7 @@ import braidlab.*
 n = 10;
 omega = 1;
 tmax = 20;
+proj = .2;
 
 f = @(t,X) rigid(t,X,omega);
 
@@ -20,18 +21,22 @@ rng('default')
 XY0 = XY0 + .001*rand(size(XY0));
 
 % Integrate some trajectories at discrete times.
+tic
 t = linspace(0,tmax,101);
 XY = zeros(length(t),2,n);
 for i = 1:n
-  [~,XY1] = ode45(f,t,XY0(:,i));
+  [~,XY1] = ode45(f,t,XY0(:,i),odeset('AbsTol',1e-6,'RelTol',1e-6));
   XY(:,:,i) = XY1;
 end
 
 % Construct braid from discretized trajectories.
-b0 = databraid(XY,t);
+b0 = databraid(XY,t,proj);
+toc
 
 % Construct braid directly from ODE.
-b = braid(f,[0 tmax],XY0);
+tic
+b = braid(f,[0 tmax],XY0,proj,odeset('AbsTol',1e-6));
+toc
 
 % Check if the braids match.
 if (b == b0)

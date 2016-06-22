@@ -1,7 +1,5 @@
-function [varargout] = colorbraiding_ODE(func,tspan,XY0)
+function [varargout] = colorbraiding_ODE(func,tspan,XY0,proj,odeopts)
 %COLORBRAIDING_ODE   Find braid generators from trajectory ODE.
-
-% TODO: projection angle, pass optional parameters to ODE45.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -42,17 +40,24 @@ n = size(XY0,2); % number of punctures
 
 cross_cell = cell(n); % Cell array for crossing times.
 
-%if nargin < 4
+if nargin < 4
   % Default projection line is X axis.
   proj = 0;
-%end
+end
+
+if nargin < 5
+  % Additional options for integrator.
+  odeopts = [];
+end
 
 %delta = braidlab.prop('BraidAbsTol');
 
 % Rotate coordinates according to angle proj.  Note that since the
 % projection line is supposed to be rotated counterclockwise by proj, we
 % rotate the data clockwise by proj.
-if proj ~= 0, XY0 = rotate_data_clockwise(XY0,proj); end
+if proj ~= 0
+  XY0 = squeeze(rotate_data_clockwise(reshape(XY0,[1 size(XY0)]),proj));
+end
 
 % Sort the initial conditions from left to right according to their initial
 % X coord; IDX contains the indices of the sort.
@@ -69,9 +74,11 @@ for I = 1:n
     XY02 = [XY0(:,I);XY0(:,J)];
     func2 = @(t,XY2) [func(t,XY2(1:2));func(t,XY2(3:4))];
 
+    % Default options to the integrator.
+    optsdef = odeset('Events',@paircross_event,'AbsTol',1e-6,'RelTol',1e-6);
+    % Overwrite defaults with specific options.
+    opts = odeset(optsdef,odeopts);
     % Integrate, recording events when the particles cross.
-    opts = [];
-    opts = odeset(opts,'Events',@paircross_event,'AbsTol',1e-6,'RelTol',1e-6);
     [~,~,tc,XY2c,cdir] = ode45(func2,tspan,XY02,opts);
 
     dY = XY2c(:,2) - XY2c(:,4);

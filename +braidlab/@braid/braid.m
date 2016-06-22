@@ -57,7 +57,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   methods
 
-    function br = braid(b,secnd,third)
+    function br = braid(b,secnd,third,varargin)
     %BRAID   Construct a braid object.
     %   B = BRAID(W) creates a braid object B from a vector of generators W.
     %   B = BRAID(W,N) specifies the number of strings N of the braid group,
@@ -223,7 +223,7 @@ classdef braid < matlab.mixin.CustomDisplay
 	% The secnd argument is the timespan.
 	% The third argument is the initial positions.
 	% TODO: projection angle, options to ODE45.
-        br = braidlab.braid.colorbraiding_ODE(b,secnd,third);
+        br = braidlab.braid.colorbraiding_ODE(b,secnd,third,varargin{:});
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
@@ -494,7 +494,7 @@ classdef braid < matlab.mixin.CustomDisplay
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
     [varargout] = colorbraiding(XY,t,proj,checkclosure)
-    [varargout] = colorbraiding_ODE(func,tspan,XY0)
+    [varargout] = colorbraiding_ODE(func,tspan,XY0,proj,odeopts)
   end % methods block
 
 end % braid classdef
