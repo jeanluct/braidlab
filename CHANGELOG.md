@@ -1,15 +1,19 @@
 # Change Log
 
+
 ## [Unreleased][unreleased]
+
+
+## [3.2.1] - 2016-10-18
 
 * braid constructor issues a warning when creating a braid from data
   consisting of unclosed orbits.  Use braid(closure(XY)) to suppress the
-  warning.  (See issue #130.)
+  warning (issue #130).
 
-* Fix issue #131: loopsigma_helper without GMP still tries to compile
-  functions with mpz_class.
+* Bugfix: loopsigma_helper without GMP still tried to compile
+  functions with mpz_class (issue #131).
 
-* Fix issue #132: Added mutex protection around temporary loop storage.
+* Bugfix: added mutex protection around temporary loop storage (issue #132).
 
 
 ## [3.2] - 2015-08-27
@@ -314,7 +318,8 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2...develop
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...develop
+[3.2.1]: https://github.com/jeanluct/braidlab/compare/release-3.2...release-3.2.1
 [3.2]: https://github.com/jeanluct/braidlab/compare/release-3.1...release-3.2
 [3.1]: https://github.com/jeanluct/braidlab/compare/release-3.0.1...release-3.1
 [3.0.1]: https://github.com/jeanluct/braidlab/compare/release-3.0...release-3.0.1
