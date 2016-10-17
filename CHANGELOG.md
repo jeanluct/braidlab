@@ -4,7 +4,12 @@
 
 * braid constructor issues a warning when creating a braid from data
   consisting of unclosed orbits.  Use braid(closure(XY)) to suppress the
-  warning.
+  warning.  (See issue #130.)
+
+* Fix issue #131: loopsigma_helper without GMP still tries to compile
+  functions with mpz_class.
+
+* Fix issue #132: Added mutex protection around temporary loop storage.
 
 
 ## [3.2] - 2015-08-27
