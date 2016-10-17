@@ -110,7 +110,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   BRAID('HironakaKin',(N+2)/2,(N-4)/2), which is pseudo-Anosov but
     %   does not minimize entropy for even N.
     %
-    %   B = BRAID('VenzkePsi',N) or BRAID('PSI',N) returns a member of
+    %   B = BRAID('VenzkePsi',N) or BRAID('Psi',N) returns a member of
     %   the Venzke family of psi-braids on N strings (N>4).
     %
     %   B = BRAID(K) returns a braid representative B for the knot K.  The

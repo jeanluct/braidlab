@@ -12,13 +12,13 @@ function [varargout] = entropy(b,varargin)
 %   parameter-value pairs that modify algorithm behavior (defaults in
 %   braces).
 %
-%   * Method - Algorithm Choice [ 'trains' | {'iter'} ] Chooses between
+%   * Method - Algorithm Choice [ 'Trains' | {'Iter'} ] Chooses between
 %   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
 %   for long braids B-H algorithm becomes very inefficient.
 %
-%   The following options apply only to Iterative algorithm:
+%   The following options apply only to the Iterative algorithm:
 %
-%   * Tol - Absolute convergence tolerance [non-negative number, {1e-6}]
+%   * Tol - Absolute convergence tolerance [non-negative number {1e-6}]
 %   Tol is only approximate: if the iteration converges slowly it can
 %   be off by a small amount.
 %
@@ -28,10 +28,10 @@ function [varargout] = entropy(b,varargin)
 %   specified as a positive number
 %
 %   * Length - Choice of loop length function [ 'intaxis' |
-%   'minlength' | { 'l2norm' } ]  See documentation of loop.intaxis,
-%   loop.minlength, loop.l2norm for details. The choice should affect
+%   'minlength' | {'l2norm'} ]  See documentation of loop.intaxis,
+%   loop.minlength, loop.l2norm for details.  The choice should affect
 %   the output only if finite (small) number of iterations is
-%   performed. For large number of iterations, 'l2norm' should be
+%   performed.  For large number of iterations, 'l2norm' should be
 %   preferred for speed.
 %
 %   * NConv - Number of consecutive convergences [ positive {3} ]
@@ -41,15 +41,15 @@ function [varargout] = entropy(b,varargin)
 %   increasing NConv is required for extreme accuracy.
 %
 %   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
-%   algorithm. Shortcut for Tol = 0 && MaxIt = 1
+%   algorithm.  Shortcut for Tol = 0 && MaxIt = 1.
 %
-%   ENTR = ENTROPY(B, 'Finite','MaxInt',N, ...) compute exactly N
-%   iterations of the algorithm ('MaxInt' parameter has to be
-%   specified). Identical to passing Tol = 0 and MaxInt = N.
+%   ENTR = ENTROPY(B,'Finite','MaxInt',N, ...) computes exactly N iterations
+%   of the algorithm (the parameter 'MaxInt' has to be specified).
+%   Identical to passing Tol = 0 and MaxInt = N.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
-%   are normalized such that NORM(PLOOP.COORDS)=1.
+%   are normalized such that NORM(PLOOP.COORDS) = 1.
 %
 %   This is a method for the BRAID class.
 %   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
