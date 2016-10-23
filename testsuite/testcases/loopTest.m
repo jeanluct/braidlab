@@ -3,7 +3,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -464,6 +464,15 @@ classdef loopTest < matlab.unittest.TestCase
       Niter = 100;
       testCase.verifyError(@()loopEntropy(Niter),...
                            'BRAIDLAB:braid:sumg:overflow')
+    end
+
+    function test_loop_plot_for_loop_vector(testCase)
+
+    % loop vector containing two loops
+      lv = braidlab.loop([0 1 1 1; 0 0 1 1]);
+      testCase.verifyError(@()plot(lv),...
+                           'BRAIDLAB:loop:plot:multiloop');
+
     end
 
   end

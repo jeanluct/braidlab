@@ -16,7 +16,7 @@ function b = taffy(ptype,projang)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -54,9 +54,9 @@ switch lower(ptype)
   % The classic 3-rod taffy puller has counter-rotating rods.
   n = 3;
   z = zeros(npts,n);
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = .5 + r*exp(-i*(th-pi));
+  z(:,3) = .5 + r*exp(-1i*(th-pi));
   cl = {'r' gray 'b'};
  case {'4rods'}
   % For 4 rods, co-rotating.
@@ -66,10 +66,10 @@ switch lower(ptype)
   n = 4;
   z = zeros(npts,n);
   r0 = .5*r;
-  z(:,1) = 0 + r*exp(i*(th-pi));
-  z(:,2) = 0 + r0*exp(i*th);
-  z(:,3) = 1 + r*exp(i*th);
-  z(:,4) = 1 + r0*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
+  z(:,2) = 0 + r0*exp(1i*th);
+  z(:,3) = 1 + r*exp(1i*th);
+  z(:,4) = 1 + r0*exp(1i*(th-pi));
   cl = {'r' 'r' 'b' 'b'};
  case {'4rods-alt'}
   % For 4 rods, co-rotating.
@@ -77,18 +77,18 @@ switch lower(ptype)
   % Replace the moving rods by fixed rods (topologically equivalent).
   n = 4;
   z = zeros(npts,n);
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = 1 + r*exp(i*th);
+  z(:,3) = 1 + r*exp(1i*th);
   z(:,4) = 1;
   cl = {'r' gray 'b' gray};
  case {'5rods'}
   % For 5 rods, insert one in the middle.  Doesn't change the entropy.
   n = 5;
   z = zeros(npts,n);
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = 1 + r*exp(i*th);
+  z(:,3) = 1 + r*exp(1i*th);
   z(:,4) = 1;
   z(:,5) = .5*ones(size(z(:,1)));
   cl = {'r' gray 'b' gray 'm'};
@@ -96,24 +96,24 @@ switch lower(ptype)
   % For 6 rods, insert fixed rods on axes of rotation.
   n = 6;
   z = zeros(npts,n);
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = 1 + r*exp(i*th);
+  z(:,3) = 1 + r*exp(1i*th);
   z(:,4) = 1;
-  z(:,5) = 0 + r*exp(i*th);
-  z(:,6) = 1 + r*exp(i*(th-pi));
+  z(:,5) = 0 + r*exp(1i*th);
+  z(:,6) = 1 + r*exp(1i*(th-pi));
   cl = {'r' gray 'b' gray 'r' 'b'};
  case {'6rods-bad'}
   % Alternate (bad) design for 6 rods.
   n = 6;
   z = zeros(npts,n);
   r0 = .5*r;
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = 0 + r0*exp(i*th);
+  z(:,3) = 0 + r0*exp(1i*th);
   z(:,4) = 1;
-  z(:,5) = 1 + r*exp(i*th);
-  z(:,6) = 1 + r0*exp(i*(th-pi));
+  z(:,5) = 1 + r*exp(1i*th);
+  z(:,6) = 1 + r0*exp(1i*(th-pi));
   cl = {'r' gray 'r' gray 'b' 'b'};
  case {'6rods-alt'}
   % Alternate design for 6 rods.
@@ -121,12 +121,12 @@ switch lower(ptype)
   r = 1.2;
   z = zeros(npts,n);
   r0 = .3*r;
-  z(:,1) = 0 + r*exp(i*(th-pi));
+  z(:,1) = 0 + r*exp(1i*(th-pi));
   z(:,2) = 0;
-  z(:,3) = 0 + r0*exp(i*th);
+  z(:,3) = 0 + r0*exp(1i*th);
   z(:,4) = 1;
-  z(:,5) = 1 + r*exp(i*th);
-  z(:,6) = 1 + r0*exp(i*(th-pi));
+  z(:,5) = 1 + r*exp(1i*th);
+  z(:,6) = 1 + r0*exp(1i*(th-pi));
   cl = {'r' gray 'b' gray 'r' 'b'};
 end
 

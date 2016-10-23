@@ -20,7 +20,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -129,7 +129,7 @@ classdef databraid < braidlab.braid
                          {'real','finite','scalar','nonnan','nonempty'},...
                          'BRAIDLAB.databraid','proj');
 
-      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj);
+      [b,br.tcross] = braidlab.braid.colorbraiding(XY,t,proj,false);
 
       br.word = b.word;
       br.tcross = br.tcross(:).';   % Store tcross as row vector.

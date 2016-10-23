@@ -20,7 +20,7 @@ function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -45,8 +45,8 @@ import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex;
-useMatlabVersion = any(BRAIDLAB_braid_nomex);
+global BRAIDLAB_loop_nomex;
+useMatlabVersion = any(BRAIDLAB_loop_nomex);
 
 if isempty(sigma_idx)
   loop_out = loop_in;

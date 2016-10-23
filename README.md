@@ -6,6 +6,25 @@
 
 See the [*braidlab* user's guide][4].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.  The guide is also posted on [arXiv][5].
 
+### citing *braidlab*
+
+If you use *braidlab* in one of your papers, please cite it as:
+
+* J.-L. Thiffeault and Marko Budišić, _Braidlab: A Software Package for Braids and Loops_, [arXiv:1410.0849](http://arXiv.org/abs/1410.0849) [math.GT] (2013-2016), Version `<<version number>>`.
+
+You can use this BibTeX entry:
+```
+@Misc{braidlab,
+    author = {Jean-Luc Thiffeault and Marko Budi\v{s}i\'{c}},
+    title = {Braidlab: {A} Software Package for Braids and Loops},
+    eprint = {arXiv:1410.0849 [math.GT]},
+    url = {http://arXiv.org/abs/1410.0849},
+    year = {2013--2016},
+    note = {Version <<version number>>}
+}
+```
+We can add your paper to the [publication list](https://github.com/jeanluct/braidlab/wiki/Publications).
+
 ### contributors
 
 [Michael Allshouse][6] contributed extensive testing, comments, and some of the code.

@@ -3,7 +3,7 @@
 #
 #   http://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 #                            Marko Budisic         <marko@math.wisc.edu>
 #
 #   This file is part of Braidlab.
@@ -59,6 +59,7 @@ MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 
 all: check-env
 	cd +braidlab/private; $(MAKE) all
+	cd +braidlab/+util; $(MAKE) all
 	cd +braidlab/@braid/private; $(MAKE) all
 	cd +braidlab/@loop/private; $(MAKE) all
 	cd +braidlab/@cfbraid/private; $(MAKE) all

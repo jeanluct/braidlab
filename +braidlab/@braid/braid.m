@@ -15,7 +15,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic         <marko@math.wisc.edu>
 %
 %   This file is part of Braidlab.
@@ -110,7 +110,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   BRAID('HironakaKin',(N+2)/2,(N-4)/2), which is pseudo-Anosov but
     %   does not minimize entropy for even N.
     %
-    %   B = BRAID('VenzkePsi',N) or BRAID('PSI',N) returns a member of
+    %   B = BRAID('VenzkePsi',N) or BRAID('Psi',N) returns a member of
     %   the Venzke family of psi-braids on N strings (N>4).
     %
     %   B = BRAID(K) returns a braid representative B for the knot K.  The
@@ -235,7 +235,7 @@ classdef braid < matlab.mixin.CustomDisplay
                            {'real','finite','scalar','nonnan','nonempty'},...
                            'BRAIDLAB.databraid','projection angle');
 
-        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
+        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
@@ -487,7 +487,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
-    [varargout] = colorbraiding(XY,t,proj)
+    [varargout] = colorbraiding(XY,t,proj,checkclosure)
   end % methods block
 
 end % braid classdef
