@@ -4,7 +4,7 @@
 ## [Unreleased][unreleased]
 
 
-## [3.2.1] - 2016-10-18
+## [3.2.1] - 2016-10-23
 
 * braid constructor issues a warning when creating a braid from data
   consisting of unclosed orbits.  Use braid(closure(XY)) to suppress the
