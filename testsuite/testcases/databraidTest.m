@@ -47,8 +47,14 @@ classdef databraidTest < matlab.unittest.TestCase
       testCase.verifyError(@() databraid, ...
                            'BRAIDLAB:databraid:databraid:badarg');
       % Too many input arguments.
-      testCase.verifyError(@() databraid(1,1,1,1), ...
-                           'MATLAB:maxrhs');
+      % The error message id changed name from R2016b.
+      maxver = '9.1.0.441655'; maxrel = '2016b';
+      if verLessThan('matlab', maxver)
+        maxrhs_id = 'MATLAB:maxrhs';
+      else
+        maxrhs_id = 'MATLAB:TooManyInputs';
+      end
+      testCase.verifyError(@() databraid(1,1,1,1),maxrhs_id);
       % Wrong number of crossing times.
       testCase.verifyError(@() databraid([1 2],1), ...
                            'BRAIDLAB:databraid:check_tcross:badtimes');
