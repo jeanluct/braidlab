@@ -14,8 +14,8 @@ function [tc,dY] = interpcross(t,X,Y,itc,p1,p2)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
 %

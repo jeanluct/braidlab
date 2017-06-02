@@ -1,7 +1,10 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
+## [3.2.2] - 2017-06-02
+
+* Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
+  databraidTest to fail (issue #137).
 
 
 ## [3.2.1] - 2016-10-23
