@@ -1,9 +1,6 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
-
-
 ## [3.2.2] - 2017-06-02
 
 * Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
