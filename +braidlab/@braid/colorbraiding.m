@@ -38,9 +38,8 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2016  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
-%                        Michael Allshouse <mallshouse@chaos.utexas.edu>
+%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
 %
