@@ -13,6 +13,14 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
 %
+%   When two strands project onto the same point at any time instance, it
+%   is not generally possible to robustly determine their identities. In
+%   such events, the function issues the error
+%   BRAIDLAB:braid:colorbraiding:coincidentprojection
+%   identifying the offending pair of strands. To resolve this issue,
+%   either change the PROJANG parameter or reduce the value of the braidlab
+%   parameter BraidAbsTol using braidlab.prop('BraidAbsTol', VALUE) command.
+%
 %   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
 %
@@ -31,7 +39,7 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %   you want to manually set the number of threads used, set a global MATLAB
 %   variable BRAIDLAB_threads to a positive integer.
 %
-%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
+%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID, BRAIDLAB.PROP
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
