@@ -1,4 +1,4 @@
-function plot(L, varargin)
+function [varargout] = plot(L, varargin)
 %PLOT   Plot a loop.
 %   PLOT(L) plots a representative of the equivalence class
 %   defined by the loop L.
@@ -93,10 +93,19 @@ assert( size(L.coords,1) == 1, ...
 % M_coord, N_coord - "above", "below" intersection numbers
 [n, b_coord, M_coord, N_coord] = getcoords( L );
 
+if options.Components || nargout > 0
+  % Find components if they are to be colored differently, or if handles
+  % to the lines is requested as an output argument.
+  divideComponents = true;
+else
+  divideComponents = false;
+end
+divideComponents = true;
+
 %% Compute components and assign colors to them
 % If components are plotted separately, compute them and assign
 % unique colors
-if options.Components
+if divideComponents
   % cumulative sum of intersections, i.e., intersections at punctures
   % 1, then 1+2, then 1+2+3, ...
   T_sum = cumsum( M_coord + N_coord );
@@ -214,6 +223,7 @@ end
 % 'left' semicircles are C-shaped
 % 'right' semicircles are D-shaped
 
+XYcomp = cell(1,Nc);
 
 % Cycle through each puncture.
 for p = 1:n
@@ -228,14 +238,10 @@ for p = 1:n
   % Draw this number of semicircles taking into account the direction
   % (left/right) around the puncture.
   for sc = 1:abs(nl)
-    if options.Components
-      mycomp = components( keytohash([p, -sign(nl)*sc]) );
-      mycolor = compcolors(mycomp,:);
-      options.LineColor = mycolor;
-    end
-
-    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
-                puncture_position, pgap, options );
+    mycomp = components( keytohash([p, -sign(nl)*sc]) );
+    XYcomp{mycomp} = [XYcomp{mycomp} ...
+                     joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
+                                 puncture_position, pgap )];
   end
 end
 
@@ -270,14 +276,10 @@ for p = 1:n-1
       idx_mine = nr + s; % index of the vertex
       idx_next = -(nl-s+tojoindown+1);
 
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
-      end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      mycomp = components( keytohash([p,idx_mine]) );
+      XYcomp{mycomp} = [XYcomp{mycomp} ...
+                       joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                                   puncture_position, pgap )];
 
     end
     % The lines that join upwards (on the same side).
@@ -289,14 +291,10 @@ for p = 1:n-1
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
 
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
-      end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      mycomp = components( keytohash([p,idx_mine]) );
+      XYcomp{mycomp} = [XYcomp{mycomp} ...
+                       joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                                   puncture_position, pgap )];
     end
   end
 end
@@ -339,8 +337,9 @@ for p = 1:n-1
         options.LineColor = mycolor;
       end
 
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      XYcomp{mycomp} = [XYcomp{mycomp} ...
+                       joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                                   puncture_position, pgap )];
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
@@ -351,16 +350,19 @@ for p = 1:n-1
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
 
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
-      end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      mycomp = components( keytohash([p,idx_mine]) );
+      XYcomp{mycomp} = [XYcomp{mycomp} ...
+                       joinpoints( [p,idx_mine], [p+1,idx_next], ...
+                                   puncture_position, pgap )];
     end
   end
+end
+
+% Plot the components.
+for mycomp = 1:Nc
+  mycolor = compcolors(mycomp,:);
+  options.LineColor = mycolor;
+  plotcomp(XYcomp{mycomp},options)
 end
 
 if ~holdstate
@@ -374,6 +376,8 @@ if ~holdstate
   axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
 
+
+%============================================================================
 function [n, b_coord, M_coord, N_coord] = getcoords( L )
 %% getcoords( L )
 %
@@ -404,11 +408,12 @@ M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
+
 %============================================================================
-function joinpoints( mine, next, positions, gaps, options )
+function XYplot = joinpoints( mine, next, positions, gaps )
 %% joinpoints( mine, next, positions, gaps, options )
 %
-% Function that plots segments of loops - either straight lines or semicircles
+% Make loop segments - either straight lines or semicircles - for later plotting
 %
 % *** Inputs: ***
 % mine and next are pairs (puncture index, vertex index) defining
@@ -427,7 +432,6 @@ function joinpoints( mine, next, positions, gaps, options )
 %
 % positions - n x 2 matrix of puncture positions
 % gaps      - 1 x n vector of gaps between loop lines at each puncture
-% options   - options data for line plotting
 %
 % *** Warning: *** This function is for internal use, error
 % checking is not bullet proof.
@@ -456,22 +460,22 @@ if dp == 0
   loop_curve_x = cirsign*linspace(0,rad,50);
   loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
   loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-  Xplot = positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)];
-  Yplot = positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom];
+  XYplot = ...
+      [positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)] ; ...
+       positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom]];
 
 else
   %% Draw straight lines
   y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
   y2 = next(2)*gaps(next(1))+positions(next(1),2);
-  Xplot = [positions(mine(1),1) positions(next(1),1)];
-  Yplot = [y1 y2];
+  XYplot = ...
+      [positions(mine(1),1) positions(next(1),1) ; ...
+       y1 y2];
 end
-
-plotseg(Xplot,Yplot,options)
 
 
 %============================================================================
-function h = plotseg( Xplot, Yplot, options )
+function [varargout] = plotcomp( XYplot, options )
 
 pltopts = {'LineWidth',options.LineWidth,'LineStyle',options.LineStyle};
 if options.Components
@@ -480,4 +484,6 @@ else
   pltopts = {options.LineColor,pltopts{:}};
 end
 
-h = plot(Xplot, Yplot, pltopts{:})
+h = plot(XYplot(1,:), XYplot(2,:), pltopts{:});
+
+if nargout > 0, varargout{1} = h; end
