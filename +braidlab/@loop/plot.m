@@ -404,6 +404,7 @@ M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
+%============================================================================
 function joinpoints( mine, next, positions, gaps, options )
 %% joinpoints( mine, next, positions, gaps, options )
 %
@@ -466,12 +467,17 @@ else
   Yplot = [y1 y2];
 end
 
+plotseg(Xplot,Yplot,options)
+
+
+%============================================================================
+function h = plotseg( Xplot, Yplot, options )
+
+pltopts = {'LineWidth',options.LineWidth,'LineStyle',options.LineStyle};
 if options.Components
-  plot(Xplot, Yplot, ...
-       'Color', options.LineColor,'LineWidth',options.LineWidth, ...
-       'LineStyle',options.LineStyle)
+  pltopts = {'Color', options.LineColor,pltopts{:}};
 else
-  plot(Xplot, Yplot, ...
-       options.LineColor,'LineWidth',options.LineWidth, ...
-       'LineStyle',options.LineStyle)
+  pltopts = {options.LineColor,pltopts{:}};
 end
+
+h = plot(Xplot, Yplot, pltopts{:})
