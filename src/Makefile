@@ -34,7 +34,7 @@ OBJS = $(OBJSOURCES:.cpp=.o)
 
 all: lib frontend train
 
-lib libtrains: ../lib/libtrains.a
+lib libtrains libtrains.a: ../lib/libtrains.a
 
 ../lib/libtrains.a: $(OBJS)
 	ar cr libtrains.a $(OBJS)
@@ -47,7 +47,7 @@ train: ../lib/libtrains.a train.o
 
 # Clean up directory.  Remove object files and dependencies file.
 clean:
-	rm -f $(OBJS) $(DEPFILE)
+	rm -f $(OBJS) frontend.o train.o $(DEPFILE)
 
 # Clean up everything, including executables and library.
 distclean:
