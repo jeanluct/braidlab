@@ -411,7 +411,7 @@ N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
 
 %============================================================================
 function XYplot = joinpoints( mine, next, positions, gaps )
-%% joinpoints( mine, next, positions, gaps, options )
+%% joinpoints( mine, next, positions, gaps )
 %
 % Make loop segments - either straight lines or semicircles - for later plotting
 %
