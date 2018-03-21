@@ -12,7 +12,7 @@ CPP          = g++
 MAKEDEPCMD   = $(CPP)
 
 # Compile options.
-#USE_CLN = 1
+# Use make USE_CLN=1 to compile with the CLN library.
 ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
