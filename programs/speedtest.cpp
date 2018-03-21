@@ -33,8 +33,6 @@
 #include <cmath>
 
 #include "cbraid.h"
-using namespace CBraid;
-using namespace std;
 
 #include "optarg.h"
 #include "timecounter.h"
@@ -50,6 +48,9 @@ double BlockSize, SecurityLevel;
 
 void Encrypt()
 {
+    using namespace CBraid;
+    using namespace std;
+
     TimeCounter t;
 
     ArtinBraid x(Index), y(Index), z(Index), b1(Index), b2(Index);
@@ -100,6 +101,9 @@ void Encrypt()
 
 void Decrypt()
 {
+	using namespace CBraid;
+	using namespace std;
+
 	std::clock_t t1, t2;
 
 	ArtinBraid a1(Index), a2(Index);
@@ -142,6 +146,9 @@ void Decrypt()
 
 int main(int argc, char *argv[])
 {
+    using namespace CBraid;
+    using namespace std;
+
     // Process command line options.
     OptArg::optmap m;
     m << OptArg::opt("-n", OptArg::int_arg, &Index)
