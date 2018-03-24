@@ -172,6 +172,14 @@ if isnan(params.maxit)
     % spectral gap.  Roughly, each iteration yields spgap decimal digits.
     spgap = 19 * b.n^-3;
     maxit = ceil(-log10(tol) / spgap) + 30;
+    % For large braids this will overflow int, causing problems with the
+    % MEX file.  There's really no point in using a longer int, since
+    % this is a ludicrous number of iterations.
+    if maxit > intmax('int32')
+      warning('BRAIDLAB:braid:entropy:maxitint32',...
+              'Setting maxit to largest 32-bit integer.')
+      maxit = intmax('int32');
+    end
   end
 else
   maxit = params.maxit;
