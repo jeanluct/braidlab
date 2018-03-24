@@ -2,6 +2,9 @@
 
 import braidlab.*
 
+global BRAIDLAB_debuglvl
+BRAIDLAB_debuglvl = 1;
+
 % A simple pA braid and its entropy.
 b0 = braid([1 -2]);
 entr0 = entropy(b0);
