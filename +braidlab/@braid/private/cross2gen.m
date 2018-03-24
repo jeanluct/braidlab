@@ -60,7 +60,7 @@ cross_cell = cell(n); % Cell array for crossing times.
 % Cycle through all pairs of strings and find all crossings.
 %
 
-debugmsg('cross2gen: Search for crossings between pairs of strings');
+debugmsg('cross2gen: Search for crossings between pairs of strings',2);
 
 for I = 1:n
   debugmsg([num2str(I) '/' num2str(n)],2) % Counter to monitor progress

@@ -69,7 +69,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
         isa(loop_in,'single') || ...
         isa(loop_in,'int32') || ...
         isa(loop_in,'int64')
-    debugmsg('Using MEX loopsigma with Matlab data structures.');
+    debugmsg('Using MEX loopsigma with Matlab data structures.',2);
 
     % storing loops in columns is more efficient for memory fetching
     loop_in = transpose(loop_in);
@@ -83,7 +83,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
     return
 
   elseif isa(loop_in,'vpi')
-    debugmsg('Using MEX loopsigma with VPI.')
+    debugmsg('Using MEX loopsigma with VPI.',2)
     % Convert u to cell of strings to pass to C++ file.
     Nloops = size(loop_in,1);
     Ncoord = size(loop_in,2);
@@ -121,7 +121,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
   end
 end
 
-debugmsg('Using Matlab loopsigma.')
+debugmsg('Using Matlab loopsigma.',2)
 
 n = size(loop_in,2)/2 + 2;
 a = loop_in(:,1:n-2); b = loop_in(:,(n-1):end);

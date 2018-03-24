@@ -3,6 +3,12 @@
 
 ## [Unreleased][unreleased]
 
+* Bugfix: for large braids maxit could overflow an int32 (issue #138).
+
+* Move "utility" debug messages to debug level 2.  Now debug level 1
+  should be reserved for mathematical diagnostic information (e.g.,
+  internal iterations, convergence).  This provides a cleaner output
+  when debugging the actual functionality of the code.
 
 ## [3.2.2] - 2017-06-02
 

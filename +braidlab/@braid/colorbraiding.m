@@ -89,7 +89,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
+debugmsg(['colorbraiding: Initialize parameters for crossing analysis'],2);
 tic
 n = size(XY,3); % number of punctures
 
@@ -137,7 +137,7 @@ if checkclosure
   end
 end
 
-debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
+debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000),2);
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -148,7 +148,7 @@ try % trapping to ensure proper identification of strands
     assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
                         'forced']);
 
-    debugmsg('Using MEX algorithm')
+    debugmsg('Using MEX algorithm',2)
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
@@ -158,7 +158,7 @@ try % trapping to ensure proper identification of strands
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')
+    debugmsg('Using MATLAB algorithm',2)
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XY,t,delta);
     end

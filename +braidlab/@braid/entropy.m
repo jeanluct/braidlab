@@ -172,6 +172,14 @@ if isnan(params.maxit)
     % spectral gap.  Roughly, each iteration yields spgap decimal digits.
     spgap = 19 * b.n^-3;
     maxit = ceil(-log10(tol) / spgap) + 30;
+    % For large braids this will overflow int, causing problems with the
+    % MEX file.  There's really no point in using a longer int, since
+    % this is a ludicrous number of iterations.
+    if maxit > intmax('int32')
+      warning('BRAIDLAB:braid:entropy:maxitint32',...
+              'Setting maxit to largest 32-bit integer.')
+      maxit = intmax('int32');
+    end
   end
 else
   maxit = params.maxit;
@@ -193,9 +201,9 @@ else
 end
 
 paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
-                    'LENGTH = %s\n'], tol,maxit,nconvreq,params.length);
+                    'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
 
-braidlab.util.debugmsg( paramstring, 1);
+braidlab.util.debugmsg(paramstring,1);
 
 %% MEX implementation
 if ~usematlab
@@ -217,7 +225,7 @@ if ~usematlab
 
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
-                                       tol,lengthflag, true);
+                                       tol,lengthflag,true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
@@ -258,7 +266,7 @@ if usematlab
     entr = log(currentLoopLength);
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
-                     i,entr,entr-entr0),2)
+                     i,entr,entr-entr0),1)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;

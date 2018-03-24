@@ -49,7 +49,7 @@ else
     % use the global variable to set the number of threads
     ComputedThreads = ceil(BRAIDLAB_threads);
     debugmsg(sprintf(['getAvailableThreadNumber: Number of threads set by ' ...
-                      'BRAIDLAB_threads to: %d.'],ComputedThreads));
+                      'BRAIDLAB_threads to: %d.'],ComputedThreads),2);
   else
     % try to autodetect the optimal number of threads (== number of cores)
     try
@@ -58,7 +58,7 @@ else
       ComputedThreads=r.availableProcessors;
 
       debugmsg(sprintf(['Number of threads auto-set to %d using ' ...
-                        'java.lang.Runtime.'], ComputedThreads));
+                        'java.lang.Runtime.'],ComputedThreads),2);
       % 'feature' fails - auto set number of threads to 1
     catch
       ComputedThreads = 1;

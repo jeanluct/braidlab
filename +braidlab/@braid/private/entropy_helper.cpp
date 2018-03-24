@@ -53,7 +53,7 @@ int BRAIDLAB_debuglvl = -1;
 #define P_BRAID   prhs[0]
 #define P_LOOP_IN prhs[1]
 #define P_MAXIT prhs[2]
-#define P_NCONV prhs[3]
+#define P_NCONVREQ prhs[3]
 #define P_TOL prhs[4]
 #define P_LENGTHTYPE prhs[5]
 #define P_ISFUNDAMENTAL prhs[6]
@@ -74,7 +74,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const double *u = mxGetPr(P_LOOP_IN);
 
   const int maxit = (int)mxGetScalar(P_MAXIT);
-  const int nconvreq = (int)mxGetScalar(P_NCONV);
+  const int nconvreq = (int)mxGetScalar(P_NCONVREQ);
   const double tol = mxGetScalar(P_TOL);
 
   const char lengthFlag =
@@ -149,7 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       entr = std::log(currentLength);
 
-      if (BRAIDLAB_debuglvl >= 2)
+      if (BRAIDLAB_debuglvl >= 1)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 
