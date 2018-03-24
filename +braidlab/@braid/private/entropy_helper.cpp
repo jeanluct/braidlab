@@ -149,7 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
       entr = std::log(currentLength);
 
-      if (BRAIDLAB_debuglvl >= 2)
+      if (BRAIDLAB_debuglvl >= 1)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 

@@ -193,9 +193,9 @@ else
 end
 
 paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
-                    'LENGTH = %s\n'], tol,maxit,nconvreq,params.length);
+                    'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
 
-braidlab.util.debugmsg( paramstring, 1);
+braidlab.util.debugmsg(paramstring,1);
 
 %% MEX implementation
 if ~usematlab
@@ -217,7 +217,7 @@ if ~usematlab
 
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
-                                       tol,lengthflag, true);
+                                       tol,lengthflag,true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
@@ -258,7 +258,7 @@ if usematlab
     entr = log(currentLoopLength);
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
-                     i,entr,entr-entr0),2)
+                     i,entr,entr-entr0),1)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;

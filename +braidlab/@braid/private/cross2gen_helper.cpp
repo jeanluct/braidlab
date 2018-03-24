@@ -81,7 +81,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     NThreadsRequested = 0;
   }
 
-  if (1 <= BRAIDLAB_debuglvl)  {
+  if (2 <= BRAIDLAB_debuglvl)  {
     printf("cross2gen_helper: Number of threads requested %d\n",
            NThreadsRequested );
   }

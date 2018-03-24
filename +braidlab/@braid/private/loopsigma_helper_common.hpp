@@ -241,7 +241,7 @@ template <class T>
 void BraidInPlace<T>::run(size_t NThreadsRequested) {
 
 #ifndef BRAIDLAB_NOTHREADING
-  // restrict the number of threads if there are less jobs than available
+  // restrict the number of threads if there are fewer jobs than available
   // threads
   NThreadsRequested = NThreadsRequested > Nloops ? Nloops : NThreadsRequested;
 #else
@@ -254,7 +254,7 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
 
   // unthreaded version
   if (NThreadsRequested == 1) {
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("loopsigma_helper: multiplication running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -264,7 +264,7 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
   }
 #ifndef BRAIDLAB_NOTHREADING
   else {   // threaded version
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("loopsigma_helper: multiplication running THREADED (%d threads).\n",
              NThreadsRequested);
       mexEvalString("pause(0.001);"); //flush

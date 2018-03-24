@@ -459,7 +459,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
   if (! crossingErrors.empty() ) {
     int count  = 1;
     // output individual errors
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       mexPrintf("List of all crossingErrors encountered:\n");
       for( std::list<PWXexception>::iterator e = crossingErrors.begin();
            e != crossingErrors.end();
@@ -484,13 +484,13 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
   crossings.sort();
   tictoc.toc("cross2gen_helper: sorting crossdat", true);
 
-  if (1 <= BRAIDLAB_debuglvl)  {
+  if (2 <= BRAIDLAB_debuglvl)  {
     printf("cross2gen_helper: Number of crossings %d\n", crossings.size() );
     mexEvalString("pause(0.001);"); //flush
   }
 
   // Determine generators from ordered crossing data
-  if (1 <= BRAIDLAB_debuglvl)  {
+  if (2 <= BRAIDLAB_debuglvl)  {
     printf("cross2gen_helper: Convert crossings to generator sequence\n");
     mexEvalString("pause(0.001);");
   }
@@ -682,7 +682,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 
   // unthreaded version
   if ( NThreadsRequested == 1 ) {
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("cross2gen_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -701,7 +701,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
                                         this, std::placeholders::_1);
     ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
 
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf(
         "cross2gen_helper: pairwise crossings running on %d threads.\n",
         NThreadsRequested );
