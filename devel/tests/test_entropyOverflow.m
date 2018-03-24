@@ -1,9 +1,13 @@
 % Test program to check when the internal algorithm for entropy overflows.
 
+% See issue #138.
+
 import braidlab.*
 
-global BRAIDLAB_debuglvl
+global BRAIDLAB_debuglvl BRAIDLAB_braid_nomex
 BRAIDLAB_debuglvl = 1;
+BRAIDLAB_braid_nomex = false;
+%BRAIDLAB_braid_nomex = true;
 
 % A simple pA braid and its entropy.
 b0 = braid([1 -2]);
