@@ -144,10 +144,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (it = 1; it <= maxit; ++it)
     {
-      const mwSize maxgen = 300;
+      //
       // Make sure the word is not too long.  In the worst case
       // scenario we risk overflowing the update rules.  If it's too
       // long, break up the word into chunks.
+      //
+      // The maximum number of generators (worst case scenario) is
+      // obtained by taking the braid with the largest TEPG (topological
+      // entropy per generator), with Golden ratio (GR) entropy.  The
+      // largest representable real number is realmax.  Hence, the
+      // number of iterations to real realmax is
+      //
+      // log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
+      //
+      // However, because the L2 norm squares the entries, this number
+      // is halved.
+      const mwSize maxgen = 300;
       int nchnk = std::ceil((double)Ngen/maxgen);
       if (BRAIDLAB_debuglvl >= 2)
 	printf("entropy_helper: Ngen=%d  nchnk=%d\n",Ngen,nchnk);
