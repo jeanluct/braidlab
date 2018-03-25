@@ -1,4 +1,4 @@
-function [out,varargout] = mtimes(b1,b2,logscale)
+function [out,varargout] = mtimes(b1,b2)
 %MTIMES   Multiply two braids together or act on a loop with a braid.
 %   C = B1*B2, where B1 and B2 are braid objects, returns the product of
 %   the two braids.  The product is the group operation in the braid
@@ -39,8 +39,6 @@ function [out,varargout] = mtimes(b1,b2,logscale)
 %   You should have received a copy of the GNU General Public License
 %   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 % LICENSE>
-
-if nargin < 3, logscale = false; end
 
 if isa(b2,'braidlab.annbraid')
   % If b2 is an annbraid, the product is a plain braid.
@@ -86,15 +84,9 @@ elseif isa(b2,'braidlab.loop')
     out = loopsigma(b1.word,b2.coords,b1.n);
     out = braidlab.loop(out,'bp',b2.basepoint);
   else
-    if logscale
-      [out,logsc] = loopsigma(b1.word,b2.coords,b1.n,logscale);
-      varargout{1} = logsc;
-      out = braidlab.loop(out,'bp',b2.basepoint);
-    else
-      [out,opsigns] = loopsigma(b1.word,b2.coords,b1.n);
-      out = braidlab.loop(out,'bp',b2.basepoint);
-      varargout{1} = linact(b1,opsigns,size(b2(1).coords,2));
-    end
+    [out,opsigns] = loopsigma(b1.word,b2.coords,b1.n);
+    out = braidlab.loop(out,'bp',b2.basepoint);
+    varargout{1} = linact(b1,opsigns,size(b2(1).coords,2));
   end
 else
   error('BRAIDLAB:braid:mtimes:badobject', ...

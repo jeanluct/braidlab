@@ -240,10 +240,37 @@ if usematlab
   nconv = 0;
   entr0 = -1;
 
+  % Discount extra arcs if intaxis is used.
+  switch params.length
+    case 'intaxis'
+      discount = b.n - 1;
+    otherwise
+      discount = 0;
+  end
+
+  currentLoopLength = lenfun(u) - discount;
+
   for i = 1:maxit
 
-    % Apply braid to loop and get entropy estimate.
-    [u,entr] = mtimes(b,u,true);
+    % Make sure the word is not too long.  In the worst case scenario we risk
+    % overflowing the update rules.  If it's too long, break up the word
+    % into chunks.
+    maxgen = 300;
+    nchnk = ceil(length(b)/maxgen);
+
+    entr = 0;
+    for k = 1:nchnk
+      % Normalize coordinates and discount by the loop length.
+      u.coords = u.coords/currentLoopLength;
+      discount = discount/currentLoopLength;
+      w0 = (k-1)*maxgen + 1;
+      w1 = min(w0 + maxgen - 1,length(b));
+      bb = braidlab.braid(b.word(w0:w1),b.n);
+      % Apply braid to loop and get entropy estimate.
+      u = bb*u;
+      currentLoopLength = lenfun(u) - discount;
+      entr = entr + log(currentLoopLength);
+    end
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),1)
@@ -279,5 +306,6 @@ end
 varargout{1} = entr;
 
 if nargout > 1
+  u.coords = u.coords/currentLoopLength;
   varargout{2} = u;
 end
