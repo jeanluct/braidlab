@@ -43,9 +43,9 @@ function [varargout] = entropy(b,varargin)
 %   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
 %   algorithm.  Shortcut for Tol = 0 && MaxIt = 1.
 %
-%   ENTR = ENTROPY(B,'Finite','MaxInt',N, ...) computes exactly N iterations
-%   of the algorithm (the parameter 'MaxInt' has to be specified).
-%   Identical to passing Tol = 0 and MaxInt = N.
+%   ENTR = ENTROPY(B,'Finite','MaxIt',N, ...) computes exactly N iterations
+%   of the algorithm (the parameter 'MaxIt' has to be specified).
+%   Identical to passing Tol = 0 and MaxIt = N.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -107,7 +107,7 @@ parser.parse( b, varargin{:} );
 params = parser.Results;
 
 % shortcut flag passed
-switch params.flag
+switch lower(params.flag)
   case 'finite'
     params.tol = 0;
   case 'onestep'

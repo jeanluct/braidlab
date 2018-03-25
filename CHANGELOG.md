@@ -3,6 +3,8 @@
 
 ## [Unreleased][unreleased]
 
+* Bugfix: case issue in braid.entropy flags.
+
 * Bugfix: for large braids maxit could overflow an int32 (partial fix
   for issue #138).
 
