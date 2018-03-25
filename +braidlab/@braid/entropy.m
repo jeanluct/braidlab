@@ -27,6 +27,13 @@ function [varargout] = entropy(b,varargin)
 %   the small-dilatation psi braids. If Tol == 0, MaxIt has to be
 %   specified as a positive number
 %
+%   * Length - Choice of loop length function [ 'intaxis' |
+%   'minlength' | {'l2norm'} ]  See documentation of loop.intaxis,
+%   loop.minlength, loop.l2norm for details.  The choice should affect
+%   the output only if finite (small) number of iterations is
+%   performed.  For large number of iterations, 'l2norm' should be
+%   preferred for speed.
+%
 %   * NConv - Number of consecutive convergences [ positive {3} ]
 %   Demands that the tolerance TOL be achieved NConv consecutive
 %   times, rounded up to an integer.  For low-entropy braids,
@@ -45,7 +52,7 @@ function [varargout] = entropy(b,varargin)
 %   are normalized such that NORM(PLOOP.COORDS) = 1.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, BRAID.COMPLEXITY, BRAID.TNTYPE, PSIROOTS.
+%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -93,6 +100,7 @@ parser.addParameter('nconv', 3, @(n)isnumeric(n) && n > 0 );
 
 % Type of algorithm
 parser.addParameter('method', 'iter', @ischar);
+parser.addParameter('length','l2norm',@ischar);
 
 parser.parse( b, varargin{:} );
 
@@ -119,6 +127,8 @@ end
 params.method = validateflag(params.method, {'iter','moussafir'},...
                            {'trains','train-tracks','bh'});
 
+params.length = validateflag(params.length, 'intaxis','minlength','l2norm');
+
 
 %% TRAIN-TRACKS ALGORITHM (EXITS AFTER if)
 if strcmpi( params.method, 'trains' )
@@ -133,6 +143,16 @@ if strcmpi( params.method, 'trains' )
   else
     return
   end
+end
+
+%% ITERATIVE ALGORITHM LENGTH CHOICE
+switch params.length
+  case 'intaxis',
+    lenfun = @(l) l.intaxis;
+  case 'minlength',
+    lenfun = @minlength;
+  case 'l2norm',
+    lenfun = @l2norm;
 end
 
 %% ITERATIVE ALGORITHM: set parameters
@@ -180,15 +200,32 @@ else
   usematlab = true;
 end
 
-paramstring = sprintf('TOL = %.1e \t MAXIT = %d \t NCONV = %d\n', ...
-                      tol,maxit,nconvreq);
+paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
+                       'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
 
 braidlab.util.debugmsg(paramstring,1);
 
 %% MEX implementation
 if ~usematlab
   try
-    [entr,i,u.coords] = entropy_helper(b.word,u.coords,maxit,nconvreq,tol);
+    % Only works on double precision numbers.
+    %
+    % Limited argument checking with
+    % BRAIDLAB:entropy_helper:badlengthflag and
+    % BRAIDLAB:entropy_helper:badarg
+    % errors.
+    switch( params.length )
+      case 'intaxis'
+        lengthflag = 0;
+      case 'minlength'
+        lengthflag = 1;
+      case 'l2norm'
+        lengthflag = 2;
+    end
+
+    [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
+                                       maxit,nconvreq,...
+                                       tol,lengthflag,true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...

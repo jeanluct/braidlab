@@ -14,6 +14,9 @@
 // 2 - maximum number of iterations
 // 3 - number of consecutive time tolerance should be achieved
 // 4 - tolerance
+// 5 - flag signaling loop length type (0 - intaxis, 1-minlength, 2-l2)
+// 6 - true if passed loop is a fundamental loop
+//     (loop length is computed differently in this case)
 
 //
 // <LICENSE
@@ -40,6 +43,10 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
+// Function that switches the type of length computation throws
+// BRAIDLAB:braid:entropy_helper:badlengthflag for unsupported length flag.
+double looplength(mwSize N, double *a, double *b, char lengthFlag);
+
 int BRAIDLAB_debuglvl = -1;
 
 #define P_BRAID   prhs[0]
@@ -47,6 +54,8 @@ int BRAIDLAB_debuglvl = -1;
 #define P_MAXIT prhs[2]
 #define P_NCONVREQ prhs[3]
 #define P_TOL prhs[4]
+#define P_LENGTHTYPE prhs[5]
+#define P_ISFUNDAMENTAL prhs[6]
 
 #define P_ENTROPY plhs[0]
 #define P_ITERATES plhs[1]
@@ -59,10 +68,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
                         "%d is not enough output arguments; need %d.",nrhs,3);
     }
-  if (nrhs < 5)
+  if (nrhs < 7)
     {
       mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
-                        "%d is not enough input arguments; need %d.",nrhs,5);
+                        "%d is not enough input arguments; need %d.",nrhs,7);
     }
 
   // Get debug level global variable.
@@ -77,6 +86,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int maxit = (int)mxGetScalar(P_MAXIT);
   const int nconvreq = (int)mxGetScalar(P_NCONVREQ);
   const double tol = mxGetScalar(P_TOL);
+
+  const char lengthFlag =
+    static_cast<char>( mxGetScalar(P_LENGTHTYPE) );
+
+  const bool isFundamental = ( mxGetScalar(P_ISFUNDAMENTAL) > 0 );
 
   const mwSize Ngen = std::max(mxGetM(P_BRAID),mxGetN(P_BRAID));
 
@@ -112,8 +126,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int nconv = 0;
   double entr;
   double entr0 = -1;
+  double discount;
 
-  double currentLength = std::sqrt(l2norm2(N,a,b));
+  switch(lengthFlag) {
+  case 0:
+    // intaxis discount is # braid punctures - 1
+    // if a fundamental loop is passed, it has an extra puncture
+    // so to get # braid punctures, we have to first subtract 1
+    discount = n - ( isFundamental ? 1. : 0. ) - 1.;
+    break;
+  default:
+    discount = 0.;
+    break;
+  }
+
+  double currentLength = looplength(N,a,b,lengthFlag);
 
   for (it = 1; it <= maxit; ++it)
     {
@@ -127,18 +154,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       entr = 0;
       for (int k = 0; k < nchnk; ++k)
 	{
-	  // Normalize coordinates by the loop length.
+	  // Normalize coordinates and discount by the loop length.
 	  for (mwIndex k = 1; k <= N/2; ++k)
-	    {
-	      a[k] /= currentLength;
-	      b[k] /= currentLength;
-	    }
+	    { a[k] /= currentLength; b[k] /= currentLength; }
+	  discount /= currentLength;
 	  mwIndex w0 = k*maxgen;
 	  mwIndex w1 = std::min(w0 + maxgen - 1,Ngen-1);
 	  if (BRAIDLAB_debuglvl >= 2)
 	    printf("entropy_helper: w0=%d  w1=%d\n",w0,w1);
 	  update_rules(w1-w0+1, n, braidword+w0, a, b);
-	  currentLength = std::sqrt(l2norm2(N,a,b));
+	  currentLength = looplength(N,a,b,lengthFlag) - discount;
 	  entr = entr + std::log(currentLength);
 	}
 
@@ -177,4 +202,36 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (mwIndex k = 1; k <= N/2; ++k) { uo[k-1] = a[k]; uo[k-1+N/2] = b[k]; }
 
   return;
+}
+
+double looplength( mwSize N, double *a, double *b, char lengthFlag) {
+
+  double retval = -1;
+
+  switch( lengthFlag ) {
+
+  case 0:
+    retval = intaxis<double>(N,a,b);
+    break;
+
+  case 1:
+    retval = minlength<double>(N,a,b);
+    break;
+
+  case 2:
+    retval = sqrt(l2norm2(N,a,b));
+    break;
+
+  default:
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlengthflag",
+                      "Supported flags: 0 (l2), 1 (intaxis), 2 (minlength).");
+    break;
+  }
+
+  if (retval < 0)
+    mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badlength",
+                      "Loop length must never be negative.");
+
+  return retval;
+
 }
