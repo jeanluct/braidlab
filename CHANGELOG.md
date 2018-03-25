@@ -5,6 +5,11 @@
 
 * Bugfix: case issue in braid.entropy flags.
 
+* Bugfix: to allow computation of the entropy for huge braids that
+  cause intermediate overflow in the update rules, break up large
+  braids into smaller chunks, each of which will not overflow, and
+  store the logarithmic growth (issue #138).
+
 * Bugfix: for large braids maxit could overflow an int32 (partial fix
   for issue #138).
 
