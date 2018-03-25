@@ -158,10 +158,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	  for (mwIndex k = 1; k <= N/2; ++k)
 	    { a[k] /= currentLength; b[k] /= currentLength; }
 	  discount /= currentLength;
+	  // Break into chunks.
 	  mwIndex w0 = k*maxgen;
 	  mwIndex w1 = std::min(w0 + maxgen - 1,Ngen-1);
 	  if (BRAIDLAB_debuglvl >= 2)
 	    printf("entropy_helper: w0=%d  w1=%d\n",w0,w1);
+	  // Apply braid to loop and get entropy estimate.
 	  update_rules(w1-w0+1, n, braidword+w0, a, b);
 	  currentLength = looplength(N,a,b,lengthFlag) - discount;
 	  entr = entr + std::log(currentLength);

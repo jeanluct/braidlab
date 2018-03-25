@@ -263,6 +263,7 @@ if usematlab
       % Normalize coordinates and discount by the loop length.
       u.coords = u.coords/currentLoopLength;
       discount = discount/currentLoopLength;
+      % Break into chunks.
       w0 = (k-1)*maxgen + 1;
       w1 = min(w0 + maxgen - 1,length(b));
       bb = braidlab.braid(b.word(w0:w1),b.n);
