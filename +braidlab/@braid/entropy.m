@@ -148,8 +148,7 @@ end
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
   case 'intaxis',
-    % Discount extra end arcs if intaxis is used.
-    lenfun = @(l) l.intaxis - (b.n-1);
+    lenfun = @(l) l.intaxis;
   case 'minlength',
     lenfun = @minlength;
   case 'l2norm',

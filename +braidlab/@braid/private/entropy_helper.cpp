@@ -116,36 +116,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int nconv = 0;
   double entr;
   double entr0 = -1;
-  double discount;
 
-  switch(lengthFlag) {
-  case 0:
-    // intaxis discount is # braid punctures - 1
-    // if a fundamental loop is passed, it has an extra puncture
-    // so to get # braid punctures, we have to first subtract 1
-    discount = n - ( isFundamental ? 1. : 0. ) - 1.;
-    break;
-  default:
-    discount = 0.;
-    break;
-  }
-
-  double currentLength = looplength(N,a,b,lengthFlag) - discount;
+  double currentLength = looplength(N,a,b,lengthFlag);
 
   for (it = 1; it <= maxit; ++it)
     {
-      // Normalize coordinates and the discount factor by the loop length
-      for (mwIndex k = 1; k <= N/2; ++k)
-        {
-          a[k] /= currentLength;
-          b[k] /= currentLength;
-        }
-      discount /= currentLength;
-
       // Act with the braid sequence in braidword onto the coordinates a,b.
       update_rules(Ngen, n, braidword, a, b);
 
-      currentLength = looplength(N,a,b,lengthFlag) - discount;
+      currentLength = looplength(N,a,b,lengthFlag);
 
       entr = std::log(currentLength);
 
