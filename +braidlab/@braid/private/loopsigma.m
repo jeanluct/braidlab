@@ -1,4 +1,4 @@
-function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
+function [loop_out,opSign] = loopsigma(sigma_idx,loop_in,Npunc)
 %LOOPSIGMA   Act on a loop with a braid group generator sigma.
 %
 %   LOOP_OUT = LOOPSIGMA(SIGMA_IDX,LOOP_IN, NPUNC) acts on the loop LOOP_IN
@@ -211,7 +211,7 @@ for j = 1:length(sigma_idx)
   end
   a = ap; b = bp;
 end
-loop_out = [ap bp];
+loop_out = [a b];
 
 if nargout > 1
   opSign = reshape(opSign,[size(loop_in,1) maxopSign*length(sigma_idx)]);

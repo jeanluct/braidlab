@@ -43,10 +43,9 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-// function that switches the type of length computation
-// throws BRAIDLAB:braid:entropy_helper:badlengthflag if
-// passed length flag is unsupported
-double looplength( mwSize N, double *a, double *b, char lengthFlag);
+// Function that switches the type of length computation throws
+// BRAIDLAB:braid:entropy_helper:badlengthflag for unsupported length flag.
+double looplength(mwSize N, double *a, double *b, char lengthFlag);
 
 int BRAIDLAB_debuglvl = -1;
 
@@ -64,6 +63,17 @@ int BRAIDLAB_debuglvl = -1;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+  if (nlhs < 3)
+    {
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
+                        "%d is not enough output arguments; need %d.",nrhs,3);
+    }
+  if (nrhs < 7)
+    {
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
+                        "%d is not enough input arguments; need %d.",nrhs,7);
+    }
+
   // Get debug level global variable.
   mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
   if (isDebug) {
@@ -134,20 +144,42 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (it = 1; it <= maxit; ++it)
     {
-      // Normalize coordinates and the discount factor by the loop length
-      for (mwIndex k = 1; k <= N/2; ++k)
-        {
-          a[k] /= currentLength;
-          b[k] /= currentLength;
-        }
-      discount /= currentLength;
-
-      // Act with the braid sequence in braidword onto the coordinates a,b.
-      update_rules(Ngen, n, braidword, a, b);
-
-      currentLength = looplength(N,a,b,lengthFlag) - discount;
-
-      entr = std::log(currentLength);
+      //
+      // Make sure the word is not too long.  In the worst case
+      // scenario we risk overflowing the update rules.  If it's too
+      // long, break up the word into chunks.
+      //
+      // The maximum number of generators (worst case scenario) is
+      // obtained by taking the braid with the largest TEPG (topological
+      // entropy per generator), with Golden ratio (GR) entropy.  The
+      // largest representable real number is realmax.  Hence, the
+      // number of iterations to real realmax is
+      //
+      // log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
+      //
+      // However, because the L2 norm squares the entries, this number
+      // is halved.
+      const mwSize maxgen = 300;
+      int nchnk = std::ceil((double)Ngen/maxgen);
+      if (BRAIDLAB_debuglvl >= 2)
+	printf("entropy_helper: Ngen=%d  nchnk=%d\n",Ngen,nchnk);
+      entr = 0;
+      for (int k = 0; k < nchnk; ++k)
+	{
+	  // Normalize coordinates and discount by the loop length.
+	  for (mwIndex k = 1; k <= N/2; ++k)
+	    { a[k] /= currentLength; b[k] /= currentLength; }
+	  discount /= currentLength;
+	  // Break into chunks.
+	  mwIndex w0 = k*maxgen;
+	  mwIndex w1 = std::min(w0 + maxgen - 1,Ngen-1);
+	  if (BRAIDLAB_debuglvl >= 2)
+	    printf("entropy_helper: w0=%d  w1=%d\n",w0,w1);
+	  // Apply braid to loop and get entropy estimate.
+	  update_rules(w1-w0+1, n, braidword+w0, a, b);
+	  currentLength = looplength(N,a,b,lengthFlag) - discount;
+	  entr = entr + std::log(currentLength);
+	}
 
       if (BRAIDLAB_debuglvl >= 1)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",

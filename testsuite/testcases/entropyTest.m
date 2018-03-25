@@ -150,6 +150,21 @@ classdef entropyTest < matlab.unittest.TestCase
       end
     end
 
+    function test_huge_entropy(testCase)
+      % Test a braid with enormous entropy, which would overflow even one
+      % application of the update rules.
+      % See issue #138.
+      tol = 1e-6;
+      % The simplest pA braid and its entropy.
+      b0 = braidlab.braid([1 -2]);
+      entr0 = entropy(b0);
+      % Number of repetitions of the braid.
+      % This gives a braid with entropy about 385!
+      Nrep = 400;
+      entr = entropy(b0^Nrep,'Tol',tol);
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+    end
+
     function test_entropy_complexity(testCase)
       % Test that complexity and one-iterate entropy are the same.
         len = 40;
@@ -170,5 +185,5 @@ classdef entropyTest < matlab.unittest.TestCase
                                'AbsTol',1e-12, ['intaxis: ' diagnostic]);
         end
     end
-  end
+end
 end

@@ -148,7 +148,7 @@ end
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
   case 'intaxis',
-    lenfun = @(l) l.intaxis;
+    lenfun = @(l)l.intaxis;
   case 'minlength',
     lenfun = @minlength;
   case 'l2norm',
@@ -201,7 +201,7 @@ else
 end
 
 paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
-                       'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
+                    'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
 
 braidlab.util.debugmsg(paramstring,1);
 
@@ -240,7 +240,7 @@ if usematlab
   nconv = 0;
   entr0 = -1;
 
-  % Discount extra arcs if intaxis is used.
+  % discount extra arcs if intaxis is used
   switch params.length
     case 'intaxis'
       discount = b.n - 1;
@@ -249,41 +249,21 @@ if usematlab
   end
 
   currentLoopLength = lenfun(u) - discount;
-
   for i = 1:maxit
-    %
-    % Make sure the word is not too long.  In the worst case scenario we risk
-    % overflowing the update rules.  If it's too long, break up the word
-    % into chunks.
-    %
-    % The maximum number of generators (worst case scenario) is obtained by
-    % taking the braid with the largest TEPG (topological entropy per
-    % generator), with Golden ratio (GR) entropy.  The largest representable
-    % real number is realmax.  Hence, the number of iterations to real
-    % realmax is
-    %
-    % log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
-    %
-    % However, because the L2 norm squares the entries, this number is
-    % halved.
-    %
-    maxgen = 300;
-    nchnk = ceil(length(b)/maxgen);
 
-    entr = 0;
-    for k = 1:nchnk
-      % Normalize coordinates and discount by the loop length.
-      u.coords = u.coords/currentLoopLength;
-      discount = discount/currentLoopLength;
-      % Break into chunks.
-      w0 = (k-1)*maxgen + 1;
-      w1 = min(w0 + maxgen - 1,length(b));
-      bb = braidlab.braid(b.word(w0:w1),b.n);
-      % Apply braid to loop and get entropy estimate.
-      u = bb*u;
-      currentLoopLength = lenfun(u) - discount;
-      entr = entr + log(currentLoopLength);
-    end
+    % normalize discounting factor
+    discount = discount/currentLoopLength;
+
+    % normalize braid coordinates to avoid overflow
+    u.coords = u.coords/currentLoopLength;
+
+    % apply braid to loop
+    u = b*u;
+
+    % update loop length
+    currentLoopLength = lenfun(u) - discount;
+
+    entr = log(currentLoopLength);
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),1)
