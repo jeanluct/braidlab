@@ -140,7 +140,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     break;
   }
 
-  double currentLength = looplength(N,a,b,lengthFlag);
+  double currentLength = looplength(N,a,b,lengthFlag) - discount;
 
   for (it = 1; it <= maxit; ++it)
     {
