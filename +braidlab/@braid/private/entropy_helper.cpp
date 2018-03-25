@@ -117,19 +117,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (it = 1; it <= maxit; ++it)
     {
-      // Normalize coordinates by the loop length.
-      for (mwIndex k = 1; k <= N/2; ++k)
-        {
-          a[k] /= currentLength;
-          b[k] /= currentLength;
-        }
-
-      // Act with the braid sequence in braidword onto the coordinates a,b.
-      update_rules(Ngen, n, braidword, a, b);
-
-      currentLength = std::sqrt(l2norm2(N,a,b));
-
-      entr = std::log(currentLength);
+      const mwSize maxgen = 300;
+      // Make sure the word is not too long.  In the worst case
+      // scenario we risk overflowing the update rules.  If it's too
+      // long, break up the word into chunks.
+      int nchnk = std::ceil((double)Ngen/maxgen);
+      if (BRAIDLAB_debuglvl >= 2)
+	printf("entropy_helper: Ngen=%d  nchnk=%d\n",Ngen,nchnk);
+      entr = 0;
+      for (int k = 0; k < nchnk; ++k)
+	{
+	  // Normalize coordinates by the loop length.
+	  for (mwIndex k = 1; k <= N/2; ++k)
+	    {
+	      a[k] /= currentLength;
+	      b[k] /= currentLength;
+	    }
+	  mwIndex w0 = k*maxgen;
+	  mwIndex w1 = std::min(w0 + maxgen - 1,Ngen-1);
+	  if (BRAIDLAB_debuglvl >= 2)
+	    printf("entropy_helper: w0=%d  w1=%d\n",w0,w1);
+	  update_rules(w1-w0+1, n, braidword+w0, a, b);
+	  currentLength = std::sqrt(l2norm2(N,a,b));
+	  entr = entr + std::log(currentLength);
+	}
 
       if (BRAIDLAB_debuglvl >= 1)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
