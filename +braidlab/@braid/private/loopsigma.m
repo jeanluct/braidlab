@@ -214,7 +214,7 @@ for j = 1:length(sigma_idx)
     end
   end
   if logscale
-    sc = sum(abs(ap),2) + sum(abs(bp),2);
+    sc = sqrt(sum(ap.^2,2) + sum(bp.^2,2));
     ap = ap/sc; bp = bp/sc;
     logsc = logsc + log(sc);
   end
