@@ -148,7 +148,8 @@ end
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
   case 'intaxis',
-    lenfun = @(l)l.intaxis;
+    % Discount extra end arcs if intaxis is used.
+    lenfun = @(l) l.intaxis - (b.n-1);
   case 'minlength',
     lenfun = @minlength;
   case 'l2norm',
@@ -240,30 +241,10 @@ if usematlab
   nconv = 0;
   entr0 = -1;
 
-  % discount extra arcs if intaxis is used
-  switch params.length
-    case 'intaxis'
-      discount = b.n - 1;
-    otherwise
-      discount = 0;
-  end
-
-  currentLoopLength = lenfun(u) - discount;
   for i = 1:maxit
 
-    % normalize discounting factor
-    discount = discount/currentLoopLength;
-
-    % normalize braid coordinates to avoid overflow
-    u.coords = u.coords/currentLoopLength;
-
-    % apply braid to loop
-    u = b*u;
-
-    % update loop length
-    currentLoopLength = lenfun(u) - discount;
-
-    entr = log(currentLoopLength);
+    % Apply braid to loop and get entropy estimate.
+    [u,entr] = mtimes(b,u,true);
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
                      i,entr,entr-entr0),1)
@@ -299,6 +280,5 @@ end
 varargout{1} = entr;
 
 if nargout > 1
-  u.coords = u.coords/currentLoopLength;
   varargout{2} = u;
 end

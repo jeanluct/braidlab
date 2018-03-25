@@ -1,4 +1,4 @@
-function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
+function [loop_out,opSign] = loopsigma(sigma_idx,loop_in,Npunc,logscale)
 %LOOPSIGMA   Act on a loop with a braid group generator sigma.
 %
 %   LOOP_OUT = LOOPSIGMA(SIGMA_IDX,LOOP_IN, NPUNC) acts on the loop LOOP_IN
@@ -41,6 +41,8 @@ function [loop_out, opSign] = loopsigma(sigma_idx,loop_in, Npunc)
 
 assert(nargin >= 3, 'Not enough arguments');
 
+if nargin < 4, logscale = false; end
+
 import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
@@ -50,7 +52,7 @@ useMatlabVersion = any(BRAIDLAB_loop_nomex);
 
 if isempty(sigma_idx)
   loop_out = loop_in;
-  if nargout > 1
+  if nargout > 1 && ~logscale
     opSign = reshape([],[size(loop_in,1) 0]);
   end
   return
@@ -73,7 +75,7 @@ if ~useMatlabVersion && exist('loopsigma_helper','file') == 3
 
     % storing loops in columns is more efficient for memory fetching
     loop_in = transpose(loop_in);
-    if nargout > 1
+    if nargout > 1 && ~logscale
       [loop_out, opSign] = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
     else
       loop_out = loopsigma_helper(sigma_idx,loop_in,Npunc,Nthreads);
@@ -132,10 +134,12 @@ pos = @(x)max(x,0); neg = @(x)min(x,0);
 % If nargout > 1, record the state of pos/neg operators.
 % There are at most maxopSign such choices for each generator.
 maxopSign = 5;
-if nargout > 1
+if nargout > 1 && ~logscale
   opSign = zeros(size(loop_in,1),length(sigma_idx),maxopSign);
 end
 
+if logscale, logsc = 0; end
+  
 for j = 1:length(sigma_idx)
   i = abs(sigma_idx(j));
   if sigma_idx(j) > 0
@@ -144,7 +148,7 @@ for j = 1:length(sigma_idx)
       bp(:,1) = sumg( a(:,1) , pos(b(:,1)) );
       ap(:,1) = sumg( -b(:,1) , pos(bp(:,1)) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,1));
         opSign(:,j,2) = sign(bp(:,1));
       end
@@ -153,7 +157,7 @@ for j = 1:length(sigma_idx)
       bp(:,n-2) = sumg( a(:,n-2) , neg(b(:,n-2)) );
       ap(:,n-2) = sumg( -b(:,n-2) , neg(bp(:,n-2)) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,n-2));
         opSign(:,j,2) = sign(bp(:,n-2));
       end
@@ -165,7 +169,7 @@ for j = 1:length(sigma_idx)
       ap(:,i) = sumg( a(:,i), -neg(b(:,i)), -neg(sumg(neg(b(:,i-1)), -c)) );
       bp(:,i) = sumg( b(:,i-1), -neg(c) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,i));
         opSign(:,j,2) = sign(b(:,i-1));
         opSign(:,j,3) = sign(c);
@@ -179,7 +183,7 @@ for j = 1:length(sigma_idx)
       bp(:,1) = sumg(-a(:,1), pos(b(:,1)) );
       ap(:,1) = sumg(b(:,1), -pos(bp(:,1)) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,1));
         opSign(:,j,2) = sign(bp(:,1));
       end
@@ -188,7 +192,7 @@ for j = 1:length(sigma_idx)
       bp(:,n-2) = sumg(-a(:,n-2), neg(b(:,n-2)) );
       ap(:,n-2) = sumg(b(:,n-2), - neg(bp(:,n-2)) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,n-2));
         opSign(:,j,2) = sign(bp(:,n-2));
       end
@@ -200,7 +204,7 @@ for j = 1:length(sigma_idx)
       ap(:,i) = sumg(a(:,i), neg(b(:,i)), neg(sumg(neg(b(:,i-1)), d)) );
       bp(:,i) = sumg(b(:,i-1), pos(d) );
 
-      if nargout > 1
+      if nargout > 1 && ~logscale
         opSign(:,j,1) = sign(b(:,i));
         opSign(:,j,2) = sign(b(:,i-1));
         opSign(:,j,3) = sign(pos(b(:,i)) - d);
@@ -209,10 +213,19 @@ for j = 1:length(sigma_idx)
       end
     end
   end
+  if logscale
+    sc = sum(abs(ap),2) + sum(abs(bp),2);
+    ap = ap/sc; bp = bp/sc;
+    logsc = logsc + log(sc);
+  end
   a = ap; b = bp;
 end
-loop_out = [ap bp];
+loop_out = [a b];
 
 if nargout > 1
-  opSign = reshape(opSign,[size(loop_in,1) maxopSign*length(sigma_idx)]);
+  if ~logscale
+    opSign = reshape(opSign,[size(loop_in,1) maxopSign*length(sigma_idx)]);
+  else
+    opSign = logsc;
+  end
 end
