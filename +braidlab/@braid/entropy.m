@@ -259,7 +259,7 @@ if usematlab
     % The maximum number of generators (worst case scenario) is obtained by
     % taking the braid with the largest TEPG (topological entropy per
     % generator), with Golden ratio (GR) entropy.  The largest representable
-    % real number is realmax.  Hence, the number of iterations to real
+    % real number is realmax.  Hence, the number of iterations to reach
     % realmax is
     %
     % log(realmax)/log(GR) ~ 737 for IEEE arithmetic.

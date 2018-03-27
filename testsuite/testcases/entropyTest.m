@@ -159,9 +159,13 @@ classdef entropyTest < matlab.unittest.TestCase
       b0 = braidlab.braid([1 -2]);
       entr0 = entropy(b0);
       % Number of repetitions of the braid.
-      % This gives a braid with entropy about 385!
-      Nrep = 400;
-      entr = entropy(b0^Nrep,'Tol',tol);
+      % This gives a braid with entropy about 1925!
+      Nrep = 2000;
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','l2norm');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','intaxis');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','minlen');
       testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
     end
 

@@ -153,14 +153,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       // obtained by taking the braid with the largest TEPG (topological
       // entropy per generator), with Golden ratio (GR) entropy.  The
       // largest representable real number is realmax.  Hence, the
-      // number of iterations to real realmax is
+      // number of iterations to reach realmax is
       //
       // log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
       //
-      // However, because the L2 norm squares the entries, this number
-      // is halved.
 
-      const mwSize maxgen = 300;
+#ifdef BRAIDLAB_OVERFLOWING_L2NORM
+      // The naive L2 norm implementation squares the entries, so
+      // overflows sooner.
+      const mwSize maxgen = 700;
+#else
+      // Use L2 norm that avoids overflow.
+      const mwSize maxgen = 1400;
+#endif
       int nchnk = std::ceil((double)Ngen/maxgen);
 
       if (BRAIDLAB_debuglvl >= 2)
@@ -241,7 +246,7 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag) {
     break;
 
   case 2:
-    retval = sqrt(l2norm2(N,a,b));
+    retval = l2norm(N,a,b);
     break;
 
   default:

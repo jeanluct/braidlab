@@ -53,7 +53,7 @@ T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 */
 template <class T>
-T l2norm2(const int N, const T *a, const T *b);
+T l2norm(const int N, const T *a, const T *b);
 
 /*
 Compute minimal topological length of a loop represented by Dynnikov
@@ -105,14 +105,32 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu);
 
 // algorithm as written is 1-indexed
 template <class T>
-T l2norm2(const int N, const T *a, const T *b)
+T l2norm(const int N, const T *a, const T *b)
 {
+#ifdef BRAIDLAB_OVERFLOWING_L2NORM
   T l2 = 0;
 
   for (size_t k = 1; k <= N/2; ++k)
     l2 += a[k]*a[k] + b[k]*b[k];
 
-  return l2;
+  return std::sqrt(l2);
+#else
+  // Find the maximum element in |a| and |b|.
+  auto abscomp = [](T const& x, T const& y)
+    { return (std::abs(x) < std::abs(y)); };
+  T c = std::max(std::abs(*(std::max_element(a+1,a+1+N/2,abscomp))),
+                 std::abs(*(std::max_element(b+1,b+1+N/2,abscomp))));
+  if (c == 0) return 0;
+
+  T l2 = 0;
+
+  // Avoid overflow by dividing by c as we go.
+  // Underflow is ok, since it means component doesn't contribute.
+  for (size_t k = 1; k <= N/2; ++k)
+    l2 += (a[k]/c)*(a[k]/c) + (b[k]/c)*(b[k]/c);
+
+  return c*std::sqrt(l2);
+#endif
 }
 
 // algorithm as written is 1-indexed
