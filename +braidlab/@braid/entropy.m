@@ -275,12 +275,13 @@ if usematlab
       % Normalize coordinates and discount by the loop length.
       u.coords = u.coords/currentLoopLength;
       discount = discount/currentLoopLength;
-      % Break into chunks.
+      % Select chunk.
       w0 = (k-1)*maxgen + 1;
       w1 = min(w0 + maxgen - 1,length(b));
       bb = braidlab.braid(b.word(w0:w1),b.n);
-      % Apply braid to loop and get entropy estimate.
+      % Apply braid to loop.
       u = bb*u;
+      % New loop length and entropy estimate.
       currentLoopLength = lenfun(u) - discount;
       entr = entr + log(currentLoopLength);
     end
