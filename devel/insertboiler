@@ -9,7 +9,12 @@
 # It will recurse down the directory.  The file COPYING needs to be in
 # the folder where the command is executed.
 
-ROOTDIR=$1
+if [ $# -eq 0 ]; then
+    ROOTDIR=.
+else
+    # Get directory from command-line, stripping trailing slash.
+    ROOTDIR=${1%/}
+fi
 export BPFILE=COPYING
 
 function checktag() {
@@ -44,6 +49,13 @@ function ibtag() {
 }
 export -f ibtag
 
+# bibtex doesn't like @ characters anywhere else than to start bib entries,
+# even in comments.  So replace the @ by (at) in email addresses.
+function bibatfix() {
+    sed -i "s/${1}\@/${1}(at)/g" ${2}
+}
+export -f bibatfix
+
 # Insert boilerplate for various file extensions.
 find $ROOTDIR -name "*.m" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "%" "$@"' _
@@ -58,8 +70,15 @@ find $ROOTDIR -name "*.bib" -print0 | \
 find $ROOTDIR -name "Makefile*" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "#" "$@"' _
 
+# Fix emails in bib files (hardwired list, unfortunately).
+for emailname in jeanluc marko allshouse; do
+    find $ROOTDIR -name "*.bib" -print0 | \
+	xargs -0 -n 1 bash -c 'bibatfix '${emailname}' "$@"' _
+done
+
 unset -f checktag
 unset -f ibtag
+unset -f bibatfix
 unset BPFILE
 unset OPENTAG
 unset CLOSETAG
