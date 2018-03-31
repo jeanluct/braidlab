@@ -51,7 +51,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [10]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
 [11]: http://www.mathworks.com/matlabcentral/fileexchange/6543
 [12]: https://github.com/progschj/ThreadPool
-[13]: http://www.mathworks.com/matlabcentral/newsreader/view_thread/13728
+[13]: http://mathforum.org/kb/thread.jspa?forumID=80&threadID=257763&messageID=835342#835342
 [14]: http://www.gnu.org/licenses/gpl-3.0.html
 [15]: http://github.com/jeanluct/braidlab/raw/master/COPYING
 [16]: http://github.com/jeanluct/braidlab/raw/master/LICENSE
