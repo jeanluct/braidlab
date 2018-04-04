@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+
+## [3.2.3] - 2018-04-04
+
 * Bugfix: case issue in braid.entropy flags.
 
 * Bugfix: to allow computation of the entropy for huge braids that
@@ -339,7 +342,8 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...develop
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...develop
+[3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
 [3.2.2]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...release-3.2.2
 [3.2.1]: https://github.com/jeanluct/braidlab/compare/release-3.2...release-3.2.1
 [3.2]: https://github.com/jeanluct/braidlab/compare/release-3.1...release-3.2
