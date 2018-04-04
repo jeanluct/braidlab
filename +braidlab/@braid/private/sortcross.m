@@ -18,7 +18,7 @@ function crossdat = sortcross(cross_cell)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %                       Michael Allshouse <m.allshouse@northeastern.edu>
 %

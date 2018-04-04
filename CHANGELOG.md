@@ -1,6 +1,24 @@
 # Change Log
 
 
+## [3.2.3] - 2018-04-04
+
+* Bugfix: case issue in braid.entropy flags.
+
+* Bugfix: to allow computation of the entropy for huge braids that
+  cause intermediate overflow in the update rules, break up large
+  braids into smaller chunks, each of which will not overflow, and
+  store the logarithmic growth (issue #138).
+
+* Bugfix: for large braids maxit could overflow an int32 (partial fix
+  for issue #138).
+
+* Move "utility" debug messages to debug level 2.  Now debug level 1
+  should be reserved for mathematical diagnostic information (e.g.,
+  internal iterations, convergence).  This provides a cleaner output
+  when debugging the actual functionality of the code.
+
+
 ## [3.2.2] - 2017-06-02
 
 * Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
@@ -321,7 +339,8 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...develop
+[3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
+[3.2.2]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...release-3.2.2
 [3.2.1]: https://github.com/jeanluct/braidlab/compare/release-3.2...release-3.2.1
 [3.2]: https://github.com/jeanluct/braidlab/compare/release-3.1...release-3.2
 [3.1]: https://github.com/jeanluct/braidlab/compare/release-3.0.1...release-3.1

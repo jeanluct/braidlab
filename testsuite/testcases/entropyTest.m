@@ -3,7 +3,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -150,6 +150,25 @@ classdef entropyTest < matlab.unittest.TestCase
       end
     end
 
+    function test_huge_entropy(testCase)
+      % Test a braid with enormous entropy, which would overflow even one
+      % application of the update rules.
+      % See issue #138.
+      tol = 1e-6;
+      % The simplest pA braid and its entropy.
+      b0 = braidlab.braid([1 -2]);
+      entr0 = entropy(b0);
+      % Number of repetitions of the braid.
+      % This gives a braid with entropy about 1925!
+      Nrep = 2000;
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','l2norm');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','intaxis');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+      entr = entropy(b0^Nrep,'Tol',tol,'Length','minlen');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+    end
+
     function test_entropy_complexity(testCase)
       % Test that complexity and one-iterate entropy are the same.
         len = 40;
@@ -170,5 +189,5 @@ classdef entropyTest < matlab.unittest.TestCase
                                'AbsTol',1e-12, ['intaxis: ' diagnostic]);
         end
     end
-  end
+end
 end

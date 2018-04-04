@@ -24,7 +24,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <marko@clarkson.edu>
 //
 //   This file is part of Braidlab.
@@ -43,17 +43,16 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-// function that switches the type of length computation
-// throws BRAIDLAB:braid:entropy_helper:badlengthflag if
-// passed length flag is unsupported
-double looplength( mwSize N, double *a, double *b, char lengthFlag);
+// Function that switches the type of length computation throws
+// BRAIDLAB:braid:entropy_helper:badlengthflag for unsupported length flag.
+double looplength(mwSize N, double *a, double *b, char lengthFlag);
 
 int BRAIDLAB_debuglvl = -1;
 
 #define P_BRAID   prhs[0]
 #define P_LOOP_IN prhs[1]
 #define P_MAXIT prhs[2]
-#define P_NCONV prhs[3]
+#define P_NCONVREQ prhs[3]
 #define P_TOL prhs[4]
 #define P_LENGTHTYPE prhs[5]
 #define P_ISFUNDAMENTAL prhs[6]
@@ -64,6 +63,17 @@ int BRAIDLAB_debuglvl = -1;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+  if (nlhs < 3)
+    {
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
+                        "%d is not enough output arguments; need %d.",nrhs,3);
+    }
+  if (nrhs < 7)
+    {
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:entropy_helper:badarg",
+                        "%d is not enough input arguments; need %d.",nrhs,7);
+    }
+
   // Get debug level global variable.
   mxArray *isDebug = mexGetVariable("global", "BRAIDLAB_debuglvl");
   if (isDebug) {
@@ -74,7 +84,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const double *u = mxGetPr(P_LOOP_IN);
 
   const int maxit = (int)mxGetScalar(P_MAXIT);
-  const int nconvreq = (int)mxGetScalar(P_NCONV);
+  const int nconvreq = (int)mxGetScalar(P_NCONVREQ);
   const double tol = mxGetScalar(P_TOL);
 
   const char lengthFlag =
@@ -134,22 +144,57 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (it = 1; it <= maxit; ++it)
     {
-      // Normalize coordinates and the discount factor by the loop length
-      for (mwIndex k = 1; k <= N/2; ++k)
-        {
-          a[k] /= currentLength;
-          b[k] /= currentLength;
-        }
-      discount /= currentLength;
+      //
+      // Make sure the word is not too long.  In the worst case
+      // scenario we risk overflowing the update rules.  If it's too
+      // long, break up the word into chunks.
+      //
+      // The maximum number of generators (worst case scenario) is
+      // obtained by taking the braid with the largest TEPG (topological
+      // entropy per generator), with Golden ratio (GR) entropy.  The
+      // largest representable real number is realmax.  Hence, the
+      // number of iterations to reach realmax is
+      //
+      // log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
+      //
 
-      // Act with the braid sequence in braidword onto the coordinates a,b.
-      update_rules(Ngen, n, braidword, a, b);
-
-      currentLength = looplength(N,a,b,lengthFlag) - discount;
-
-      entr = std::log(currentLength);
+#ifdef BRAIDLAB_OVERFLOWING_L2NORM
+      // The naive L2 norm implementation squares the entries, so
+      // overflows sooner.
+      const mwSize maxgen = 700;
+#else
+      // Use L2 norm that avoids overflow.
+      const mwSize maxgen = 1400;
+#endif
+      int nchnk = std::ceil((double)Ngen/maxgen);
 
       if (BRAIDLAB_debuglvl >= 2)
+	printf("entropy_helper: Ngen=%d  nchnk=%d\n",Ngen,nchnk);
+
+      entr = 0;
+      for (int k = 0; k < nchnk; ++k)
+	{
+	  // Normalize coordinates and discount by the loop length.
+	  for (mwIndex k = 1; k <= N/2; ++k)
+	    { a[k] /= currentLength; b[k] /= currentLength; }
+	  discount /= currentLength;
+
+	  // Select chunk.
+	  mwIndex w0 = k*maxgen;
+	  mwIndex w1 = std::min(w0 + maxgen - 1,Ngen-1);
+
+	  if (BRAIDLAB_debuglvl >= 2)
+	    printf("entropy_helper: w0=%d  w1=%d\n",w0,w1);
+
+	  // Apply braid to loop.
+	  update_rules(w1-w0+1, n, braidword+w0, a, b);
+
+	  // New loop length and entropy estimate.
+	  currentLength = looplength(N,a,b,lengthFlag) - discount;
+	  entr = entr + std::log(currentLength);
+	}
+
+      if (BRAIDLAB_debuglvl >= 1)
         printf("  iteration %d  entr=%.10e  diff=%.4e\n",
                   it, entr, entr-entr0);
 
@@ -201,7 +246,7 @@ double looplength( mwSize N, double *a, double *b, char lengthFlag) {
     break;
 
   case 2:
-    retval = sqrt(l2norm2(N,a,b));
+    retval = l2norm(N,a,b);
     break;
 
   default:

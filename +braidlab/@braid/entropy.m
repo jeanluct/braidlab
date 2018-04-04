@@ -43,9 +43,9 @@ function [varargout] = entropy(b,varargin)
 %   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
 %   algorithm.  Shortcut for Tol = 0 && MaxIt = 1.
 %
-%   ENTR = ENTROPY(B,'Finite','MaxInt',N, ...) computes exactly N iterations
-%   of the algorithm (the parameter 'MaxInt' has to be specified).
-%   Identical to passing Tol = 0 and MaxInt = N.
+%   ENTR = ENTROPY(B,'Finite','MaxIt',N, ...) computes exactly N iterations
+%   of the algorithm (the parameter 'MaxIt' has to be specified).
+%   Identical to passing Tol = 0 and MaxIt = N.
 %
 %   [ENTR,PLOOP] = ENTROPY(B,...) also returns the projective loop PLOOP
 %   corresponding to the generalized eigenvector.  The Dynnikov coordinates
@@ -59,7 +59,7 @@ function [varargout] = entropy(b,varargin)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -107,7 +107,7 @@ parser.parse( b, varargin{:} );
 params = parser.Results;
 
 % shortcut flag passed
-switch params.flag
+switch lower(params.flag)
   case 'finite'
     params.tol = 0;
   case 'onestep'
@@ -148,7 +148,7 @@ end
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
   case 'intaxis',
-    lenfun = @(l)l.intaxis;
+    lenfun = @(l) l.intaxis;
   case 'minlength',
     lenfun = @minlength;
   case 'l2norm',
@@ -172,6 +172,14 @@ if isnan(params.maxit)
     % spectral gap.  Roughly, each iteration yields spgap decimal digits.
     spgap = 19 * b.n^-3;
     maxit = ceil(-log10(tol) / spgap) + 30;
+    % For large braids this will overflow int, causing problems with the
+    % MEX file.  There's really no point in using a longer int, since
+    % this is a ludicrous number of iterations.
+    if maxit > intmax('int32')
+      warning('BRAIDLAB:braid:entropy:maxitint32',...
+              'Setting maxit to largest 32-bit integer.')
+      maxit = intmax('int32');
+    end
   end
 else
   maxit = params.maxit;
@@ -193,9 +201,9 @@ else
 end
 
 paramstring = sprintf(['TOL = %.1e \t MAXIT = %d \t NCONV = %d \t ' ...
-                    'LENGTH = %s\n'], tol,maxit,nconvreq,params.length);
+                       'LENGTH = %s\n'],tol,maxit,nconvreq,params.length);
 
-braidlab.util.debugmsg( paramstring, 1);
+braidlab.util.debugmsg(paramstring,1);
 
 %% MEX implementation
 if ~usematlab
@@ -217,7 +225,7 @@ if ~usematlab
 
     [entr,i,u.coords] = entropy_helper(b.word,u.coords,...
                                        maxit,nconvreq,...
-                                       tol,lengthflag, true);
+                                       tol,lengthflag,true);
     usematlab = false;
   catch me
     warning(me.identifier, [ me.message ...
@@ -232,7 +240,7 @@ if usematlab
   nconv = 0;
   entr0 = -1;
 
-  % discount extra arcs if intaxis is used
+  % Discount extra arcs if intaxis is used.
   switch params.length
     case 'intaxis'
       discount = b.n - 1;
@@ -241,24 +249,45 @@ if usematlab
   end
 
   currentLoopLength = lenfun(u) - discount;
+
   for i = 1:maxit
+    %
+    % Make sure the word is not too long.  In the worst case scenario we risk
+    % overflowing the update rules.  If it's too long, break up the word
+    % into chunks.
+    %
+    % The maximum number of generators (worst case scenario) is obtained by
+    % taking the braid with the largest TEPG (topological entropy per
+    % generator), with Golden ratio (GR) entropy.  The largest representable
+    % real number is realmax.  Hence, the number of iterations to reach
+    % realmax is
+    %
+    % log(realmax)/log(GR) ~ 737 for IEEE arithmetic.
+    %
+    % However, because the L2 norm squares the entries, this number is
+    % halved.
+    %
+    maxgen = 300;
+    nchnk = ceil(length(b)/maxgen);
 
-    % normalize discounting factor
-    discount = discount/currentLoopLength;
-
-    % normalize braid coordinates to avoid overflow
-    u.coords = u.coords/currentLoopLength;
-
-    % apply braid to loop
-    u = b*u;
-
-    % update loop length
-    currentLoopLength = lenfun(u) - discount;
-
-    entr = log(currentLoopLength);
+    entr = 0;
+    for k = 1:nchnk
+      % Normalize coordinates and discount by the loop length.
+      u.coords = u.coords/currentLoopLength;
+      discount = discount/currentLoopLength;
+      % Select chunk.
+      w0 = (k-1)*maxgen + 1;
+      w1 = min(w0 + maxgen - 1,length(b));
+      bb = braidlab.braid(b.word(w0:w1),b.n);
+      % Apply braid to loop.
+      u = bb*u;
+      % New loop length and entropy estimate.
+      currentLoopLength = lenfun(u) - discount;
+      entr = entr + log(currentLoopLength);
+    end
 
     debugmsg(sprintf('  iteration %d  entr=%.10e  diff=%.4e',...
-                     i,entr,entr-entr0),2)
+                     i,entr,entr-entr0),1)
     % Check if we've converged to requested tolerance.
     if abs(entr-entr0) < tol
       nconv = nconv + 1;

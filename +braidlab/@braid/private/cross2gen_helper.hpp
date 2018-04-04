@@ -15,7 +15,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <marko@clarkson.edu>
 //
 //   This file is part of Braidlab.
@@ -66,6 +66,15 @@
 # endif
 
 #endif // clang
+
+// The printf code for printing a size_t or mwSize (unsigned).
+// On GCC this is a long unsigned int.
+// The z stands for a variable width (C99, imported by C++11).
+// However, this may not be portable to other compilers.
+// See
+// https://stackoverflow.com/questions/1546789/clean-code-to-printf-size-t-in-c-or-nearest-equivalent-of-c99s-z-in-c
+// https://stackoverflow.com/questions/3209909/how-to-printf-unsigned-long-in-c
+#define BRAIDLAB_PRINTF_SIZE_T "%zu"
 
 #include <iostream>
 #include <vector>
@@ -139,7 +148,7 @@ public:
   // print 3D matrix, each 2D slice at a time
   void print() {
     for ( size_t s = 0; s < S(); s++ ) {
-      printf("Slice %d: \n",s);
+      printf("Slice " BRAIDLAB_PRINTF_SIZE_T ": \n",s);
       for ( size_t r = 0; r < R(); r++ ) {
         for ( size_t c = 0; c < C(); c++ )
           printf("%.3f\t", (*this)(r, c, s) );
@@ -459,7 +468,7 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
   if (! crossingErrors.empty() ) {
     int count  = 1;
     // output individual errors
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       mexPrintf("List of all crossingErrors encountered:\n");
       for( std::list<PWXexception>::iterator e = crossingErrors.begin();
            e != crossingErrors.end();
@@ -484,13 +493,13 @@ cross2gen( Real3DMatrix& XYtraj, RealVector& t,
   crossings.sort();
   tictoc.toc("cross2gen_helper: sorting crossdat", true);
 
-  if (1 <= BRAIDLAB_debuglvl)  {
-    printf("cross2gen_helper: Number of crossings %d\n", crossings.size() );
+  if (2 <= BRAIDLAB_debuglvl)  {
+    printf("cross2gen_helper: Number of crossings " BRAIDLAB_PRINTF_SIZE_T "\n", crossings.size() );
     mexEvalString("pause(0.001);"); //flush
   }
 
   // Determine generators from ordered crossing data
-  if (1 <= BRAIDLAB_debuglvl)  {
+  if (2 <= BRAIDLAB_debuglvl)  {
     printf("cross2gen_helper: Convert crossings to generator sequence\n");
     mexEvalString("pause(0.001);");
   }
@@ -617,7 +626,7 @@ double Timer::toc( const char* msg, bool reset ) {
 // print basic information about PWX
 void PWX::print(int debuglevel = 0) {
   if (debuglevel <= BRAIDLAB_debuglvl) {
-    printf("%2f \t %c \t %d \t %d\n", t, L_On_Top ? '+' : '-', L, R);
+    printf("%2f \t %c \t " BRAIDLAB_PRINTF_SIZE_T " \t " BRAIDLAB_PRINTF_SIZE_T "\n", t, L_On_Top ? '+' : '-', L, R);
     mexEvalString("pause(0.001);");
   }
 }
@@ -682,7 +691,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 
   // unthreaded version
   if ( NThreadsRequested == 1 ) {
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("cross2gen_helper: pairwise crossings running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -701,9 +710,9 @@ void PairCrossings::run( size_t NThreadsRequested ) {
                                         this, std::placeholders::_1);
     ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
 
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf(
-        "cross2gen_helper: pairwise crossings running on %d threads.\n",
+        "cross2gen_helper: pairwise crossings running on " BRAIDLAB_PRINTF_SIZE_T " threads.\n",
         NThreadsRequested );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -762,7 +771,7 @@ bool Strings::applyCrossings
             "Block has to contain at least one crossing" );
 
   if (3 <= BRAIDLAB_debuglvl)  {
-    printf("Concurrent block size: %d\n", distance(start, end) );
+    printf("Concurrent block size: " BRAIDLAB_PRINTF_SIZE_T "\n", distance(start, end) );
   }
 
   // single crossing was sent -- if it cannot be applied successfuly,

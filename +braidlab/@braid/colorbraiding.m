@@ -13,6 +13,14 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
 %
+%   When two strands project onto the same point at any time instance, it
+%   is not generally possible to robustly determine their identities. In
+%   such events, the function issues the error
+%   BRAIDLAB:braid:colorbraiding:coincidentprojection
+%   identifying the offending pair of strands. To resolve this issue,
+%   either change the PROJANG parameter or reduce the value of the braidlab
+%   parameter BraidAbsTol using braidlab.prop('BraidAbsTol', VALUE) command.
+%
 %   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
 %
@@ -31,14 +39,14 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %   you want to manually set the number of threads used, set a global MATLAB
 %   variable BRAIDLAB_threads to a positive integer.
 %
-%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
+%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID, BRAIDLAB.PROP
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -81,7 +89,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
+debugmsg(['colorbraiding: Initialize parameters for crossing analysis'],2);
 tic
 n = size(XY,3); % number of punctures
 
@@ -129,7 +137,7 @@ if checkclosure
   end
 end
 
-debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
+debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000),2);
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -140,7 +148,7 @@ try % trapping to ensure proper identification of strands
     assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
                         'forced']);
 
-    debugmsg('Using MEX algorithm')
+    debugmsg('Using MEX algorithm',2)
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
@@ -150,7 +158,7 @@ try % trapping to ensure proper identification of strands
     if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')
+    debugmsg('Using MATLAB algorithm',2)
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XY,t,delta);
     end
