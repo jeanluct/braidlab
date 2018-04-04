@@ -10,7 +10,7 @@ See the [*braidlab* user's guide][4].  If you already downloaded *braidlab* the 
 
 If you use *braidlab* in one of your papers, please cite it as:
 
-* J.-L. Thiffeault and Marko Budišić, _Braidlab: A Software Package for Braids and Loops_, [arXiv:1410.0849](http://arXiv.org/abs/1410.0849) [math.GT] (2013-2017), Version `<<version number>>`.
+* J.-L. Thiffeault and Marko Budišić, _Braidlab: A Software Package for Braids and Loops_, [arXiv:1410.0849](http://arXiv.org/abs/1410.0849) [math.GT] (2013-2018), Version `<<version number>>`.
 
 You can use this BibTeX entry:
 ```
@@ -19,7 +19,7 @@ You can use this BibTeX entry:
     title = {Braidlab: {A} Software Package for Braids and Loops},
     eprint = {arXiv:1410.0849 [math.GT]},
     url = {http://arXiv.org/abs/1410.0849},
-    year = {2013--2017},
+    year = {2013--2018},
     note = {Version <<version number>>}
 }
 ```
