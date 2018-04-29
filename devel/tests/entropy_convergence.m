@@ -29,7 +29,7 @@ tic
 try
   etr = entropy(b,'trains');
 catch err
-  if strcmp(err.identifier,'BRAIDLAB:braid:tntype_helper:notdecr')
+  if strcmp(err.identifier,'BRAIDLAB:braid:train_helper:notdecr')
     warning('Growth not decreasing... giving up on train tracks.')
   end
   etr = 0;

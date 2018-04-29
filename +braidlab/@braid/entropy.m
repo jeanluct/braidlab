@@ -52,7 +52,7 @@ function [varargout] = entropy(b,varargin)
 %   are normalized such that NORM(PLOOP.COORDS) = 1.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
+%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TRAIN, PSIROOTS.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
@@ -136,8 +136,9 @@ if strcmpi( params.method, 'trains' )
     error('BRAIDLAB:braid:entropy:nargout',...
           'Too many output arguments for ''trains'' option.')
   end
-  [TN,varargout{1}] = tntype_helper(b.word,b.n);
-  if strcmpi(TN,'reducible1')
+  T = train_helper(b.word,b.n);
+  varargout{1} = T.entropy;
+  if strcmpi(T.tntype,'reducible1')
     warning('BRAIDLAB:braid:entropy:reducible',...
             'Reducible braid... falling back on iterative method.')
   else

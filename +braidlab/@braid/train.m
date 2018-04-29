@@ -1,13 +1,20 @@
-function [varargout] = tntype(b)
-%TNTYPE   Thurston-Nielsen type of a braid.
-%   T = TNTYPE(B) returns the Thurston-Nielsen type of a braid B.  The braid
-%   is regarded as labeling an isotopy class on the punctured disk.  The
-%   type T can take the values 'finite-order', 'reducible', or
-%   'pseudo-Anosov', following the Thurston-Nielsen classification theorem.
+function [varargout] = train(b)
+%TRAIN   Train track of a braid.
+%   T = TRAIN(B) returns a structure T with the train track information for
+%   a braid B.  The braid is regarded as labeling an isotopy class on the
+%   punctured disk.
 %
-%   [T,ENTR] = TNTYPE(B) also returns the entropy ENTR of the braid.
+%   The returned structure T contains the following fields:
 %
-%   TNTYPE uses Toby Hall's implementation of the Bestvina-Handel algorithm.
+%   T.tntype: the Thurston type of the isotopy class.  This take the values
+%   'finite-order', 'reducible', or 'pseudo-Anosov', following the
+%   Thurston-Nielsen classification theorem.
+%
+%   T.entropy: the entropy of the braid.
+%
+%   T.ttmap: the train track map.
+%
+%   TRAIN uses Toby Hall's implementation of the Bestvina-Handel algorithm.
 %
 %   References:
 %
@@ -48,17 +55,14 @@ function [varargout] = tntype(b)
 % LICENSE>
 
 if b.n >= 3
-  [TN,entr] = tntype_helper(b.word,b.n);
+  T = train_helper(b.word,b.n);
 else
-  TN = 'finite-order';
-  entr = 0;
+  T.tntype = 'finite-order';
+  T.entropy = 0;
 end
 
-if any(strcmpi(TN,{'reducible1','reducible2'}))
-  varargout{1} = 'reducible';
-else
-  varargout{1} = TN;
-end
+varargout{1} = T;
 
-% Optionally also return entropy, since we get it for free as well.
-if nargout > 1, varargout{2} = entr; end
+if any(strcmpi(T.tntype,{'reducible1','reducible2'}))
+  varargout{1}.tntype = 'reducible';
+end

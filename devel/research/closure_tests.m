@@ -57,7 +57,8 @@ parfor i = 1:N
   b = braidlab.braid(XYc);
   if docompact, b = compact(b); end
   try
-    [tntext{i},entr(i)] = tntype(b);
+    t = train(b);
+    tntext{i} = t.tntype; entr(i) = t.entr;
   catch err
     entr(i) = 0;
     tntext{i} = 'error';

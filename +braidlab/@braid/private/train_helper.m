@@ -1,5 +1,5 @@
-function varargout = tntype_helper(varargin) %#ok<STOUT>
-%TNTYPE_HELPER   See tntype_helper.cpp.
+function varargout = train_helper(varargin) %#ok<STOUT>
+%TRAIN_HELPER   See train_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
 %   does not exist.

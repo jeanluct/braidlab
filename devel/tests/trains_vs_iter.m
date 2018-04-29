@@ -35,11 +35,11 @@ for n = 3:nmax
 	TN = 'reducible';
 	while ~strcmp(TN,'pseudo-Anosov')
 	  b = braid('random',n,k);
-	  [TN,~] = tntype(b);
+	  TN = getfield(train(b),'tntype');
 	end
       else
 	b = braid('random',n,k);
-	[TN,~] = tntype(b);
+        TN = getfield(train(b),'tntype');
       end
 
       tic
@@ -50,7 +50,7 @@ for n = 3:nmax
       try
 	entr_trains(n,k) = entropy(b,'trains');
       catch err
-	if strcmp(err.identifier,'BRAIDLAB:braid:tntype_helper:notdecr')
+	if strcmp(err.identifier,'BRAIDLAB:braid:train_helper:notdecr')
 	  entr_trains(n,k) = NaN;
 	else
 	  rethrow(err);

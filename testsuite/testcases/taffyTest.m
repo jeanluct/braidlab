@@ -57,7 +57,7 @@ classdef taffyTest < matlab.unittest.TestCase
 
       b = taffy('3rods');
       testCase.verifyEqual(b,testCase.b3rods)
-      [t,entr] = tntype(b);
+      t = getfield(train(b),'tntype');
       testCase.verifyEqual(t,'pseudo-Anosov')
 
       b = taffy('4rods');
@@ -69,14 +69,14 @@ classdef taffyTest < matlab.unittest.TestCase
       % Parallel code can return different generators, but same braids (#116).
       %testCase.verifyEqual(b,testCase.b6rodsbad)
       testCase.verifyTrue(b == testCase.b6rodsbad)
-      t = tntype(b);
+      t = getfield(train(b),'tntype');
       testCase.verifyEqual(t,'reducible')
 
       b = taffy('6rods');
       % Parallel code can return different generators, but same braids (#116).
       %testCase.verifyEqual(b,testCase.b6rods)
       testCase.verifyTrue(b == testCase.b6rods)
-      [t,entr] = tntype(b);
+      t = getfield(train(b),'tntype');
       testCase.verifyEqual(t,'pseudo-Anosov')
 
       % The four particles are initially aligned exactly along the y axis.

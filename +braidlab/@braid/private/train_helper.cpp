@@ -1,7 +1,7 @@
 //
 // Matlab MEX file
 //
-// TNTYPE_HELPER
+// TRAIN_HELPER
 //
 
 // <LICENSE
@@ -28,10 +28,11 @@
 //   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
 // LICENSE>
 
-// Helper file for tntype.m.
+// Helper file for train.m.
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "mex.h"
 #include "trains/newarray.h"
 #include "trains/braid.h"
@@ -42,7 +43,7 @@ bool trains::GrowthCheck = true;
 extern void _main();
 
 //
-// tntype_helper uses Toby Hall's "trains" code to find the isotopy class.
+// train_helper uses Toby Hall's "trains" code to find the isotopy class.
 //
 // Some braids fail: for example, the 9-string braid
 //
@@ -60,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   typedef std::vector<int>::iterator vecit;
   typedef std::vector<int>::const_iterator veccit;
 
-  // Arguments checked and formatted in tntype.m.
+  // Arguments checked and formatted in train.m.
 
   const mxArray *wA = prhs[0];
   const int *w = (int *)mxGetData(wA); // wA contains int32's.
@@ -91,7 +92,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         // Encountered exception... decrease tolerance and try again once.
         if (++tries > maxtries)
           {
-            mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
+            mexErrMsgIdAndTxt("BRAIDLAB:braid:train_helper:notdecr",
                               "Growth not decreasing in fold and "
                               "minimum tolerance of %.2Le reached.",
                               trains::TOL);
@@ -100,7 +101,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       }
     catch(...)
       {
-        mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:notdecr",
+        mexErrMsgIdAndTxt("BRAIDLAB:braid:train_helper:notdecr",
                           "Unknown exception occurred.");
       }
   } while (tries <= maxtries);
@@ -127,22 +128,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   else if (G.GetType() == trains::pA_or_red)
     {
-      mexWarnMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:pA_or_red",
+      mexWarnMsgIdAndTxt("BRAIDLAB:braid:train_helper:pA_or_red",
                          "Ambiguous type.");
       type = "pA_or_reducible";
     }
   else
     {
-      mexErrMsgIdAndTxt("BRAIDLAB:braid:tntype_helper:unknown",
+      mexErrMsgIdAndTxt("BRAIDLAB:braid:train_helper:unknown",
                         "Unknown type.");
     }
 
-  plhs[0] = mxCreateString(type.c_str());
+  // Store result in a Matlab data structure.
+  const int nfields = 2;    // number of fields
 
-  if (nlhs > 1)
+  // Field names.
+  std::string strfnames[nfields] = {"tntype","entropy"};
+
+  // Allocate field names, copy strings over.
+  const int MAXCHARS = 20;  // maximum characters in each field (terrible)
+  const char *fieldnames[nfields];
+  for (int i = 0; i < nfields; ++i)
     {
-      // Also return the diltation.
-      plhs[1] = mxCreateDoubleMatrix(1,1,mxREAL);
-      *(mxGetPr(plhs[1])) = log(dil);
+      fieldnames[i] = (char *)mxMalloc(MAXCHARS);
+      std::memcpy((void *)fieldnames[i],
+		  strfnames[i].c_str(),
+		  strfnames[i].length()+1);
     }
+
+  plhs[0] = mxCreateStructMatrix(1,1,nfields,fieldnames);
+  mxArray *wtntype = mxCreateString(type.c_str());
+  mxArray *wentropy = mxCreateDoubleMatrix(1,1,mxREAL);
+  *(mxGetPr(wentropy)) = log(dil);
+  mxSetFieldByNumber(plhs[0],0,0,wtntype);
+  mxSetFieldByNumber(plhs[0],0,1,wentropy);
+
+  for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);
 }
