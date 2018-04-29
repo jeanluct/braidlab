@@ -142,7 +142,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   const int nfields = 2;    // number of fields
 
   // Field names.
-  std::string strfnames[nfields] = {"tntype","entropy"};
+  std::string fieldnames_string[nfields] =
+    {"tntype","entropy"};
 
   // Allocate field names, copy strings over.
   const int MAXCHARS = 20;  // maximum characters in each field (terrible)
@@ -151,10 +152,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       fieldnames[i] = (char *)mxMalloc(MAXCHARS);
       std::memcpy((void *)fieldnames[i],
-		  strfnames[i].c_str(),
-		  strfnames[i].length()+1);
+                  fieldnames_string[i].c_str(),
+                  fieldnames_string[i].length()+1);
     }
 
+  // Create a 1x1 Matlab structure.
   plhs[0] = mxCreateStructMatrix(1,1,nfields,fieldnames);
   mxArray *wtntype = mxCreateString(type.c_str());
   mxArray *wentropy = mxCreateDoubleMatrix(1,1,mxREAL);
@@ -162,5 +164,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxSetFieldByNumber(plhs[0],0,0,wtntype);
   mxSetFieldByNumber(plhs[0],0,1,wentropy);
 
+  // Free memory for field names.  So 1995.
   for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);
 }
