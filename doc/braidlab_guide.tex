@@ -505,7 +505,7 @@ algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm|(}%
 we add an optional \lstinline{'Method'} parameter:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> entropy(braid([1 2]),'Method','trains')
+>> entropy(braid([1 2]),'Method','train')
 
 ans = 0
 \end{lstlisting}
@@ -513,27 +513,42 @@ ans = 0
 Note that for large braids the Bestvina--Handel algorithm is impractical.  But
 when applicable it can also determine the Thurston--Nielsen type %
 \index{braid!Thurston--Nielsen type}%
-of the braid~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}:
-\index{braid class@\braid\ class!tntype@\lstinline{tntype}|(}%
+of the braid as well as the transition matrix for the train track
+map~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}: \index{braid
+  class@\braid\ class!train@\lstinline{train}|(}%
 \index{braid!pseudo-Anosov|(}%
 \index{braid!reducible|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> tntype(braid([1 2 -3]))
+>> train(braid([1 2 -3]))
 
-ans = pseudo-Anosov
->> tntype(braid([1 2]))
+ans = struct with fields:
 
-ans = finite-order
->> tntype(braid([1 2],4))  % reducing curve around 1,2,3
+      tntype: 'pseudo-Anosov'
+     entropy: 0.8314
+    transmat: [4×4 double]
 
-ans = reducible
+>> train(braid([1 2]))
+
+ans = struct with fields:
+
+      tntype: 'finite-order'
+     entropy: 0
+    transmat: [3×3 double]
+
+>> train(braid([1 2],4))  % reducing curve around 1,2,3
+
+ans = struct with fields:
+
+      tntype: 'reducible'
+     entropy: 0
+    transmat: [3×3 double]
 \end{lstlisting}
 \index{braid!pseudo-Anosov|)}%
 \index{braid!reducible|)}%
 \braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
 algorithm~\citep{HallTrain}. %
 \index{Bestvina--Handel algorithm|)}%
-\index{braid class@\braid\ class!tntype@\lstinline{tntype}|)}%
+\index{braid class@\braid\ class!train@\lstinline{train}|)}%
 
 The topological entropy is a measure of braid complexity that relies on %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|)}%
@@ -1836,13 +1851,15 @@ which also produces Figure~\ref{fig:taffy_3rods}.  The Thurston--Nielsen %
 type and topological entropy %
 \index{braid!entropy}%
 of this braid are %
-\index{braid class@\braid\ class!tntype@\lstinline{tntype}|(}%
+\index{braid class@\braid\ class!train@\lstinline{train}|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [t,entr] = tntype(b)
+>> train(b)
 
-t = pseudo-Anosov
+ans = struct with fields:
 
-entr = 1.7627
+      tntype: 'pseudo-Anosov'
+     entropy: 1.7627
+    transmat: [2×2 double]
 \end{lstlisting}
 One would expect a competent taffy puller to be pseudo-Anosov, %
 \index{braid!pseudo-Anosov}%
@@ -1861,7 +1878,7 @@ The design in Figure~\ref{fig:taffy_4rods} can be plotted and analyzed with
 
 b = < 1  3  2  2  1  3 >
 \end{lstlisting}
-When we apply \lstinline{tntype} to this braid we find the braid is
+When we apply \lstinline{train} to this braid we find the braid is
 pseudo-Anosov with exactly the same entropy as the 3-rod taffy puller,
 $1.7627$.  There is thus no obvious advantage to using more rods in this case.
 
@@ -1899,9 +1916,13 @@ b = < 2  1  2  4  5  4  3  3  2  1  2  4  5  4 >
 with Thurston--Nielsen type
 \index{braid!reducible|(}%
 \begin{lstlisting}[frame=single,framerule=0pt]
->> tntype(b)
+>> train(b)
 
-ans = reducible
+ans = struct with fields:
+
+      tntype: 'reducible'
+     entropy: 0
+    transmat: [5×5 double]
 \end{lstlisting}
 There are reducing curves in this design: simply wrap a loop around the left
 gray rod and the inner red rod, and it will rotate without stretching. %
@@ -1916,13 +1937,15 @@ b = < 3  2  1  2  4  5  4  3  3  2  1  2  5  4  5  3 >
 \end{lstlisting}
 with Thurston--Nielsen type and entropy
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [t,entr] = tntype(b)
+>> [t,entr] = train(b)
 
-t = pseudo-Anosov
+ans = struct with fields:
 
-entr = 2.6339
+      tntype: 'pseudo-Anosov'
+     entropy: 2.6339
+    transmat: [5×5 double]
 \end{lstlisting}
-\index{braid class@\braid\ class!tntype@\lstinline{tntype}|)}%
+\index{braid class@\braid\ class!train@\lstinline{train}|)}%
 The fixed rods have increased the entropy by~$50\%$!  This sounds like a
 fairly small change, but what it means is that this 6-rod design achieves
 growth of~$10^7$ in about~$6$ iterations rather than~$10$.  Alexander Flanagan

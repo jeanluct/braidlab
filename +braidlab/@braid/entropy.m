@@ -12,7 +12,7 @@ function [varargout] = entropy(b,varargin)
 %   parameter-value pairs that modify algorithm behavior (defaults in
 %   braces).
 %
-%   * Method - Algorithm Choice [ 'Trains' | {'Iter'} ] Chooses between
+%   * Method - Algorithm Choice [ 'Train' | {'Iter'} ] Chooses between
 %   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
 %   for long braids B-H algorithm becomes very inefficient.
 %
@@ -125,16 +125,16 @@ end
 
 % determine type of algorithm
 params.method = validateflag(params.method, {'iter','moussafir'},...
-                           {'trains','train-tracks','bh'});
+                           {'train','trains','train-tracks','bh'});
 
 params.length = validateflag(params.length, 'intaxis','minlength','l2norm');
 
 
 %% TRAIN-TRACKS ALGORITHM (EXITS AFTER if)
-if strcmpi( params.method, 'trains' )
+if strcmpi( params.method, 'train' )
   if nargout > 1
     error('BRAIDLAB:braid:entropy:nargout',...
-          'Too many output arguments for ''trains'' option.')
+          'Too many output arguments for ''train'' option.')
   end
   T = train_helper(b.word,b.n);
   varargout{1} = T.entropy;

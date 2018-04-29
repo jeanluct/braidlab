@@ -3,6 +3,13 @@
 
 ## [Unreleased][unreleased]
 
+* braid.train replaces braid.tntype.  It returns the Thurston-Nielsen
+  type, the entropy, and now the transition matrix for the train track
+  map.
+
+* The braid.entropy option name 'Trains' is now 'Train', for
+  consistency (though 'Trains' is still supported).
+
 
 ## [3.2.3] - 2018-04-04
 
