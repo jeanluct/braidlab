@@ -12,7 +12,7 @@ function [varargout] = train(b)
 %
 %   T.entropy: the entropy of the braid.
 %
-%   T.ttmap: the train track map.
+%   T.transmat: the transition matrix for the train track map.
 %
 %   TRAIN uses Toby Hall's implementation of the Bestvina-Handel algorithm.
 %

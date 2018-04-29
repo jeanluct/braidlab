@@ -31,6 +31,7 @@
 // Helper file for train.m.
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <cstring>
 #include "mex.h"
@@ -58,8 +59,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   using std::cout;
   using std::endl;
   using std::max;
-  typedef std::vector<int>::iterator vecit;
-  typedef std::vector<int>::const_iterator veccit;
 
   // Arguments checked and formatted in train.m.
 
@@ -139,11 +138,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   // Store result in a Matlab data structure.
-  const int nfields = 2;    // number of fields
+  const int nfields = 3;    // number of fields
+  int field = 0;
 
   // Field names.
   std::string fieldnames_string[nfields] =
-    {"tntype","entropy"};
+    {"tntype","entropy","transmat"};
 
   // Allocate field names, copy strings over.
   const int MAXCHARS = 20;  // maximum characters in each field (terrible)
@@ -158,11 +158,42 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   // Create a 1x1 Matlab structure.
   plhs[0] = mxCreateStructMatrix(1,1,nfields,fieldnames);
+
+  // Copy TN type, entropy to fields.
   mxArray *wtntype = mxCreateString(type.c_str());
-  mxArray *wentropy = mxCreateDoubleMatrix(1,1,mxREAL);
-  *(mxGetPr(wentropy)) = log(dil);
-  mxSetFieldByNumber(plhs[0],0,0,wtntype);
-  mxSetFieldByNumber(plhs[0],0,1,wentropy);
+  mxArray *wentropy = mxCreateDoubleScalar(log(dil));
+  mxSetFieldByNumber(plhs[0],0,field++,wtntype);
+  mxSetFieldByNumber(plhs[0],0,field++,wentropy);
+
+  // Find transition matrix.
+  // Output in raw format, do not show infinitesimal edges (false).
+  std::vector<std::string> M = G.TransitionMatrix(trains::raw,false);
+  // Copy rows (strings) to a Matlab matrix.
+  const int nedges = M.size();
+  mxArray *wtransmat = mxCreateDoubleMatrix(nedges,nedges,mxREAL);
+  double *transmat = (double *)mxGetPr(wtransmat);
+  for (int i = 0; i < nedges; ++i)
+    {
+      std::stringstream rowss(M[i]);
+      for (int j = 0; j < nedges; ++j)
+	{
+	  if (!(rowss >> transmat[i + nedges*j]))
+	    {
+	      mexErrMsgIdAndTxt("BRAIDLAB:braid:train_helper:badrow",
+				"Row %d has %d columns "
+				"(needs %d).",i+1,j,nedges);
+	    }
+	}
+      int num;
+      if (rowss >> num)
+	{
+	  mexErrMsgIdAndTxt("BRAIDLAB:braid:train_helper:badrow",
+			    "Row %d has more than %d columns."
+			    ,i+1,nedges);
+	}
+    }
+  // Attach Matlab matrix to field.
+  mxSetFieldByNumber(plhs[0],0,field++,wtransmat);
 
   // Free memory for field names.  So 1995.
   for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);
