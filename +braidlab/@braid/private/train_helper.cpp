@@ -59,6 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   using std::cout;
   using std::endl;
   using std::max;
+  using std::vector;
 
   // Arguments checked and formatted in train.m.
 
@@ -138,12 +139,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
   // Store result in a Matlab data structure.
-  const int nfields = 3;    // number of fields
+  const int nfields = 4;    // number of fields
   int field = 0;
 
   // Field names.
   std::string fieldnames_string[nfields] =
-    {"tntype","entropy","transmat"};
+    {"tntype","entropy","transmat","ttmap"};
 
   // Allocate field names, copy strings over.
   const int MAXCHARS = 20;  // maximum characters in each field (terrible)
@@ -167,7 +168,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   // Find transition matrix.
   // Output in raw format, do not show infinitesimal edges (false).
-  std::vector<std::string> M = G.TransitionMatrix(trains::raw,false);
+  vector<std::string> M = G.TransitionMatrix(trains::raw,false);
   // Copy rows (strings) to a Matlab matrix.
   const int nedges = M.size();
   mxArray *wtransmat = mxCreateDoubleMatrix(nedges,nedges,mxREAL);
@@ -194,6 +195,46 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   // Attach Matlab matrix to field.
   mxSetFieldByNumber(plhs[0],0,field++,wtransmat);
+
+  // Find the train track map.
+  trains::edgeiterator J(G.Edges);
+  // Store as vector of vectors.
+  // ttmap[i] will give a vector of signed image edges.
+  // Infinitesimal edges are listed first.
+  vector<vector<int>> ttmap;
+  // Loop over all edges, infinitesimal and main.
+  do
+    {
+      trains::intiterator I(J.Now().Image);
+      vector<int> ttmaprow;
+      // Loop over image edges.
+      do
+	{
+	  // Add edge to vector.
+	  ttmaprow.push_back(I.Now());
+	  I++;
+	}
+      while (!I.AtOrigin());
+      // Add image vector for this edge.
+      ttmap.push_back(ttmaprow);
+      J++;
+    }
+  while (!J.AtOrigin());
+
+  // Store as ttmap as cell array of vectors.
+  mxArray *wttmap = mxCreateCellMatrix(ttmap.size(),1);
+  for (int i = 0; i < ttmap.size(); ++i)
+    {
+      mxArray *wrow = mxCreateDoubleMatrix(1,ttmap[i].size(),mxREAL);
+      double *row = (double *)mxGetPr(wrow);
+      for (int j = 0; j < ttmap[i].size(); ++j)
+        {
+          row[j] = ttmap[i][j];
+	}
+      mxSetCell(wttmap,i,wrow);
+    }
+  // Attach Matlab cell array to field.
+  mxSetFieldByNumber(plhs[0],0,field++,wttmap);
 
   // Free memory for field names.  So 1995.
   for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);
