@@ -1,4 +1,4 @@
-function [varargout] = train(b)
+function T = train(b)
 %TRAIN   Train track of a braid.
 %   T = TRAIN(B) returns a structure T with the train track information for
 %   a braid B.  The braid is regarded as labeling an isotopy class on the
@@ -6,13 +6,19 @@ function [varargout] = train(b)
 %
 %   The returned structure T contains the following fields:
 %
-%   T.tntype: the Thurston type of the isotopy class.  This take the values
+%   T.braid: the braid itself.
+%
+%   T.tntype: Thurston type of the isotopy class.  This take the values
 %   'finite-order', 'reducible', or 'pseudo-Anosov', following the
 %   Thurston-Nielsen classification theorem.
 %
-%   T.entropy: the entropy of the braid.
+%   T.entropy: entropy of the braid.
 %
-%   T.transmat: the transition matrix for the train track map.
+%   T.ttmap: train track map, stored as a cell array of vectors.  For
+%   example, edge 2 mapped to the edge sequence [-3 1 2] corresponds to
+%   T.ttmap{2} = [-3 1 2].
+%
+%   T.transmat: transition matrix for the train track map.
 %
 %   TRAIN uses Toby Hall's implementation of the Bestvina-Handel algorithm.
 %
@@ -61,8 +67,27 @@ else
   T.entropy = 0;
 end
 
-varargout{1} = T;
-
+% There are two types of reducibility.  From trains/graph.h:
+%
+%    Reducible1 means transition matrix reducible
+%    Reducible2 have efficient fibred surface
+%
+% More info on this in trains frontend's "help gates":
+%
+%    If the graph map held in memory has been found to represent a
+%    pseudo-Anosov isotopy class, or a reducible class for which
+%    reducibility has been detected because there is an efficient fibred
+%    surface with a vertex at which not all of the gates are connected by
+%    infinitesimal edges, then this command will display lists of gates and
+%    infinitesimal edges at each vertex. The gates are listed in cyclic
+%    (anticlockwise) order around the vertex.
+%
+% For now, treat these as identical and just set the field to 'reducible'.
 if any(strcmpi(T.tntype,{'reducible1','reducible2'}))
-  varargout{1}.tntype = 'reducible';
+  T.tntype = 'reducible';
 end
+
+T.braid = b;
+
+% Preferred order.
+T = orderfields(T,{'braid','tntype','entropy','transmat','ttmap'});
