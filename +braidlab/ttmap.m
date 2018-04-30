@@ -66,9 +66,7 @@ else
   letlist = n+1:length(tt);
 end
 
-if params.inverses
-  error('Inverses parameter not yet implemented.')
-end
+fprintf('\n');
 
 for i = letlist
   if i <= n
@@ -94,4 +92,25 @@ for i = letlist
     end
   end
   fprintf('\n');
+  if params.inverses && i > n
+    fprintf('%2s',alphaup(i-n))
+    fprintf(' ->');
+    for j = length(tt{i}):-1:1
+      g = tt{i}(j);
+      if g > 0
+        if g <= n
+          if params.peripheral, fprintf(' %d',-g); end
+        else
+          fprintf(' %s',alphaup(g-n))
+        end
+      else
+        if abs(g) <= n
+          if params.peripheral, fprintf(' %d',-g); end
+        else
+          fprintf(' %s',alphalo(abs(g)-n))
+        end
+      end
+    end
+    fprintf('\n');
+  end
 end
