@@ -1,7 +1,7 @@
 function ttmap(t,varargin)
 %TTMAP   Print a train track map obtained by braid.train.
 %   TTMAP(T) displays the train-track map in structure T in a human-redable
-%   form.
+%   form.  T can be either a braid or a structure returned by braid.train.
 %
 %   TTMAP(T,'Parameter',VALUE,...) takes additional parameter-value pairs
 %   (defaults in braces).
@@ -41,13 +41,20 @@ import braidlab.util.validateflag
 
 parser = inputParser;
 
-parser.addRequired('t', @(x)isa(x,'struct') ...
-                   && isfield(x,'ttmap') && isfield(x,'braid'));
+% First argument is a structure returned by braidlab.train, or a braid.
+parser.addRequired('t', @(x) ...
+                   (isa(x,'struct') && ...
+                    isfield(x,'ttmap') && ...
+                    isfield(x,'braid')) ...
+                   || ...
+                   (isa(x,'braidlab.braid')));
 parser.addParameter('inverses', false, @(x)islogical(x));
 parser.addParameter('peripheral', true, @(x)islogical(x));
 
 parser.parse(t, varargin{:});
 params = parser.Results;
+
+if isa(t,'braidlab.braid') t = train(t); end
 
 n = t.braid.n;
 tt = t.ttmap;
