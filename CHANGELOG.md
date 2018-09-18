@@ -6,15 +6,15 @@
 
 ## [3.2.3] - 2018-04-04
 
-* Bugfix: case issue in braid.entropy flags.
+* Bugfix: case issue in `braid.entropy` flags.
 
 * Bugfix: to allow computation of the entropy for huge braids that
   cause intermediate overflow in the update rules, break up large
   braids into smaller chunks, each of which will not overflow, and
   store the logarithmic growth (issue #138).
 
-* Bugfix: for large braids maxit could overflow an int32 (partial fix
-  for issue #138).
+* Bugfix: for large braids `maxit` could overflow an `int32` (partial
+  fix for issue #138).
 
 * Move "utility" debug messages to debug level 2.  Now debug level 1
   should be reserved for mathematical diagnostic information (e.g.,
@@ -25,63 +25,63 @@
 ## [3.2.2] - 2017-06-02
 
 * Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
-  databraidTest to fail (issue #137).
+  `databraidTest` to fail (issue #137).
 
 
 ## [3.2.1] - 2016-10-23
 
-* braid constructor issues a warning when creating a braid from data
-  consisting of unclosed orbits.  Use braid(closure(XY)) to suppress the
-  warning (issue #130).
+* `braid` constructor issues a warning when creating a braid from data
+  consisting of unclosed orbits.  Use `braid(closure(XY))` to suppress
+  the warning (issue #130).
 
-* Bugfix: loopsigma_helper without GMP still tried to compile
-  functions with mpz_class (issue #131).
+* Bugfix: `loopsigma_helper` without GMP still tried to compile
+  functions with `mpz_class` (issue #131).
 
 * Bugfix: added mutex protection around temporary loop storage (issue #132).
 
 
 ## [3.2] - 2015-08-27
 
-* braid.mtimes acting on loops is now multithreaded.
+* `braid.mtimes` acting on loops is now multithreaded.
 
-* braid.braid can generate normally-distributed random braids
+* `braid.braid` can generate normally-distributed random braids
 
-* braid.subbraid now has a C++ implementation.
+* `braid.subbraid` now has a C++ implementation.
 
-* loop.plot takes the option 'BasePointColor'.
+* `loop.plot` takes the option `BasePointColor`.
 
 * Added troubleshooting appendix to braidlab guide, which describes
   global flags and issue reporting.
 
-* Bugfix: prevent creation of empty loop with loop([]), or equivalently a
-  loop with two punctures with loop(2), or a loop with one puncture and a
-  basepoint with loop(1,'BasePoint').
+* Bugfix: prevent creation of empty loop with `loop([])`, or
+  equivalently a loop with two punctures with `loop(2)`, or a loop
+  with one puncture and a basepoint with `loop(1,'BasePoint')`.
 
-* Bugfix: disallow passing of nonincreasing time vector to databraid.
+* Bugfix: disallow passing of nonincreasing time vector to `databraid`.
 
-* Bugfix: disallow inf and NaN when creating braid from generator list.
+* Bugfix: disallow `inf` and `NaN` when creating braid from generator list.
 
 * Various other small bugfixes.
 
 
 ## [3.1] - 2015-01-11
 
-* The function braidlab.prop can be used to set global properties,
+* The function `braidlab.prop` can be used to set global properties,
   such as the way braids are plotted and the direction of rotation for
   generators.
 
-* braidlab.prop can set the absolute tolerance for determining
+* `braidlab.prop` can set the absolute tolerance for determining
   coincidence of coordinates when constructing a braid from data
-  (property BraidAbsTol).  This replaces the previous relative
+  (property `BraidAbsTo`l).  This replaces the previous relative
   comparison which had been used since 2.0.  (See issue #117.)
 
-* braid.plot takes color and linestyle attributes.
+* `braid.plot` takes color and linestyle attributes.
 
-* braid.lk returns the Lawrence-Krammer representation of a braid.
+* `braid.lk` returns the Lawrence-Krammer representation of a braid.
 
-* The class annbraid is used to represent braids on annular domains.
+* The class `annbraid` is used to represent braids on annular domains.
 
-* databraids are displayed differently from braids, with crossing
+* `databraids` are displayed differently from braids, with crossing
   times shown.
 
 * The braidlab guide has been expanded with a short introduction to
@@ -106,12 +106,12 @@
 
 * Fix some outdated output in guide.
 
-* Fix a bug when calling C++ version of intersec.
+* Fix a bug when calling C++ version of `intersec`.
 
-* Fix a bug in braid.mtimes that disallowed valid action on loop
+* Fix a bug in `braid.mtimes` that disallowed valid action on loop
   with basepoint.
 
-* Remove broken braid.reducing.
+* Remove broken `braid.reducing`.
 
 * Makefile detects Linux 32-bit architecture.
 
@@ -128,69 +128,71 @@
 
 * Loop constructor can now return an array of canonical loops.  This
   is useful for pre-allocating memory, among other things.  To make
-  this work, the loop constructor form loop(a,b) has been removed (use
-  loop([a b]) instead).  This shouldn't affect things much as that
-  form was hardly used and was not documented in the guide.
+  this work, the loop constructor form `loop(a,b)` has been removed
+  (use `loop([a b])` instead).  This shouldn't affect things much as
+  that form was hardly used and was not documented in the guide.
 
-* Loop constructor can take an option 'BasePoint' when creating loops,
+* Loop constructor can take an option `BasePoint` when creating loops,
   to add an extra puncture.  The basepoint is not allowed to move
   under braid operations.
 
-* Loop constructor: loop(n) now returns a loop with n punctures,
-  rather than (n+1).  Use loop(n,'BasePoint') to add the extra puncture.
+* Loop constructor: `loop(n)` now returns a loop with `n` punctures,
+  rather than `n+1`.  Use `loop(n,'BasePoint')` to add the extra
+  puncture.
 
-* loop.n now returns the number of non-basepoint punctures.  Use
-  loop.totaln to get the total number of punctures, including the
+* `loop.n` now returns the number of non-basepoint punctures.  Use
+  `loop.totaln` to get the total number of punctures, including the
   basepoint.
 
-* Loop constructor has an option 'Enum' to enumerate a list of loops
+* Loop constructor has an option `Enum` to enumerate a list of loops
   with coordinate values between specified bounds.
 
-* Loop constructor takes 'FullTwist' option.
+* Loop constructor takes `FullTwist` option.
 
-* loop.minlength is now a C++ MEX file.
+* `loop.minlength` is now a C++ MEX file.
 
-* Update braid.plot for Matlab 2014b.
+* Update `braid.plot` for Matlab 2014b.
 
-* braid.tensor and databraid.tensor can handle more than one braid at
-  a time.  There was also a bug in databraid.tensor: the braids have
-  to be interweaved.
+* `braid.tensor` and `databraid.tensor` can handle more than one braid
+  at a time.  There was also a bug in `databraid.tensor`: the braids
+  have to be interweaved.
 
-* braid.entropy supports different length functions.  The arguments to
-  entropy have change significantly.  In particular, the train-track
-  algorithm is now specified using entropy(b,'Method','trains').
+* `braid.entropy` supports different length functions.  The arguments
+  to entropy have change significantly.  In particular, the
+  train-track algorithm is now specified using
+  `entropy(b,'Method','trains')`.
 
-* databraid.entropy and databraid.complexity are no longer
-  implemented.  Instead, use databraid.ftbe (Finite Time Braiding
+* `databraid.entropy` and `databraid.complexity` are no longer
+  implemented.  Instead, use `databraid.ftbe` (Finite Time Braiding
   Exponent).  This is to distinguish the entropy of data, which
   doesn't necessarily close, to that of a "true" braid.
 
-* databraid now allows generators with simultaneous times, as long as
-  all the generators for a given time commute with each other.  This
-  affects in particular testing for equality of two databraids.  For
-  example, databraid([1 3],[1 1]) and databraid([3 1],[1 1]) are now
-  equal.
+* `databraid` now allows generators with simultaneous times, as long
+  as all the generators for a given time commute with each other.
+  This affects in particular testing for equality of two `databraids`.
+  For example, `databraid([1 3],[1 1])` and `databraid([3 1],[1 1])`
+  are now equal.
 
-* More unit tests in the testsuite, especially for cfbraid
+* More unit tests in the testsuite, especially for `cfbraid`
   (undocumented class for canonical form braids, but used behind the
-  scenes) and databraid.
+  scenes) and `databraid`.
 
 * And of course, many bugfixes and small tweaks...
 
 
 ## [2.1] - 2014-10-02
 
-* Simplify the linear action code: instead of braid.linact use an
-  optional return argument for braid.mtimes.  braid.cycle now does
-  what braid.cyclemat did.  The nitty-gritty pos/neg operators are
-  invisible to the user (see issue #65).  None of this should affect
-  users, since these were not documented in the guide (but now they
-  are).
+* Simplify the linear action code: instead of `braid.linact` use an
+  optional return argument for `braid.mtimes`.  `braid.cycle` now does
+  what `braid.cyclemat` did.  The nitty-gritty `pos`/`neg` operators
+  are invisible to the user (see issue #65).  None of this should
+  affect users, since these were not documented in the guide (but now
+  they are).
 
 * Fix detection of some limit cycles (issue #52).  Also allow
   specification of an initial loop when looking for cycles.
 
-* Move some utility functions to namespace +util, to make them less
+* Move some utility functions to namespace `+util`, to make them less
   visible to user.
 
 * Moved installation instructions to an appendix in the guide.  Added
@@ -205,70 +207,71 @@
   compatible with Matlab 2014a (which broke a lot of things).  The
   Makefiles no longer attempt to detect which compiler MEX uses, so
   you'll have to set it manually if you use a nonstandard one (e.g.,
-  'make CXX=g++-4.7.1 CC=gcc-4.7.1').  This has been tested on 64-bit
+  `make CXX=g++-4.7.1 CC=gcc-4.7.1`).  This has been tested on 64-bit
   Linux and Mac OS.
 
 * When constructing a braid object from data, the braid constructor
   now uses a C++ MEX file (written by Marko Budisic) giving a big
   speedup for large datasets.  Support for parallelization on multiple
-  cores is included.  The global variable BRAIDLAB_threads determines
-  the number of threads used.
+  cores is included.  The global variable `BRAIDLAB_threads`
+  determines the number of threads used.
 
 * The braid constructor can make knot representatives, e.g.,
-  b=braid('8_3') returns a braid representative for the third
+  `b=braid('8_3')` returns a braid representative for the third
   8-crossing knot.
 
-* The private method braid.loopsigma's C++ helper functions (used by
-  braid*loop) can now handle int32, int64, and single, in addition to
-  double.  This makes checking braid equality and triviality much
-  faster, unless overflow occurs and VPI has to be used.
+* The private method `braid.loopsigma`'s C++ helper functions (used by
+  `braid*loop`) can now handle `int32`, `int64`, and `single`, in
+  addition to `double`.  This makes checking braid equality and
+  triviality much faster, unless overflow occurs and VPI has to be
+  used.
 
-* The private method braid.loopsigma's C++ helper functions can also
+* The private method `braid.loopsigma`'s C++ helper functions can also
   handle VPI (Variable Precision Integers) by using GMP, the GNU
   MultiPrecision library.  If you don't have GMP installed, compile
-  with option "BRAIDLAB_USE_GMP=0".  However, this will lead to a
+  with option `BRAIDLAB_USE_GMP=0`.  However, this will lead to a
   massive slowdown when working with VPI types (Variable Precision
   Integers).
 
-* New methods in the loop class: loop.components, loop.plot
-  'Components' option, loop.getgraph.  These are not yet documented in
-  the guide, as they are an advanced feature, though they are
+* New methods in the loop class: `loop.components`, `loop.plot`
+  `Components` option, `loop.getgraph`.  These are not yet documented
+  in the guide, as they are an advanced feature, though they are
   described in the help text to the functions.
 
-* braid.burau and braid.alexpoly can use the symbolic toolbox.
-  alexpoly no longer centers the polynomial by default, since
-  centering cannot always be used with a laurpoly object, and can
-  never be used for integral types.  Use option 'centered'.
+* `braid.burau` and `braid.alexpoly` can use the symbolic toolbox.
+  `alexpoly` no longer centers the polynomial by default, since
+  centering cannot always be used with a `laurpoly` object, and can
+  never be used for integral types.  Use option `centered`.
 
-* braid.mtimes acting on loops has an optional output argument that
-  records the signs of the pos/neg operators in the update rules
-  (loopsigma).  This allows reconstruction of the matrix for the
+* `braid.mtimes` acting on loops has an optional output argument that
+  records the signs of the `pos`/`neg` operators in the update rules
+  (`loopsigma`).  This allows reconstruction of the matrix for the
   effective linear action, as well as checking for limit cycles for
   the action.
 
-* New methods in the braid class: braid.linact converts the optional
-  output from braid.mtimes (see above) to a matrix.  braid.cycle looks
-  for a limit cycle in the braid action on loops.  braid.cyclemat uses
-  braid.cycle to return a matrix corresponding to this limit cycle.
-  The largest eigenvalue of this matrix, normalized by the period,
-  gives the Perron root of the largest pseudo-Anosov component(s).
-  This is not documented in the guide yet, because it's still a bit
-  experimental.  In particular it sometimes fails to find the limit
-  cycle (issue #52).
+* New methods in the braid class: `braid.linact` converts the optional
+  output from `braid.mtimes` (see above) to a matrix.  `braid.cycle`
+  looks for a limit cycle in the braid action on loops.
+  `braid.cyclemat` uses `braid.cycle` to return a matrix corresponding
+  to this limit cycle.  The largest eigenvalue of this matrix,
+  normalized by the period, gives the Perron root of the largest
+  pseudo-Anosov component(s).  This is not documented in the guide
+  yet, because it's still a bit experimental.  In particular it
+  sometimes fails to find the limit cycle (issue #52).
 
 * Many other small bugfixes and improvements.
 
 Several improvements to the method braid.entropy:
 
-* braid.entropy has a C MEX helper function and is much faster.  It no
-  longer checks if the braid is trivial, which avoids overflow and
+* `braid.entropy` has a C MEX helper function and is much faster.  It
+  no longer checks if the braid is trivial, which avoids overflow and
   speeds up the function.
 
-* braid.entropy's convergence has been greatly improved (see next item
-  for more details).  With enough iterations, machine precision can
-  usually be achieved.
+* `braid.entropy`'s convergence has been greatly improved (see next
+  item for more details).  With enough iterations, machine precision
+  can usually be achieved.
 
-* braid.entropy's optional second return argument has changed from a
+* `braid.entropy`'s optional second return argument has changed from a
   list of iterates to the final generalized eigenvector.  The reason
   is that the internal algorithm has changed: the Dynnikov coordinates
   get renormalized at every step, much like the power iteration method
@@ -286,7 +289,7 @@ Several improvements to the method braid.entropy:
 
 * Plot empty braids (why not...).
 
-* braid.compact no longer checks for trivial braid, since this can
+* `braid.compact` no longer checks for trivial braid, since this can
   take a lot of time (more than the compact itself).
 
 * Unit test for entropy added to testsuite.
@@ -298,7 +301,7 @@ Several improvements to the method braid.entropy:
 
 ## [1.0.4] - 2014-01-03
 
-* The databraid class records crossing times of a dataset.
+* The `databraid` class records crossing times of a dataset.
 
 * Added an example section on taffy pullers to braidlab guide.
 
@@ -310,9 +313,9 @@ Several improvements to the method braid.entropy:
 * The braidlab guide has been updated and expanded, and now has a
   table of contents and a detailed index.
 
-* New methods in braid class: 'alexpoly' returns the Alexander
-  polynomial.  'burau' can now construct a matrix of Laurent
-  polynomials (wavelet toolbox required).  'tensor' is the tensor
+* New methods in `braid` class: `alexpoly` returns the Alexander
+  polynomial.  `burau` can now construct a matrix of Laurent
+  polynomials (wavelet toolbox required).  `tensor` is the tensor
   product of braids.
 
 * Big speedup in creating braids from data, due to improved safety
@@ -321,7 +324,7 @@ Several improvements to the method braid.entropy:
 
 ## [1.0.2] - 2013-12-13
 
-* loopTest.m in testsuite.
+* `loopTest.m` in testsuite.
 
 * Clean up files.  Eliminate subrepos.
 
