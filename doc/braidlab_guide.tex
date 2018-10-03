@@ -510,45 +510,7 @@ we add an optional \lstinline{'Method'} parameter:
 ans = 0
 \end{lstlisting}
 \index{braid!finite-order|)}%
-Note that for large braids the Bestvina--Handel algorithm is impractical.  But
-when applicable it can also determine the Thurston--Nielsen type %
-\index{braid!Thurston--Nielsen type}%
-of the braid as well as the train track map and its transition
-matrix~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}: \index{braid
-  class@\braid\ class!train@\lstinline{train}|(}%
-\index{braid!pseudo-Anosov|(}%
-\index{braid!reducible|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
->> train(braid([1 2 -3]))
-
-ans = struct with fields:
-
-      tntype: 'pseudo-Anosov'
-     entropy: 0.8314
-    transmat: [4×4 double]
-
->> train(braid([1 2]))
-
-ans = struct with fields:
-
-      tntype: 'finite-order'
-     entropy: 0
-    transmat: [3×3 double]
-
->> train(braid([1 2],4))  % reducing curve around 1,2,3
-
-ans = struct with fields:
-
-      tntype: 'reducible'
-     entropy: 0
-    transmat: [3×3 double]
-\end{lstlisting}
-\index{braid!pseudo-Anosov|)}%
-\index{braid!reducible|)}%
-\braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
-algorithm~\citep{HallTrain}. %
-\index{Bestvina--Handel algorithm|)}%
-\index{braid class@\braid\ class!train@\lstinline{train}|)}%
+Note that for large braids the Bestvina--Handel algorithm is impractical.
 
 The topological entropy is a measure of braid complexity that relies on %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|)}%
@@ -577,6 +539,102 @@ See Section~\ref{sec:loop} or `\lstinline{help braid.complexity}' for details
 on how the geometric complexity is computed. %
 \index{braid!complexity|)}%
 \index{braid class@\braid\ class!complexity@\lstinline{complexity}|)}%
+
+
+\subsubsection{Train track map and transition matrix}
+
+\index{train track map|(}%
+\index{transition matrix|(}%
+The Bestvina--Handel train track algorithm~\citep{Bestvina1995} can be used to
+determine the Thurston--Nielsen type %
+\index{braid!Thurston--Nielsen type \lstinline{tntype}}%
+of the braid as well as the train track map and its transition
+matrix~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}: \index{braid
+  class@\braid\ class!train@\lstinline{train}|(}%
+\index{braid!pseudo-Anosov|(}%
+\index{braid!reducible|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> train(braid([1 2 -3]))
+
+ans = struct with fields:
+
+       braid: [1x1 braidlab.braid]
+      tntype: 'pseudo-Anosov'
+     entropy: 0.8314
+    transmat: [4x4 double]
+       ttmap: {8x1 cell}
+
+>> train(braid([1 2]))
+
+ans = struct with fields:
+
+       braid: [1x1 braidlab.braid]
+      tntype: 'finite-order'
+     entropy: 0
+    transmat: [3x3 double]
+       ttmap: {6x1 cell}
+
+>> train(braid([1 2],4))  % reducing curve around 1,2,3
+
+ans = struct with fields:
+
+       braid: [1x1 braidlab.braid]
+      tntype: 'reducible'
+     entropy: 0
+    transmat: [3x3 double]
+       ttmap: {7x1 cell}
+\end{lstlisting}
+\index{braid!pseudo-Anosov|)}%
+\index{braid!reducible|)}%
+\braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
+algorithm~\citep{HallTrain}. %
+\index{Bestvina--Handel algorithm|)}%
+\index{braid class@\braid\ class!train@\lstinline{train}|)}%
+
+The train track map can be displayed in a human-readable format using the
+command \lstinline{ttmap}: %
+\index{ttmap@\lstinline{ttmap}|(}%
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> tt = train(braid([1 2 -3]));
+>> ttmap(tt)
+
+ 1 -> 4
+ 2 -> 1
+ 3 -> 2
+ 4 -> 3
+ a -> D
+ b -> d a -3 b -4 B
+ c -> B 3 A
+ d -> c
+\end{lstlisting}
+Here peripheral (infinitesimal) edges are denoted by numbers and main edges by
+letters.  Inverse main edges are denoted by capital letters.  The display of
+infinitesimal edges can be suppressed:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> ttmap(tt,'Peripheral',false)
+
+ a -> D
+ b -> d a b B
+ c -> B A
+ d -> c
+\end{lstlisting}
+The transition matrix associated with the train track map does \emph{not}
+contain the peripheral edges, since these do not affect the entropy:
+\begin{lstlisting}[frame=single,framerule=0pt]
+>> tt.transmat
+
+ans = 0     1     1     0
+      0     2     1     0
+      0     0     0     1
+      1     1     0     0
+
+>> max(abs(eig(ans)))
+
+ans = 2.2966
+\end{lstlisting}
+\index{transition matrix|)}%
+\index{train track map|)}%
+\index{ttmap@\lstinline{ttmap}|)}%
 
 
 \subsubsection{Representation and invariants}
@@ -1847,7 +1905,7 @@ Let's use \braidlab\ to analyze the rod motion.  From the folder
 b = < -2  1  1 -2 >
 \end{lstlisting}
 which also produces Figure~\ref{fig:taffy_3rods}.  The Thurston--Nielsen %
-\index{braid!Thurston--Nielsen type}%
+\index{braid!Thurston--Nielsen type \lstinline{tntype}}%
 type and topological entropy %
 \index{braid!entropy}%
 of this braid are %
@@ -1857,9 +1915,11 @@ of this braid are %
 
 ans = struct with fields:
 
+       braid: [1x1 braidlab.braid]
       tntype: 'pseudo-Anosov'
      entropy: 1.7627
-    transmat: [2×2 double]
+    transmat: [2x2 double]
+       ttmap: {5x1 cell}
 \end{lstlisting}
 One would expect a competent taffy puller to be pseudo-Anosov, %
 \index{braid!pseudo-Anosov}%
@@ -1920,9 +1980,11 @@ with Thurston--Nielsen type
 
 ans = struct with fields:
 
+       braid: [1x1 braidlab.braid]
       tntype: 'reducible'
      entropy: 0
-    transmat: [5×5 double]
+    transmat: [5x5 double]
+       ttmap: {11x1 cell}
 \end{lstlisting}
 There are reducing curves in this design: simply wrap a loop around the left
 gray rod and the inner red rod, and it will rotate without stretching. %
@@ -1941,9 +2003,11 @@ with Thurston--Nielsen type and entropy
 
 ans = struct with fields:
 
+       braid: [1x1 braidlab.braid]
       tntype: 'pseudo-Anosov'
      entropy: 2.6339
-    transmat: [5×5 double]
+    transmat: [5x5 double]
+       ttmap: {11x1 cell}
 \end{lstlisting}
 \index{braid class@\braid\ class!train@\lstinline{train}|)}%
 The fixed rods have increased the entropy by~$50\%$!  This sounds like a
