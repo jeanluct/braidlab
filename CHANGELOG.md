@@ -6,13 +6,13 @@
 * `ttmap` displays the train track map in the struct returns by
   `braid.train` in an easy-to-read format.
 
-* `braid.train` replaces braid.tntype.  It returns a struct containing
-  the the Thurston-Nielsen type, the entropy, and now the train track
-  map and the transition matrix, all using Toby Hall's train track
-  code.
+* `braid.train` replaces `braid.tntype`.  It returns a struct
+  containing the Thurston-Nielsen type, the entropy, and now the train
+  track map and the transition matrix, all using Toby Hall's C++ train
+  track code.
 
-* The `braid.entropy` option name `Trains` is now `Train`, for
-  consistency (though `Trains` is still supported).
+* The `braid.entropy` option name `trains` is now `train`, for
+  consistency (though `trains` is still supported).
 
 
 ## [3.2.3] - 2018-04-04

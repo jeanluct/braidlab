@@ -12,7 +12,7 @@ function [varargout] = entropy(b,varargin)
 %   parameter-value pairs that modify algorithm behavior (defaults in
 %   braces).
 %
-%   * Method - Algorithm Choice [ 'Train' | {'Iter'} ] Chooses between
+%   * Method - Algorithm Choice [ 'train' | {'iter'} ] Chooses between
 %   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
 %   for long braids B-H algorithm becomes very inefficient.
 %
