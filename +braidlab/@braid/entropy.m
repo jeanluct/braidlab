@@ -10,22 +10,21 @@ function [varargout] = entropy(b,varargin)
 %
 %   ENTR = ENTROPY(B,'Parameter',VALUE,... ) takes additional
 %   parameter-value pairs that modify algorithm behavior (defaults in
-%   braces).
+%   braces):
 %
-%   * Method - Algorithm Choice [ 'train' | {'iter'} ] Chooses between
+%   * Method - Algorithm choice [ 'train' | {'iter'} ] Chooses between
 %   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
 %   for long braids B-H algorithm becomes very inefficient.
 %
 %   The following options apply only to the Iterative algorithm:
 %
-%   * Tol - Absolute convergence tolerance [non-negative number {1e-6}]
-%   Tol is only approximate: if the iteration converges slowly it can
-%   be off by a small amount.
+%   * Tol - Absolute convergence tolerance [ non-negative number {1e-6} ]
+%   Tol is only approximate: if the iteration converges slowly it can be off
+%   by a small amount.
 %
-%   * MaxIt - Maximum # of iterations [{varies}]
-%   The default is computed based on Tol and the extreme case given by
-%   the small-dilatation psi braids. If Tol == 0, MaxIt has to be
-%   specified as a positive number
+%   * MaxIt - Maximum # of iterations [ {varies} ] The default is computed
+%   based on Tol and the extreme case given by the small-dilatation psi
+%   braids. If Tol == 0, MaxIt has to be specified as a positive number
 %
 %   * Length - Choice of loop length function [ 'intaxis' |
 %   'minlength' | {'l2norm'} ]  See documentation of loop.intaxis,
@@ -43,7 +42,7 @@ function [varargout] = entropy(b,varargin)
 %   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
 %   algorithm.  Shortcut for Tol = 0 && MaxIt = 1.
 %
-%   ENTR = ENTROPY(B,'Finite','MaxIt',N, ...) computes exactly N iterations
+%   ENTR = ENTROPY(B,'Finite','MaxIt',N,...) computes exactly N iterations
 %   of the algorithm (the parameter 'MaxIt' has to be specified).
 %   Identical to passing Tol = 0 and MaxIt = N.
 %

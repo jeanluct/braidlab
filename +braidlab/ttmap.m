@@ -4,15 +4,18 @@ function ttmap(t,varargin)
 %   form.  T can be either a braid or a structure returned by braid.train.
 %
 %   TTMAP(T,'Parameter',VALUE,...) takes additional parameter-value pairs
-%   (defaults in braces).
+%   (defaults in braces):
 %
 %   * Peripheral - Include peripheral edges [ {true} | false ]
 %
 %   * Inverses - Display images of inverse edges [ true | {false} ]
 %
-%   * ColorMain -  [ <color> | true | {false} ]
+%   * ColorMain - Color letters corresponding to main edges [ 'COLOR' | true
+%   | {false} ] Default is uncolored ('black'), or 'blue' if set to true.
 %
-%   * ColorPeripheral -  [ <color> | true | {false} ]
+%   * ColorPeripheral - Color letters corresponding to peripheral edges [
+%   'COLOR' | true | {false} ] Default is uncolored ('black'), or 'red' if
+%   set to true.
 %
 %   See also BRAID, BRAID.BRAID, BRAID.TRAIN.
 
@@ -126,7 +129,7 @@ for i = letlist
   % J-LT:
   % Since cprintf uses undocumented Matlab features, it is unreliable.
   % In particular, weird irreproducible behavior occurs if we try to
-  % print the arrow in color, or even in black.  Using fprintf here
+  % print the arrow in color, or even in black.  Using fprintf here is
   % the only way I've found to keep it from changing color.
   % Weirdly, it inherits the color of the edge type to its left.
   % Good enough.
