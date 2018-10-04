@@ -10,8 +10,8 @@ loop.loop('Enum')
 loop.l2norm
 debugmsg
 ttmap('Inverses')
-ttmap('ColorMain')
-ttmap('ColorPeripheral')
+ttmap('BoldMain')
+ttmap('BoldPeripheral')
 
 @cfbraid class
 loop pre-allocation (see devel/test/loop_speedtest)
