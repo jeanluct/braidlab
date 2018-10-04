@@ -4,7 +4,7 @@
 
 ### documentation and installation
 
-See the [*braidlab* user's guide][4].  If you already downloaded *braidlab* the guide is in the doc folder.  For installation instructions, see the appendix in the guide.  The guide is also posted on [arXiv][5].
+See the [*braidlab* user's guide][4] in the `doc` folder.  The guide is also posted on [arXiv][5].  For installation instructions, see the Appendix in the guide.
 
 ### citing *braidlab*
 
@@ -29,15 +29,15 @@ We can add your paper to the [publication list](https://github.com/jeanluct/brai
 
 [Michael Allshouse][6] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Trains][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; and Jakob Progsch's [ThreadPool][12].
+*braidlab* uses Toby Hall's [Trains][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; Jakob Progsch's [ThreadPool][12]; and Yair Altman's [cprintf][13].
 
 ### license
 
-*braidlab* is released under the [GNU General Public License v3][13].  See [COPYING][14] and [LICENSE][15].
+*braidlab* is released under the [GNU General Public License v3][14].  See [COPYING][15] and [LICENSE][16].
 
 ### support
 
-The development of *braidlab* was supported by the [US National Science Foundation][16], under grants [DMS-0806821][17] and [CMMI-1233935][18].
+The development of *braidlab* was supported by the [US National Science Foundation][17], under grants [DMS-0806821][18] and [CMMI-1233935][19].
 
 [1]: http://www.mathworks.com/products/matlab/
 [2]: http://www.math.wisc.edu/~jeanluc/
@@ -51,11 +51,12 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [10]: http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic
 [11]: http://www.mathworks.com/matlabcentral/fileexchange/6543
 [12]: https://github.com/progschj/ThreadPool
-[13]: http://www.gnu.org/licenses/gpl-3.0.html
-[14]: http://github.com/jeanluct/braidlab/raw/master/COPYING
-[15]: http://github.com/jeanluct/braidlab/raw/master/LICENSE
-[16]: http://www.nsf.gov
-[17]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
-[18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
+[13]: https://www.mathworks.com/matlabcentral/fileexchange/24093-cprintf-display-formatted-colored-text-in-the-command-window
+[14]: http://www.gnu.org/licenses/gpl-3.0.html
+[15]: http://github.com/jeanluct/braidlab/raw/master/COPYING
+[16]: http://github.com/jeanluct/braidlab/raw/master/LICENSE
+[17]: http://www.nsf.gov
+[18]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=0806821
+[19]: http://www.nsf.gov/awardsearch/showAward?AWD_ID=1233935
 
 [![Analytics](https://ga-beacon.appspot.com/UA-46449211-2/braidlab/readme)](https://github.com/igrigorik/ga-beacon)

@@ -6,9 +6,13 @@ function ttmap(t,varargin)
 %   TTMAP(T,'Parameter',VALUE,...) takes additional parameter-value pairs
 %   (defaults in braces).
 %
+%   * Peripheral - Include peripheral edges [ {true} | false ]
+%
 %   * Inverses - Display images of inverse edges [ true | {false} ]
 %
-%   * Peripheral - Include peripheral edges [ {true} | false ]
+%   * ColorMain -  [ <color> | true | {false} ]
+%
+%   * ColorPeripheral -  [ <color> | true | {false} ]
 %
 %   See also BRAID, BRAID.BRAID, BRAID.TRAIN.
 
@@ -38,6 +42,7 @@ function ttmap(t,varargin)
 
 %% Process inputs
 import braidlab.util.validateflag
+import braidlab.util.cprintf
 
 parser = inputParser;
 
@@ -50,9 +55,46 @@ parser.addRequired('t', @(x) ...
                    (isa(x,'braidlab.braid')));
 parser.addParameter('inverses', false, @(x)islogical(x));
 parser.addParameter('peripheral', true, @(x)islogical(x));
+parser.addParameter('colormain', 'black', ...
+                    @(x) islogical(x) || ischar(x));
+parser.addParameter('colorperipheral', 'black', ...
+                    @(x) islogical(x) || ischar(x));
 
 parser.parse(t, varargin{:});
 params = parser.Results;
+
+if ~ischar(params.colormain)
+  if params.colormain
+    % Default value if we ask for main edge coloring.
+    params.colormain = 'blue';
+  else
+    params.colormain = 'black';
+  end
+end
+
+if ~ischar(params.colorperipheral)
+  if params.colorperipheral
+    % Default value if we ask for peripheral edge coloring.
+    params.colorperipheral = 'red';
+  else
+    params.colorperipheral = 'black';
+  end
+end
+
+mec = params.colormain;
+pec = params.colorperipheral;
+
+if strcmpi(mec,'black')
+  printmain = @(varargin) fprintf(varargin{:});
+else
+  printmain = @(varargin) cprintf(mec,varargin{:});
+end
+
+if strcmpi(pec,'black')
+  printperi = @(varargin) fprintf(varargin{:});
+else
+  printperi = @(varargin) cprintf(pec,varargin{:});
+end
 
 if isa(t,'braidlab.braid') t = train(t); end
 
@@ -77,44 +119,52 @@ fprintf('\n');
 
 for i = letlist
   if i <= n
-    fprintf('%2d',i)
+    printperi('%2d',i)
   else
-    fprintf('%2s',alphalo(i-n))
+    printmain('%2s',alphalo(i-n))
   end
+  % J-LT:
+  % Since cprintf uses undocumented Matlab features, it is unreliable.
+  % In particular, weird irreproducible behavior occurs if we try to
+  % print the arrow in color, or even in black.  Using fprintf here
+  % the only way I've found to keep it from changing color.
+  % Weirdly, it inherits the color of the edge type to its left.
+  % Good enough.
   fprintf(' ->');
   for j = 1:length(tt{i})
     g = tt{i}(j);
     if g > 0
       if g <= n
-        if params.peripheral, fprintf(' %d',g); end
+        if params.peripheral, printperi(' %d',g); end
       else
-        fprintf(' %s',alphalo(g-n))
+        printmain(' %s',alphalo(g-n))
       end
     else
       if abs(g) <= n
-        if params.peripheral, fprintf(' %d',g); end
+        if params.peripheral, printperi(' %d',g); end
       else
-        fprintf(' %s',alphaup(abs(g)-n))
+        printmain(' %s',alphaup(abs(g)-n))
       end
     end
   end
   fprintf('\n');
   if params.inverses && i > n
-    fprintf('%2s',alphaup(i-n))
+    printmain('%2s',alphaup(i-n))
+    % See comment above about arrow color.
     fprintf(' ->');
     for j = length(tt{i}):-1:1
       g = tt{i}(j);
       if g > 0
         if g <= n
-          if params.peripheral, fprintf(' %d',-g); end
+          if params.peripheral, printperi(' %d',-g); end
         else
-          fprintf(' %s',alphaup(g-n))
+          printmain(' %s',alphaup(g-n))
         end
       else
         if abs(g) <= n
-          if params.peripheral, fprintf(' %d',-g); end
+          if params.peripheral, printperi(' %d',-g); end
         else
-          fprintf(' %s',alphalo(abs(g)-n))
+          printmain(' %s',alphalo(abs(g)-n))
         end
       end
     end
