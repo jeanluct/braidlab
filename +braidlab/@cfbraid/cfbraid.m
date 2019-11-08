@@ -122,14 +122,14 @@ classdef cfbraid < matlab.mixin.CustomDisplay
       ee = isempty(b.factors) && b.delta == 0;
     end
 
-    function ee = ispositive(obj)
+    function ee = ispositive(b)
     %ISPOSITIVE   Return true if braid is positive.
     %   ISPOSITIVE(B) returns true if the braid B can be written with only
     %   positive crossings.
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID, BRAID.
-      ee = obj.delta >= 0;
+      ee = b.delta >= 0;
     end
 
     function w = braid(b)
