@@ -115,18 +115,22 @@ ostream& operator << (ostream& Out, TTT& T)
 	intlist::iterator iter;
 	intintlist::iterator iteriter;
 	for (iter = T.Type.begin(); iter != T.Type.end(); iter++)
-		if (*iter >= 0) Out << *iter << " ";
-		else Out << "* ";
+	{
+		if (*iter >= 0)
+			Out << *iter << " ";
+		else
+			Out << "* ";
+	}
+	Out << '\n';
+	int i=0;
+	for (iteriter = T.Image.begin(); iteriter != T.Image.end(); iteriter++)
+	{
+		i++;
+		Out << i << " -> ";
+		for (iter = (*iteriter).begin(); iter != (*iteriter).end(); iter++) Out << *iter << " ";
 		Out << '\n';
-		int i=0;
-		for (iteriter = T.Image.begin(); iteriter != T.Image.end(); iteriter++)
-		{
-			i++;
-			Out << i << " -> ";
-			for (iter = (*iteriter).begin(); iter != (*iteriter).end(); iter++) Out << *iter << " ";
-			Out << '\n';
-		}
-		return Out;
+	}
+	return Out;
 }
 
 bool TTT::operator<(TTT& T)

@@ -3,7 +3,7 @@
 all:
 	cd src; make all
 
-lib libtrains:
+lib libtrains libtrains.a:
 	cd src; make lib
 
 # Clean up directory.  Remove object files and dependencies file.

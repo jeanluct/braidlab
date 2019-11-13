@@ -619,13 +619,15 @@ turnplace graph::LocateTurn(turn& T)
 	{
 		intarray& Now = (I.Now()).Image;
 		for (uint i=1; long(i)<Now.TopIndex(); i++)
+		{
 			if ( (Now[i]==-T.i && Now[i+1]==T.j) || (Now[i]==-T.j && Now[i+1]==T.i) )
 			{
 				Result.Label = (I.Now()).Label;
 				Result.Position = i;
 				return Result;
 			}
-			I++;
+		}
+		I++;
 	} while (!I.AtOrigin());
 	THROW("Locating non-existent turn",1);
 }

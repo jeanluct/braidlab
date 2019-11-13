@@ -1,3 +1,3 @@
 env = Environment()
 
-env.SConscript('src/SConscript', {'env': env})
+env.SConscript(dirs = ['src'], exports = 'env')
