@@ -199,22 +199,15 @@ bool matrix::IsIrreducible(bool* Indices)
 void matrix::Transpose()
 {
 	for (uint i=0; i<n; ++i)
-<<<<<<< HEAD
-=======
 	{
->>>>>>> trains-branch
 		for (uint j=0; j<i; ++j)
 		{
 			long temp  = p[i][j];
 			p[i][j] = p[j][i];
 			p[j][i] = temp;
 		}
-<<<<<<< HEAD
-		GrowthDone = false;
-=======
 	}
 	GrowthDone = false;
->>>>>>> trains-branch
 }
 
 } // namespace trains
