@@ -431,7 +431,7 @@ inline Factor<P>::~Factor()
 template<class P>
 inline Factor<P>& Factor<P>::Delta(sint32 k)
 {
-    for(register sint16 i = 1; i <= Index(); ++i)
+    for(sint16 i = 1; i <= Index(); ++i)
         At(i) = Pres.DeltaTable(i, k);
     return *this;
 }
@@ -522,7 +522,7 @@ inline Factor<P>& Factor<P>::Assign(const Factor<P>& f)
 #endif
 
     if (&f != this) {
-        for(register sint16 i = 1; i <= Index(); ++i) {
+        for(sint16 i = 1; i <= Index(); ++i) {
             At(i) = f[i];
         }
     }
@@ -548,7 +548,7 @@ inline bool Factor<P>::Compare(const Factor<P>& f) const
     }
 #endif
 
-    for(register sint16 i = 1; i <= Index(); ++i) {
+    for(sint16 i = 1; i <= Index(); ++i) {
         if (At(i) != f[i])
             return false;
     }
@@ -573,7 +573,7 @@ inline bool Factor<P>::operator!=(const Factor& f) const
 template<class P>
 inline bool Factor<P>::CompareWithDelta(sint32 k) const
 {
-    for(register sint16 i = 1; i <= Index(); ++i) {
+    for(sint16 i = 1; i <= Index(); ++i) {
         if (At(i) != Pres.DeltaTable(i, k))
             return false;
     }
@@ -599,7 +599,7 @@ inline Factor<P> Factor<P>::Composition(
     }
 #endif
     Factor f(Index());
-    for(register sint16 i = 1; i <= Index(); ++i)
+    for(sint16 i = 1; i <= Index(); ++i)
         f[i] = a[At(i)];
     return f;
 }
@@ -615,7 +615,7 @@ inline Factor<P>& Factor<P>::AssignComposition(
         exit(1);
     }
 #endif
-    for(register sint16 i = 1; i <= Index(); ++i)
+    for(sint16 i = 1; i <= Index(); ++i)
         At(i) = a[At(i)];
     return *this;
 }
@@ -639,7 +639,7 @@ template<class P>
 inline Factor<P> Factor<P>::Inverse() const
 {
     Factor f(Index());
-    for(register sint16 i = 1; i <= Index(); ++i)
+    for(sint16 i = 1; i <= Index(); ++i)
         f[At(i)] = i;
     return f;
 }
@@ -663,7 +663,7 @@ template<class P>
 inline Factor<P> Factor<P>::Flip(sint32 k) const
 {
     Factor f(Index());
-    for(register sint16 i = 1; i <= Index(); ++i)
+    for(sint16 i = 1; i <= Index(); ++i)
         f[i] = Pres.DeltaTable(At(Pres.DeltaTable(i, -k)), k);
     return f;
 }
