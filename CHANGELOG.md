@@ -3,8 +3,8 @@
 
 ## [Unreleased][unreleased]
 
-* `ttmap` displays the train track map in the struct returns by
-  `braid.train` in an easy-to-read format.
+* `ttmap` displays in an easy-to-read format the train track map
+  contained in the struct returned by `braid.train`.
 
 * `braid.train` replaces `braid.tntype`.  It returns a struct
   containing the Thurston-Nielsen type, the entropy, and now the train
@@ -13,6 +13,8 @@
 
 * The `braid.entropy` option name `trains` is now `train`, for
   consistency (though `trains` is still supported).
+
+* Suppress a few warnings exposed by recent compilers.
 
 
 ## [3.2.3] - 2018-04-04
