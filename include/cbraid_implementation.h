@@ -269,9 +269,9 @@ inline void BandPresentation::BStoPT(const sint8* s, sint16* a) const
 }
 
 
+#ifdef USE_CLN
 inline void BandPresentation::Randomize(sint16* r) const
 {
-#ifdef USE_CLN
 
     static sint8 s[MaxBraidIndex];
     static sint16 a[MaxBraidIndex];
@@ -283,6 +283,8 @@ inline void BandPresentation::Randomize(sint16* r) const
         r[a[i]] = i;
 
 #else
+inline void BandPresentation::Randomize(sint16*) const
+{
 
     std::cerr << std::flush
          << "! BandPresentation::Randomize(): CLN is required.\n"
