@@ -243,7 +243,7 @@ void graph::Collapse(long Label)
 	uint Index = FindEdge(Label);
 	if (!Index) THROW("Trying to collapse non-existent edge",1);
 	edge& E = Edges[Index];
-	if (! (E.Image).TopIndex() == 0) THROW("Trying to collapse non-trivial edge",1);
+	if (! ((E.Image).TopIndex() == 0)) THROW("Trying to collapse non-trivial edge",1);
 	//First identify vertices at two ends of Edge
 	uint StartIndex = FindVertex(E.Start), EndIndex = FindVertex(E.End);
 	if (StartIndex == EndIndex) // Starts and ends at same vertex

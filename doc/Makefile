@@ -3,7 +3,7 @@
 #
 #   http://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 #                            Marko Budisic          <marko@clarkson.edu>
 #
 #   This file is part of Braidlab.
@@ -48,5 +48,6 @@ distclean: clean
 	# Revert PDF file to latest revision.
 	git checkout $(MASTERFILE).pdf
 	# Update timestamp so make knows to remake the file.
-	touch -d "`git log -1 --date=iso --format=%cd $(MASTERFILE).pdf`" \
-		$(MASTERFILE).pdf
+	# Make pdf file 1 second older.
+	touch -r $(MASTERFILE).pdf -d '-1 second' $(MASTERFILE).pdf
+	touch $(MASTERFILE).tex

@@ -3,7 +3,7 @@
 #
 #   http://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 #                            Marko Budisic          <marko@clarkson.edu>
 #
 #   This file is part of Braidlab.
@@ -35,7 +35,7 @@ ifeq ($(CPPFLAGS_CLN),-DUSE_CLN)
 	LIBFLAGS_CLN = -lcln
 endif
 # The -fPIC option is for Matlab MEX-files.  Doesn't hurt for other uses.
-CPPFLAGS = -Wall -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
+CPPFLAGS = -Wall -std=c++11 -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
 ARFLAGS = rv
 CXX = g++

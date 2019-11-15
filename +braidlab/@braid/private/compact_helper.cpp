@@ -9,7 +9,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <marko@clarkson.edu>
 //
 //   This file is part of Braidlab.
@@ -187,7 +187,7 @@ bool commute_and_cancel(T& b, const int dir, const int n,
                       badrel =
                         (abs(b[i]) == n-1 ||
                          abs(b[i+dir]) == n-1 ||
-                         abs(b[i+2*dir] == n-1));
+                         abs(b[i+2*dir]) == n-1);
 #ifdef BRAIDLAB_COMPACT_DEBUG
                       if (badrel)
                         cerr << "Omitting annular braid relation.\n";

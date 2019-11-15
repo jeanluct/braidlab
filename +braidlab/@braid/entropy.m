@@ -10,22 +10,21 @@ function [varargout] = entropy(b,varargin)
 %
 %   ENTR = ENTROPY(B,'Parameter',VALUE,... ) takes additional
 %   parameter-value pairs that modify algorithm behavior (defaults in
-%   braces).
+%   braces):
 %
-%   * Method - Algorithm Choice [ 'Trains' | {'Iter'} ] Chooses between
+%   * Method - Algorithm choice [ 'train' | {'iter'} ] Chooses between
 %   Bestvina-Handel train tracks or Moussafir iterative algorithm. Note that
 %   for long braids B-H algorithm becomes very inefficient.
 %
 %   The following options apply only to the Iterative algorithm:
 %
-%   * Tol - Absolute convergence tolerance [non-negative number {1e-6}]
-%   Tol is only approximate: if the iteration converges slowly it can
-%   be off by a small amount.
+%   * Tol - Absolute convergence tolerance [ non-negative number {1e-6} ]
+%   Tol is only approximate: if the iteration converges slowly it can be off
+%   by a small amount.
 %
-%   * MaxIt - Maximum # of iterations [{varies}]
-%   The default is computed based on Tol and the extreme case given by
-%   the small-dilatation psi braids. If Tol == 0, MaxIt has to be
-%   specified as a positive number
+%   * MaxIt - Maximum # of iterations [ {varies} ] The default is computed
+%   based on Tol and the extreme case given by the small-dilatation psi
+%   braids. If Tol == 0, MaxIt has to be specified as a positive number
 %
 %   * Length - Choice of loop length function [ 'intaxis' |
 %   'minlength' | {'l2norm'} ]  See documentation of loop.intaxis,
@@ -43,7 +42,7 @@ function [varargout] = entropy(b,varargin)
 %   ENTR = ENTROPY(B,'OneStep',...) computes a single iteration of the
 %   algorithm.  Shortcut for Tol = 0 && MaxIt = 1.
 %
-%   ENTR = ENTROPY(B,'Finite','MaxIt',N, ...) computes exactly N iterations
+%   ENTR = ENTROPY(B,'Finite','MaxIt',N,...) computes exactly N iterations
 %   of the algorithm (the parameter 'MaxIt' has to be specified).
 %   Identical to passing Tol = 0 and MaxIt = N.
 %
@@ -52,14 +51,14 @@ function [varargout] = entropy(b,varargin)
 %   are normalized such that NORM(PLOOP.COORDS) = 1.
 %
 %   This is a method for the BRAID class.
-%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TNTYPE, PSIROOTS.
+%   See also BRAID, LOOP.MINLENGTH, LOOP.INTAXIS, BRAID.TRAIN, PSIROOTS.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -125,19 +124,20 @@ end
 
 % determine type of algorithm
 params.method = validateflag(params.method, {'iter','moussafir'},...
-                           {'trains','train-tracks','bh'});
+                           {'train','trains','train-tracks','bh'});
 
 params.length = validateflag(params.length, 'intaxis','minlength','l2norm');
 
 
 %% TRAIN-TRACKS ALGORITHM (EXITS AFTER if)
-if strcmpi( params.method, 'trains' )
+if strcmpi( params.method, 'train' )
   if nargout > 1
     error('BRAIDLAB:braid:entropy:nargout',...
-          'Too many output arguments for ''trains'' option.')
+          'Too many output arguments for ''train'' option.')
   end
-  [TN,varargout{1}] = tntype_helper(b.word,b.n);
-  if strcmpi(TN,'reducible1')
+  T = train_helper(b.word,b.n);
+  varargout{1} = T.entropy;
+  if strcmpi(T.tntype,'reducible1')
     warning('BRAIDLAB:braid:entropy:reducible',...
             'Reducible braid... falling back on iterative method.')
   else

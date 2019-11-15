@@ -12,8 +12,9 @@ CPP          = g++
 MAKEDEPCMD   = $(CPP)
 
 # Compile options.
-#CPPFLAGS_CLN = -DUSE_CLN
-ifeq ($(CPPFLAGS_CLN),-DUSE_CLN)
+# Use make USE_CLN=1 to compile with the CLN library.
+ifeq ($(USE_CLN),1)
+	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
 CPPFLAGS = -Wall -O -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
@@ -53,6 +54,7 @@ do-speedtest: speedtest
 # Cleanup.
 clean:
 	rm -rf $(subst _main,,$(PROGRAMS)) $(OBJS) $(DEPFILE)
+	cd $(CBRAID_LIBDIR); make clean
 
 # Make dependencies.
 depend:

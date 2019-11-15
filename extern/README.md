@@ -17,9 +17,12 @@ subfolder.  Credits and licenses are in each library's subfolder.
 ```sh
   git checkout cbraid-branch; git pull # pull changes from remote cbraid-remote
   git checkout develop
-  git merge --squash -Xsubtree=extern/cbraid --no-commit cbraid-branch
+  git merge --squash -s recursive -Xsubtree=extern/cbraid --no-commit --allow-unrelated-histories cbraid-branch
 ```
 See [Subtree Merging](http://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).
+
+This seems a bit broken now: I had to add --allow-unrelated-histories,
+but Git seems to create a squash commit of everything each time.
 
 ### Trains
 
@@ -28,6 +31,9 @@ in a separate branch [`trains-branch`](https://github.com/jeanluct/braidlab/tree
 ```sh
   git checkout trains-branch; git pull # pull changes from remote trains-remote
   git checkout develop
-  git merge --squash -Xsubtree=extern/trains --no-commit trains-branch
+  git merge --squash -s recursive -Xsubtree=extern/trains --no-commit --allow-unrelated-histories trains-branch
 ```
 See [Subtree Merging](http://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).
+
+This seems a bit broken now: I had to add --allow-unrelated-histories,
+but Git seems to create a squash commit of everything each time.

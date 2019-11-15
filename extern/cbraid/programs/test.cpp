@@ -28,8 +28,6 @@
 
 
 #include "cbraid.h"
-using namespace CBraid;
-using namespace std;
 
 #include "optarg.h"
 
@@ -44,13 +42,16 @@ bool bVerbose = false;
 int CLibRandomSeed = 0;
 
 template<class T> const char* TypeName() { return "(Unknown)"; }
-template<> const char* TypeName<ArtinBraid>() { return "ArtinBraid"; }
-template<> const char* TypeName<BandBraid>() { return "BandBraid"; }
+template<> const char* TypeName<CBraid::ArtinBraid>() { return "ArtinBraid"; }
+template<> const char* TypeName<CBraid::BandBraid>() { return "BandBraid"; }
 
 
 template<class B>
 bool CFormMulTest(B& (B::*pMakeCForm)())
 {
+    using namespace CBraid;
+    using namespace std;
+
     B a(Index), b(Index), c(Index), d(Index);
 
     cout << "a=" << a.Randomize(CLength) << endl
@@ -70,6 +71,9 @@ bool CFormMulTest(B& (B::*pMakeCForm)())
 template <class B>
 bool CFormInvTest(B& (B::*pMakeCForm)())
 {
+    using namespace CBraid;
+    using namespace std;
+
     B a(Index), b(Index), c(Index);
 
     cout << "a=" << a.Randomize(CLength) << endl;
@@ -87,6 +91,9 @@ bool CFormInvTest(B& (B::*pMakeCForm)())
 template<class B>
 bool LeftReductionTest(B (B::*pReduce)())
 {
+    using namespace CBraid;
+    using namespace std;
+
     B x(Index), y(Index), a(Index), b(Index), c(Index);
 
     bool rc = true;
@@ -108,6 +115,9 @@ bool LeftReductionTest(B (B::*pReduce)())
 template<class B>
 bool RightReductionTest(B (B::*pReduce)())
 {
+    using namespace CBraid;
+    using namespace std;
+
     B x(Index), y(Index), a(Index), b(Index), c(Index);
 
     bool rc = true;
@@ -128,6 +138,9 @@ bool RightReductionTest(B (B::*pReduce)())
 
 bool ArtinBandConversionTest()
 {
+    using namespace CBraid;
+    using namespace std;
+
     ArtinBraid a(Index), b(Index);
     BandBraid p(Index), q(Index);
 
@@ -145,6 +158,9 @@ bool ArtinBandConversionTest()
 
 int main(int argc, char* argv[])
 {
+    using namespace CBraid;
+    using namespace std;
+
     // Process command line options.
     OptArg::optmap m;
     m << OptArg::opt("-index", OptArg::int_arg, &Index)

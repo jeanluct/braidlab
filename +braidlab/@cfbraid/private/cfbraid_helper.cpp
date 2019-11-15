@@ -9,7 +9,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <marko@clarkson.edu>
 //
 //   This file is part of Braidlab.
@@ -46,7 +46,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   const mxArray *wA = prhs[0];
   const int *w = (int *)mxGetData(wA); // wA contains int32's.
-  const mwSize N = max(mxGetM(wA),mxGetN(wA));
+  const mwSize N = std::max(mxGetM(wA),mxGetN(wA));
   int n = (int)mxGetScalar(prhs[1]);
   int ityp = (int)mxGetScalar(prhs[2]);
 

@@ -1,5 +1,5 @@
-function varargout = tntype_helper(varargin) %#ok<STOUT>
-%TNTYPE_HELPER   See tntype_helper.cpp.
+function varargout = train_helper(varargin) %#ok<STOUT>
+%TRAIN_HELPER   See train_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
 %   does not exist.
@@ -9,7 +9,7 @@ function varargout = tntype_helper(varargin) %#ok<STOUT>
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2018  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.

@@ -32,16 +32,17 @@
 #include <cstdlib>
 #include <stdio.h>
 
-using namespace CBraid;
-using namespace Braiding;
-using namespace std;
-
 int main()
 {
-  char  c, *file;
+  using namespace CBraid;
+  using CBraid::sint16;  // Avoid ambiguity with CLN.
+  using namespace Braiding;
+  using namespace std;
+
+ char  c, *file;
   sint16 p=0, power=1, power2=1, i, j, n, repeat=0,
     size, type, rigidity, iteration;
-  list <sint16> word, word2, graph, graphinv;
+  list<sint16> word, word2, graph, graphinv;
   list<sint16>::iterator itw, itg;
 
   ArtinBraid B=ArtinBraid(1), B1=ArtinBraid(1),

@@ -28,10 +28,13 @@
 #include <iomanip>
 #include <fstream>
 
-using namespace CBraid;
-using namespace std;
 
 namespace Braiding {
+
+using CBraid::ArtinBraid;
+using CBraid::ArtinFactor;
+using CBraid::sint16;
+using std::list;
 
 ///////////////////////////////////////////////////////
 //
