@@ -48,5 +48,6 @@ distclean: clean
 	# Revert PDF file to latest revision.
 	git checkout $(MASTERFILE).pdf
 	# Update timestamp so make knows to remake the file.
-	touch $(MASTERFILE).pdf
+	# Make pdf file 1 second older.
+	touch -r $(MASTERFILE).pdf -d '-1 second' $(MASTERFILE).pdf
 	touch $(MASTERFILE).tex
