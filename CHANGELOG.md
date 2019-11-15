@@ -3,6 +3,8 @@
 
 ## [Unreleased][unreleased]
 
+* Add `pure` option to `closure`.
+
 
 ## [3.2.4] - 2019-11-15
 
@@ -361,7 +363,8 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...develop
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...develop
+[3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
 [3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
 [3.2.2]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...release-3.2.2
 [3.2.1]: https://github.com/jeanluct/braidlab/compare/release-3.2...release-3.2.1
