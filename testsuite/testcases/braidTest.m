@@ -134,6 +134,10 @@ classdef braidTest < matlab.unittest.TestCase
 
       b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
       testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
+
+      b = braidlab.braid(braidlab.closure(XY,'pure'));
+      testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2 1 3 2]));
+      testCase.verifyTrue(b.ispure);
     end
 
     function test_braid_equal(testCase)
