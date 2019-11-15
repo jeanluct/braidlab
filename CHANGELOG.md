@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+
+## [3.2.4] - 2019-11-15
+
 * `ttmap` displays in an easy-to-read format the train track map
   contained in the struct returned by `braid.train`.
 
