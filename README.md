@@ -29,7 +29,7 @@ We can add your paper to the [publication list](https://github.com/jeanluct/brai
 
 [Michael Allshouse][6] contributed extensive testing, comments, and some of the code.
 
-*braidlab* uses Toby Hall's [Trains][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; and Jakob Progsch's [ThreadPool][12].
+*braidlab* uses Toby Hall's [Trains][7]; Jae Choon Cha's [CBraid][8]; Juan Gonzalez-Meneses's [Braiding][9]; John D'Errico's [Variable Precision Integer Arithmetic][10]; Markus Buehren's [assignmentoptimal][11]; and Jakob Progsch and Václav Zeman's [ThreadPool][12].
 
 ### license
 

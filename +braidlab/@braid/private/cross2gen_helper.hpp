@@ -87,7 +87,7 @@
 
 #ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
-#include "ThreadPool.h" // (c) Jakob Progsch
+#include "ThreadPool.h" // (c) Jakob Progsch, Václav Zeman
                         // https://github.com/progschj/ThreadPool
 #endif
 
@@ -708,7 +708,7 @@ void PairCrossings::run( size_t NThreadsRequested ) {
     //
     auto ptrDetectCrossings = std::bind(&PairCrossings::detectCrossings,
                                         this, std::placeholders::_1);
-    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
+    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch, Václav Zeman
 
     if (2 <= BRAIDLAB_debuglvl)  {
       printf(
