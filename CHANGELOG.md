@@ -3,6 +3,15 @@
 
 ## [Unreleased][unreleased]
 
+* Many small edits and fixes to the braidlab guide to bring it up to
+  date with current syntax.  (Thanks to Giuseppe Di Labbio.)
+
+* Bugfix: missing brackets around `varargout` in `annbraid` caused no
+  return argument form to fail.  (Thanks to Giuseppe Di Labbio.)
+
+* Bugfix: missing `lower` in `knot2braid`.  So `'Trefoil'` couldn't be
+  capitalized as in examples.  (Thanks to Giuseppe Di Labbio.)
+
 * Add `pure` option to `closure`.
 
 
