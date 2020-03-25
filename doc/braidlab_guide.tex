@@ -328,7 +328,7 @@ a = < 1 -2 >
 which defaults to the minimum required strings,~$3$.  The same braid
 on~$4$ strings is constructed with
 \begin{lstlisting}[frame=single,framerule=0pt]
-> a4 = braid([1 -2],4)   % force 4 strings
+>> a4 = braid([1 -2],4)   % force 4 strings
 
 a4 = < 1 -2 >
 \end{lstlisting}
@@ -417,7 +417,7 @@ ans = < 4  3  2  1  4  3  2  4  3  4 >
 
 >> braid('8_21')  % braid for 8-crossing knot #21
 
-ans = < 4  3  2  1  4  3  2  4  3  4 >
+ans = < 2  2  2  1  2  2 -1 -1  2 -1 >
 \end{lstlisting}
 In Section~\ref{sec:braidfromdata} we will show how to construct a braid from
 a trajectory data set.  \index{braid class@\braid\ class!constructor|)}
@@ -530,11 +530,11 @@ application of the braid:
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> complexity(braid([1 -2]))
 
-ans = 2
+ans = 1.3863
 
 >> complexity(braid([1 2]))
 
-ans = 1.5850
+ans = 1.0986
 \end{lstlisting}
 See Section~\ref{sec:loop} or `\lstinline{help braid.complexity}' for details
 on how the geometric complexity is computed. %
@@ -875,11 +875,11 @@ ans = 3
 Many of the methods work described for the \lstinline{braid} class can be
 applied to \annbraid{}s.  For instance,
 \begin{lstlisting}[frame=single,framerule=0pt]
->> entropy(braid([1 -2])))      % entropy of a normal braid
+>> entropy(braid([1 -2]))      % entropy of a normal braid
 
 ans = 0.9624
 
->> entropy(annbraid([1 -2])))   % entropy of annular braid
+>> entropy(annbraid([1 -2]))   % entropy of annular braid
 
 ans = 1.7627
 \end{lstlisting}
@@ -930,8 +930,8 @@ data:
 >> whos
   Name         Size               Bytes  Class     Attributes
 
-  XY        9740x2x4             623360  double
-  ti           1x9740             77920  double
+  XY        9739x2x4             623296  double
+  ti           1x9739             77912  double
 \end{lstlisting}
 Here \lstinline{ti} is the vector of times, and \lstinline{XY} is a
 three-dimensional array: its first component specifies the timestep,
@@ -1120,15 +1120,12 @@ does: a \lstinline{databraid}. %
 Its constructor takes an optional vector of times as an argument, and it has a
 data member \lstinline{tcross} %
 \index{tcross@\lstinline{tcross}|(}%
-that retains the crossing times.  Using the same data \lstinline{XY} from
-before, sampled at times \lstinline{ti}, we have
+that retains the crossing times.  Using the data \lstinline{XY} from Section~\ref{sec:braidfromdataex}, sampled at times \lstinline{ti}, we have
 \begin{lstlisting}[frame=single,framerule=0pt]
 >> b = databraid(XY,ti);
 >> b.tcross(1:3)
 
-ans = 870.9010
-      872.1758
-      887.0089
+ans = 870.9010  872.1758  887.0089
 \end{lstlisting}
 \index{tcross@\lstinline{tcross}|)}%
 Storing crossing times enables us to truncate generators in a
@@ -1687,7 +1684,6 @@ M = 2  -1
 \end{lstlisting}
 And again:
 \begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2]); l = loop([1 1]);
 >> [l,M] = b*l; l, full(M)
 
 l = (( 18 -11 ))
@@ -2007,7 +2003,7 @@ b = < 3  2  1  2  4  5  4  3  3  2  1  2  5  4  5  3 >
 \end{lstlisting}
 with Thurston--Nielsen type and entropy
 \begin{lstlisting}[frame=single,framerule=0pt]
->> [t,entr] = train(b)
+>> t = train(b)
 
 ans = struct with fields:
 
@@ -2234,8 +2230,8 @@ To see the properties available and their current values, use the
 ans =         GenRotDir: 1
           GenLoopActDir: 'lr'
        GenPlotOverUnder: 1
-            BraidAbsTol: 1.0000e-10
            BraidPlotDir: 'bt'
+            BraidAbsTol: 1.0000e-10
     LoopCoordsBasePoint: 'right'
 \end{lstlisting}
 To set a property, use something like \lstinline{prop('BraidPlotDir','lr')}.
