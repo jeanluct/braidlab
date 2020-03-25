@@ -234,7 +234,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = conjtest@braidlab.braid(b1.braid,b2.braid);
+      [varargout{1:nargout}] = conjtest@braidlab.braid(b1.braid,b2.braid);
     end
 
     function [varargout] = cycle(b,varargin)
@@ -242,7 +242,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = cycle@braidlab.braid(b.braid,varargin{:});
+      [varargout{1:nargout}] = cycle@braidlab.braid(b.braid,varargin{:});
     end
 
     function [varargout] = entropy(b,varargin)
@@ -250,7 +250,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = entropy@braidlab.braid(b.braid,varargin{:});
+      [varargout{1:nargout}] = entropy@braidlab.braid(b.braid,varargin{:});
     end
 
     function l = loopcoords(b,varargin)
@@ -281,7 +281,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = train@braidlab.braid(b.braid);
+      [varargout{1:nargout}] = train@braidlab.braid(b.braid);
     end
 
   end % methods block
