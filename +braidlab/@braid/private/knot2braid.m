@@ -38,7 +38,7 @@ function b = knot2braid(K)
 
 import braidlab.braid
 
-switch K
+switch lower(K)
  case {'0_1','unknot'}
   b = braid([1]); %#ok<NBRAK>
  case {'3_1','trefoil'}
