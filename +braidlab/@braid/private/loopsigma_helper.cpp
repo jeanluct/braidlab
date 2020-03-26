@@ -12,6 +12,14 @@
 
 #include "loopsigma_helper_common.hpp"
 
+#ifdef BRAIDLAB_WIN // MinGW needs these included again for some reason
+#include "update_rules.hpp"
+#include "sumg.hpp"
+#ifndef BRAIDLAB_NOTHREADING
+#include "ThreadPool.h"
+#endif
+#endif
+
 // Helper function for loopsigma
 //
 // ** ASSUMES THAT LOOPS ARE STORED COLUMNWISE **

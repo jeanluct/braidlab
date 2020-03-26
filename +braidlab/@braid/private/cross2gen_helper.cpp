@@ -36,6 +36,12 @@
 #include "mex.h"
 #include "cross2gen_helper.hpp"
 
+#ifdef BRAIDLAB_WIN // MinGW needs this included again for some reason
+#ifndef BRAIDLAB_NOTHREADING
+#include "ThreadPool.h"
+#endif
+#endif
+
 
 /*
 *** Inputs:

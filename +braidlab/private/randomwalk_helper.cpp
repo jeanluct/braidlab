@@ -7,6 +7,9 @@
 // Helper file for randomwalk.m.
 
 #include <iostream>
+#ifdef BRAIDLAB_WIN
+#define _USE_MATH_DEFINES  // define M_PI for MinGW
+#endif
 #include <cmath>
 #include "mex.h"
 
