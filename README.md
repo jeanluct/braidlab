@@ -4,7 +4,7 @@
 
 ### documentation and installation
 
-The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file and make sure the folder containing `+braidlab` is on your path.  Run `import braidlab.*` to access the braidlab namespace.  You can then create a braid with
+The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file and make sure the folder containing `+braidlab` is on your Matlab path.  Run `import braidlab.*` to access the *braidlab* namespace.  You can then create a braid with
 ```
 > b = braid([1 2 -3])
 
