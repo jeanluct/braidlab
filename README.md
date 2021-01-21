@@ -25,7 +25,7 @@ The train track map associated with the braid's mapping class is
  c -> B 3 A
  d -> c
 ```
-where numbers denote peripheriale edges, and letters main edges.
+where numbers denote peripheral edges, and letters main edges.
 
 *braidlab* can do much more; see the [*braidlab* user's guide][5] in the `doc` folder for many examples.  The guide is also posted on [arXiv][6].  For detailed installation instructions from source files, see the Appendix in the guide.
 
