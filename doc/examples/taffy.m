@@ -47,7 +47,7 @@ if ~ischar(ptype), ptype = sprintf('%drods',ptype); end
 npts = 200; r = .75; rodr = .05;
 
 gray = [.8 .8 .8];
-th = linspace(0,2*pi,npts); th = th(end:-1:1);
+th = linspace(2*pi,0,npts);  % clockwise
 
 switch lower(ptype)
  case {'3rod','3rods'}
@@ -159,7 +159,4 @@ set(gcf,'color','w')
 
 if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end
 
-XY = zeros(npts,2,n);
-XY(:,1,:) = real(z); XY(:,2,:) = imag(z);
-
-b = braid(XY,projang);
+b = braid(z,projang);

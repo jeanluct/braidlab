@@ -69,7 +69,9 @@ classdef braid < matlab.mixin.CustomDisplay
     %
     %   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
-    %   of time steps and N is the number of particles.
+    %   of time steps and N is the number of particles.  XY can also be
+    %   specified as a complex array XY(1:NSTEPS,1:N), with the real and
+    %   imaginary parts corresponding to the coordinates.
     %
     %   B = BRAID(XY,PROJANG) uses a projection line with angle PROJANG (in
     %   radians) from the X axis to determine crossings.  The default is to
@@ -218,6 +220,16 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
+      elseif ndims(b) == 2 && size(b,2) > 1
+        % b is a 2-dim array of complex data.
+        if nargin > 2
+          error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
+        elseif nargin < 2
+          % Use a zero projection angle.
+          secnd = 0;
+        end
+        Z = reshape([real(b);imag(b)], [size(b,1) 2 size(b,2)]);
+        br = braidlab.braid(Z,secnd);
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
@@ -239,7 +251,7 @@ classdef braid < matlab.mixin.CustomDisplay
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
           % b is neither a row vector or a column vector.  Hopefully the
-          % user means a one-particle dataset.  Perhaps he/she is trying to
+          % user means a one-particle dataset.  Perhaps they're trying to
           % create several braids at once (which is not currently
           % allowed).  By default, print a warning.
           if size(b,2) == 2
