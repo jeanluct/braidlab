@@ -103,8 +103,15 @@ classdef braidTest < matlab.unittest.TestCase
 
       % Creating a braid from a two-dimensional array is assumed to be a
       % single-particle dataset.  Print a warning, though.
-      testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
+      XY = [1 2;2 3;1 2];
+      testCase.verifyWarning(@() braidlab.braid(XY), ...
                              'BRAIDLAB:braid:braid:onetraj');
+
+      % However, if we cast the trajectory to complex, then assumed to be
+      % two particles on the real axis in the complex plane.
+      Z = complex(XY);
+      testCase.verifyWarningFree(@() braidlab.braid(Z));
+      testCase.verifyEqual(braidlab.braid(Z).n,2);
 
       % Two particles have a coincident position.
       XY = zeros(4,2,2);

@@ -69,7 +69,9 @@ classdef braid < matlab.mixin.CustomDisplay
     %
     %   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
-    %   of time steps and N is the number of particles.
+    %   of time steps and N is the number of particles.  XY can also be
+    %   specified as a complex array XY(1:NSTEPS,1:N), with the real and
+    %   imaginary parts corresponding to the coordinates.
     %
     %   B = BRAID(XY,PROJANG) uses a projection line with angle PROJANG (in
     %   radians) from the X axis to determine crossings.  The default is to
@@ -218,6 +220,44 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
+      elseif ndims(b) == 2 && size(b,1) > 1 && size(b,2) > 1
+        if isreal(b) && size(b,2) == 2
+          % This is a one-strand braid specified as real data.
+          % If the user wants to create a braid of 2 complex trajectories
+          % that happens to be on the real axis, convert to complex.
+          %
+          % Example:
+          %
+          % >> Z = [1 1 1 ; 2 2 2]'
+          % >> braid(Z)
+          %
+          % will return the identity braid on one strand (and print warning).
+          %
+          % >> braid(complex(Z))
+          %
+          % will return the identity braid on two strands.
+          %
+          warning('BRAIDLAB:braid:braid:onetraj', ...
+                  [ 'Creating trivial braid from single ' ...
+                    'trajectory (did you mean that?).' ])
+          if any(b(1,:) - b(end,:) ~= 0)
+            warning('BRAIDLAB:braid:braid:notclosed',...
+                    ['The trajectories do not form a closed braid.  ' ...
+                     'Consider calling ''closure'' on the data first.']);
+          end
+          br.word = int32([]);
+          br.n = 1;
+        else
+          % b is a 2-dim array of complex data.
+          if nargin > 2
+            error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
+          elseif nargin < 2
+            % Use a zero projection angle.
+            secnd = 0;
+          end
+          XY = reshape([real(b);imag(b)], [size(b,1) 2 size(b,2)]);
+          br = braidlab.braid(XY,secnd);
+        end
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
         if nargin > 2
@@ -238,8 +278,12 @@ classdef braid < matlab.mixin.CustomDisplay
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
       else
         if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
+          % I _think_ the complex braid constructor form has made this code
+          % block obsolete.  Go ahead and delete after a while.
+          error('BRAIDLAB:braid:braid:badlogic', ...
+                'This code block should be unreachable?')
           % b is neither a row vector or a column vector.  Hopefully the
-          % user means a one-particle dataset.  Perhaps he/she is trying to
+          % user means a one-particle dataset.  Perhaps they're trying to
           % create several braids at once (which is not currently
           % allowed).  By default, print a warning.
           if size(b,2) == 2
