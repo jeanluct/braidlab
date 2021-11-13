@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+* Add complex constructor braid(Z), where Z is K x N and contains
+  complex trajectory data.
+
 * Many small edits and fixes to the braidlab guide to bring it up to
   date with current syntax.  (Thanks to Giuseppe Di Labbio.)
 
