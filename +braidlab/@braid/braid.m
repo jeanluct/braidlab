@@ -240,11 +240,15 @@ classdef braid < matlab.mixin.CustomDisplay
           warning('BRAIDLAB:braid:braid:onetraj', ...
                   [ 'Creating trivial braid from single ' ...
                     'trajectory (did you mean that?).' ])
-          if any(b(1,:) - b(end,:) ~= 0)
+
+          % Check check if braid is closed using tolerance.
+          delta = braidlab.prop('BraidAbsTol');
+          if any(abs(b(1,:) - b(end,:)) > delta)
             warning('BRAIDLAB:braid:braid:notclosed',...
                     ['The trajectories do not form a closed braid.  ' ...
                      'Consider calling ''closure'' on the data first.']);
           end
+
           br.word = int32([]);
           br.n = 1;
         else
