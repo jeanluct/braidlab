@@ -7,7 +7,7 @@ function M = update_rules_matrix(b,opSign,N)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
