@@ -374,7 +374,6 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-=======
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
 [3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
