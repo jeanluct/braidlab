@@ -1018,6 +1018,14 @@ ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
 \end{lstbraidlab}
 which shows that the winding number between these two strings is~$-4$.
 
+A braid can also be created from complex orbit data:
+\begin{lstbraidlab}
+>> Z = squeeze(XY(:,1,:) + 1i*XY(:,2,:));
+>> b = braid(Z);
+\end{lstbraidlab}
+where the complex array \lstinline{Z} has rows equal to the number of time
+slices, and columns equal to the number of particles.
+
 
 \subsubsection{Changing the projection line and enforcing closure}
 \label{sec:projection}
