@@ -1,9 +1,6 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
-
-
 ## [3.2.5] - 2021-11-17
 
 * Add complex constructor braid(Z), where Z is K x N and contains
@@ -378,7 +375,6 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...develop
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
 [3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
