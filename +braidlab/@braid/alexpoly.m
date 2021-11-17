@@ -12,7 +12,7 @@ function p = alexpoly(b,x,opt)
 %   Supported objects are X=laurpoly(1,1) (from the Matlab wavelet toolbox,
 %   the default) and X=sym('x') (from the Matlab symbolic toolbox). X can
 %   also be a numeric type (a real or complex number), but in that case the
-%   'centered' option below is unavailable.
+%   'Centered' option below is unavailable.
 %
 %   P = ALEXPOLY(B,X,'Centered') or ALEXPOLY(B,'Centered') centers the
 %   polynomial so that P(X) = (+/-)P(1/X).  (The + sign always applies if
@@ -73,7 +73,7 @@ function p = alexpoly(b,x,opt)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -138,7 +138,7 @@ errnotmono = {'BRAIDLAB:braid:alexpoly:notmonomial', ...
               'p(z) = p(1/z) cannot be enforced.'};
 errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
               ['Polynomial with fractional powers.  Remove ' ...
-               '''centered'' option or use the symbolic toolbox.']};
+               '''Centered'' option or use the symbolic toolbox.']};
 
 % Compute reduced Burau representation of the braid.
 bu = burau(b,x);

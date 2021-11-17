@@ -5,7 +5,7 @@
 #
 #   http://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 #                            Marko Budisic          <marko@clarkson.edu>
 #
 #   This file is part of Braidlab.
@@ -64,7 +64,7 @@ train_helper.$(MEXSUFFIX): train_helper.cpp
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
-	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp ThreadPool_nofuture.h ThreadPool.h
+	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
@@ -74,7 +74,7 @@ entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 cross2gen_helper.$(MEXSUFFIX): cross2gen_helper.cpp \
-	cross2gen_helper.hpp ThreadPool_nofuture.h ThreadPool.h
+	cross2gen_helper.hpp ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 

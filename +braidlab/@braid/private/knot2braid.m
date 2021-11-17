@@ -17,7 +17,7 @@ function b = knot2braid(K)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -38,7 +38,7 @@ function b = knot2braid(K)
 
 import braidlab.braid
 
-switch K
+switch lower(K)
  case {'0_1','unknot'}
   b = braid([1]); %#ok<NBRAK>
  case {'3_1','trefoil'}

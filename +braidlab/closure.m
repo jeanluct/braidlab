@@ -6,6 +6,9 @@ function XYc = closure(XY,ctype)
 %   (when projected along the X axis).  The data format is
 %   XY(TIMESTEP,COORD,PARTICLES).
 %
+%   XYC = CLOSURE(XY,'Pure') closes the trajectories to make a pure braid,
+%   that is, such that the strings return to their initial position.
+%
 %   XYC = CLOSURE(XY,'MinDist') closes the trajectories to minimize the sum
 %   of the Euclidean distances between the final and initial points.  This
 %   uses Markus Buehren's implementation of the Hungarian algorithm for the
@@ -15,14 +18,14 @@ function XYc = closure(XY,ctype)
 %   XYC = CLOSURE(XY,PERM) closes the braid so that final points are
 %   linked according to permutation PERM.
 %
-%   See also BRAID, BRAID.BRAID.
+%   See also BRAID, BRAID.BRAID, BRAID.ISPURE.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -72,6 +75,11 @@ else
     % Find the final order of the particles.
     [~,I1] = sort(squeeze(XY(end,2,:)));
     XYnew(1,:,I1) = XY(1,:,I0);
+
+   case 'pure'
+    % Find the initial order of the particles.
+    [~,I0] = sort(squeeze(XY(1,1,:)));
+    XYnew(1,:,I0) = XY(1,:,I0);
 
    case 'mindist'
     n = size(XY,3);

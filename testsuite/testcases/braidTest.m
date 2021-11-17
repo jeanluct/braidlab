@@ -3,7 +3,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -103,8 +103,15 @@ classdef braidTest < matlab.unittest.TestCase
 
       % Creating a braid from a two-dimensional array is assumed to be a
       % single-particle dataset.  Print a warning, though.
-      testCase.verifyWarning(@() braidlab.braid([1 2;2 3;-1 3]), ...
+      XY = [1 2;2 3;1 2];
+      testCase.verifyWarning(@() braidlab.braid(XY), ...
                              'BRAIDLAB:braid:braid:onetraj');
+
+      % However, if we cast the trajectory to complex, then assumed to be
+      % two particles on the real axis in the complex plane.
+      Z = complex(XY);
+      testCase.verifyWarningFree(@() braidlab.braid(Z));
+      testCase.verifyEqual(braidlab.braid(Z).n,2);
 
       % Two particles have a coincident position.
       XY = zeros(4,2,2);
@@ -134,6 +141,10 @@ classdef braidTest < matlab.unittest.TestCase
 
       b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
       testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
+
+      b = braidlab.braid(braidlab.closure(XY,'pure'));
+      testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2 1 3 2]));
+      testCase.verifyTrue(b.ispure);
     end
 
     function test_braid_equal(testCase)

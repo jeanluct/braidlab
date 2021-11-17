@@ -1,5 +1,21 @@
 # Change Log
 
+## [3.2.5] - 2021-11-17
+
+* Add complex constructor braid(Z), where Z is K x N and contains
+  complex trajectory data.
+
+* Many small edits and fixes to the braidlab guide to bring it up to
+  date with current syntax.  (Thanks to Giuseppe Di Labbio.)
+
+* Bugfix: missing brackets around `varargout` in `annbraid` caused no
+  return argument form to fail.  (Thanks to Giuseppe Di Labbio.)
+
+* Bugfix: missing `lower` in `knot2braid`.  So `'Trefoil'` couldn't be
+  capitalized as in examples.  (Thanks to Giuseppe Di Labbio.)
+
+* Add `pure` option to `closure`.
+
 
 ## [3.2.4] - 2019-11-15
 
@@ -358,6 +374,9 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
+=======
+[3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
+[3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
 [3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3
 [3.2.2]: https://github.com/jeanluct/braidlab/compare/release-3.2.1...release-3.2.2
 [3.2.1]: https://github.com/jeanluct/braidlab/compare/release-3.2...release-3.2.1

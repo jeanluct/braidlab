@@ -6,7 +6,7 @@
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <marko@clarkson.edu>
 %
 %   This file is part of Braidlab.
@@ -91,18 +91,23 @@
 
 \begin{document}
 
-\lstset{language=Matlab}
-\lstset{breaklines=true}
-\lstset{backgroundcolor=\color{beige}}
-%\lstset{emph={directory,containing,{+}braidlab},emphstyle=\color{red}}
+\lstdefinestyle{braidlabStyle}{
+  language=Matlab,
+  breaklines=true,
+  backgroundcolor=\color{beige},
+  basicstyle=\small\ttfamily,
+  keywordstyle=\small\ttfamily,
+  identifierstyle=,
+  commentstyle=\small\rmfamily\itshape,
+  stringstyle=\small\ttfamily,
+  showstringspaces=false
+}
 
-\lstset{% general command to set parameter(s)
-basicstyle=\small\ttfamily,
-keywordstyle=\small\ttfamily,
-identifierstyle=,
-commentstyle=\small\rmfamily\itshape,%\ttfamily,
-stringstyle=\small\ttfamily,
-showstringspaces=false}
+\lstnewenvironment{lstbraidlab}
+    {\lstset{frame=single,framerule=0pt}}
+    {}
+
+\lstset{style=braidlabStyle}
 
 
 \title{\href{{http://github.com/jeanluct/braidlab}}{\braidlab}:
@@ -320,33 +325,33 @@ your machine.
 \braidlab\ defines a number of classes, most importantly \braid\ and \loopc.
 The braid~$\sigma_1\sigma_2^{-1}$ is constructed with %
 \index{braid class@\braid\ class!constructor|(}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 -2])   % defaults to 3 strings
 
 a = < 1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 which defaults to the minimum required strings,~$3$.  The same braid
 on~$4$ strings is constructed with
-\begin{lstlisting}[frame=single,framerule=0pt]
-> a4 = braid([1 -2],4)   % force 4 strings
+\begin{lstbraidlab}
+>> a4 = braid([1 -2],4)   % force 4 strings
 
 a4 = < 1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 Two braids can be multiplied: %
 \index{braid class@\braid\ class!multiplication (\lstinline{*})}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 -2]); b = braid([1 2]);
 >> a*b, b*a
 
 ans = < 1 -2  1  2 >
 
 ans = < 1  2  1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 Powers %
 \index{braid class@\braid\ class!power (\lstinline{^})}%
 can also be taken, including the inverse: %
 \index{braid class@\braid\ class!inverse (\lstinline{inv})}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a^5, inv(a), a*a^-1
 
 ans = < 1 -2  1 -2  1 -2  1 -2  1 -2 >
@@ -354,16 +359,16 @@ ans = < 1 -2  1 -2  1 -2  1 -2  1 -2 >
 ans = < 2 -1 >
 
 ans = < 1 -2  2 -1 >
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!identity braid}%
 Note that this last expression is the identity braid, but is not simplified.
 The method \lstinline{compact} attempts to simplify the braid: %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> compact(a*a^-1)
 
 ans = < e >
-\end{lstlisting}
+\end{lstbraidlab}
 The method \lstinline{compact} is based on the heuristic algorithm
 of~\citet{Bangert2002}, since finding the braid of minimum length in the
 standard generators is in general difficult~\citep{Paterson1991}.  Hence,
@@ -371,65 +376,65 @@ there is no guarantee that in general \lstinline{compact} will find the
 identity braid, even though it does so here.  To really test if a braid is the
 identity (trivial braid), use the method \lstinline{istrivial}: %
 \index{braid class@\braid\ class!istrivial@\lstinline{istrivial}}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> istrivial(a*a^-1)
 
 ans = 1
-\end{lstlisting}
+\end{lstbraidlab}
 
 The number of strings is %
 \index{braid class@\braid\ class!number of strings (\lstinline{n})}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a.n
 
 ans = 3
-\end{lstlisting}
+\end{lstbraidlab}
 Note that
 \index{help@\lstinline{help}|(}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> help braid
-\end{lstlisting}
+\end{lstbraidlab}
 describes the class \braid.  To get more information on the \braid\
 constructor, invoke%
 \index{braid class@\braid\ class!constructor}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> help braid.braid
-\end{lstlisting}
+\end{lstbraidlab}
 which refers to the method \braid\ within the class \braid. %
 \index{help@\lstinline{help}|)}%
 (Use \lstinline{methods(braid)} to list all the methods in the class.)  There
 are other ways to construct a \braid, such as using random %
 \index{braid class@\braid\ class!constructor!random braid} generators, here a
 braid with~$5$ strings and~$10$ random generators:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> braid('Random',5,10)
 
 ans = < 1  4 -4  2  4 -1 -2  4  4  4 >
-\end{lstlisting}
+\end{lstbraidlab}
 The constructor can also build some standard braids: %
 \index{braid class@\braid\ class!constructor!half-twist}
 \index{braid class@\braid\ class!constructor!knots}
 \index{knot!braid representative}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> braid('HalfTwist',5)
 
 ans = < 4  3  2  1  4  3  2  4  3  4 >
 
 >> braid('8_21')  % braid for 8-crossing knot #21
 
-ans = < 4  3  2  1  4  3  2  4  3  4 >
-\end{lstlisting}
+ans = < 2  2  2  1  2  2 -1 -1  2 -1 >
+\end{lstbraidlab}
 In Section~\ref{sec:braidfromdata} we will show how to construct a braid from
 a trajectory data set.  \index{braid class@\braid\ class!constructor|)}
 
 \index{braid class@\braid\ class!equality (\lstinline{==})}%
 The \braid\ class handles equality of braids:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 -2]); b = braid([1 -2 2 1 2 -1 -2 -1]);
 >> a == b
 
 ans = 1
-\end{lstlisting}
+\end{lstbraidlab}
 These are the same braid, even though they appear different from their
 generator sequence~\citep{Birman1975}.  Equality is determined efficiently
 by %
@@ -446,23 +451,23 @@ We can extract a subbraid %
 choosing specific strings: for example, if we take the~$4$-string
 braid~$\sigma_1\sigma_2\sigma_3^{-1}$ and discard the third string, we
 obtain~$\sigma_1\sigma_2^{-1}$:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 2 -3]);
 >> subbraid(a,[1 2 4])   % subbraid using strings 1,2,4
 
 ans = < 1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}|)}
 
 The opposite of subbraid is the \emph{tensor product}, the larger braid
 obtained by laying two braids side-by-side \citep{KasselTuraev}: %
 \index{braid class@\braid\ class!tensor@\lstinline{tensor}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 2 -3]); b = braid([1 -2]);
 >> tensor(a,b)
 
 ans = < 1  2 -3  5 -6 >
-\end{lstlisting}
+\end{lstbraidlab}
 Here, the tensor product of a 4-braid and a 3-braid has 7 strings.  The
 generators $\sigma_1\sigma_2^{-1}$ of \lstinline{b} became
 $\sigma_5\sigma_6^{-1}$ after re-indexing so they appear to the right of
@@ -484,31 +489,31 @@ topological entropy %
 \index{topological entropy|see{braid entropy}}%
 \index{entropy|see{braid entropy}}%
 to a braid:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> entropy(braid([1 2 -3]))
 
 ans = 0.8314
-\end{lstlisting}
+\end{lstbraidlab}
 \index{action!of braid on loop}%
 The entropy is computed by iterated action on a loop~\citep{Moussafir2006}.
 This can fail if the braid is finite-order %
 \index{braid!finite-order|(}%
 or has very low entropy:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> entropy(braid([1 2]))
 Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.  Returning zero entropy.
 
 ans = 0
-\end{lstlisting}
+\end{lstbraidlab}
 To force the entropy to be computed using the Bestvina--Handel train track
 algorithm~\citep{Bestvina1995}, %
 \index{Bestvina--Handel algorithm|(}%
 we add an optional \lstinline{'Method'} parameter:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> entropy(braid([1 2]),'Method','train')
 
 ans = 0
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid!finite-order|)}%
 Note that for large braids the Bestvina--Handel algorithm is impractical.
 
@@ -527,15 +532,15 @@ this will converge to zero.  The \emph{geometric complexity} %
 of a braid~\citep{Dynnikov2007}, is defined in terms of the $\log_2$ of the
 number of intersections of a set of curves with the real axis, after one
 application of the braid:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> complexity(braid([1 -2]))
 
-ans = 2
+ans = 1.3863
 
 >> complexity(braid([1 2]))
 
-ans = 1.5850
-\end{lstlisting}
+ans = 1.0986
+\end{lstbraidlab}
 See Section~\ref{sec:loop} or `\lstinline{help braid.complexity}' for details
 on how the geometric complexity is computed. %
 \index{braid!complexity|)}%
@@ -554,7 +559,7 @@ matrix~\citep{Fathi1979,Thurston1988,Casson1988,Boyland1994}: \index{braid
   class@\braid\ class!train@\lstinline{train}|(}%
 \index{braid!pseudo-Anosov|(}%
 \index{braid!reducible|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> train(braid([1 2 -3]))
 
 ans = struct with fields:
@@ -584,7 +589,7 @@ ans = struct with fields:
      entropy: 0
     transmat: [3x3 double]
        ttmap: {7x1 cell}
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid!pseudo-Anosov|)}%
 \index{braid!reducible|)}%
 \braidlab\ uses Toby Hall's implementation of the Bestvina--Handel
@@ -595,7 +600,7 @@ algorithm~\citep{HallTrain}. %
 The train track map can be displayed in a human-readable format using the
 command \lstinline{ttmap}: %
 \index{ttmap@\lstinline{ttmap}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> tt = train(braid([1 2 -3]));
 >> ttmap(tt)
 
@@ -607,21 +612,21 @@ command \lstinline{ttmap}: %
  b -> d a -3 b -4 B
  c -> B 3 A
  d -> c
-\end{lstlisting}
+\end{lstbraidlab}
 Here peripheral (infinitesimal) edges are denoted by numbers and main edges by
 letters.  Inverse main edges are denoted by capital letters.  The display of
 infinitesimal edges can be suppressed:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> ttmap(tt,'Peripheral',false)
 
  a -> D
  b -> d a b B
  c -> B A
  d -> c
-\end{lstlisting}
+\end{lstbraidlab}
 The transition matrix associated with the train track map does \emph{not}
 contain the peripheral edges, since these do not affect the entropy:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> tt.transmat
 
 ans = 0     1     1     0
@@ -632,7 +637,7 @@ ans = 0     1     1     0
 >> max(abs(eig(ans)))
 
 ans = 2.2966
-\end{lstlisting}
+\end{lstbraidlab}
 \index{transition matrix|)}%
 \index{train track map|)}%
 \index{ttmap@\lstinline{ttmap}|)}%
@@ -646,12 +651,12 @@ representation~\citep{Burau1936,Birman1975} %
 \index{braid!Burau representation|(}%
 \index{braid class@\braid\ class!burau@\lstinline{burau}|(}%
 of a braid is obtained with the method \lstinline{burau}:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> burau(braid([1 -2]),-1)
 
 ans = 1    -1
      -1     2
-\end{lstlisting}
+\end{lstbraidlab}
 where the last argument ($-1$) is the value of the parameter~$t$ in the
 Laurent polynomials %
 \index{Laurent polynomials|(}%
@@ -660,7 +665,7 @@ wavelet toolbox, %
 \index{Matlab!wavelet toolbox}%
 \index{laurpoly@\lstinline{laurpoly}|(}%
 we can use actual Laurent polynomials as the entries:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> B = burau(braid([1 -2]),laurpoly(1,1))
 
      | - z^(+1)        z^(+1)     |
@@ -668,7 +673,7 @@ we can use actual Laurent polynomials as the entries:
  B = |                            |
      |                            |
      |   - 1        + 1 - z^(-1)  |
-\end{lstlisting}
+\end{lstbraidlab}
 but the matrix is now given as a cell array%
 \index{Matlab!cell array}%
 \index{cell array|see{Matlab cell array}}%
@@ -680,39 +685,39 @@ but the matrix is now given as a cell array%
   like multiplication are not defined.} %
 , %
 each entry containing a \lstinline{laurpoly} object:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> B{2,2}
 
 ans(z) = + 1 - z^(-1)
-\end{lstlisting}
+\end{lstbraidlab}
 Instead of \lstinline{laurpoly} objects, we can use Matlab's symbolic
 toolbox: \index{Matlab!symbolic toolbox}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> B = burau(braid([1 -2]),sym('t'))
 
 B = [ -t,       t]
     [ -1, 1 - 1/t]
-\end{lstlisting}
+\end{lstbraidlab}
 where now \lstinline{B} is a matrix of \lstinline{sym} objects:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> B(2,2)
 
 ans = 1 - 1/t
-\end{lstlisting}
+\end{lstbraidlab}
 
 \index{braid!Lawrence--Krammer representation|(}%
 \index{braid class@\braid\ class!lk@\lstinline{lk}|(}%
 Another well-known homological representation of braid groups is the
 Lawrence--Krammer representation \citep{Lawrence1990,Bigelow2001}.  It is
 given in terms of two parameters, usually denoted~$t$ and~$q$:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> K = lk(braid([1 -2]),sym('t'),sym('q'))
 
 K = [ -(q-1)^2/q - q*t*(q-1),  -(q-1)/q,  (q^2-q+1)/q^2]
     [                 -q^2*t,         0,              0]
     [           -(q-1)/(q*t),  -1/(q*t),  (q-1)/(q^2*t)]
-\end{lstlisting}
-In this case there we cannot use \lstinline{laurpoly} entries, since the
+\end{lstbraidlab}
+In this case we cannot use \lstinline{laurpoly} entries, since the
 representation involves Laurent polynomials in two symbols.  For this reason,
 and because its size grows more rapidly with the number of strings (matrices
 of dimension $\tfrac12\nn(\nn-1)$), the Lawrence--Krammer representation is
@@ -730,34 +735,34 @@ the %
 braid~$\sigma_1^3$ \citep{AlexanderPolynomial}, which gives a Laurent
 polynomial
 \index{braid class@\braid\ class!alexpoly@\lstinline{alexpoly}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> alexpoly(braid([1 1 1]))  % can also use braid('Trefoil')
 
 ans(z) = + z^(+2) - z^(+1) + 1
-\end{lstlisting}
+\end{lstbraidlab}
 The figure-eight knot is the closure of~$(\sigma_1\sigma_2^{-1})^2$:
 \index{knot!figure-eight}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> alexpoly(braid([1 -2 1 -2]))  % or braid('Figure-8')
 
 ans(z) = - 1 + 3*z^(-1) - z^(-2)
-\end{lstlisting}
+\end{lstbraidlab}
 This can be `centered' so that it satisfies~$p(z)=\pm p(1/z)$:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> alexpoly(braid([1 -2 1 -2]),'Centered')
 
 ans(z) = - z^(+1) + 3 - z^(-1)
-\end{lstlisting}
+\end{lstbraidlab}
 The centered Alexander polynomial is a knot invariant, \index{knot!invariant}
 so it can be used to determine when two knots are not the same.  For knots,
 the centered polynomial is guaranteed to have integral powers.  For links,
 such as the Hopf link consisting of two singly-linked loops, it might not:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> alexpoly(braid([1 1]),'Centered')  % the Hopf link
 
 Error using braidlab.braid/alexpoly
 Polynomial with fractional powers.  Remove 'Centered' option or use the symbolic toolbox.
-\end{lstlisting}
+\end{lstbraidlab}
 \index{Matlab!symbolic toolbox}%
 Fractional powers cannot be represented with a \lstinline{laurpoly} object. %
 \index{laurpoly@\lstinline{laurpoly}|)}%
@@ -765,11 +770,11 @@ Fractional powers cannot be represented with a \lstinline{laurpoly} object. %
 In that case we can drop the \lstinline{Centered} option, which yields the uncentered
 polynomial $1-z$.  Alternatively, we can switch to using a variable from the
 symbolic toolbox:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> alexpoly(braid([1 1]),sym('x'),'Centered')
 
 ans = 1/x^(1/2) - x^(1/2)
-\end{lstlisting}
+\end{lstbraidlab}
 \index{sym@\lstinline{sym}}%
 which can represent fractional powers.  This polynomial
 satisfies~$p(x)=-p(1/x)$.
@@ -782,11 +787,11 @@ satisfies~$p(x)=-p(1/x)$.
 The method \lstinline{perm} %
 \index{braid class@\braid\ class!perm@\lstinline{perm}|(}%
 gives the permutation of strings corresponding to a braid: %
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> perm(braid([1 2 -3]))
 
 ans = 2  3  4  1
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!perm@\lstinline{perm}|)}%
 If the strings are unpermuted, then the braid is \emph{pure}, %
 \index{braid!pure}%
@@ -798,11 +803,11 @@ Finally, the \emph{writhe} %
 \index{braid class@\braid\ class!writhe@\lstinline{writhe}|(}%
 of a braid is the sum of the powers of its generators.  The writhe of
 $\sigma_1^{+1}\sigma_2^{+1}\sigma_3^{-1}$ is $+1+1-1 = 1$:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> writhe(braid([1 2 -3]))
 
 ans = 1
-\end{lstlisting}
+\end{lstbraidlab}
 The writhe is a braid invariant.
 \index{braid class@\braid\ class!writhe@\lstinline{writhe}|)}%
 
@@ -851,38 +856,38 @@ exploiting the annular topology.  These kinds of braids were considered in
 
 \braidlab\ supports annular braids with the subclass \annbraid, derived from
 \braid.  The syntax for creating an annular braid is
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = annbraid([1 2 -3])
 
 b = < 1  2 -3 >*
-\end{lstlisting}
+\end{lstbraidlab}
 The asterisk indicates that this is an annular braid, which has an extra fixed
 puncture on the right (called the basepoint).  Hence, the braid has~$4$
 punctures, as indicated by
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b.n    % total number of punctures, including the fixed one
 
 ans = 4
-\end{lstlisting}
+\end{lstbraidlab}
 but only~$3$ punctures can move, as returned by \lstinline{nann}, the number
 of annular punctures:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b.nann    % number of moving punctures
 
 ans = 3
-\end{lstlisting}
+\end{lstbraidlab}
 
 Many of the methods work described for the \lstinline{braid} class can be
 applied to \annbraid{}s.  For instance,
-\begin{lstlisting}[frame=single,framerule=0pt]
->> entropy(braid([1 -2])))      % entropy of a normal braid
+\begin{lstbraidlab}
+>> entropy(braid([1 -2]))      % entropy of a normal braid
 
 ans = 0.9624
 
->> entropy(annbraid([1 -2])))   % entropy of annular braid
+>> entropy(annbraid([1 -2]))   % entropy of annular braid
 
 ans = 1.7627
-\end{lstlisting}
+\end{lstbraidlab}
 The annular braid has more entropy, since curves grow faster by getting
 entangled on the extra puncture \citep{MattFinn2011_silver}.
 %
@@ -925,14 +930,14 @@ The folder \lstinline{testsuite/testcases} %
 contains a dataset of trajectories, from laboratory data for granular
 media~\citep{Puckett2012}.  We load the
 data:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> clear; load testdata
 >> whos
   Name         Size               Bytes  Class     Attributes
 
-  XY        9740x2x4             623360  double
-  ti           1x9740             77920  double
-\end{lstlisting}
+  XY        9739x2x4             623296  double
+  ti           1x9739             77912  double
+\end{lstbraidlab}
 Here \lstinline{ti} is the vector of times, and \lstinline{XY} is a
 three-dimensional array: its first component specifies the timestep,
 its second specifies the $X$ or $Y$ coordinate, and its third
@@ -973,13 +978,13 @@ plotted vertically.  Figure~\ref{fig:testdata_trajs} shows the same
 data, but projected along the~$X$ direction.  To construct a braid
 from this data, we simply execute %
 \index{braid class@\braid\ class!length@\lstinline{length}}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> warning('off','BRAIDLAB:braid:colorbraiding:notclosed')
 >> b = braid(XY);
 >> b.length
 
 ans = 894
-\end{lstlisting}
+\end{lstbraidlab}
 This is a very long braid!  (We've temporarily turned off a warning about the
 data not being closed; we'll see what it's about in
 Section~\ref{sec:projection}.)  But Figure~\ref{fig:testdata_trajs} suggests
@@ -988,7 +993,7 @@ that this is misleading: many of the crossings %
 are `wiggles' that cancel each other out.  Indeed, if we attempt to shorten
 the braid: %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = compact(b)
 
 b = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
@@ -996,7 +1001,7 @@ b = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 >> b.length
 
 ans = 14
-\end{lstlisting}
+\end{lstbraidlab}
 we find the number of generators (the length) has dropped to~$14$!  We can
 then plot this shortened braid as a braid diagram using \lstinline{plot(b)} %
 \index{braid class@\braid\ class!plot@\lstinline{plot}} to produce
@@ -1006,12 +1011,20 @@ particles undergo a large number of twists around each other; we can check
 this by creating a subbraid %
 \index{braid class@\braid\ class!subbraid class@\lstinline{subbraid}}%
 with only those two strings:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> subbraid(b,[2 3])
 
 ans = < -1 -1 -1 -1 -1 -1 -1 -1 >
-\end{lstlisting}
+\end{lstbraidlab}
 which shows that the winding number between these two strings is~$-4$.
+
+A braid can also be created from complex orbit data:
+\begin{lstbraidlab}
+>> Z = squeeze(XY(:,1,:) + 1i*XY(:,2,:));
+>> b = braid(Z);
+\end{lstbraidlab}
+where the complex array \lstinline{Z} has rows equal to the number of time
+slices, and columns equal to the number of particles.
 
 
 \subsubsection{Changing the projection line and enforcing closure}
@@ -1021,7 +1034,7 @@ The braid in the previous section was constructed from the data by assuming a
 projection along the~$X$ axis (the default).  We can choose a different
 projection by specifying an optional angle for the projection line; for
 instance, to project along the~$Y$ axis we invoke
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid(XY,pi/2);   % project onto Y axis
 >> b.length
 
@@ -1030,19 +1043,19 @@ ans = 673
 >> b.compact
 
 ans = < -3 -3 -3 -3  1 -3 -3 -3 -3 >
-\end{lstlisting}
+\end{lstbraidlab}
 In general, a change of projection line only changes the braid by
 conjugation~\citep{Boyland1994,Thiffeault2010}.  We can test for
 conjugacy: %
 \index{braid!conjugate|(}%
 \index{braid class@\braid\ class!compact@\lstinline{compact}|(}%
 \index{braid class@\braid\ class!conjtest@\lstinline{conjtest}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> bX = compact(braid(XY,0)); bY = compact(braid(XY,pi/2));
 >> conjtest(bX,bY)   % test for conjugacy of braids
 
 ans = 0
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!compact@\lstinline{compact}|)}%
 The braids are not conjugate.  This is because our trajectories do not form a
 `true' braid: the final points do not correspond exactly with the initial
@@ -1058,14 +1071,14 @@ enforce a closure method: %
 \index{braid class@\braid\ class!closure@\lstinline{closure}|(}%
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
 \index{crossing!in braid closure|(}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> XY = closure(XY);   % close braid and avoid new crossings
 >> bX = compact(braid(XY,0)), bY = compact(braid(XY,pi/2))
 
 bX = < -2 -2 -1 -2 -1 -1 -1 -1 -1  3 -1  3  2  1 >
 
 bY = < -3 -3 -3 -3  1 -3  1 -3 -3 -3 >
-\end{lstlisting}
+\end{lstbraidlab}
 This default closure simply draws line segments from the final points to the
 initial points in such a way that no new crossings are created in the~$X$
 projection. %
@@ -1074,19 +1087,19 @@ Hence, the $X$-projected braid \lstinline{bX} is unchanged by the closure, but
 here the $Y$-projected braid \lstinline{bY} is longer by one generator
 (\lstinline{bY} is plotted in Figure~\ref{fig:testdata_braidY}).  This is
 enough to make the braids conjugate:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> [~,c] = conjtest(bX,bY)  % ~ means discard first return arg
 
 c = < 3  2 >
-\end{lstlisting}
+\end{lstbraidlab}
 \index{tilde@tilde (\lstinline{~}), as return argument}
 where the optional second argument \lstinline{c} is the conjugating
 braid, as we can verify:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> bX == c*bY*c^-1
 
 ans = 1
-\end{lstlisting}
+\end{lstbraidlab}
 There are other ways to enforce closure of a braid (see
 \lstinline{help closure}), in particular
 \lstinline{closure(XY,'MinDist')}, which minimizes the total distance
@@ -1120,16 +1133,13 @@ does: a \lstinline{databraid}. %
 Its constructor takes an optional vector of times as an argument, and it has a
 data member \lstinline{tcross} %
 \index{tcross@\lstinline{tcross}|(}%
-that retains the crossing times.  Using the same data \lstinline{XY} from
-before, sampled at times \lstinline{ti}, we have
-\begin{lstlisting}[frame=single,framerule=0pt]
+that retains the crossing times.  Using the data \lstinline{XY} from Section~\ref{sec:braidfromdataex}, sampled at times \lstinline{ti}, we have
+\begin{lstbraidlab}
 >> b = databraid(XY,ti);
 >> b.tcross(1:3)
 
-ans = 870.9010
-      872.1758
-      887.0089
-\end{lstlisting}
+ans = 870.9010  872.1758  887.0089
+\end{lstbraidlab}
 \index{tcross@\lstinline{tcross}|)}%
 Storing crossing times enables us to truncate generators in a
 \lstinline{databraid} by retaining only those with crossing times within a
@@ -1273,21 +1283,21 @@ disjoint loops (see Section~\ref{sec:loopcoords}).%
 
 \index{loop class@\loopc\ class!constructor|(}
 Let's create the loop in Figure~\ref{fig:dynn_loop} as a \loopc\ object:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> l = loop([-1 1 -2 0 -1 0])
 
 l = (( -1 1 -2 0 -1 0 ))
-\end{lstlisting}
+\end{lstbraidlab}
 \index{loop class@\loopc\ class!constructor|)}
 Figure~\ref{fig:dynn_loop2} shows the output of the \lstinline{plot(l)} %
 \index{loop class@\loopc\ class!plot@\lstinline{plot}}
 command.  We can convert from loop coordinates\index{loop!coordinates} to
 intersection numbers with
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> intersec(l)
 
 ans = 2 0 1 3 4 0 2 2 4 4   % [mu1 ... mu6 nu1 ... nu4]
-\end{lstlisting}
+\end{lstbraidlab}
 which returns~$\mu_1\dots\mu_{2n-4}$ followed by~$\nu_1\dots\mu_{n-1}$, as
 defined in Figure~\ref{fig:dynn_def}.
 \index{loop!intersection numbers|)}%
@@ -1296,7 +1306,7 @@ We can also extract the loop coordinates from a \loopc\ object using the
 methods \lstinline{a}, \lstinline{b}, and \lstinline{ab}: %
 \index{loop class@\loopc\ class!%
   abab@\lstinline{a}, \lstinline{b}, \lstinline{ab}}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> l = loop ([-1 1 -2 0 -1 0]);
 >> l.a
 
@@ -1310,7 +1320,7 @@ ans =  0    -1     0
 
 a = -1     1    -2
 b =  0    -1     0
-\end{lstlisting}
+\end{lstbraidlab}
 As for braids, \lstinline{l.n} returns the number of punctures (or strings). %
 \index{loop class@\loopc\ class!number of punctures (\lstinline{n})}
 
@@ -1342,12 +1352,12 @@ and then act on the loop \lstinline{l} by using the multiplication operator:
   $\sigma_1^{-1}$ applied to the loop in (a).}
 \end{figure}
 %
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([-1],5);   % one generator with 5 strings
 >> b*l                  % act on a loop with a braid
 
 ans = (( -1  1 -2  1 -1  0 ))
-\end{lstlisting}
+\end{lstbraidlab}
 Figure~\ref{fig:dynn_loop2_sigm1} shows \lstinline{plot(b*l)}.  The first and
 second punctures %
 \index{punctures|(}%
@@ -1364,21 +1374,21 @@ have zero size.  After pulling tight the loop on the punctures, %
 \index{punctures|)}%
 it is then made up of unit-length segments.  The minimum length is thus an
 integer.  For the loop in Figure~\ref{fig:dynn_loop2},
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> minlength(l)
 
 ans = 12
-\end{lstlisting}
+\end{lstbraidlab}
 \index{loop class@\loopc\ class!minlength@\lstinline{minlength}|)}
 \index{loop class@\loopc\ class!intaxis@\lstinline{intaxis}|(}
 Another useful measure of a loop's complexity is its minimum intersection
 number with the real axis~\citep{Moussafir2006,Hall2009,Thiffeault2010}, which
 for this loop is the same as its minimum length:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> intaxis(l)
 
 ans = 12
-\end{lstlisting}
+\end{lstbraidlab}
 The \lstinline{intaxis} method is used to measure a braid's geometric
 complexity, %
 \index{braid!complexity|(}%
@@ -1390,32 +1400,32 @@ as defined by~\citet{Dynnikov2007}.
 \index{loop class@\loopc\ class!vectorized|(}
 Sometimes we wish to study a large set of different loops.  The loop
 constructor vectorizes:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> ll = loop([-1 1 -2 0; 1 -2 3 4])
 
 ll = (( -1  1 -2  0 ))
      ((  1 -2  3  4 ))
-\end{lstlisting}
+\end{lstbraidlab}
 \index{loop class@\loopc\ class!constructor|)}
 \index{loop class@\loopc\ class!minlength@\lstinline{minlength}|(}
 We can then, for instance, compute the length of every loop:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> minlength(ll)
 
 ans = 14
       34
-\end{lstlisting}
+\end{lstbraidlab}
 \index{loop class@\loopc\ class!minlength@\lstinline{minlength}|)}
 or even act on all the loops with the same braid:
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|(}%
 \index{braid class@\braid\ class!multiplication (\lstinline{*})|(}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 -2]);
 >> b*ll
 
 ans = (( 2   1  -2   1 ))
       (( 5  -2  -3  11 ))
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!multiplication (\lstinline{*})|)}
 \index{braid class@\braid\ class!action on \loopc\ (\lstinline{*})|)}%
 Some commands, such as \lstinline{plot}, do not vectorize.  Different loops
@@ -1430,7 +1440,7 @@ of the \lstinline{braid} class
 repeatedly acting on a loop, and monitoring the growth rate of the loop.  For
 example, let us compare the entropy obtained by acting~$100$ times on an
 initial loop, compared with the \lstinline{entropy} method:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 2 3 -4]);
 % apply braid 100 times to l, then compute growth of length
 >> log(minlength(b^100*l)/minlength(l)) / 100
@@ -1440,7 +1450,7 @@ ans = 0.7637
 >> entropy(b)
 
 ans = 0.7672
-\end{lstlisting}
+\end{lstbraidlab}
 The entropy value returned by \lstinline{entropy(b)} is more precise,
 since that method monitors convergence and adjusts the number of
 iterations accordingly. %
@@ -1458,11 +1468,11 @@ iterations accordingly. %
 The command \lstinline{loop(n,'BasePoint')} returns a \emph{canonical set of
   loops} for~$n$ punctures:%
 \index{punctures|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> l = loop(5,'BP')    % 'BP' is short for 'BasePoint'
 
 ans = (( 0  0  0  0 -1 -1 -1 -1 ))*
-\end{lstlisting}
+\end{lstbraidlab}
 \index{loop!multi-|(} This multiloop is depicted in
 Figure~\ref{fig:fundloops}, with basepoint puncture shown in green.  The
 \lstinline{*} indicates that this loop has a basepoint.  Note that the
@@ -1505,12 +1515,12 @@ The canonical loop coordinates for braids exploit the fact that two braids are
 equal if and only if they act the same way on the fundamental group of the
 disk \citep{Dehornoy2008}.  Hence, if we take a braid and act on
 \lstinline{loop(5,'BP')},
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 2 3 -4]);
 >> b*loop(5,'BP')
 
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))*
-\end{lstlisting}
+\end{lstbraidlab}
 then the set of numbers \lstinline{(( 0 0 3 -1 -1 -1 -4 3 ))*} can be thought
 of as \emph{uniquely} characterizing the braid.  It is this property that is
 used to rapidly determine equality of braids.  (The loop
@@ -1518,11 +1528,11 @@ used to rapidly determine equality of braids.  (The loop
 same loop coordinates for the braid can be obtained without creating an
 intermediate loop with %
 \index{braid class@\braid\ class!loopcoords@\lstinline{loopcoords}}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> loopcoords(b)
 
 ans = (( 0  0  3 -1 -1 -1 -4  3 ))*
-\end{lstlisting}
+\end{lstbraidlab}
 
 \index{loop class@\loopc\ class|)}
 \index{loop!coordinates|)}
@@ -1601,20 +1611,20 @@ loop~$\abv$.
 Let's show an example using \braidlab.  We take the
 braid~$\sigma_1\sigma_2^{-1}$ and the loop with coordinates~$\ac_1=0$,
 $\bc_1=-1$.  The action is
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 -2]); l = loop([0 -1]);
 >> lp = b*l
 
 lp = (( 1 -1 ))
-\end{lstlisting}
+\end{lstbraidlab}
 The effective linear action can be obtained by requesting a second output
 argument from the result of~\lstinline{*}:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> [lp,M] = b*l; full(M)
 
 ans = 1 -1
       0  1
-\end{lstlisting}
+\end{lstbraidlab}
 Note that the effective linear action \lstinline{M} is by default returned as
 a sparse matrix, %
 \index{sparse matrix}%
@@ -1623,7 +1633,7 @@ which it often is when dealing with many strands.  We use \lstinline{full} %
 to convert it back into a regular full matrix.  We can then verify that the
 matrix product of \lstinline{M} and the column vector of coordinates
 \lstinline{l.coords'} is the same as the action \lstinline{lp = b*l}:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> M*l.coords'
 
 ans = 1
@@ -1633,21 +1643,21 @@ ans = 1
 
 ans = 1
      -1
-\end{lstlisting}
+\end{lstbraidlab}
 The difference is that \lstinline{M} may only be applied \emph{to this
   specific loop} (or a loop that happens to share the same effective linear
 action).
 
 A common thing to do is to find the effective linear action on the canonical
 set \lstinline{loop(b.n,'BP')} (see Section~\ref{sec:loopcoords}):
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> [~,M] = b*loop(b.n,'BP'); full(M)
 
 ans = 0     0    -1     0
       0     1     0     1
       0     1     1     1
       1    -1    -1     0
-\end{lstlisting}
+\end{lstbraidlab}
 The canonical set assumes an extra puncture, so the matrix dimension is larger
 by~$2$.
 
@@ -1667,7 +1677,7 @@ that it can achieve periodic limit cycles.
 
 The effective linear action has a very interesting behavior when a braid is
 iterated on some initial loop.  Consider the following example:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 -2]); l = loop([1 1]);
 >> [l,M] = b*l; l, full(M)
 
@@ -1675,26 +1685,25 @@ l = (( 3 -1 ))
 
 M = 2   1
    -1   0
-\end{lstlisting}
+\end{lstbraidlab}
 Now repeat this last command:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> [l,M] = b*l; l, full(M)
 
 l = (( 7 -4 ))
 
 M = 2  -1
    -1   1
-\end{lstlisting}
+\end{lstbraidlab}
 And again:
-\begin{lstlisting}[frame=single,framerule=0pt]
->> b = braid([1 -2]); l = loop([1 1]);
+\begin{lstbraidlab}
 >> [l,M] = b*l; l, full(M)
 
 l = (( 18 -11 ))
 
 M = 2  -1
    -1   1
-\end{lstlisting}
+\end{lstbraidlab}
 The effective linear action \lstinline{M} has not changed.  In fact it has
 achieved a fixed point: %
 \index{fixed point|see{cycle}}%
@@ -1726,9 +1735,9 @@ Figure~\ref{fig:efflinact1} shows the output of
 \label{fig:efflinact}
 \end{figure}
 %
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 -2]); M = cycle(b,'Plot');
-\end{lstlisting}
+\end{lstbraidlab}
 The member function \lstinline{cycle} iterates the braid on an initial loop,
 taken to be the canonical set \lstinline{loop(b.n,'BP')}.  The vertical axis
 in Fig.~\ref{fig:efflinact1} shows the elements of the effective linear action
@@ -1751,18 +1760,18 @@ example with the following:%
   her~$\sigma_1\sigma_2\sigma_3\sigma_4^{-1}$, since her generators rotate the
   punctures counterclockwise.}
 %
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([-1 -2 -3 4]);
 >> M = b.cycle(loop(b.n),'Iter')
 
 M = [6x6 double]    [6x6 double]
-\end{lstlisting}
+\end{lstbraidlab}
 The option \lstinline{'Iter'} tells \lstinline{cycle} to compute an individual
 matrix for each iterate of the cycle, rather than the net product of all the
 matrices in the cycle.  The output is a cell array %
 \index{Matlab!cell array}%
 of two~$6$ by~$6$ matrices, corresponding to the period-2 cycle:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> full(M{1}), full(M{2})
 
 ans = -1     1     0     0     0     0
@@ -1778,7 +1787,7 @@ ans =  0     0     0     1     0     0
       -1     1     0    -1     1     0
        0    -1     1     0    -1     1
        0     0     1     0     0     1
-\end{lstlisting}
+\end{lstbraidlab}
 as given by \citet{Yurttas2014_preprint}.  Note that we use an initial loop
 for~$\nn$ punctures (\lstinline{loop(b.n)}) without base point, rather than
 the default, to reproduce her example exactly.  For the pseudo-Anosov case,
@@ -1786,11 +1795,11 @@ any initial loop will give the same matrices.
 
 What is more surprising is that these limit cycles occur for finite-order
 braids as well.  Figure~\ref{fig:efflinact2} is produced by
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid([1 2 3]); [~,period] = cycle(b,'Plot')
 
 period = 4
-\end{lstlisting}
+\end{lstbraidlab}
 Indeed, staring at the pattern in Fig.~\ref{fig:efflinact2} it is easy to see
 that the effective action does achieve a limit cycle of period~$4$.  This
 braid is definitely not pseudo-Anosov: it is finite-order.
@@ -1802,9 +1811,9 @@ Pseudo-Anosov braids %
 \index{braid!pseudo-Anosov}%
 can achieve longer cycles, which \braidlab\ can find:
 Figure~\ref{fig:efflinact3} is the plot produced by
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid('Psi',11); [M,period] = cycle(b,'Plot');
-\end{lstlisting}
+\end{lstbraidlab}
 The period here is~$5$, and the matrix~$M$ is~$20$ by~$20$.  The braid %
 \index{psi braids@$\psi$ braids}%
 \index{braid!entropy!minimum}%
@@ -1828,20 +1837,20 @@ with the matrix in hand we can find the characteristic polynomial:%
 \footnote{Matlab's symbolic toolbox %
 \index{Matlab!symbolic toolbox}%
 is needed for \lstinline{poly2sym} and \lstinline{factor}.}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = braid('Psi',7); [M,period] = cycle(b);
 >> factor(poly2sym(charpoly(M)))  % convert to symbolic form
 
 ans = (x^2 + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)*(x - 1)^2*(x + 1)^2
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!cycle@\lstinline{cycle}|)}%
 Compare this to the known polynomial that gives the dilation:
 \index{psiroots@\lstinline{psiroots}}
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> factor(poly2sym(psiroots(7,'Poly')))
 
 ans = (x + 1)*(x^3 - x^2 - 1)*(x^3 + x - 1)
-\end{lstlisting}
+\end{lstbraidlab}
 (The function \lstinline{psiroots} returns the roots and characteristic
 polynomial of a~$\psi$ braid; this is useful for testing purposes.)  Note that
 the factor whose largest root is the dilatation, %
@@ -1907,18 +1916,18 @@ Let's use \braidlab\ to analyze the rod motion.  From the folder
   relations~\eqref{eq:relations} are taken into account.}
 %
 \index{taffy@\lstinline{taffy}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = taffy('3rods')
 
 b = < -2  1  1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 which also produces Figure~\ref{fig:taffy_3rods}.  The Thurston--Nielsen %
 \index{braid!Thurston--Nielsen type \lstinline{tntype}}%
 type and topological entropy %
 \index{braid!entropy}%
 of this braid are %
 \index{braid class@\braid\ class!train@\lstinline{train}|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> train(b)
 
 ans = struct with fields:
@@ -1928,7 +1937,7 @@ ans = struct with fields:
      entropy: 1.7627
     transmat: [2x2 double]
        ttmap: {5x1 cell}
-\end{lstlisting}
+\end{lstbraidlab}
 One would expect a competent taffy puller to be pseudo-Anosov, %
 \index{braid!pseudo-Anosov}%
 as this one is.  It implies that there is no `bad' initial condition where a
@@ -1941,11 +1950,11 @@ motion.  Needless to say, this leads to extremely rapid growth, since after
 $10$ periods the taffy length has been multiplied by roughly $10^7$.
 
 The design in Figure~\ref{fig:taffy_4rods} can be plotted and analyzed with
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = taffy('4rods')
 
 b = < 1  3  2  2  1  3 >
-\end{lstlisting}
+\end{lstbraidlab}
 When we apply \lstinline{train} to this braid we find the braid is
 pseudo-Anosov with exactly the same entropy as the 3-rod taffy puller,
 $1.7627$.  There is thus no obvious advantage to using more rods in this case.
@@ -1976,14 +1985,14 @@ shown in Figure~\ref{fig:taffy_6rods-bad}.
 %
 The only change is to extend the rotation axles into two extra fixed rods
 (shown in gray).  The resulting braid is
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = taffy('6rods-bad')
 
 b = < 2  1  2  4  5  4  3  3  2  1  2  4  5  4 >
-\end{lstlisting}
+\end{lstbraidlab}
 with Thurston--Nielsen type
 \index{braid!reducible|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> train(b)
 
 ans = struct with fields:
@@ -1993,21 +2002,21 @@ ans = struct with fields:
      entropy: 0
     transmat: [5x5 double]
        ttmap: {11x1 cell}
-\end{lstlisting}
+\end{lstbraidlab}
 There are reducing curves in this design: simply wrap a loop around the left
 gray rod and the inner red rod, and it will rotate without stretching. %
 \index{braid!reducible|)}%
 To avoid this, we extend the radius of motion of the inner rods to equal that
 of the outer ones, and obtain the design shown in
 Figure~\ref{fig:taffy_4rods}.  The corresponding braid is
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b = taffy('6rods')
 
 b = < 3  2  1  2  4  5  4  3  3  2  1  2  5  4  5  3 >
-\end{lstlisting}
+\end{lstbraidlab}
 with Thurston--Nielsen type and entropy
-\begin{lstlisting}[frame=single,framerule=0pt]
->> [t,entr] = train(b)
+\begin{lstbraidlab}
+>> t = train(b)
 
 ans = struct with fields:
 
@@ -2016,7 +2025,7 @@ ans = struct with fields:
      entropy: 2.6339
     transmat: [5x5 double]
        ttmap: {11x1 cell}
-\end{lstlisting}
+\end{lstbraidlab}
 \index{braid class@\braid\ class!train@\lstinline{train}|)}%
 The fixed rods have increased the entropy by~$50\%$!  This sounds like a
 fairly small change, but what it means is that this 6-rod design achieves
@@ -2029,12 +2038,12 @@ The symmetric design of the taffy pullers illustrates one pitfall when
 constructing braids.  If we give an optional projection angle %
 \index{projection line!bad choice of angle|(}%
 of~$\pi/2$ to \lstinline{taffy}:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> taffy('4rods',pi/2)
 Error using braidlab.braid/colorbraiding
 Paths of particles 2 and 1 have a coincident projection.
 Try changing the projection angle.
-\end{lstlisting}
+\end{lstbraidlab}
 This corresponds to using the $y$ (vertical) axis to compute the braid, but as
 we can see from Figure~\ref{fig:taffy_4rods} this is a bad choice, since all
 the rods are initially perfectly aligned along that axis.  The braid obtained
@@ -2049,7 +2058,7 @@ projections.%
 Instead of attempting to construct the braid, \braidlab\ returns an error and
 asks the user to modify the projection axis.  A tiny change in the projection
 line is sufficient to break the symmetry:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> taffy('4rods',pi/2 + .01)
 
 ans = < -2  2  1  3  2 -3 -1  3  1  2  1  3 >
@@ -2057,7 +2066,7 @@ ans = < -2  2  1  3  2 -3 -1  3  1  2  1  3 >
 >> compact(ans)
 
 ans = < 3  1  2  2  3  1 >
-\end{lstlisting}
+\end{lstbraidlab}
 \index{taffy@\lstinline{taffy}|)}%
 which is actually equal to the braid formed from projecting on the~$x$ axis,
 though it need only be conjugate %
@@ -2077,12 +2086,12 @@ Recall the command~\lstinline{subbraid}
 from Section~\ref{sec:braidclass}.  We
 took the~$4$-string braid~$\sigma_1\sigma_2\sigma_3^{-1}$ and discarded the
 third string, to obtain~$\sigma_1\sigma_2^{-1}$:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a = braid([1 2 -3]);
 >> b = subbraid(a,[1 2 4])   % discard string 3, keep 1,2,4
 
 b = < 1 -2 >
-\end{lstlisting}
+\end{lstbraidlab}
 %
 \begin{figure}
 \begin{center}
@@ -2105,12 +2114,12 @@ The braids \lstinline{a} and \lstinline{b} are shown in
 Fig.~\ref{fig:subbraid}; their entropies are %
 \index{braid class@\braid\ class!entropy@\lstinline{entropy}|(}%
 \index{braid!entropy|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> a.entropy, b.entropy
 
 ans = 0.8314
 ans = 0.9624
-\end{lstlisting}
+\end{lstbraidlab}
 Note that the entropy of the subbraid~\lstinline{b} is \emph{higher} than the
 original braid.  This is counter-intuitive: shouldn't removing strings cause
 loops to shorten, therefore lowering their growth?\footnote{In fact, the
@@ -2160,32 +2169,32 @@ define a homeomorphism on the filled-in surface.  To remedy this, let us take
 enough powers of the braid~$\sigma_1\sigma_2\sigma_3^{-1}$ to ensure that the
 third puncture returns to its original position, using the method
 \lstinline{perm} to find the permutation induced by the braid:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> perm(a)
 
 ans = 2     3     4     1
-\end{lstlisting}
+\end{lstbraidlab}
 The permutation is cyclic (it can be constructed with exactly one cycle), so
 the fourth power should do it:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> perm(a^4)
 
 ans = 1     2     3     4
-\end{lstlisting}
+\end{lstbraidlab}
 This is now a pure braid: all the strings return to their original position
 (Fig.~\ref{fig:s1s2s-3_4_diagram}).  Now here's the surprise: the subbraid
 obtained by removing the third string from \lstinline{a^4} is
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> b2 = subbraid(a^4,[1 2 4])
 
 b2 = < 1 -2  1 -2  1  2 >
-\end{lstlisting}
+\end{lstbraidlab}
 which is \emph{not} \lstinline{b^4} (Fig.~\ref{fig:s1s-2s1s-2s1s2_diagram})!
 However, now there is no paradox in the entropies:\footnote{\citet{Song2005}
   showed that the entropy of a pure braid \index{braid!pure} is greater
   than~$\log(2+\sqrt5) \simeq 1.4436$, if it is nonzero.}
 \index{braid!finite-order|(}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> entropy(a^4), entropy(b2)
 
 ans = 3.3258
@@ -2193,17 +2202,17 @@ ans = 3.3258
 Warning: Failed to converge to requested tolerance; braid is likely finite-order or has low entropy.  Returning zero entropy.
 
 ans = 0
-\end{lstlisting}
+\end{lstbraidlab}
 \braidlab\ has trouble computing the entropy because the braid \lstinline{b2}
 appears to be finite-order.  Indeed, the braid \lstinline{b2} is conjugate
 to~$\sigma_1^2$: %
 \index{braid class@\braid\ class!compact@\lstinline{compact}}%
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> c = braid([2 -1],3);
 >> compact(c*b2*c^-1)
 
 ans = < 1  1 >
-\end{lstlisting}
+\end{lstbraidlab}
 showing that its entropy is indeed zero.
 \index{braid!finite-order|)}%
 
@@ -2228,16 +2237,16 @@ one.  Luckily, \braidlab\ has you covered.
 \index{prop@\lstinline{prop}|(}%
 To see the properties available and their current values, use the
 \lstinline{prop} command:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> prop
 
 ans =         GenRotDir: 1
           GenLoopActDir: 'lr'
        GenPlotOverUnder: 1
-            BraidAbsTol: 1.0000e-10
            BraidPlotDir: 'bt'
+            BraidAbsTol: 1.0000e-10
     LoopCoordsBasePoint: 'right'
-\end{lstlisting}
+\end{lstbraidlab}
 To set a property, use something like \lstinline{prop('BraidPlotDir','lr')}.
 This will plot braids from left-to-right from now on, as in
 Fig.~\ref{fig:fulltwist_lr}.
@@ -2264,15 +2273,16 @@ values.
 The development of \braidlab\ was supported by the US National Science
 Foundation, under grants DMS-0806821 and CMMI-1233935. The authors thank
 Michael Allshouse and Margaux Filippi for extensive testing and comments.
-Michael Allshouse also contributed some of the code. Alexander Flanagan helped
-with testing and the taffy puller research. James Puckett and Karen Daniels
+Michael Allshouse also contributed some of the code.  Giuseppe Di Labbio
+reported several bugs and helped improve the guide.  Alexander Flanagan helped
+with testing and the taffy puller research.  James Puckett and Karen Daniels
 provided the test data from their granular medium
 experiments~\citep{Puckett2012}; \braidlab\ uses Toby Hall's \emph{Train}
 \citep{HallTrain}; Jae Choon Cha's \emph{CBraid} \citep{CBraid}; Juan
 Gonz\'{a}lez-Meneses's \emph{Braiding} \citep{Braiding}; John D'Errico's
 \emph{Variable Precision Integer Arithmetic} \citep{vpi}; Markus Buehren's
-\emph{assignmentoptimal} \citep{assignmentoptimal}; and Jakob Progsch's
-\emph{ThreadPool} \citep{ThreadPool}.
+\emph{assignmentoptimal} \citep{assignmentoptimal}; and Jakob Progsch and
+V\'{a}clav Zeman's \emph{ThreadPool} \citep{ThreadPool}.
 
 
 \appendix
@@ -2345,14 +2355,7 @@ source repository with the terminal command
   language=bash,backgroundcolor=\color{white}]
 $ git clone https://github.com/jeanluct/braidlab.git
 \end{lstlisting}
-assuming Git is installed on your system.  If you prefer to use
-Mercurial\index{Mercurial}, make sure you have the
-\href{http://hg-git.github.io/}{\lstinline{hg-git}} extension enabled and type
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ hg clone git+https://github.com/jeanluct/braidlab.git
-\end{lstlisting}
-Either way, after the cloning finishes type
+assuming Git is installed on your system.  After the cloning finishes type
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make
@@ -2395,9 +2398,9 @@ the folder that contains the subfolder \lstinline{+braidlab}, and not the
 \end{lstlisting}
 To execute a \braidlab\ \textit{function}, either call it using the syntax
 \hbox{\lstinline{braidlab.}\textit{function}}, or import the whole namespace:
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> import braidlab.*
-\end{lstlisting}
+\end{lstbraidlab}
 This allows invoking \textit{function} by itself, without the
 \lstinline{braidlab} prefix.  For the remainder of this document, we
 assume this has been done and omit the \lstinline{braidlab} prefix.
@@ -2411,9 +2414,9 @@ every Matlab session.
 \index{testsuite}
 To check that everything is working, \braidlab\ includes a testsuite.  From
 Matlab, change to the \lstinline{testsuite} folder, and run
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> test_braidlab
-\end{lstlisting}
+\end{lstbraidlab}
 making sure the path is set properly (Section~\ref{sec:path}).
 Note that running the testsuite requires Matlab version 2013a or later.
 
@@ -2622,17 +2625,17 @@ problem:
 
 All the flags are set through MATLAB's \lstinline{global} variables as follows.
 To set the global value of the flag \lstinline{BRAIDLAB_<flagname>} to \lstinline{true}, issue the following set of commands \emph{before} you run your code.
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> global BRAIDLAB_<flagname>
 >> BRAIDLAB_<flagname> = true;
-\end{lstlisting}
+\end{lstbraidlab}
 At this point, any change in the flag value, e.g.,
 \lstinline{BRAIDLAB_<flagname> = false}, will be reflected in \braidlab's
 operation. When you are done troubleshooting the code, clear the flag by
 calling
-\begin{lstlisting}[frame=single,framerule=0pt]
+\begin{lstbraidlab}
 >> clear global BRAIDLAB_<flagname>
-\end{lstlisting}
+\end{lstbraidlab}
 to restore the default state of \braidlab.
 \index{global flags|)}%
 

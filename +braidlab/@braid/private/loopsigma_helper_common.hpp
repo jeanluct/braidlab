@@ -6,7 +6,7 @@
 //
 //   http://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2019  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <marko@clarkson.edu>
 //
 //   This file is part of Braidlab.
@@ -69,7 +69,7 @@ int BRAIDLAB_debuglvl = -1; // set externally after the include
 
 #ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
-#include "ThreadPool.h" // (c) Jakob Progsch
+#include "ThreadPool.h" // (c) Jakob Progsch, Václav Zeman
                         // https://github.com/progschj/ThreadPool
 #endif
 
@@ -270,7 +270,7 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
       mexEvalString("pause(0.001);"); //flush
     }
     // scheduler for threads
-    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
+    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch, Václav Zeman
 
     // std::bind creates a function reference to a member function
     // needed here b/c passing references to member functions
