@@ -34,6 +34,7 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <cassert>
 #include "mex.h"
 #include "trains/newarray.h"
 #include "trains/braid.h"
@@ -105,6 +106,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                           "Unknown exception occurred.");
       }
   } while (tries <= maxtries);
+
+  // Reset tolerance.
+  // Matlab remembers the value of globals!
+  // So subsequent calls to train start at too high a tolerance.
+  // This is yet another reason why globals are bad.
+  // See issue #152.
+  trains::TOL = STARTTOL;
 
   std::string type;
 
@@ -235,6 +243,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   // Attach Matlab cell array to field.
   mxSetFieldByNumber(plhs[0],0,field++,wttmap);
+
+  assert(field == nfields);
 
   // Free memory for field names.  So 1995.
   for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);
