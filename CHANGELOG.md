@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+* Bugfix: reset global `TOL` in `train_helper.cpp` (Matlab remembers
+  globals!).  See issue #152.
+
 * `_USE_MATH_DEFINES` before including `<cmath>` for MinGW-w64
   compiler.  (Thanks to Giuseppe Di Labbio.)
 
