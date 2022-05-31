@@ -3,11 +3,14 @@
 
 ## [Unreleased][unreleased]
 
+* `_USE_MATH_DEFINES` before including `<cmath>` for MinGW-w64
+  compiler.  (Thanks to Giuseppe Di Labbio.)
+
 
 ## [3.2.5] - 2021-11-17
 
-* Add complex constructor braid(Z), where Z is K x N and contains
-  complex trajectory data.
+* Add complex constructor `braid(Z)`, where `Z` is `K x N` and
+  contains complex trajectory data.
 
 * Many small edits and fixes to the braidlab guide to bring it up to
   date with current syntax.  (Thanks to Giuseppe Di Labbio.)

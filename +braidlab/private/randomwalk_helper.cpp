@@ -7,6 +7,7 @@
 // Helper file for randomwalk.m.
 
 #include <iostream>
+#define _USE_MATH_DEFINES   // for MinGW-w64 to recognize M_PI
 #include <cmath>
 #include "mex.h"
 
