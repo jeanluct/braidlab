@@ -28,14 +28,14 @@ ARCH = $(shell uname -m)
 ifeq ($(SYS), Linux)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexa64
-	endif
-	ifeq ($(ARCH), i686)
+	else ifeq ($(ARCH), i686)
 		MEXSUFFIX = mexglx
 	endif
-endif
-ifeq ($(SYS), Darwin)
+else ifeq ($(SYS), Darwin)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexmaci64
+	else ifeq ($(ARCH), arm64)
+		MEXSUFFIX = mexmaca64
 	endif
 endif
 

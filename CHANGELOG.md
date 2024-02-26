@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+* Bugfix: Add arm64 to ARCH in Makefile, for compatibility with Mac M1
+  architecture.  See issue #153.  (Thanks to Daniel Lester.)
+
 * Bugfix: reset global `TOL` in `train_helper.cpp` (Matlab remembers
   globals!).  See issue #152.
 
