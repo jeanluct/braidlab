@@ -15,8 +15,8 @@ function [gen,tcr] = sortcross2gen(n,crossdat)
 %
 %   http://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %                       Michael Allshouse <m.allshouse@northeastern.edu>
 %
 %   This file is part of Braidlab.
