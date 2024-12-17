@@ -4,7 +4,7 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
 //   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 //                            Marko Budisic          <mbudisic@gmail.com>
@@ -22,7 +22,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 
@@ -53,7 +53,7 @@ int BRAIDLAB_debuglvl = -1; // set externally after the include
 #endif // gcc
 
 // CLANG: feature list:
-// http://clang.llvm.org/cxx_status.html
+// https://clang.llvm.org/cxx_status.html
 #if (defined __clang__)
 
 #define CLANGVERSION (__clang_major__ * 10000   \

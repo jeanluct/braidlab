@@ -61,7 +61,7 @@ function p = alexpoly(b,x,opt)
 %   References:
 %
 %   E. Weisstein, "Alexander Polynomial." From MathWorld -- A Wolfram Web
-%   Resource. http://mathworld.wolfram.com/AlexanderPolynomial.html
+%   Resource. https://mathworld.wolfram.com/AlexanderPolynomial.html
 %
 %   D. Rolfsen, "Knots and Links," AMS Chelsea (2003).
 %
@@ -71,7 +71,7 @@ function p = alexpoly(b,x,opt)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
 %   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
@@ -89,7 +89,7 @@ function p = alexpoly(b,x,opt)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 center = false;

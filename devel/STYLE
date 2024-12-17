@@ -66,7 +66,7 @@ function [varargout] = tntype(b)
 %   Topology 34 (1995), 109-140.
 %
 %   T. Hall, "Train: A C++ program for computing train tracks of surface
-%   homeomorphisms," http://www.liv.ac.uk/~tobyhall/T_Hall.html
+%   homeomorphisms," https://www.liverpool.ac.uk/~tobyhall/T_Hall.html
 %
 %   W. P. Thurston, "On the geometry and dynamics of diffeomorphisms of
 %   surfaces," Bull. Am. Math. Soc. 19 (1988), 417-431.
@@ -102,6 +102,6 @@ C/C++ FILES
 * In MEX files use the Matlab macros mwSize for size of arrays and
   mwIndex for indexing into them.  Use mwSignedIndex for differences
   between indices.  See
-    http://www.mathworks.com/help/matlab/apiref/mwsize.html
-    http://www.mathworks.com/help/matlab/apiref/mwindex.html
-    http://www.mathworks.com/help/matlab/apiref/mwsignedindex.html
+    https://www.mathworks.com/help/matlab/apiref/mwsize.html
+    https://www.mathworks.com/help/matlab/apiref/mwindex.html
+    https://www.mathworks.com/help/matlab/apiref/mwsignedindex.html

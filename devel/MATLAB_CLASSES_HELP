@@ -27,6 +27,6 @@
  * Classes cannot be private, since the @ folder must be on the path.
 
 See
-http://www.mathworks.com/help/techdoc/matlab_oop/brfynt_-1.html
-http://www.mathworks.com/help/techdoc/matlab_prog/f4-70335.html
-http://stackoverflow.com/questions/2748302/what-is-the-closest-thing-matlab-has-to-namespaces
+http://www.mathworks.com/help/techdoc/matlab_oop/brfynt_-1.html  (broken)
+http://www.mathworks.com/help/techdoc/matlab_prog/f4-70335.html  (broken)
+httpsx://stackoverflow.com/questions/2748302/what-is-the-closest-thing-matlab-has-to-namespaces

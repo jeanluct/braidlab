@@ -13,7 +13,7 @@ function XYc = closure(XY,ctype)
 %   of the Euclidean distances between the final and initial points.  This
 %   uses Markus Buehren's implementation of the Hungarian algorithm for the
 %   optimal assigment problem.
-%   (http://www.mathworks.com/matlabcentral/fileexchange/6543)
+%   (https://www.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem)
 %
 %   XYC = CLOSURE(XY,PERM) closes the braid so that final points are
 %   linked according to permutation PERM.
@@ -23,7 +23,7 @@ function XYc = closure(XY,ctype)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
 %   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
@@ -41,7 +41,7 @@ function XYc = closure(XY,ctype)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 % Currently, the method of closure is tightly related to the axis of

@@ -10,7 +10,7 @@
  <LICENSE
    Braidlab: a Matlab package for analyzing data using braids
 
-   http://github.com/jeanluct/braidlab
+   https://github.com/jeanluct/braidlab
 
    Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
                             Marko Budisic          <mbudisic@gmail.com>
@@ -28,7 +28,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
  LICENSE>
 */
 
