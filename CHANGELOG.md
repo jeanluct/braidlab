@@ -3,6 +3,8 @@
 
 ## [Unreleased][unreleased]
 
+* Suppress a linker warning by passing LDFLAGS='-z noexecstack' to MEX.
+
 * Bugfix: Add arm64 to ARCH in Makefile, for compatibility with Mac M1
   architecture.  See issue #153.  (Thanks to Daniel Lester.)
 

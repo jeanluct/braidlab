@@ -43,7 +43,7 @@ MEX = mex
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
 # C++11 is needed for parallel code.
 CXXFLAGS = $(CFLAGS) -std=c++11
-MEXFLAGS  = -largeArrayDims -O
+MEXFLAGS = LDFLAGS='-z noexecstack' -largeArrayDims -O
 
 # Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
 ifneq ($(BRAIDLAB_USE_GMP), 0)
