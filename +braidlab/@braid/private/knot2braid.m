@@ -6,9 +6,12 @@ function b = knot2braid(K)
 %
 %   Reference:
 %
-%   http://homepages.warwick.ac.uk/~maaac/images/knot_braid_rep.jpg
+%   The knots correspond to the Rolf# column in Table 1 here:
+%   https://arxiv.org/pdf/math/0401051
 %
-%   (There's an error for 8_18: it is [1 -2]^4, not [1 -2]^3.)
+%   The braid representatives were originally obtained from
+%     http://homepages.warwick.ac.uk/~maaac/images/knot_braid_rep.jpg
+%   which is now a broken link, so may differ.
 %
 %   See also ALEXPOLY, BRAID.
 
