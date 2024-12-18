@@ -71,7 +71,7 @@ find $ROOTDIR -name "Makefile*" -print0 | \
     xargs -0 -n 1 bash -c 'ibtag "#" "$@"' _
 
 # Fix emails in bib files (hardwired list, unfortunately).
-for emailname in jeanluc marko allshouse; do
+for emailname in jeanluc mbudisic allshouse; do
     find $ROOTDIR -name "*.bib" -print0 | \
 	xargs -0 -n 1 bash -c 'bibatfix '${emailname}' "$@"' _
 done
