@@ -2433,6 +2433,23 @@ Note that running the testsuite requires Matlab version 2013a or later.
 Here are some common problems that can occur when installing or compiling
 braidlab.
 
+\subsubsection{Invalid MEX-file: Wrong version of libraries}
+
+If you get a Matlab error about the wrong version of libraries:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+Invalid MEX-file '/home/jeanluc/Projects/articles/braidlab/+braidlab/@braid/private/train_helper.mexa64':
+    /usr/local/MATLAB/R2025a/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
+    (required by /home/jeanluc/Projects/articles/braidlab/+braidlab/@braid/private/train_helper.mexa64)
+\end{lstlisting}
+then run Matlab from the command-line by specifying the system library
+location:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab
+\end{lstlisting}
+You may need to adjust the path above for your local configuration.
+
 \subsubsection{Unsupported compiler}
 
 \index{Linux|(}%

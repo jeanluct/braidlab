@@ -6,6 +6,8 @@
 
 ## [3.2.6] - 2024-12-18
 
+* Add LD_PRELOAD suggestion in guide.  (Thanks to Nick Tufillaro.)
+
 * Suppress a linker warning by passing `LDFLAGS='-z noexecstack'` to MEX.
 
 * Bugfix: Add `arm64` to `ARCH` in Makefile, for compatibility with Mac M1
