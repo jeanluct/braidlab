@@ -19,7 +19,7 @@ function [A, Lp] = getgraph(L)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.

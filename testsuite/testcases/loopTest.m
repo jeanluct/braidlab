@@ -3,7 +3,7 @@
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2024  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -161,7 +161,7 @@ classdef loopTest < matlab.unittest.TestCase
               braidlab.loop([1,2,3,4], @int32) ], ...
                                 'BRAIDLAB:loop:vertcat:mixeddatatypes');
       end
-          
+
       % Column-vector of loops of different numbers of punctures
       % is not allowed
       testCase.verifyError( @()[...

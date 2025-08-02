@@ -33,7 +33,7 @@ where numbers denote peripheral edges, and letters main edges.
 
 If you use *braidlab* in one of your papers, please cite it as:
 
-* J.-L. Thiffeault and Marko Budišić, _Braidlab: A Software Package for Braids and Loops_, [arXiv:1410.0849](https://arXiv.org/abs/1410.0849) [math.GT] (2013-2024), Version `<<version number>>`.
+* J.-L. Thiffeault and Marko Budišić, _Braidlab: A Software Package for Braids and Loops_, [arXiv:1410.0849](https://arXiv.org/abs/1410.0849) [math.GT] (2013-2025), Version `<<version number>>`.
 
 You can use this BibTeX entry:
 ```
@@ -42,7 +42,7 @@ You can use this BibTeX entry:
     title = {Braidlab: {A} Software Package for Braids and Loops},
     eprint = {arXiv:1410.0849 [math.GT]},
     url = {https://arXiv.org/abs/1410.0849},
-    year = {2013--2024},
+    year = {2013--2025},
     note = {Version <<version number>>}
 }
 ```
