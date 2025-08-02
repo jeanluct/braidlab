@@ -1,5 +1,6 @@
 # Change Log
 
+
 ## [3.2.6] - 2025-08-02
 
 * Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
