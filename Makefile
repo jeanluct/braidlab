@@ -1,10 +1,10 @@
 # <LICENSE
 #   Braidlab: a Matlab package for analyzing data using braids
 #
-#   http://github.com/jeanluct/braidlab
+#   https://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-#                            Marko Budisic          <marko@clarkson.edu>
+#   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#                            Marko Budisic          <mbudisic@gmail.com>
 #
 #   This file is part of Braidlab.
 #
@@ -19,7 +19,7 @@
 #   GNU General Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License
-#   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+#   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 # LICENSE>
 
 # Find architecture, set corresponding mex file suffix.
@@ -28,14 +28,14 @@ ARCH = $(shell uname -m)
 ifeq ($(SYS), Linux)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexa64
-	endif
-	ifeq ($(ARCH), i686)
+	else ifeq ($(ARCH), i686)
 		MEXSUFFIX = mexglx
 	endif
-endif
-ifeq ($(SYS), Darwin)
+else ifeq ($(SYS), Darwin)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexmaci64
+	else ifeq ($(ARCH), arm64)
+		MEXSUFFIX = mexmaca64
 	endif
 endif
 
@@ -43,7 +43,7 @@ MEX = mex
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
 # C++11 is needed for parallel code.
 CXXFLAGS = $(CFLAGS) -std=c++11
-MEXFLAGS  = -largeArrayDims -O
+MEXFLAGS = LDFLAGS='-z noexecstack' -largeArrayDims -O
 
 # Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
 ifneq ($(BRAIDLAB_USE_GMP), 0)

@@ -13,10 +13,11 @@ function [gen,tcr] = sortcross2gen(n,crossdat)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
+%                       Michael Allshouse <m.allshouse@northeastern.edu>
 %
 %   This file is part of Braidlab.
 %
@@ -31,7 +32,7 @@ function [gen,tcr] = sortcross2gen(n,crossdat)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 import braidlab.util.debugmsg

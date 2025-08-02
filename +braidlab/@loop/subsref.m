@@ -7,10 +7,10 @@ function [varargout] = subsref(obj,s)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -25,7 +25,7 @@ function [varargout] = subsref(obj,s)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 if ~isempty(obj) && ~isscalar(obj)

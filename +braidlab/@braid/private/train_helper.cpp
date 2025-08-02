@@ -7,10 +7,10 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                            Marko Budisic          <marko@clarkson.edu>
+//   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic          <mbudisic@gmail.com>
 //
 //   This file is part of Braidlab.
 //
@@ -25,7 +25,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 // Helper file for train.m.
@@ -34,6 +34,7 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <cassert>
 #include "mex.h"
 #include "trains/newarray.h"
 #include "trains/braid.h"
@@ -105,6 +106,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                           "Unknown exception occurred.");
       }
   } while (tries <= maxtries);
+
+  // Reset tolerance.
+  // Matlab remembers the value of globals!
+  // So subsequent calls to train start at too high a tolerance.
+  // This is yet another reason why globals are bad.
+  // See issue #152.
+  trains::TOL = STARTTOL;
 
   std::string type;
 
@@ -235,6 +243,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   // Attach Matlab cell array to field.
   mxSetFieldByNumber(plhs[0],0,field++,wttmap);
+
+  assert(field == nfields);
 
   // Free memory for field names.  So 1995.
   for (int i = 0; i < nfields; ++i) mxFree((void *)fieldnames[i]);

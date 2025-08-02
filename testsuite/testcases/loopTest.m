@@ -1,10 +1,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -19,7 +19,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef loopTest < matlab.unittest.TestCase
@@ -151,11 +151,16 @@ classdef loopTest < matlab.unittest.TestCase
       testCase.verifyError(@()braidlab.loop([1 2 3; 4 5 6]), ...
                            'BRAIDLAB:loop:loop:oddlength');
 
-      % Column-vector of loops of different types is not allowed
-      testCase.verifyError( @()[...
-          braidlab.loop([1,2,3,4], @double) ; ...
-          braidlab.loop([1,2,3,4], @int32) ], ...
-                            'BRAIDLAB:loop:vertcat:mixeddatatypes');
+      % Column-vector of loops of different types is not allowed.
+      % Starting with release 2025a, Matlab allows this by finding
+      % a consistent data type.  I think it's ok to take this as default
+      % behavior now, since this is an edge case to some degree.
+      if isMATLABReleaseOlderThan('R2025a')
+          testCase.verifyError( @()[...
+              braidlab.loop([1,2,3,4], @double) ; ...
+              braidlab.loop([1,2,3,4], @int32) ], ...
+                                'BRAIDLAB:loop:vertcat:mixeddatatypes');
+      end
 
       % Column-vector of loops of different numbers of punctures
       % is not allowed

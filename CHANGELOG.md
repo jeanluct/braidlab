@@ -1,9 +1,29 @@
 # Change Log
 
+## [3.2.6] - 2025-08-02
+
+* Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
+  longer throws exception for mismatched data types.  See issue #155.
+  (Thanks to Nick Tufillaro.)
+
+* Add LD_PRELOAD suggestion in guide.  (Thanks to Nick Tufillaro.)
+
+* Suppress a linker warning by passing `LDFLAGS='-z noexecstack'` to MEX.
+
+* Bugfix: Add `arm64` to `ARCH` in Makefile, for compatibility with Mac M1
+  architecture.  See issue #153.  (Thanks to Daniel Lester.)
+
+* Bugfix: reset global `TOL` in `train_helper.cpp` (Matlab remembers
+  globals!).  See issue #152.  (Thanks to Giuseppe Di Labbio.)
+
+* `_USE_MATH_DEFINES` before including `<cmath>` for MinGW-w64
+  compiler.  (Thanks to Giuseppe Di Labbio.)
+
+
 ## [3.2.5] - 2021-11-17
 
-* Add complex constructor braid(Z), where Z is K x N and contains
-  complex trajectory data.
+* Add complex constructor `braid(Z)`, where `Z` is `K x N` and
+  contains complex trajectory data.
 
 * Many small edits and fixes to the braidlab guide to bring it up to
   date with current syntax.  (Thanks to Giuseppe Di Labbio.)
@@ -374,6 +394,7 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
+[3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
 [3.2.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.2...release-3.2.3

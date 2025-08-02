@@ -6,19 +6,22 @@ function b = knot2braid(K)
 %
 %   Reference:
 %
-%   http://homepages.warwick.ac.uk/~maaac/images/knot_braid_rep.jpg
+%   The knots correspond to the Rolf# column in Table 1 here:
+%   https://arxiv.org/pdf/math/0401051
 %
-%   (There's an error for 8_18: it is [1 -2]^4, not [1 -2]^3.)
+%   The braid representatives were originally obtained from
+%     http://homepages.warwick.ac.uk/~maaac/images/knot_braid_rep.jpg
+%   which is now a broken link, so may differ.
 %
 %   See also ALEXPOLY, BRAID.
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -33,7 +36,7 @@ function b = knot2braid(K)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 import braidlab.braid

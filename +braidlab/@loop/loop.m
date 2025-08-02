@@ -37,10 +37,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2021  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -55,7 +55,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef loop < matlab.mixin.CustomDisplay
@@ -419,7 +419,7 @@ classdef loop < matlab.mixin.CustomDisplay
           case 'MATLAB:cell2mat:MixedDataTypes',
             error('BRAIDLAB:loop:vertcat:mixeddatatypes',...
                   ['Only loops of the matching data type'...
-                   ' can be stacked']);
+                   ' can be stacked with Matlab < 2025a']);
           case 'MATLAB:catenate:dimensionMismatch',
             error('BRAIDLAB:loop:vertcat:mixedpuncturecount',...
                   ['Only loops with matching number '...
