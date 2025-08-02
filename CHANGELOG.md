@@ -4,7 +4,11 @@
 ## [Unreleased][unreleased]
 
 
-## [3.2.6] - 2024-12-18
+## [3.2.6] - 2025-08-02
+
+* Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
+  longer throws exception for mismatched data types.  See issue #155.
+  (Thanks to Nick Tufillaro.)
 
 * Add LD_PRELOAD suggestion in guide.  (Thanks to Nick Tufillaro.)
 
