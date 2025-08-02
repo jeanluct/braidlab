@@ -1,9 +1,6 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
-
-
 ## [3.2.6] - 2025-08-02
 
 * Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
@@ -398,7 +395,6 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...develop
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
