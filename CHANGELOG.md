@@ -8,6 +8,7 @@
   - Auto-detect GMP at build and automatically disable if system libs missing.
   - Prefer Homebrew GMP; add its -I and -L flags when detected.
   - Make doc distclean portable: use Python utime instead of GNU touch -d.
+  - Fix `doc/Makefile` recipe parsing on macOS by using a portable, core-OS timestamp adjustment (no Python/Perl); removes a makefile syntax error during `make distclean`.
 
 * macOS-only
 
