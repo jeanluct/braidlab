@@ -39,7 +39,8 @@ else ifeq ($(SYS), Darwin)
 	endif
 endif
 
-# Set MACOSX deployment target to the major SDK version (e.g. 15.0) when on Darwin
+# Set MACOSX deployment target to the major SDK version (e.g. 15.0)
+# when on Darwin
 ifeq ($(SYS), Darwin)
 	SDKVER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null || echo)
 	ifneq ($(SDKVER),)
@@ -76,7 +77,8 @@ endif
 endif
 
 ifneq ($(BRAIDLAB_USE_GMP), 0)
-	# If Homebrew installed gmp, prefer its lib/include paths (Apple Silicon: /opt/homebrew)
+	# If Homebrew installed gmp, prefer its lib/include paths
+	# (Apple Silicon: /opt/homebrew)
 	BREW_GMP_PREFIX := $(shell brew --prefix gmp 2>/dev/null || echo)
 	ifneq ($(BREW_GMP_PREFIX),)
 		GMP_LD = -L$(BREW_GMP_PREFIX)/lib -lgmpxx -lgmp
