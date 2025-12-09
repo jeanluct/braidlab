@@ -39,16 +39,55 @@ else ifeq ($(SYS), Darwin)
 	endif
 endif
 
+# Set MACOSX deployment target to the major SDK version (e.g. 15.0) when on Darwin
+ifeq ($(SYS), Darwin)
+	SDKVER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null || echo)
+	ifneq ($(SDKVER),)
+		SDKMAJOR := $(firstword $(subst ., ,$(SDKVER)))
+		MACOSX_DEPLOYMENT_TARGET ?= $(SDKMAJOR).0
+	endif
+endif
+
 MEX = mex
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
 # C++11 is needed for parallel code.
 CXXFLAGS = $(CFLAGS) -std=c++11
-MEXFLAGS = LDFLAGS='-z noexecstack' -largeArrayDims -O
+MEXFLAGS = -largeArrayDims -O
 
-# Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
+# Modify MEXFLAGS to exclude unsupported flags on macOS
+ifeq ($(SYS), Darwin)
+	MEXFLAGS := $(filter-out LDFLAGS='-z noexecstack', $(MEXFLAGS))
+endif
+
+# Use BRAIDLAB_USE_GMP=0 on command line to disable GMP if desired.
+# If BRAIDLAB_USE_GMP is not set, try to detect available GMP libraries
+# and disable GMP automatically when they are not present. This avoids
+# failing the build on systems without libgmp / libgmpxx installed.
+ifndef BRAIDLAB_USE_GMP
+# Test by attempting to link a tiny program against gmpxx and gmp.
+# Use a one-line shell command that pipes source to the compiler to avoid
+# issues with multi-line heredocs inside make's $(shell ...).
+GMP_CHECK := $(shell printf 'int main(void){return 0;}' | cc -x c - -lgmpxx -lgmp -o /tmp/_braidlab_gmp_test 2>/dev/null && echo yes || echo no; rm -f /tmp/_braidlab_gmp_test 2>/dev/null)
+ifeq ($(GMP_CHECK),yes)
+	BRAIDLAB_USE_GMP = 1
+else
+	BRAIDLAB_USE_GMP = 0
+endif
+endif
+
 ifneq ($(BRAIDLAB_USE_GMP), 0)
-	GMP_LD = -lgmpxx -lgmp
+	# If Homebrew installed gmp, prefer its lib/include paths (Apple Silicon: /opt/homebrew)
+	BREW_GMP_PREFIX := $(shell brew --prefix gmp 2>/dev/null || echo)
+	ifneq ($(BREW_GMP_PREFIX),)
+		GMP_LD = -L$(BREW_GMP_PREFIX)/lib -lgmpxx -lgmp
+		CFLAGS += -I$(BREW_GMP_PREFIX)/include
+		CXXFLAGS += -I$(BREW_GMP_PREFIX)/include
+	else
+		GMP_LD = -lgmpxx -lgmp
+	endif
 	MEXFLAGS += -DBRAIDLAB_USE_GMP
+else
+	GMP_LD =
 endif
 
 MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \

@@ -1,6 +1,20 @@
 # Change Log
 
 
+## [3.2.7-rc1] - 2025-12-08
+
+* Cross-platform
+
+  - Auto-detect GMP at build and automatically disable if system libs missing.
+  - Prefer Homebrew GMP; add its -I and -L flags when detected.
+  - Make doc distclean portable: use Python utime instead of GNU touch -d.
+
+* macOS-only
+
+  - Remove Linux-only -z noexecstack flag on Darwin to avoid linker errors.
+  - Default MACOSX_DEPLOYMENT_TARGET to SDK major version (e.g., 15.0) when unset, for consistent builds.
+  - Add Homebrew GMP -I/-L flags on macOS when detected so helpers link.
+
 ## [3.2.6] - 2025-08-02
 
 * Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
