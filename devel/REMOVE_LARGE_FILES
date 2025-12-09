@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Remove large files from history.  Shrinks repo from 50MB to 11MB.
+
+# Decided not to do this, since it changes the SHAs.  Not really worth
+# messing up issues.
+
+# http://naleid.com/blog/2012/01/17/finding-and-purging-big-files-from-git-history
+
+echo "Do not run this, you fool!"
+exit 1
+
+# Get list of largest blobs.
+git rev-list --objects --all | sort -k 2 >| allfileshas.txt
+git gc && git verify-pack -v .git/objects/pack/pack-*.idx | egrep "^\w+ blob\W+[0-9]+ [0-9]+ [0-9]+$" | sort -k 3 -n -r >| bigobjects.txt
+rm -f bigtosmall.txt
+for SHA in `cut -f 1 -d\  < bigobjects.txt`; do
+    echo $(grep $SHA bigobjects.txt) $(grep $SHA allfileshas.txt) | awk '{print $1,$3,$7}' >> bigtosmall.txt
+done;
+
+# List of files/directories to prune (no spaces allowed w the current setup).
+PRUNE[0]='directMethod/comp7.mat'
+PRUNE[1]='testing/DynnikovWiest/DynnikovWiest_TransmRelax.mws'
+PRUNE[2]='LCS_tutorial/trm.mat'
+PRUNE[3]='LCS_tutorial/modified_duffing.mat'
+PRUNE[4]='extern/VariablePrecisionIntegers_orig/@vpi/_primeslist_.mat'
+PRUNE[5]='extern/VariablePrecisionIntegers/@vpi/_primeslist_.mat'
+PRUNE[6]='extern/VariablePrecisionIntegers_orig/@vpi/Edigits.mat'
+PRUNE[7]='extern/VariablePrecisionIntegers/@vpi/Edigits.mat'
+# Not sure why, but we have to do this one twice.
+PRUNE[8]='extern/VariablePrecisionIntegers/@vpi/Edigits.mat'
+
+# Prune the files from history.
+for P in ${PRUNE[@]}; do
+    CMD='git rm -rf --cached --ignore-unmatch '${P}
+    echo "${CMD}"
+    git filter-branch -f --prune-empty --index-filter "${CMD}" --tag-name-filter cat -- --all
+done
+
+# Prune the cached data.
+git update-ref -d refs/original/refs/heads/master
+git reflog expire --expire=now --all
+git gc --prune=now
+
+# Update list of largest blobs.
+git rev-list --objects --all | sort -k 2 >| allfileshas_after.txt
+git gc && git verify-pack -v .git/objects/pack/pack-*.idx | egrep "^\w+ blob\W+[0-9]+ [0-9]+ [0-9]+$" | sort -k 3 -n -r >| bigobjects_after.txt
+rm -f bigtosmall_after.txt
+for SHA in `cut -f 1 -d\  < bigobjects_after.txt`; do
+    echo $(grep $SHA bigobjects_after.txt) $(grep $SHA allfileshas_after.txt) | awk '{print $1,$3,$7}' >> bigtosmall_after.txt
+done;
