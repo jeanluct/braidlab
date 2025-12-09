@@ -47,7 +47,7 @@ clean:
 distclean: clean
 	# Revert PDF file to latest revision.
 	git checkout $(MASTERFILE).pdf
-	# Update timestamp so make knows to remake the file.
-	# Make pdf file 1 second older.
-	touch -r $(MASTERFILE).pdf -d '-1 second' $(MASTERFILE).pdf
+	# Update timestamp so make knows to remake the file. Use a single
+	# sh -c invocation to avoid multi-line continuation issues in make.
+	@sh -c 'os=$$(uname -s); if [ "$$os" = "Linux" ]; then touch -r "$(MASTERFILE).pdf" -d "-1 second" "$(MASTERFILE).pdf"; elif [ "$$os" = "Darwin" ]; then T=$$(stat -f %m "$(MASTERFILE).pdf"); Tprev=$$((T-1)); DATE=$$(date -r $$Tprev +%Y%m%d%H%M.%S); touch -t $$DATE "$(MASTERFILE).pdf"; else echo "Warning: unknown OS ($$os); PDF mtime not adjusted"; fi'
 	touch $(MASTERFILE).tex
