@@ -28,7 +28,7 @@ classdef NoMEXException < MException
 
   methods
     function obj = NoMEXException(varargin)
-      obj = obj@MException('BRAIDLAB:NOMEX', varargin{:});
+      obj = obj@MException('BRAIDLAB:NoMEX', varargin{:});
       obj.message = ['Missing MEX: ' obj.message char(10) ...
                      'Compile braidlab to access full functionality.'];
     end

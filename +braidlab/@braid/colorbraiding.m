@@ -145,7 +145,7 @@ debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000),2);
 try % trapping to ensure proper identification of strands
 
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
+    assert(~useMatlabVersion, 'BRAIDLAB:NoMEX', ['Matlab version ' ...
                         'forced']);
 
     debugmsg('Using MEX algorithm',2)
@@ -155,7 +155,7 @@ try % trapping to ensure proper identification of strands
     [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
-    if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NoMEX') )
       rethrow(me);
     else
     debugmsg('Using MATLAB algorithm',2)
