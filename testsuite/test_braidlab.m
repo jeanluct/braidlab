@@ -46,13 +46,13 @@ if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_braid_nomex
   if ~braidlab.util.assertmex(['+braidlab/@braid/private/compact_helper'])
     msg = ['Requested MEX tests but braidlab appears uncompiled.  ' ...
-           'Either compile braidlab or pass ''nomex'' to test_braidlab; ' ...
+           'Either compile braidlab or pass ''NoMEX'' to test_braidlab; ' ...
            'otherwise there will be LOTS of errors.'];
     warning('BRAIDLAB:test_braidlab:mex_uncompiled',msg);
     pause(1);
   end
   disp('Testing braidlab with MEX algorithms.');
-elseif strcmpi(nomex,'nomex')
+elseif strcmpi(nomex,'NoMEX')
   % Disable MEX algorithms.
   global BRAIDLAB_loop_nomex; %#ok<TLEV>
   global BRAIDLAB_braid_nomex; %#ok<TLEV>
@@ -64,17 +64,32 @@ else
         'Unknown option ''%s''.',nomex)
 end
 
-suite = TestSuite.fromFolder(tcfolder);
-%suite = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'cycleTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'databraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'taffyTest.m']);
+% Create test suite with explicit test modules
+% Skip tests that completely depend on MEX when running in nomex mode.
+suites = {};
+
+% Always included tests.
+suites{end+1} = TestSuite.fromFile([tcfolder 'braidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'databraidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'loopTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'utilTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'cycleTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'entropyTest.m']);
+
+% Tests that require MEX.
+if ~(nargin >= 1 && strcmpi(nomex,'NoMEX'))
+  suites{end+1} = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'compactTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'taffyTest.m']);
+else
+  disp(['Skipping MEX-dependent tests: ' ...
+        'cfbraidTest, compactTest, conjtestTest, taffyTest.']);
+end
+
+% Combine all test suites.
+suite = [suites{:}];
 runner = TestRunner.withTextOutput;
 res = runner.run(suite);
 

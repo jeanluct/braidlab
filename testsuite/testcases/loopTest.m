@@ -46,6 +46,10 @@ classdef loopTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_loop_constructor(testCase)
+      global BRAIDLAB_braid_nomex
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.assumeTrue(false,'Skipping loop constructor tests: looplist_helper MEX not available.');
+      end
       % A simple loop.
       l = testCase.l1;
       testCase.verifyEqual(l.coords,[1 -1 2 3]);
