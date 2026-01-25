@@ -170,7 +170,14 @@ classdef databraidTest < matlab.unittest.TestCase
 
     function test_databraid_subbraid(testCase)
 
-    %% Test that Matlab and MEX subbraids return the same result
+      % Skip this test if MEX algorithms are disabled globally.
+      global BRAIDLAB_braid_nomex
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.assumeTrue(false, ...
+          'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
+      end
+
+      % Test that Matlab and MEX subbraids return the same result
       n = testCase.dbrtest.n;
       substrands = 1:2:n;
 
