@@ -280,8 +280,16 @@ classdef loopTest < matlab.unittest.TestCase
     end
 
     function test_braid_test_mex(testCase)
-    % Ensure that the output of the Matlab algorithm matches the output of
-    % the mex algorithm for all different types of data.
+
+      % Skip this test if MEX algorithms are disabled globally.
+      global BRAIDLAB_braid_nomex
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.assumeTrue(false, ...
+          'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
+      end
+
+      % Ensure that the output of the Matlab algorithm matches the output of
+      % the mex algorithm for all different types of data.
 
       B = braidlab.braid([2,1,-1,-2,-1],4);
       Coords = [1,0,-1,1; 2,1,1,1; -1,1,-2,3];
