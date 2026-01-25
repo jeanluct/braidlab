@@ -46,10 +46,6 @@ classdef loopTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_loop_constructor(testCase)
-      global BRAIDLAB_braid_nomex
-      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
-        testCase.assumeTrue(false,'Skipping loop constructor tests: looplist_helper MEX not available.');
-      end
       % A simple loop.
       l = testCase.l1;
       testCase.verifyEqual(l.coords,[1 -1 2 3]);
@@ -66,7 +62,10 @@ classdef loopTest < matlab.unittest.TestCase
       % A column vector of loops.
       l = testCase.l2;
       c12 = l.coords;
-      testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
+      global BRAIDLAB_braid_nomex
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
+      end
       testCase.verifyEqual(c12(2,:),[2 3 -1 2]);
       % All loops the same dimension, so only one puncture size for all loops.
       testCase.verifyEqual(l.n,4);
@@ -194,13 +193,16 @@ classdef loopTest < matlab.unittest.TestCase
                             'BRAIDLAB:loop:noarrays');
 
       % Create enumerations of loops.
-      enum = [1 1;1 2;2 1;2 2];
-      lenum = braidlab.loop('enum',3,1,2);
-      testCase.verifyEqual(lenum.coords,enum);
-      lenum = braidlab.loop('enum',[1 1],[2 2]);
-      testCase.verifyEqual(lenum.coords,enum);
-      lenum = braidlab.loop('enum',[1 1],[2 2],@int32);
-      testCase.verifyEqual(lenum.coords,int32(enum));
+      global BRAIDLAB_braid_nomex
+      if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
+        enum = [1 1;1 2;2 1;2 2];
+        lenum = braidlab.loop('enum',3,1,2);
+        testCase.verifyEqual(lenum.coords,enum);
+        lenum = braidlab.loop('enum',[1 1],[2 2]);
+        testCase.verifyEqual(lenum.coords,enum);
+        lenum = braidlab.loop('enum',[1 1],[2 2],@int32);
+        testCase.verifyEqual(lenum.coords,int32(enum));
+      end
     end
 
     function test_loop_subscripts(testCase)
