@@ -121,6 +121,7 @@ clean:
 	cd +braidlab/@loop/private; $(MAKE) clean
 	cd +braidlab/@cfbraid/private; $(MAKE) clean
 	cd +braidlab/private; $(MAKE) clean
+	cd +braidlab/+util; $(MAKE) clean
 	cd doc; $(MAKE) clean
 
 # distclean also removes the libraries (useful for recompiling on
