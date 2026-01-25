@@ -1,9 +1,12 @@
 # Change Log
 
 
-## [3.2.7-rc1] - 2025-12-09
+## [3.2.7-rc1] - 2026-01-25
 
-* Cross-platform
+* Fix the testsuite so it properly excludes MEX-based tests when
+  `NoMEX' option is passed as an argument.
+
+* Cross-platform compatibility:
 
   - Auto-detect GMP at build and automatically disable if system libs missing.
   - Prefer Homebrew GMP; add its -I and -L flags when detected.
@@ -12,7 +15,7 @@
     core-OS timestamp adjustment (no Python/Perl); removes a makefile
     syntax error during `make distclean`.
 
-* macOS-only
+* macOS-only:
 
   - Remove Linux-only `-z noexecstack` flag on Darwin to avoid linker
     errors.
