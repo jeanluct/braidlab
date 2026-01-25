@@ -131,20 +131,27 @@ classdef braidTest < matlab.unittest.TestCase
     end
 
     function test_braid_from_randomwalk(testCase)
-      rng(1);
-      XY = braidlab.randomwalk(4,2,1);
-      % The data doesn't close, so braid creation errors.
-      testCase.verifyWarning(@() braidlab.braid(XY), ...
-                             'BRAIDLAB:braid:colorbraiding:notclosed');
-      b = braidlab.braid(braidlab.closure(XY));
-      testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
+      global BRAIDLAB_braid_nomex
+      % Skip this test if not using MEX, since randombraid is only MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        rng(1);
+        XY = braidlab.randomwalk(4,2,1);
+        % The data doesn't close, so braid creation errors.
+        testCase.verifyWarning(@() braidlab.braid(XY), ...
+                               'BRAIDLAB:braid:colorbraiding:notclosed');
+        b = braidlab.braid(braidlab.closure(XY));
+        testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
 
-      b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
-      testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
+        b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
+        testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
 
-      b = braidlab.braid(braidlab.closure(XY,'pure'));
-      testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2 1 3 2]));
-      testCase.verifyTrue(b.ispure);
+        b = braidlab.braid(braidlab.closure(XY,'pure'));
+        testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2 1 3 2]));
+        testCase.verifyTrue(b.ispure);
+      else
+        %warning('BRAIDLAB:braidTest:est_braid_from_randomwalk:skip_NoMEX', ...
+        %     'Skipping randomwalk test (only as MEX).')
+      end
     end
 
     function test_braid_equal(testCase)

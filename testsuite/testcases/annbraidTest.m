@@ -151,11 +151,18 @@ classdef annbraidTest < matlab.unittest.TestCase
       ab2 = annbraid([1 2 1 -2 -1 -2]);
       testCase.verifyTrue(~istrivial(ab2))
 
-      % Compact should respect this.
-      testCase.verifyTrue(lexeq(compact(b1),braid([],4)))
-      testCase.verifyTrue(lexeq(compact(b2),braid([],3)))
-      testCase.verifyTrue(~lexeq(compact(ab1),braid([],4)))
-      testCase.verifyTrue(~lexeq(compact(ab2),braid([],3)))
+      global BRAIDLAB_braid_nomex
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Compact should respect this.
+        % Skip this test if not using MEX, since compact is only MEX.
+        testCase.verifyTrue(lexeq(compact(b1),braid([],4)))
+        testCase.verifyTrue(lexeq(compact(b2),braid([],3)))
+        testCase.verifyTrue(~lexeq(compact(ab1),braid([],4)))
+        testCase.verifyTrue(~lexeq(compact(ab2),braid([],3)))
+      else
+        %warning('BRAIDLAB:annbraidTest:test_annbraid_compact:skip_NoMEX', ...
+        %        'Skipping compact test (only as MEX).')
+      end
     end
   end
 end

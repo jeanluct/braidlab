@@ -57,21 +57,26 @@ classdef entropyTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_entropy_trains(testCase)
-      e = entropy(testCase.b1,'method','trains');
-      testCase.verifyTrue(abs(e - testCase.e1ex) < 1e-15);
+      global BRAIDLAB_braid_nomex
+      if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
+        % These tests require MEX.
 
-      e = entropy(testCase.b2,'method','trains');
-      testCase.verifyTrue(abs(e - testCase.e2ex) < 1e-15);
+        e = entropy(testCase.b1,'method','trains');
+        testCase.verifyTrue(abs(e - testCase.e1ex) < 1e-15);
 
-      % A much more difficult case: can only get 9 digits.
-      e = entropy(testCase.b3,'method','trains');
-      testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
+        e = entropy(testCase.b2,'method','trains');
+        testCase.verifyTrue(abs(e - testCase.e2ex) < 1e-15);
 
-      testCase.verifyWarning(@() entropy(testCase.b4,'method','trains'), ...
-                             'BRAIDLAB:braid:entropy:reducible');
+        % A much more difficult case: can only get 9 digits.
+        e = entropy(testCase.b3,'method','trains');
+        testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
 
-      testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
-                           'MATLAB:InputParser:ArgumentFailedValidation');
+        testCase.verifyWarning(@() entropy(testCase.b4,'method','trains'), ...
+                               'BRAIDLAB:braid:entropy:reducible');
+
+        testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
+                             'MATLAB:InputParser:ArgumentFailedValidation');
+      end
     end
 
     function test_entropy_iter(testCase)
@@ -94,16 +99,18 @@ classdef entropyTest < matlab.unittest.TestCase
                                          'Tol',tol, ...
                                          'MaxIt', 100), ...
                              'BRAIDLAB:braid:entropy:noconv');
-      % The default gives enough iterations.
-      e = entropy(testCase.b3,'Tol',tol);
-      testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
 
-      % Try a braid with more than 100 strings, so the maximum number of
-      % iterations is determined by asymptotic spectral gap.  Have to use
-      % higher tolerance, since the entropy converges slowly.
       global BRAIDLAB_braid_nomex
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Skip this test if not using MEX.
+      if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
+        % Too slow to do without MEX.
+
+        % The default gives enough iterations.
+        e = entropy(testCase.b3,'Tol',tol);
+        testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
+
+        % Try a braid with more than 100 strings, so the maximum number of
+        % iterations is determined by asymptotic spectral gap.  Have to use
+        % higher tolerance, since the entropy converges slowly.
         e = entropy(testCase.b6,'Tol',.01*tol);
         testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
       end
@@ -141,12 +148,16 @@ classdef entropyTest < matlab.unittest.TestCase
       tol = 1e-8;
       for n = 5:16
         b = braidlab.braid('psi',n);
-        etr = entropy(b,'method','trains');
         e = entropy(b,'Tol',tol);
 
         ee = log(max(abs(braidlab.psiroots(n))));
         testCase.verifyTrue(abs(e - ee) < tol);
-        testCase.verifyTrue(abs(etr - ee) < 1e-9);
+
+        global BRAIDLAB_braid_nomex
+        if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
+          etr = entropy(b,'method','trains');
+          testCase.verifyTrue(abs(etr - ee) < 1e-9);
+        end
       end
     end
 
