@@ -237,11 +237,11 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_explicit_n_matches_generator_max(testCase)
       % Test that explicit n matches or exceeds max absolute generator.
-      b1 = braidlab.braid([1 2 3],5);
-      testCase.verifyEqual(b1.n,5);
+      br1 = braidlab.braid([1 2 3],5);
+      testCase.verifyEqual(br1.n,5);
 
-      b2 = braidlab.braid([1 2 3]);
-      testCase.verifyEqual(b2.n,4); % max(abs([1 2 3]))+1 = 4
+      br2 = braidlab.braid([1 2 3]);
+      testCase.verifyEqual(br2.n,4); % max(abs([1 2 3]))+1 = 4
     end
 
     %% Empty and trivial braids
@@ -382,16 +382,16 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_copy_braid(testCase)
       % Test that braid(braid_obj) creates correct copy.
-      b1 = braidlab.braid([1 -2 3],5);
-      b2 = braidlab.braid(b1);
+      br1 = braidlab.braid([1 -2 3],5);
+      br2 = braidlab.braid(br1);
 
-      testCase.verifyEqual(b1,b2);
-      testCase.verifyEqual(b1.word,b2.word);
-      testCase.verifyEqual(b1.n,b2.n);
+      testCase.verifyEqual(br1,br2);
+      testCase.verifyEqual(br1.word,br2.word);
+      testCase.verifyEqual(br1.n,br2.n);
 
       % Modifying copy doesn't affect original.
-      b2.word = int32([2 3]);
-      testCase.verifyNotEqual(b1,b2);
+      br2.word = int32([2 3]);
+      testCase.verifyNotEqual(br1,br2);
     end
 
     %% Data input validation
@@ -466,7 +466,7 @@ classdef braidTest < matlab.unittest.TestCase
     function test_braid_3d_trajectory_from_complex(testCase)
       % Test that complex trajectory is converted to 3D correctly.
       Z = [1+2i 2+3i; 2+1i 3+2i; 1+2i 2+3i];
-      b1 = braidlab.braid(Z);
+      br1 = braidlab.braid(Z);
 
       % Manually create equivalent 3D trajectory.
       XY = zeros(3,2,2);
@@ -474,9 +474,9 @@ classdef braidTest < matlab.unittest.TestCase
       XY(:,2,1) = imag(Z(:,1));
       XY(:,1,2) = real(Z(:,2));
       XY(:,2,2) = imag(Z(:,2));
-      b2 = braidlab.braid(XY);
+      br2 = braidlab.braid(XY);
 
-      testCase.verifyEqual(b1,b2);
+      testCase.verifyEqual(br1,br2);
     end
 
     % Knot representation
@@ -616,14 +616,14 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_special_named_word_is_int32(testCase)
       % Test that special named braids create int32 word.
-      b1 = braidlab.braid('HalfTwist',5);
-      testCase.verifyClass(b1.word,'int32');
+      br1 = braidlab.braid('HalfTwist',5);
+      testCase.verifyClass(br1.word,'int32');
 
-      b2 = braidlab.braid('Random',6,10);
-      testCase.verifyClass(b2.word,'int32');
+      br2 = braidlab.braid('Random',6,10);
+      testCase.verifyClass(br2.word,'int32');
 
-      b3 = braidlab.braid('VenzkePsi',6);
-      testCase.verifyClass(b3.word,'int32');
+      br3 = braidlab.braid('VenzkePsi',6);
+      testCase.verifyClass(br3.word,'int32');
     end
 
     function test_braid_trajectory_word_is_int32(testCase)
@@ -638,11 +638,11 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_copy_preserves_int32(testCase)
       % Test that copying a braid preserves int32 type.
-      b1 = braidlab.braid([1 2 3]);
-      b2 = braidlab.braid(b1);
+      br1 = braidlab.braid([1 2 3]);
+      br2 = braidlab.braid(br1);
 
-      testCase.verifyClass(b1.word,'int32');
-      testCase.verifyClass(b2.word,'int32');
+      testCase.verifyClass(br1.word,'int32');
+      testCase.verifyClass(br2.word,'int32');
     end
   end
 end
