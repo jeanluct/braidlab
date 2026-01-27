@@ -121,5 +121,86 @@ classdef trainTest < matlab.unittest.TestCase
       end
     end
 
+    %% ttmap tests
+
+    function test_ttmap_cell_array(testCase)
+      % Test that ttmap is a cell array.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      testCase.verifyTrue(iscell(T.ttmap));
+    end
+
+    function test_ttmap_nonempty_pseudoanosov(testCase)
+      % Test that ttmap is nonempty for pseudo-Anosov braids.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      testCase.verifyTrue(~isempty(T.ttmap));
+    end
+
+    function test_ttmap_entries_are_vectors(testCase)
+      % Test that ttmap entries are integer vectors.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      for i = 1:length(T.ttmap)
+        testCase.verifyTrue(isnumeric(T.ttmap{i}));
+        testCase.verifyTrue(isvector(T.ttmap{i}) || isempty(T.ttmap{i}));
+      end
+    end
+
+    function test_ttmap_peripheral_edges(testCase)
+      % Test that ttmap has at least n peripheral edges for n-strand braid.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      % For n-strand braid, there are n peripheral edges
+      testCase.verifyGreaterThanOrEqual(length(T.ttmap), br.n);
+    end
+
+    function test_ttmap_main_edges(testCase)
+      % Test that ttmap has main edges for pseudo-Anosov braid.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      % Total edges = n (peripheral) + main edges
+      % For this braid, should have more than just peripheral edges.
+      testCase.verifyGreaterThan(length(T.ttmap), br.n);
+    end
+
+    function test_ttmap_consistent_with_transmat(testCase)
+      % Test that ttmap main edges match transition matrix dimensions.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      % The transition matrix is for main edges only (total - n peripheral).
+      n_main = length(T.ttmap) - br.n;
+      testCase.verifyEqual(size(T.transmat, 1), n_main);
+      testCase.verifyEqual(size(T.transmat, 2), n_main);
+    end
+
+    function test_ttmap_display_function(testCase)
+      % Test that braidlab.ttmap display function works.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      % Just verify it doesn't error.
+      evalc('braidlab.ttmap(T)');  % Suppress output.
+      testCase.verifyTrue(true);
+    end
+
+    function test_ttmap_display_accepts_braid(testCase)
+      % Test that braidlab.ttmap can accept a braid directly.
+      br = braidlab.braid([1 -2], 3);
+      % Just verify it doesn't error.
+      evalc('braidlab.ttmap(br)');  % Suppress output.
+      testCase.verifyTrue(true);
+    end
+
+    function test_ttmap_display_options(testCase)
+      % Test braidlab.ttmap with various options.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      % Test with Peripheral=false option.
+      evalc('braidlab.ttmap(T, ''Peripheral'', false)');
+      % Test with Inverses=true option.
+      evalc('braidlab.ttmap(T, ''Inverses'', true)');
+      testCase.verifyTrue(true);
+    end
+
   end
 end
