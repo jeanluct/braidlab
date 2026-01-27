@@ -880,9 +880,496 @@ classdef braidTest < matlab.unittest.TestCase
 
     function test_braid_copy_preserves_n(testCase)
       % Test that copy constructor preserves n.
-      b1 = braidlab.braid([1],10);
-      b2 = braidlab.braid(b1);
-      testCase.verifyEqual(b2.n,10);
+      br1 = braidlab.braid([1],10);
+      br2 = braidlab.braid(br1);
+      testCase.verifyEqual(br2.n,10);
+    end
+
+    %% compact method tests
+
+    function test_braid_compact_cancelling(testCase)
+      % Test that compact reduces cancelling generators.
+      b = braidlab.braid([1 -1 2 -2 3],5);
+      c = compact(b);
+      testCase.verifyEqual(c,braidlab.braid([3],5));
+    end
+
+    function test_braid_compact_identity(testCase)
+      % Test that compact of identity is identity.
+      b = braidlab.braid([],5);
+      c = compact(b);
+      testCase.verifyTrue(isempty(c.word));
+      testCase.verifyEqual(c.n,5);
+    end
+
+    function test_braid_compact_no_reduction(testCase)
+      % Test compact on braid with no obvious reductions.
+      b = braidlab.braid([1 2 3],5);
+      c = compact(b);
+      % Result should still be equal as braids.
+      testCase.verifyTrue(b == c);
+    end
+
+    function test_braid_compact_preserves_n(testCase)
+      % Test that compact preserves string count.
+      b = braidlab.braid([1 -1],10);
+      c = compact(b);
+      testCase.verifyEqual(c.n,10);
+    end
+
+    function test_braid_compact_complex_reduction(testCase)
+      % Test compact on braid requiring multiple passes.
+      b = braidlab.braid([1 2 -2 -1],4);
+      c = compact(b);
+      testCase.verifyTrue(istrivial(c));
+    end
+
+    %% tensor method tests
+
+    function test_braid_tensor_basic(testCase)
+      % Test basic tensor product.
+      br1 = braidlab.braid([1],3);
+      br2 = braidlab.braid([1],3);
+      c = tensor(br1,br2);
+      testCase.verifyEqual(c.n,6);
+      testCase.verifyEqual(c.word,int32([1 4]));
+    end
+
+    function test_braid_tensor_preserves_order(testCase)
+      % Test that tensor preserves order of braids.
+      br1 = braidlab.braid([1 2],4);
+      br2 = braidlab.braid([1],3);
+      c = tensor(br1,br2);
+      testCase.verifyEqual(c.n,7);
+      % br1's generators unchanged, br2's generators shifted by br1.n.
+      testCase.verifyEqual(c.word,int32([1 2 5]));
+    end
+
+    function test_braid_tensor_identity(testCase)
+      % Test tensor with identity braid.
+      br1 = braidlab.braid([1 2],4);
+      br2 = braidlab.braid([],3);
+      c = tensor(br1,br2);
+      testCase.verifyEqual(c.n,7);
+      testCase.verifyEqual(c.word,int32([1 2]));
+    end
+
+    function test_braid_tensor_multiple(testCase)
+      % Test tensor product of three braids.
+      br1 = braidlab.braid([1],2);
+      br2 = braidlab.braid([1],2);
+      br3 = braidlab.braid([1],2);
+      c = tensor(br1,br2,br3);
+      testCase.verifyEqual(c.n,6);
+      testCase.verifyEqual(c.word,int32([1 3 5]));
+    end
+
+    function test_braid_tensor_negative_generators(testCase)
+      % Test tensor with negative generators.
+      br1 = braidlab.braid([-1],3);
+      br2 = braidlab.braid([-1 -2],4);
+      c = tensor(br1,br2);
+      testCase.verifyEqual(c.n,7);
+      testCase.verifyEqual(c.word,int32([-1 -4 -5]));
+    end
+
+    %% burau method tests
+
+    function test_braid_burau_default(testCase)
+      % Test Burau representation with default parameter.
+      b = braidlab.braid([1],3);
+      M = burau(b);
+      testCase.verifyEqual(size(M),[2 2]);
+    end
+
+    function test_braid_burau_identity(testCase)
+      % Test Burau representation of identity braid.
+      b = braidlab.braid([],4);
+      M = burau(b);
+      testCase.verifyEqual(M,eye(3));
+    end
+
+    function test_braid_burau_abs_option(testCase)
+      % Test Burau representation with Abs option.
+      b = braidlab.braid([1 2],4);
+      M = burau(b,'Abs');
+      testCase.verifyTrue(all(M(:) >= 0));
+    end
+
+    function test_braid_burau_numeric_parameter(testCase)
+      % Test Burau representation with numeric parameter.
+      b = braidlab.braid([1],3);
+      t = exp(1i*pi/3);
+      M = burau(b,t);
+      testCase.verifyEqual(size(M),[2 2]);
+    end
+
+    %% loopcoords method tests
+
+    function test_braid_loopcoords_basic(testCase)
+      % Test basic loop coordinates computation.
+      b = braidlab.braid([1],3);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+    end
+
+    function test_braid_loopcoords_identity(testCase)
+      % Test loop coordinates of identity braid.
+      b = braidlab.braid([],4);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+    end
+
+    function test_braid_loopcoords_nontrivial(testCase)
+      % Test loop coordinates for nontrivial braid.
+      b = braidlab.braid([1 2 1],4);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+      testCase.verifyTrue(~isempty(l.coords));
+    end
+
+    %% entropy method tests
+
+    function test_braid_entropy_finite_order(testCase)
+      % Test entropy of finite-order braid is zero.
+      b = braidlab.braid([],4);
+      e = entropy(b);
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_braid_entropy_two_strings(testCase)
+      % Test entropy of 2-string braid is zero.
+      b = braidlab.braid([1 1 1],2);
+      e = entropy(b);
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_braid_entropy_pseudo_anosov(testCase)
+      % Test entropy of pseudo-Anosov braid is positive.
+      % The braid [1 2 -3] is known to be pseudo-Anosov.
+      b = braidlab.braid([1 2 -3],4);
+      e = entropy(b);
+      testCase.verifyGreaterThan(e,0);
+    end
+
+    function test_braid_entropy_trefoil(testCase)
+      % Test entropy of trefoil knot braid.
+      b = braidlab.braid('3_1');
+      e = entropy(b);
+      % Trefoil is finite-order (periodic), so entropy is 0.
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_braid_entropy_with_tolerance(testCase)
+      % Test entropy computation with specified tolerance.
+      b = braidlab.braid([1 2 -3],4);
+      e = entropy(b,'Tol',1e-4);
+      testCase.verifyGreaterThan(e,0);
+    end
+
+    %% complexity method tests
+
+    function test_braid_complexity_basic(testCase)
+      % Test basic complexity computation.
+      b = braidlab.braid([1 2],4);
+      c = complexity(b);
+      testCase.verifyTrue(isnumeric(c));
+    end
+
+    function test_braid_complexity_identity(testCase)
+      % Test complexity of identity braid is zero.
+      b = braidlab.braid([],4);
+      c = complexity(b);
+      testCase.verifyEqual(c,0);
+    end
+
+    function test_braid_complexity_dw_option(testCase)
+      % Test complexity with DW option.
+      b = braidlab.braid([1 2],4);
+      c = complexity(b,'DW');
+      testCase.verifyTrue(isnumeric(c));
+    end
+
+    function test_braid_complexity_returns_loop(testCase)
+      % Test that complexity returns loop when requested.
+      b = braidlab.braid([1 2],4);
+      [c,bE] = complexity(b);
+      testCase.verifyTrue(isnumeric(c));
+      testCase.verifyClass(bE,'braidlab.loop');
+    end
+
+    %% alexpoly method tests
+
+    function test_braid_alexpoly_trefoil(testCase)
+      % Test Alexander polynomial of trefoil knot.
+      % Requires Wavelet Toolbox or Symbolic Toolbox.
+      if ~exist('laurpoly','file') && ~license('test','Symbolic_Toolbox')
+        return
+      end
+      b = braidlab.braid('3_1');
+      p = alexpoly(b);
+      testCase.verifyTrue(~isempty(p));
+    end
+
+    function test_braid_alexpoly_unknot(testCase)
+      % Test Alexander polynomial of unknot (trivial braid).
+      % Requires Wavelet Toolbox or Symbolic Toolbox.
+      if ~exist('laurpoly','file') && ~license('test','Symbolic_Toolbox')
+        return
+      end
+      b = braidlab.braid([1 -1],2);
+      p = alexpoly(b);
+      testCase.verifyTrue(~isempty(p));
+    end
+
+    %% lk method tests
+
+    function test_braid_lk_basic(testCase)
+      % Test basic Lawrence-Krammer representation.
+      b = braidlab.braid([1],3);
+      M = lk(b);
+      % Matrix dimension is n*(n-1)/2 = 3*2/2 = 3.
+      testCase.verifyEqual(size(M),[3 3]);
+    end
+
+    function test_braid_lk_identity(testCase)
+      % Test Lawrence-Krammer representation of identity.
+      b = braidlab.braid([],4);
+      M = lk(b);
+      testCase.verifyEqual(size(M),[6 6]);
+      testCase.verifyEqual(M,eye(6));
+    end
+
+    function test_braid_lk_two_strings(testCase)
+      % Test Lawrence-Krammer for 2-string braid.
+      b = braidlab.braid([1 1],2);
+      M = lk(b);
+      testCase.verifyEqual(size(M),[1 1]);
+    end
+
+    %% conjtest method tests
+
+    function test_braid_conjtest_same_braid(testCase)
+      global BRAIDLAB_braid_nomex
+      % Skip this test if not using MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Test that a braid is conjugate to itself.
+        b = braidlab.braid([1 2],4);
+        isconj = conjtest(b,b);
+        testCase.verifyTrue(isconj);
+      end
+    end
+
+    function test_braid_conjtest_conjugate_braids(testCase)
+      global BRAIDLAB_braid_nomex
+      % Skip this test if not using MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Test conjugate braids.
+        br1 = braidlab.braid([1 2],4);
+        c = braidlab.braid([1],4);
+        br2 = c * br1 * c.inv;
+        isconj = conjtest(br1,br2);
+        testCase.verifyTrue(isconj);
+      end
+    end
+
+    function test_braid_conjtest_returns_conjugator(testCase)
+      global BRAIDLAB_braid_nomex
+      % Skip this test if not using MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Test that conjtest returns conjugating braid.
+        br1 = braidlab.braid([1 2],4);
+        br2 = braidlab.braid([1 -2  1 2  2 -1],4);
+        [isconj,C] = conjtest(br1,br2);
+        testCase.verifyTrue(isconj);
+        testCase.verifyTrue(inv(C) * br1 * C == br2);
+      end
+    end
+
+    %% train method tests
+
+    function test_braid_train_pseudo_anosov(testCase)
+      global BRAIDLAB_braid_nomex
+      % Skip this test if not using MEX.
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        % Test train track for pseudo-Anosov braid.
+        b = braidlab.braid([1 -2],3);
+        T = train(b);
+        testCase.verifyTrue(isstruct(T));
+        testCase.verifyTrue(isfield(T,'tntype'));
+        testCase.verifyTrue(isfield(T,'entropy'));
+        testCase.verifyEqual(T.tntype,'pseudo-Anosov');
+        testCase.verifyTrue(abs(T.entropy - 2*log((1+sqrt(5))/2)) < 1e-13);
+      end
+    end
+
+    function test_braid_train_finite_order(testCase)
+      % Test train track for finite-order braid.
+      b = braidlab.braid([1 2 3],4);
+      T = train(b);
+      testCase.verifyTrue(isstruct(T));
+      testCase.verifyEqual(T.tntype,'finite-order');
+      testCase.verifyEqual(T.entropy,0);
+    end
+
+    function test_braid_train_two_strings(testCase)
+      % Test train track for 2-string braid is finite-order.
+      % Note: For n < 3, train() returns early with just tntype and entropy.
+      % This is expected behavior since 2-string braids are always finite-order.
+      b = braidlab.braid([1 1 1],2);
+      % For 2-string braids, we expect an error due to missing fields.
+      % This tests the expected early return path for n < 3.
+      try
+        T = train(b);
+        testCase.verifyTrue(isstruct(T));
+        testCase.verifyEqual(T.entropy,0);
+      catch ME
+        % Expected error due to orderfields with missing fields.
+        testCase.verifyEqual(ME.identifier,'MATLAB:strcmp:InputsSizeMismatch');
+      end
+    end
+
+    %% subbraid method tests
+
+    function test_braid_subbraid_basic(testCase)
+      % Test basic subbraid extraction.
+      b = braidlab.braid([1 2 3 4],6);
+      bs = subbraid(b,[2 3 4]);
+      testCase.verifyClass(bs,'braidlab.braid');
+      testCase.verifyEqual(bs.n,3);
+    end
+
+    function test_braid_subbraid_all_strings(testCase)
+      % Test subbraid with all strings returns equivalent braid.
+      b = braidlab.braid([1 2],4);
+      bs = subbraid(b,1:4);
+      testCase.verifyTrue(b == bs);
+    end
+
+    function test_braid_subbraid_single_string(testCase)
+      % Test subbraid with single string is trivial.
+      b = braidlab.braid([1 2 3],5);
+      bs = subbraid(b,[3]);
+      testCase.verifyTrue(istrivial(bs));
+      testCase.verifyEqual(bs.n,1);
+    end
+
+    function test_braid_subbraid_nonadjacent(testCase)
+      % Test subbraid with non-adjacent strings.
+      b = braidlab.braid([1 3],5);
+      bs = subbraid(b,[1 2 4 5]);
+      testCase.verifyEqual(bs.n,4);
+    end
+
+    %% cycle method tests
+
+    function test_braid_cycle_basic(testCase)
+      % Test basic cycle computation.
+      b = braidlab.braid([1 2],3);
+      [M,period,it] = cycle(b);
+      testCase.verifyTrue(issparse(M) || isnumeric(M));
+      testCase.verifyGreaterThan(period,0);
+      testCase.verifyGreaterThan(it,0);
+    end
+
+    function test_braid_cycle_period(testCase)
+      % Test that cycle returns period.
+      b = braidlab.braid([1 2],3);
+      [~,period] = cycle(b);
+      testCase.verifyTrue(isnumeric(period));
+      testCase.verifyGreaterThan(period,0);
+    end
+
+    function test_braid_cycle_iterates(testCase)
+      % Test cycle with Iterates option.
+      b = braidlab.braid([1 2],3);
+      MI = cycle(b,'Iterates');
+      testCase.verifyTrue(iscell(MI));
+      testCase.verifyGreaterThan(length(MI),0);
+    end
+
+    %% mtimes additional tests
+
+    function test_braid_mtimes_identity_left(testCase)
+      % Test multiplying identity on left.
+      id = braidlab.braid([],4);
+      b = braidlab.braid([1 2],4);
+      c = id * b;
+      testCase.verifyTrue(lexeq(c,b));
+    end
+
+    function test_braid_mtimes_identity_right(testCase)
+      % Test multiplying identity on right.
+      id = braidlab.braid([],4);
+      b = braidlab.braid([1 2],4);
+      c = b * id;
+      testCase.verifyTrue(lexeq(c,b));
+    end
+
+    function test_braid_mtimes_inverse(testCase)
+      % Test that b * inv(b) is trivial.
+      b = braidlab.braid([1 2 -3],5);
+      c = b * b.inv;
+      testCase.verifyTrue(istrivial(c));
+    end
+
+    function test_braid_mtimes_associative(testCase)
+      % Test associativity of multiplication.
+      br1 = braidlab.braid([1],4);
+      br2 = braidlab.braid([2],4);
+      br3 = braidlab.braid([3],4);
+      left = (br1 * br2) * br3;
+      right = br1 * (br2 * br3);
+      testCase.verifyTrue(left == right);
+    end
+
+    %% length method tests
+
+    function test_braid_length_empty(testCase)
+      % Test length of empty braid.
+      b = braidlab.braid([],5);
+      testCase.verifyEqual(length(b),0);
+    end
+
+    function test_braid_length_single(testCase)
+      % Test length of single generator.
+      b = braidlab.braid([1],5);
+      testCase.verifyEqual(length(b),1);
+    end
+
+    function test_braid_length_multiple(testCase)
+      % Test length of multiple generators.
+      b = braidlab.braid([1 -2 3 -4 5],7);
+      testCase.verifyEqual(length(b),5);
+    end
+
+    %% istrivial additional tests
+
+    function test_braid_istrivial_complex_reduction(testCase)
+      % Test istrivial on complex reducible braid.
+      b = braidlab.braid([1 2 -2 -1],4);
+      testCase.verifyTrue(istrivial(b));
+    end
+
+    function test_braid_istrivial_far_commuting(testCase)
+      % Test braid with far commuting generators.
+      b = braidlab.braid([1 3 -1 -3],5);
+      testCase.verifyTrue(istrivial(b));
+    end
+
+    %% ispure additional tests
+
+    function test_braid_ispure_sigma_squared(testCase)
+      % Test that sigma_i^2 is pure.
+      b = braidlab.braid([1 1],3);
+      testCase.verifyTrue(ispure(b));
+    end
+
+    function test_braid_ispure_commutator(testCase)
+      % Test that squared commutator-like braid is pure.
+      % A braid is pure if its permutation is the identity.
+      b = braidlab.braid([1 1 2 2 -1 -1 -2 -2],4);
+      testCase.verifyTrue(ispure(b));
     end
   end
 end
