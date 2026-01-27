@@ -1,10 +1,13 @@
 # Change Log
 
 
-## [3.2.7-rc1] - 2026-01-25
+## [3.2.7-rc1] - 2026-01-27
 
 * Fix the testsuite so it properly excludes MEX-based tests when
   `NoMEX' option is passed as an argument.
+
+* Add dozens of tests to the testsuite to improve coverage.
+  (Generated with the help of copilot.)
 
 * Cross-platform compatibility:
 
