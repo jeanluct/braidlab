@@ -25,78 +25,101 @@
 classdef trainTest < matlab.unittest.TestCase
 
   methods (Test)
-    function test_train_pseudo_anosov(testCase)
+
+    %% Train track structure tests
+
+    function test_structure_fields(testCase)
+      % Test train track returns expected fields.
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      testCase.verifyTrue(isstruct(T));
+      testCase.verifyTrue(isfield(T, 'tntype'));
+      testCase.verifyTrue(isfield(T, 'entropy'));
+    end
+
+    function test_structure_pseudoanosov(testCase)
       % Test train track for pseudo-Anosov braid.
-      b = braidlab.braid([1 -2],3);
-      T = train(b);
-      testCase.verifyTrue(isstruct(T));
-      testCase.verifyTrue(isfield(T,'tntype'));
-      testCase.verifyTrue(isfield(T,'entropy'));
-      testCase.verifyEqual(T.tntype,'pseudo-Anosov');
-      testCase.verifyTrue(abs(T.entropy - 2*log((1+sqrt(5))/2)) < 1e-13);
+      br = braidlab.braid([1 -2], 3);
+      T = train(br);
+      testCase.verifyEqual(T.tntype, 'pseudo-Anosov');
+      expected = 2*log((1+sqrt(5))/2);
+      testCase.verifyTrue(abs(T.entropy - expected) < 1e-13);
     end
 
-    function test_train_finite_order(testCase)
+    function test_structure_finiteorder(testCase)
       % Test train track for finite-order braid.
-      b = braidlab.braid([1 2 3],4);
-      T = train(b);
-      testCase.verifyTrue(isstruct(T));
-      testCase.verifyEqual(T.tntype,'finite-order');
-      testCase.verifyEqual(T.entropy,0);
+      br = braidlab.braid([1 2 3], 4);
+      T = train(br);
+      testCase.verifyEqual(T.tntype, 'finite-order');
+      testCase.verifyEqual(T.entropy, 0);
     end
 
-    function test_train_two_strings(testCase)
+    function test_structure_twostrings(testCase)
       % Test train track for 2-string braid is finite-order.
-      % Note: For n < 3, train() returns early with just tntype and entropy.
-      % This is expected behavior since 2-string braids are always finite-order.
-      b = braidlab.braid([1 1 1],2);
-      % For 2-string braids, we expect an error due to missing fields.
-      % This tests the expected early return path for n < 3.
+      % For n < 3, train() returns early with just tntype and entropy.
+      br = braidlab.braid([1 1 1], 2);
       try
-        T = train(b);
+        T = train(br);
         testCase.verifyTrue(isstruct(T));
-        testCase.verifyEqual(T.entropy,0);
+        testCase.verifyEqual(T.entropy, 0);
       catch ME
         % Expected error due to orderfields with missing fields.
-        testCase.verifyEqual(ME.identifier,'MATLAB:strcmp:InputsSizeMismatch');
+        testCase.verifyEqual(ME.identifier, 'MATLAB:strcmp:InputsSizeMismatch');
       end
     end
 
-    function test_entropy_trains(testCase)
-      % Test entropy calculation using trains method.
-      b1 = braidlab.braid([1 -2]);
-      e1ex = 2*log((1+sqrt(5))/2);
-      e = entropy(b1,'method','trains');
-      testCase.verifyTrue(abs(e - e1ex) < 1e-15);
+    %% Entropy with trains method tests
 
-      b2 = braidlab.braid([1 1 -2 -2]);
-      e2ex = 2*log(1+sqrt(2));
-      e = entropy(b2,'method','trains');
-      testCase.verifyTrue(abs(e - e2ex) < 1e-15);
+    function test_entropy_pseudoanosov1(testCase)
+      % Test entropy using trains method for simple pseudo-Anosov braid.
+      br = braidlab.braid([1 -2]);
+      expected = 2*log((1+sqrt(5))/2);
+      ent = entropy(br, 'method', 'trains');
+      testCase.verifyTrue(abs(ent - expected) < 1e-15);
+    end
 
-      % A much more difficult case: can only get 9 digits.
-      b3 = braidlab.braid('VenzkePsi',16);
-      e3ex = 0.166609316967714;
-      e = entropy(b3,'method','trains');
-      testCase.verifyTrue(abs(e - e3ex) < 1e-10);
+    function test_entropy_pseudoanosov2(testCase)
+      % Test entropy using trains method for [1 1 -2 -2].
+      br = braidlab.braid([1 1 -2 -2]);
+      expected = 2*log(1+sqrt(2));
+      ent = entropy(br, 'method', 'trains');
+      testCase.verifyTrue(abs(ent - expected) < 1e-15);
+    end
 
-      b4 = braidlab.braid([1 2 -3],5);
-      testCase.verifyWarning(@() entropy(b4,'method','trains'), ...
+    function test_entropy_difficult(testCase)
+      % Test entropy using trains for a difficult case.
+      % Can only get 9 digits.
+      br = braidlab.braid('VenzkePsi', 16);
+      expected = 0.166609316967714;
+      ent = entropy(br, 'method', 'trains');
+      testCase.verifyTrue(abs(ent - expected) < 1e-10);
+    end
+
+    function test_entropy_reducible_warning(testCase)
+      % Test warning for reducible braid with trains method.
+      br = braidlab.braid([1 2 -3], 5);
+      testCase.verifyWarning(@() entropy(br, 'method', 'trains'), ...
                              'BRAIDLAB:braid:entropy:reducible');
+    end
 
-      testCase.verifyError(@() entropy(b4,'garbage'), ...
+    function test_entropy_badarg(testCase)
+      % Test error for invalid entropy argument.
+      br = braidlab.braid([1 2 -3], 5);
+      testCase.verifyError(@() entropy(br, 'garbage'), ...
                            'MATLAB:InputParser:ArgumentFailedValidation');
     end
 
-    function test_low_entropy_trains(testCase)
+    %% Low entropy braids tests
+
+    function test_lowentropy_psi(testCase)
       % Test entropy on Venzke's low-entropy braids using trains method.
-      for n = 5:16
-        b = braidlab.braid('psi',n);
-        ee = log(max(abs(braidlab.psiroots(n))));
-        etr = entropy(b,'method','trains');
-        testCase.verifyTrue(abs(etr - ee) < 1e-9);
+      for nstrands = 5:16
+        br = braidlab.braid('psi', nstrands);
+        expected = log(max(abs(braidlab.psiroots(nstrands))));
+        etr = entropy(br, 'method', 'trains');
+        testCase.verifyTrue(abs(etr - expected) < 1e-9);
       end
     end
-  end
 
+  end
 end
