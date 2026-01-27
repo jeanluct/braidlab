@@ -84,5 +84,51 @@ classdef cfbraidTest < matlab.unittest.TestCase
       testCase.verifyEqual(length(cfbraid([1 2 -3])),13);
       testCase.verifyEqual(length(cfbraid([],5)),0);
     end
+
+    function test_braid_from_cfbraid(testCase)
+      % Test converting a cfbraid to braid.
+      import braidlab.cfbraid %#ok<SIMPT>
+      import braidlab.braid %#ok<SIMPT>
+
+      % Create a simple cfbraid from a word.
+      cf = cfbraid([1 2 3 1 2],5);
+
+      % Convert to braid.
+      b = braid(cf);
+
+      % Verify it's a braid and has correct number of strings.
+      testCase.verifyClass(b,'braidlab.braid');
+      testCase.verifyEqual(b.n,cf.n);
+
+      % The resulting braid should be delta^delta * factors.
+      D = braid('halftwist',cf.n);
+      expected = D^cf.delta * braid(cell2mat(cf.factors),cf.n);
+      testCase.verifyEqual(b,expected);
+    end
+
+    function test_conjtest_same_braid(testCase)
+      % Test that a braid is conjugate to itself.
+      b = braidlab.braid([1 2],4);
+      isconj = conjtest(b,b);
+      testCase.verifyTrue(isconj);
+    end
+
+    function test_conjtest_conjugate_braids(testCase)
+      % Test conjugate braids.
+      br1 = braidlab.braid([1 2],4);
+      c = braidlab.braid([1],4);
+      br2 = c * br1 * c.inv;
+      isconj = conjtest(br1,br2);
+      testCase.verifyTrue(isconj);
+    end
+
+    function test_conjtest_returns_conjugator(testCase)
+      % Test that conjtest returns conjugating braid.
+      br1 = braidlab.braid([1 2],4);
+      br2 = braidlab.braid([1 -2  1 2  2 -1],4);
+      [isconj,C] = conjtest(br1,br2);
+      testCase.verifyTrue(isconj);
+      testCase.verifyTrue(inv(C) * br1 * C == br2);
+    end
   end
 end

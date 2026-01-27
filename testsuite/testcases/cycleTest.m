@@ -125,5 +125,30 @@ classdef cycleTest < matlab.unittest.TestCase
       testCase.verifyEqual(itpsi12,testCase.itpsi12);
       testCase.verifyEqual(charpoly(Mpsi12),testCase.polypsi12);
     end
+
+    function test_cycle_basic(testCase)
+      % Test basic cycle computation.
+      b = braidlab.braid([1 2],3);
+      [M,period,it] = cycle(b);
+      testCase.verifyTrue(issparse(M) || isnumeric(M));
+      testCase.verifyGreaterThan(period,0);
+      testCase.verifyGreaterThan(it,0);
+    end
+
+    function test_cycle_period(testCase)
+      % Test that cycle returns period.
+      b = braidlab.braid([1 2],3);
+      [~,period] = cycle(b);
+      testCase.verifyTrue(isnumeric(period));
+      testCase.verifyGreaterThan(period,0);
+    end
+
+    function test_cycle_iterates(testCase)
+      % Test cycle with Iterates option.
+      b = braidlab.braid([1 2],3);
+      MI = cycle(b,'Iterates');
+      testCase.verifyTrue(iscell(MI));
+      testCase.verifyGreaterThan(length(MI),0);
+    end
   end
 end

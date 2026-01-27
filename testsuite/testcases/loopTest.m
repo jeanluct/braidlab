@@ -492,5 +492,56 @@ classdef loopTest < matlab.unittest.TestCase
 
     end
 
+    function test_loopcoords_basic(testCase)
+      % Test basic loop coordinates computation.
+      b = braidlab.braid([1],3);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+    end
+
+    function test_loopcoords_identity(testCase)
+      % Test loop coordinates of identity braid.
+      b = braidlab.braid([],4);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+    end
+
+    function test_loopcoords_nontrivial(testCase)
+      % Test loop coordinates for nontrivial braid.
+      b = braidlab.braid([1 2 1],4);
+      l = loopcoords(b);
+      testCase.verifyClass(l,'braidlab.loop');
+      testCase.verifyTrue(~isempty(l.coords));
+    end
+
+    function test_complexity_basic(testCase)
+      % Test basic complexity computation.
+      b = braidlab.braid([1 2],4);
+      c = complexity(b);
+      testCase.verifyTrue(isnumeric(c));
+    end
+
+    function test_complexity_identity(testCase)
+      % Test complexity of identity braid is zero.
+      b = braidlab.braid([],4);
+      c = complexity(b);
+      testCase.verifyEqual(c,0);
+    end
+
+    function test_complexity_dw_option(testCase)
+      % Test complexity with DW option.
+      b = braidlab.braid([1 2],4);
+      c = complexity(b,'DW');
+      testCase.verifyTrue(isnumeric(c));
+    end
+
+    function test_complexity_returns_loop(testCase)
+      % Test that complexity returns loop when requested.
+      b = braidlab.braid([1 2],4);
+      [c,bE] = complexity(b);
+      testCase.verifyTrue(isnumeric(c));
+      testCase.verifyClass(bE,'braidlab.loop');
+    end
+
   end
 end

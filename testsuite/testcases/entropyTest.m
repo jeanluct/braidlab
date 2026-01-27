@@ -56,29 +56,6 @@ classdef entropyTest < matlab.unittest.TestCase
   end
 
   methods (Test)
-    function test_entropy_trains(testCase)
-      global BRAIDLAB_braid_nomex %#ok<*GVMIS>
-      if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
-        % These tests require MEX.
-
-        e = entropy(testCase.b1,'method','trains');
-        testCase.verifyTrue(abs(e - testCase.e1ex) < 1e-15);
-
-        e = entropy(testCase.b2,'method','trains');
-        testCase.verifyTrue(abs(e - testCase.e2ex) < 1e-15);
-
-        % A much more difficult case: can only get 9 digits.
-        e = entropy(testCase.b3,'method','trains');
-        testCase.verifyTrue(abs(e - testCase.e3ex) < 1e-10);
-
-        testCase.verifyWarning(@() entropy(testCase.b4,'method','trains'), ...
-                               'BRAIDLAB:braid:entropy:reducible');
-
-        testCase.verifyError(@() entropy(testCase.b4,'garbage'), ...
-                             'MATLAB:InputParser:ArgumentFailedValidation');
-      end
-    end
-
     function test_entropy_iter(testCase)
       for tol = [1e-6 1e-10 1e-12 1e-14]
         e = entropy(testCase.b1,'Tol',tol);
@@ -145,7 +122,6 @@ classdef entropyTest < matlab.unittest.TestCase
     function test_low_entropy(testCase)
       % Test entropy on Venzke's low-entropy braids.
       % Stricter tolerance requires more maximum iterations.
-      global BRAIDLAB_braid_nomex
       tol = 1e-8;
       for n = 5:16
         b = braidlab.braid('psi',n);
@@ -153,11 +129,6 @@ classdef entropyTest < matlab.unittest.TestCase
 
         ee = log(max(abs(braidlab.psiroots(n))));
         testCase.verifyTrue(abs(e - ee) < tol);
-
-        if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
-          etr = entropy(b,'method','trains');
-          testCase.verifyTrue(abs(etr - ee) < 1e-9);
-        end
       end
     end
 
@@ -199,6 +170,43 @@ classdef entropyTest < matlab.unittest.TestCase
                                b.complexity, ...
                                'AbsTol',1e-12, ['intaxis: ' diagnostic]);
         end
+    end
+
+    function test_entropy_finite_order(testCase)
+      % Test entropy of finite-order braid is zero.
+      b = braidlab.braid([],4);
+      e = entropy(b);
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_entropy_two_strings(testCase)
+      % Test entropy of 2-string braid is zero.
+      b = braidlab.braid([1 1 1],2);
+      e = entropy(b);
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_entropy_pseudo_anosov(testCase)
+      % Test entropy of pseudo-Anosov braid is positive.
+      % The braid [1 2 -3] is known to be pseudo-Anosov.
+      b = braidlab.braid([1 2 -3],4);
+      e = entropy(b);
+      testCase.verifyGreaterThan(e,0);
+    end
+
+    function test_entropy_trefoil(testCase)
+      % Test entropy of trefoil knot braid.
+      b = braidlab.braid('3_1');
+      e = entropy(b);
+      % Trefoil is finite-order (periodic), so entropy is 0.
+      testCase.verifyEqual(e,0);
+    end
+
+    function test_entropy_with_tolerance(testCase)
+      % Test entropy computation with specified tolerance.
+      b = braidlab.braid([1 2 -3],4);
+      e = entropy(b,'Tol',1e-4);
+      testCase.verifyGreaterThan(e,0);
     end
 end
 end

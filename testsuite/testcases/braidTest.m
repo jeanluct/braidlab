@@ -130,30 +130,6 @@ classdef braidTest < matlab.unittest.TestCase
                            'BRAIDLAB:braid:colorbraiding:coincidentprojection');
     end
 
-    function test_braid_from_randomwalk(testCase)
-      global BRAIDLAB_braid_nomex %#ok<*GVMIS>
-      % Skip this test if not using MEX, since randombraid is only MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        rng(1);
-        XY = braidlab.randomwalk(4,2,1);
-        % The data doesn't close, so braid creation errors.
-        testCase.verifyWarning(@() braidlab.braid(XY), ...
-                               'BRAIDLAB:braid:colorbraiding:notclosed');
-        b = braidlab.braid(braidlab.closure(XY));
-        testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2]));
-
-        b = braidlab.braid(braidlab.closure(braidlab.randomwalk(4,2,1)),pi/4);
-        testCase.verifyEqual(b,braidlab.braid([1  3  2 -1 -3  1 -2 -3 -1]));
-
-        b = braidlab.braid(braidlab.closure(XY,'pure'));
-        testCase.verifyEqual(b,braidlab.braid([1 -3 -2 3 1 2 3 1 2 1 3 2]));
-        testCase.verifyTrue(b.ispure);
-      else
-        %warning('BRAIDLAB:braidTest:est_braid_from_randomwalk:skip_NoMEX', ...
-        %     'Skipping randomwalk test (only as MEX).')
-      end
-    end
-
     function test_braid_equal(testCase)
       testCase.verifyTrue(testCase.b1 == testCase.b3);
       testCase.verifyFalse(testCase.b1 ~= testCase.b3);
@@ -335,49 +311,6 @@ classdef braidTest < matlab.unittest.TestCase
       % n=10: even, 10 mod 8 = 2.
       b10 = braidlab.braid('VenzkePsi',10);
       testCase.verifyEqual(b10.n,10);
-    end
-
-    %% CFBRAID and AnnBraid conversions
-
-    function test_braid_from_cfbraid(testCase)
-      global BRAIDLAB_braid_nomex
-      % Skip this test if not using MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Test converting a cfbraid to braid.
-        import braidlab.cfbraid %#ok<SIMPT>
-        import braidlab.braid %#ok<SIMPT>
-
-        % Create a simple cfbraid from a word.
-        cf = cfbraid([1 2 3 1 2],5);
-
-        % Convert to braid.
-        b = braid(cf);
-
-        % Verify it's a braid and has correct number of strings.
-        testCase.verifyClass(b,'braidlab.braid');
-        testCase.verifyEqual(b.n,cf.n);
-
-        % The resulting braid should be delta^delta * factors.
-        D = braid('halftwist',cf.n);
-        expected = D^cf.delta * braid(cell2mat(cf.factors),cf.n);
-        testCase.verifyEqual(b,expected);
-      end
-    end
-
-    function test_braid_from_annbraid(testCase)
-      % Test converting annbraid to braid.
-      import braidlab.annbraid
-      import braidlab.braid
-
-      % Create an annular braid.
-      ab = annbraid([1 -2 3],4);
-
-      % Convert to braid.
-      b = braid(ab);
-
-      % Verify it's a braid with correct properties.
-      testCase.verifyClass(b,'braidlab.braid');
-      testCase.verifyEqual(b.n,ab.n);
     end
 
     function test_braid_copy_braid(testCase)
@@ -885,45 +818,6 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(br2.n,10);
     end
 
-    %% compact method tests
-
-    function test_braid_compact_cancelling(testCase)
-      % Test that compact reduces cancelling generators.
-      b = braidlab.braid([1 -1 2 -2 3],5);
-      c = compact(b);
-      testCase.verifyEqual(c,braidlab.braid([3],5));
-    end
-
-    function test_braid_compact_identity(testCase)
-      % Test that compact of identity is identity.
-      b = braidlab.braid([],5);
-      c = compact(b);
-      testCase.verifyTrue(isempty(c.word));
-      testCase.verifyEqual(c.n,5);
-    end
-
-    function test_braid_compact_no_reduction(testCase)
-      % Test compact on braid with no obvious reductions.
-      b = braidlab.braid([1 2 3],5);
-      c = compact(b);
-      % Result should still be equal as braids.
-      testCase.verifyTrue(b == c);
-    end
-
-    function test_braid_compact_preserves_n(testCase)
-      % Test that compact preserves string count.
-      b = braidlab.braid([1 -1],10);
-      c = compact(b);
-      testCase.verifyEqual(c.n,10);
-    end
-
-    function test_braid_compact_complex_reduction(testCase)
-      % Test compact on braid requiring multiple passes.
-      b = braidlab.braid([1 2 -2 -1],4);
-      c = compact(b);
-      testCase.verifyTrue(istrivial(c));
-    end
-
     %% tensor method tests
 
     function test_braid_tensor_basic(testCase)
@@ -1004,100 +898,6 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(size(M),[2 2]);
     end
 
-    %% loopcoords method tests
-
-    function test_braid_loopcoords_basic(testCase)
-      % Test basic loop coordinates computation.
-      b = braidlab.braid([1],3);
-      l = loopcoords(b);
-      testCase.verifyClass(l,'braidlab.loop');
-    end
-
-    function test_braid_loopcoords_identity(testCase)
-      % Test loop coordinates of identity braid.
-      b = braidlab.braid([],4);
-      l = loopcoords(b);
-      testCase.verifyClass(l,'braidlab.loop');
-    end
-
-    function test_braid_loopcoords_nontrivial(testCase)
-      % Test loop coordinates for nontrivial braid.
-      b = braidlab.braid([1 2 1],4);
-      l = loopcoords(b);
-      testCase.verifyClass(l,'braidlab.loop');
-      testCase.verifyTrue(~isempty(l.coords));
-    end
-
-    %% entropy method tests
-
-    function test_braid_entropy_finite_order(testCase)
-      % Test entropy of finite-order braid is zero.
-      b = braidlab.braid([],4);
-      e = entropy(b);
-      testCase.verifyEqual(e,0);
-    end
-
-    function test_braid_entropy_two_strings(testCase)
-      % Test entropy of 2-string braid is zero.
-      b = braidlab.braid([1 1 1],2);
-      e = entropy(b);
-      testCase.verifyEqual(e,0);
-    end
-
-    function test_braid_entropy_pseudo_anosov(testCase)
-      % Test entropy of pseudo-Anosov braid is positive.
-      % The braid [1 2 -3] is known to be pseudo-Anosov.
-      b = braidlab.braid([1 2 -3],4);
-      e = entropy(b);
-      testCase.verifyGreaterThan(e,0);
-    end
-
-    function test_braid_entropy_trefoil(testCase)
-      % Test entropy of trefoil knot braid.
-      b = braidlab.braid('3_1');
-      e = entropy(b);
-      % Trefoil is finite-order (periodic), so entropy is 0.
-      testCase.verifyEqual(e,0);
-    end
-
-    function test_braid_entropy_with_tolerance(testCase)
-      % Test entropy computation with specified tolerance.
-      b = braidlab.braid([1 2 -3],4);
-      e = entropy(b,'Tol',1e-4);
-      testCase.verifyGreaterThan(e,0);
-    end
-
-    %% complexity method tests
-
-    function test_braid_complexity_basic(testCase)
-      % Test basic complexity computation.
-      b = braidlab.braid([1 2],4);
-      c = complexity(b);
-      testCase.verifyTrue(isnumeric(c));
-    end
-
-    function test_braid_complexity_identity(testCase)
-      % Test complexity of identity braid is zero.
-      b = braidlab.braid([],4);
-      c = complexity(b);
-      testCase.verifyEqual(c,0);
-    end
-
-    function test_braid_complexity_dw_option(testCase)
-      % Test complexity with DW option.
-      b = braidlab.braid([1 2],4);
-      c = complexity(b,'DW');
-      testCase.verifyTrue(isnumeric(c));
-    end
-
-    function test_braid_complexity_returns_loop(testCase)
-      % Test that complexity returns loop when requested.
-      b = braidlab.braid([1 2],4);
-      [c,bE] = complexity(b);
-      testCase.verifyTrue(isnumeric(c));
-      testCase.verifyClass(bE,'braidlab.loop');
-    end
-
     %% alexpoly method tests
 
     function test_braid_alexpoly_trefoil(testCase)
@@ -1147,88 +947,6 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(size(M),[1 1]);
     end
 
-    %% conjtest method tests
-
-    function test_braid_conjtest_same_braid(testCase)
-      global BRAIDLAB_braid_nomex
-      % Skip this test if not using MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Test that a braid is conjugate to itself.
-        b = braidlab.braid([1 2],4);
-        isconj = conjtest(b,b);
-        testCase.verifyTrue(isconj);
-      end
-    end
-
-    function test_braid_conjtest_conjugate_braids(testCase)
-      global BRAIDLAB_braid_nomex
-      % Skip this test if not using MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Test conjugate braids.
-        br1 = braidlab.braid([1 2],4);
-        c = braidlab.braid([1],4);
-        br2 = c * br1 * c.inv;
-        isconj = conjtest(br1,br2);
-        testCase.verifyTrue(isconj);
-      end
-    end
-
-    function test_braid_conjtest_returns_conjugator(testCase)
-      global BRAIDLAB_braid_nomex
-      % Skip this test if not using MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Test that conjtest returns conjugating braid.
-        br1 = braidlab.braid([1 2],4);
-        br2 = braidlab.braid([1 -2  1 2  2 -1],4);
-        [isconj,C] = conjtest(br1,br2);
-        testCase.verifyTrue(isconj);
-        testCase.verifyTrue(inv(C) * br1 * C == br2);
-      end
-    end
-
-    %% train method tests
-
-    function test_braid_train_pseudo_anosov(testCase)
-      global BRAIDLAB_braid_nomex
-      % Skip this test if not using MEX.
-      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
-        % Test train track for pseudo-Anosov braid.
-        b = braidlab.braid([1 -2],3);
-        T = train(b);
-        testCase.verifyTrue(isstruct(T));
-        testCase.verifyTrue(isfield(T,'tntype'));
-        testCase.verifyTrue(isfield(T,'entropy'));
-        testCase.verifyEqual(T.tntype,'pseudo-Anosov');
-        testCase.verifyTrue(abs(T.entropy - 2*log((1+sqrt(5))/2)) < 1e-13);
-      end
-    end
-
-    function test_braid_train_finite_order(testCase)
-      % Test train track for finite-order braid.
-      b = braidlab.braid([1 2 3],4);
-      T = train(b);
-      testCase.verifyTrue(isstruct(T));
-      testCase.verifyEqual(T.tntype,'finite-order');
-      testCase.verifyEqual(T.entropy,0);
-    end
-
-    function test_braid_train_two_strings(testCase)
-      % Test train track for 2-string braid is finite-order.
-      % Note: For n < 3, train() returns early with just tntype and entropy.
-      % This is expected behavior since 2-string braids are always finite-order.
-      b = braidlab.braid([1 1 1],2);
-      % For 2-string braids, we expect an error due to missing fields.
-      % This tests the expected early return path for n < 3.
-      try
-        T = train(b);
-        testCase.verifyTrue(isstruct(T));
-        testCase.verifyEqual(T.entropy,0);
-      catch ME
-        % Expected error due to orderfields with missing fields.
-        testCase.verifyEqual(ME.identifier,'MATLAB:strcmp:InputsSizeMismatch');
-      end
-    end
-
     %% subbraid method tests
 
     function test_braid_subbraid_basic(testCase)
@@ -1259,33 +977,6 @@ classdef braidTest < matlab.unittest.TestCase
       b = braidlab.braid([1 3],5);
       bs = subbraid(b,[1 2 4 5]);
       testCase.verifyEqual(bs.n,4);
-    end
-
-    %% cycle method tests
-
-    function test_braid_cycle_basic(testCase)
-      % Test basic cycle computation.
-      b = braidlab.braid([1 2],3);
-      [M,period,it] = cycle(b);
-      testCase.verifyTrue(issparse(M) || isnumeric(M));
-      testCase.verifyGreaterThan(period,0);
-      testCase.verifyGreaterThan(it,0);
-    end
-
-    function test_braid_cycle_period(testCase)
-      % Test that cycle returns period.
-      b = braidlab.braid([1 2],3);
-      [~,period] = cycle(b);
-      testCase.verifyTrue(isnumeric(period));
-      testCase.verifyGreaterThan(period,0);
-    end
-
-    function test_braid_cycle_iterates(testCase)
-      % Test cycle with Iterates option.
-      b = braidlab.braid([1 2],3);
-      MI = cycle(b,'Iterates');
-      testCase.verifyTrue(iscell(MI));
-      testCase.verifyGreaterThan(length(MI),0);
     end
 
     %% mtimes additional tests

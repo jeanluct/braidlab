@@ -164,5 +164,21 @@ classdef annbraidTest < matlab.unittest.TestCase
         %        'Skipping compact test (only as MEX).')
       end
     end
+
+    function test_braid_from_annbraid(testCase)
+      % Test converting annbraid to braid.
+      import braidlab.annbraid
+      import braidlab.braid
+
+      % Create an annular braid.
+      ab = annbraid([1 -2 3],4);
+
+      % Convert to braid.
+      b = braid(ab);
+
+      % Verify it's a braid with correct properties.
+      testCase.verifyClass(b,'braidlab.braid');
+      testCase.verifyEqual(b.n,ab.n);
+    end
   end
 end

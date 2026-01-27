@@ -54,5 +54,42 @@ classdef compactTest < matlab.unittest.TestCase
                             'Braids not equal after compacting.');
       end
     end
+
+    function test_compact_cancelling(testCase)
+      % Test that compact reduces cancelling generators.
+      b = braidlab.braid([1 -1 2 -2 3],5);
+      c = compact(b);
+      testCase.verifyEqual(c,braidlab.braid([3],5));
+    end
+
+    function test_compact_identity(testCase)
+      % Test that compact of identity is identity.
+      b = braidlab.braid([],5);
+      c = compact(b);
+      testCase.verifyTrue(isempty(c.word));
+      testCase.verifyEqual(c.n,5);
+    end
+
+    function test_compact_no_reduction(testCase)
+      % Test compact on braid with no obvious reductions.
+      b = braidlab.braid([1 2 3],5);
+      c = compact(b);
+      % Result should still be equal as braids.
+      testCase.verifyTrue(b == c);
+    end
+
+    function test_compact_preserves_n(testCase)
+      % Test that compact preserves string count.
+      b = braidlab.braid([1 -1],10);
+      c = compact(b);
+      testCase.verifyEqual(c.n,10);
+    end
+
+    function test_compact_complex_reduction(testCase)
+      % Test compact on braid requiring multiple passes.
+      b = braidlab.braid([1 2 -2 -1],4);
+      c = compact(b);
+      testCase.verifyTrue(istrivial(c));
+    end
   end
 end
