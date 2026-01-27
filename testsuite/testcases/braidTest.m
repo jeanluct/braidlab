@@ -1093,5 +1093,87 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyEqual(size(M),[1 1]);
     end
 
+    %% closure tests
+
+    function test_closure_xproj_default(testCase)
+      % Test default closure (Xproj) appends initial positions.
+      XY = zeros(10,2,3);
+      XY(:,1,1) = linspace(0,1,10);
+      XY(:,1,2) = linspace(1,0,10);
+      XY(:,1,3) = linspace(0.5,0.5,10);
+      XYc = braidlab.closure(XY);
+      % Should have one extra time step.
+      testCase.verifyEqual(size(XYc,1), size(XY,1)+1);
+    end
+
+    function test_closure_xproj_explicit(testCase)
+      % Test explicit Xproj closure.
+      XY = zeros(10,2,3);
+      XY(:,1,1) = linspace(0,1,10);
+      XY(:,1,2) = linspace(1,0,10);
+      XY(:,1,3) = linspace(0.5,0.5,10);
+      XYc = braidlab.closure(XY,'Xproj');
+      testCase.verifyEqual(size(XYc,1), size(XY,1)+1);
+    end
+
+    function test_closure_pure(testCase)
+      % Test pure closure returns particles to initial positions.
+      XY = zeros(10,2,3);
+      XY(:,1,1) = linspace(0,1,10);
+      XY(:,1,2) = linspace(1,2,10);
+      XY(:,1,3) = linspace(2,0,10);
+      XY(:,2,:) = 0;  % Y coordinates all zero.
+      XYc = braidlab.closure(XY,'Pure');
+      % Final positions should equal initial positions.
+      testCase.verifyEqual(squeeze(XYc(end,:,:)), squeeze(XY(1,:,:)));
+    end
+
+    function test_closure_mindist(testCase)
+      % Test MinDist closure minimizes total distance.
+      XY = zeros(10,2,3);
+      XY(:,1,1) = linspace(0,0.1,10);
+      XY(:,1,2) = linspace(1,1.1,10);
+      XY(:,1,3) = linspace(2,2.1,10);
+      XY(:,2,:) = 0;
+      XYc = braidlab.closure(XY,'MinDist');
+      testCase.verifyEqual(size(XYc,1), size(XY,1)+1);
+    end
+
+    function test_closure_permutation(testCase)
+      % Test closure with explicit permutation.
+      XY = zeros(10,2,3);
+      XY(:,1,1) = linspace(0,1,10);
+      XY(:,1,2) = linspace(1,2,10);
+      XY(:,1,3) = linspace(2,0,10);
+      XY(:,2,:) = 0;
+      perm = [2 3 1];
+      XYc = braidlab.closure(XY,perm);
+      testCase.verifyEqual(size(XYc,1), size(XY,1)+1);
+      % Verify the closure uses the permutation correctly.
+      testCase.verifyEqual(squeeze(XYc(end,:,:)), squeeze(XY(1,:,perm)));
+    end
+
+    function test_closure_badarg_error(testCase)
+      % Test error for unknown closure type.
+      XY = zeros(10,2,3);
+      testCase.verifyError(@() braidlab.closure(XY,'garbage'), ...
+                           'BRAIDLAB:closure:badarg');
+    end
+
+    function test_closure_bad_permutation_error(testCase)
+      % Test error for invalid permutation (repeated elements).
+      XY = zeros(10,2,3);
+      testCase.verifyError(@() braidlab.closure(XY,[1 1 2]), ...
+                           'BRAIDLAB:closure:badarg');
+    end
+
+    function test_closure_preserves_dimensions(testCase)
+      % Test closure preserves coordinate dimensions.
+      XY = rand(20,2,5);
+      XYc = braidlab.closure(XY);
+      testCase.verifyEqual(size(XYc,2), size(XY,2));
+      testCase.verifyEqual(size(XYc,3), size(XY,3));
+    end
+
   end
 end
