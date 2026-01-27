@@ -57,7 +57,7 @@ classdef entropyTest < matlab.unittest.TestCase
 
   methods (Test)
     function test_entropy_trains(testCase)
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<*GVMIS>
       if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
         % These tests require MEX.
 
@@ -145,6 +145,7 @@ classdef entropyTest < matlab.unittest.TestCase
     function test_low_entropy(testCase)
       % Test entropy on Venzke's low-entropy braids.
       % Stricter tolerance requires more maximum iterations.
+      global BRAIDLAB_braid_nomex
       tol = 1e-8;
       for n = 5:16
         b = braidlab.braid('psi',n);
@@ -153,7 +154,6 @@ classdef entropyTest < matlab.unittest.TestCase
         ee = log(max(abs(braidlab.psiroots(n))));
         testCase.verifyTrue(abs(e - ee) < tol);
 
-        global BRAIDLAB_braid_nomex
         if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
           etr = entropy(b,'method','trains');
           testCase.verifyTrue(abs(etr - ee) < 1e-9);

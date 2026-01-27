@@ -103,9 +103,9 @@ end
 
 % pick computation method
 switch params.method
-  case 'proj', % projectivized uses entropy
+  case 'proj' % projectivized uses entropy
     stretch = entropy(braid(B),'onestep','length',params.length);
-  case 'nonproj', % non-projectivized uses complexity
+  case 'nonproj' % non-projectivized uses complexity
     stretch = complexity(braid(B),'length',params.length);
 end
 

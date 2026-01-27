@@ -37,7 +37,7 @@ function Nthreads = getAvailableThreadNumber
 % LICENSE>
 
 import braidlab.util.debugmsg
-global BRAIDLAB_threads
+global BRAIDLAB_threads %#ok<GVMIS>
 persistent ComputedThreads
 
 if ~isempty(ComputedThreads)
@@ -53,7 +53,7 @@ else
   else
     % try to autodetect the optimal number of threads (== number of cores)
     try
-      import java.lang.Runtime;
+      import java.lang.Runtime; %#ok<SIMPT>
       r=Runtime.getRuntime;
       ComputedThreads=r.availableProcessors;
 

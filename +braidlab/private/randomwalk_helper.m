@@ -1,4 +1,4 @@
-function varargout = randomwalk_helper(varargin)
+function randomwalk_helper(varargin)
 %RANDOMWALK_HELPER   See randomwalk_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

@@ -76,7 +76,7 @@ else
   printperi = @(varargin) fprintf(varargin{:});
 end
 
-if isa(t,'braidlab.braid') t = train(t); end
+if isa(t,'braidlab.braid'), t = train(t); end
 
 n = t.braid.n;
 tt = t.ttmap;

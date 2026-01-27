@@ -45,7 +45,7 @@ import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_loop_nomex;
+global BRAIDLAB_loop_nomex; %#ok<GVMIS>
 useMatlabVersion = any(BRAIDLAB_loop_nomex);
 
 if isempty(sigma_idx)

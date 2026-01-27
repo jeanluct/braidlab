@@ -69,7 +69,7 @@ import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex;
+global BRAIDLAB_braid_nomex; %#ok<GVMIS>
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
 if any(isnan(XY) | isinf(XY))
@@ -89,7 +89,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis'],2);
+debugmsg('colorbraiding: Initialize parameters for crossing analysis',2);
 tic
 n = size(XY,3); % number of punctures
 
@@ -155,7 +155,7 @@ try % trapping to ensure proper identification of strands
     [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
-    if isempty( regexpi(me.identifier, 'BRAIDLAB:NoMEX') )
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NoMEX', 'once') )
       rethrow(me);
     else
     debugmsg('Using MATLAB algorithm',2)

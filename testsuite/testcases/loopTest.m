@@ -62,7 +62,7 @@ classdef loopTest < matlab.unittest.TestCase
       % A column vector of loops.
       l = testCase.l2;
       c12 = l.coords;
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<*GVMIS>
       if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
         testCase.verifyEqual(c12(1,:),[1 -1 2 3]);
       end
@@ -193,7 +193,6 @@ classdef loopTest < matlab.unittest.TestCase
                             'BRAIDLAB:loop:noarrays');
 
       % Create enumerations of loops.
-      global BRAIDLAB_braid_nomex
       if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
         enum = [1 1;1 2;2 1;2 2];
         lenum = braidlab.loop('enum',3,1,2);
@@ -306,7 +305,6 @@ classdef loopTest < matlab.unittest.TestCase
         t = types{1};
 
         % First compute using matlab algorithm and default data, one-by-one.
-        global BRAIDLAB_braid_nomex
         oldSetting = BRAIDLAB_braid_nomex;
         BRAIDLAB_braid_nomex = true;
 
@@ -314,6 +312,7 @@ classdef loopTest < matlab.unittest.TestCase
         for k = 1:Nloops
           INmatlab{k} = braidlab.loop(Coords(k,:));
         end
+        OUTmatlab = cell(Nloops, 1);
         for k = 1:Nloops
           OUTmatlab{k} = B*INmatlab{k};
         end
@@ -352,6 +351,7 @@ classdef loopTest < matlab.unittest.TestCase
       for k = 1:Nloops
         INmatlab{k} = braidlab.loop(Coords(k,:),'Basepoint');
       end
+      OUTmatlab = cell(Nloops, 1);
       for k = 1:Nloops
         OUTmatlab{k} = B*INmatlab{k};
       end
@@ -376,51 +376,51 @@ classdef loopTest < matlab.unittest.TestCase
 
       for emptyMatrix = { [], zeros(1,0) }
 
-        emptyMatrix = emptyMatrix{1};
+        em = emptyMatrix{1};
 
-      % An empty braid (was issue #50).
-      l0 = braidlab.loop(3);
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        % An empty braid (was issue #50).
+        l0 = braidlab.loop(3);
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      % An empty braid with basepoint.
-      l0 = braidlab.loop(3,'bp');
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        % An empty braid with basepoint.
+        l0 = braidlab.loop(3,'bp');
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      % An empty braid with basepoint.
-      l0 = braidlab.loop(3,'bp',1);
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        % An empty braid with basepoint.
+        l0 = braidlab.loop(3,'bp',1);
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      l0 = braidlab.loop(5);
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        l0 = braidlab.loop(5);
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      % With basepoint.
-      l0 = braidlab.loop(5,'bp');
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        % With basepoint.
+        l0 = braidlab.loop(5,'bp');
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      % With basepoint.
-      l0 = braidlab.loop(5,'bp',1);
-      l = braidlab.braid(emptyMatrix,3)*l0;
-      testCase.verifyEqual(l,l0);
+        % With basepoint.
+        l0 = braidlab.loop(5,'bp',1);
+        l = braidlab.braid(em,3)*l0;
+        testCase.verifyEqual(l,l0);
 
-      % Trying to act with a braid with more strings than the loop.
-      testCase.verifyError(@() braidlab.braid(emptyMatrix,7)*l0, ...
-                           'BRAIDLAB:braid:mtimes:badgen')
+        % Trying to act with a braid with more strings than the loop.
+        testCase.verifyError(@() braidlab.braid(em,7)*l0, ...
+                             'BRAIDLAB:braid:mtimes:badgen')
 
-      % Trying to act with a braid on unsupported object.
-      testCase.verifyError(@() braidlab.braid(emptyMatrix,7)*3, ...
-                           'BRAIDLAB:braid:mtimes:badobject')
+        % Trying to act with a braid on unsupported object.
+        testCase.verifyError(@() braidlab.braid(em,7)*3, ...
+                             'BRAIDLAB:braid:mtimes:badobject')
 
-      % Not allowed to move the basepoint (puncture 1).
-      testCase.verifyError(@() braidlab.braid(1)*l0, ...
-                           'BRAIDLAB:braid:mtimes:fixbp')
-      % However [1 1] is ok, since puncture 1 not permuted.
-      testCase.verifyEqual(braidlab.braid([1 1])*l0, ...
-                           braidlab.loop([1  0  0  0  1 -1 -1 -1],'bp',1))
+        % Not allowed to move the basepoint (puncture 1).
+        testCase.verifyError(@() braidlab.braid(1)*l0, ...
+                             'BRAIDLAB:braid:mtimes:fixbp')
+        % However [1 1] is ok, since puncture 1 not permuted.
+        testCase.verifyEqual(braidlab.braid([1 1])*l0, ...
+                             braidlab.loop([1  0  0  0  1 -1 -1 -1],'bp',1))
 
       end
     end

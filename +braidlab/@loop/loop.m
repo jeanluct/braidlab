@@ -244,7 +244,7 @@ classdef loop < matlab.mixin.CustomDisplay
         return
       end
 
-      if length(varargin) == 1
+      if isscalar(varargin)
         % Create from an array with an even number of columns.
         if ndims(c) > 2 %#ok<ISMAT>
           error('BRAIDLAB:loop:loop:badarg', ...
@@ -356,7 +356,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID.EQ.
-      ee = [l1.n] == [l2.n] && [l1.basepoint] == [l2.basepoint];
+      ee = l1.n == l2.n && l1.basepoint == l2.basepoint;
       if ee, ee = all([l1.coords] == [l2.coords],2); end
     end
 
@@ -393,7 +393,7 @@ classdef loop < matlab.mixin.CustomDisplay
       % check that all inputs are loops
       assert( all(cellfun( @(x)isa(x,'braidlab.loop'), varargin )),...
              'BRAIDLAB:loop:vertcat:nonloops',...
-             ['Only braidlab/loops can be stacked'] );
+             'Only braidlab/loops can be stacked' );
 
       % all loops have to have the same basepoint
       basepoints = cellfun( @(x)x.basepoint, varargin );
@@ -416,11 +416,11 @@ classdef loop < matlab.mixin.CustomDisplay
 
       catch me
         switch me.identifier
-          case 'MATLAB:cell2mat:MixedDataTypes',
+          case 'MATLAB:cell2mat:MixedDataTypes'
             error('BRAIDLAB:loop:vertcat:mixeddatatypes',...
                   ['Only loops of the matching data type'...
                    ' can be stacked with Matlab < 2025a']);
-          case 'MATLAB:catenate:dimensionMismatch',
+          case 'MATLAB:catenate:dimensionMismatch'
             error('BRAIDLAB:loop:vertcat:mixedpuncturecount',...
                   ['Only loops with matching number '...
                    'of punctures can be stacked']);
@@ -431,12 +431,12 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     % Currently, concatenation other than vertical is not allowed
-    function varargout = horzcat(varargin)
+    function varargout = horzcat(varargin) %#ok<STOUT>
       error('BRAIDLAB:loop:noarrays',...
             'Only vertical concatenation of loops is allowed.')
     end
 
-    function varargout = cat(varargin)
+    function varargout = cat(varargin) %#ok<STOUT>
       error('BRAIDLAB:loop:noarrays',...
             'Only vertical concatenation of loops is allowed.')
     end

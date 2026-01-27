@@ -123,8 +123,6 @@ if stringopt
       error('BRAIDLAB:braid:alexpoly:cantcenter', ...
             'Can''t center polynomial for numeric types.')
     end
-  elseif any(strcmpi(opt,{'center','centre','centered','centred'}))
-    center = true;
   elseif any(strcmpi(opt, ...
              {'nocenter','uncentered','uncentred','uncenter','uncentre'}))
     center = false;

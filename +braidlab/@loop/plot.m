@@ -56,7 +56,7 @@ parser = inputParser;
 parser.addRequired('L', @(x)isa(x,'braidlab.loop') )
 
 % Function that checks for valid color inputs
-iscolor = @(a) (ischar(a) && numel(a)==1) || ...
+iscolor = @(a) (ischar(a) && isscalar(a)) || ...
           (all(isfinite(a) & a >= 0) && ...
            numel(a) >= 3 && numel(a) <= 4);
 
@@ -122,7 +122,7 @@ end
 % punctures in the loop coordinate
 
 % The default position of the punctures are the integers along the x-axis
-if isempty(options.PuncturePositions);
+if isempty(options.PuncturePositions)
   options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 

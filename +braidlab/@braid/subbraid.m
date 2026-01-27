@@ -45,7 +45,7 @@ if min(s) < 1 || max(s) > b.n
 end
 
 %% determine if MEX implementation should be used
-global BRAIDLAB_braid_nomex
+global BRAIDLAB_braid_nomex %#ok<GVMIS>
 if ~exist('BRAIDLAB_braid_nomex','var') || ...
       isempty(BRAIDLAB_braid_nomex) || ...
       BRAIDLAB_braid_nomex == false

@@ -131,7 +131,7 @@ classdef braidTest < matlab.unittest.TestCase
     end
 
     function test_braid_from_randomwalk(testCase)
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<*GVMIS>
       % Skip this test if not using MEX, since randombraid is only MEX.
       if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
         rng(1);
@@ -344,8 +344,8 @@ classdef braidTest < matlab.unittest.TestCase
       % Skip this test if not using MEX.
       if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
         % Test converting a cfbraid to braid.
-        import braidlab.cfbraid
-        import braidlab.braid
+        import braidlab.cfbraid %#ok<SIMPT>
+        import braidlab.braid %#ok<SIMPT>
 
         % Create a simple cfbraid from a word.
         cf = cfbraid([1 2 3 1 2],5);

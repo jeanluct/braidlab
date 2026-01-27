@@ -1,4 +1,4 @@
-function varargout = looplist_helper(varargin)
+function looplist_helper(varargin)
 %LOOPLIST_HELPER   See looplist_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

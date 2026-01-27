@@ -157,6 +157,6 @@ axis equal, hold off
 ax = axis; axis(1.2*ax); axis off
 set(gcf,'color','w')
 
-if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end
+if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end %#ok<UNRCH>
 
 b = braid(z,projang);

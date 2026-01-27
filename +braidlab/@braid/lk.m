@@ -141,7 +141,7 @@ for i = 1:n-1
 end
 
 %========================================================================
-function ok = check_relations(sig) %#ok<DEFNU>
+function ok = check_relations(sig) 
 
 % Verify that the braid relations are satisfied.
 

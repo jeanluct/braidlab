@@ -191,7 +191,7 @@ classdef cfbraid < matlab.mixin.CustomDisplay
        wc = textwrap({c},sz(1)-4);
        for i = 1:length(wc)
          % Indent rows.
-         if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
+         if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
          % If the format is loose rather than compact, add a line break.
          if strcmp(get(0,'FormatSpacing'),'loose')
            wc{i} = sprintf('%s\n',wc{i});

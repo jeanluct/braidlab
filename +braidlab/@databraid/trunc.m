@@ -45,7 +45,7 @@ if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
 end
 
 % select the desired crossing times
-if numel(interval) == 1
+if isscalar(interval)
   sel = bt.tcross <= interval;
 else
   sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);

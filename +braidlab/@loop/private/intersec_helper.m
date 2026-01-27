@@ -1,4 +1,4 @@
-function varargout = intersec_helper(varargin)
+function intersec_helper(varargin)
 %INTERSEC_HELPER   See intersec_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

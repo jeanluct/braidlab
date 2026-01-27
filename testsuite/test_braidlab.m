@@ -44,7 +44,7 @@ tcfolder = [pwd '/testcases/'];
 if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_loop_nomex
   clear global BRAIDLAB_braid_nomex
-  if ~braidlab.util.assertmex(['+braidlab/@braid/private/compact_helper'])
+  if ~braidlab.util.assertmex('+braidlab/@braid/private/compact_helper')
     msg = ['Requested MEX tests but braidlab appears uncompiled.  ' ...
            'Either compile braidlab or pass ''NoMEX'' to test_braidlab; ' ...
            'otherwise there will be LOTS of errors.'];
@@ -54,7 +54,7 @@ if nargin < 1 || isempty(nomex)
   disp('Testing braidlab with MEX algorithms.');
 elseif strcmpi(nomex,'NoMEX')
   % Disable MEX algorithms.
-  global BRAIDLAB_loop_nomex; %#ok<TLEV>
+  global BRAIDLAB_loop_nomex; %#ok<*GVMIS,TLEV>
   global BRAIDLAB_braid_nomex; %#ok<TLEV>
   BRAIDLAB_braid_nomex = true;
   BRAIDLAB_loop_nomex = true;

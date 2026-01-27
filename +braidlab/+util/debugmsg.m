@@ -36,7 +36,7 @@ function debugmsg(msg,lvl)
 % Note that this function can't be private, otherwise the global
 % namespace is invisible. (?)
 
-global BRAIDLAB_debuglvl
+global BRAIDLAB_debuglvl %#ok<GVMIS>
 
 if nargin < 1
   error('BRAIDLAB:debugmsg:nargin','Need to at least specify a message.')

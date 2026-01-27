@@ -56,7 +56,7 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp )
 % LICENSE>
 
 opts.issym = true; opts.isreal=true;
-[vc,ev] = eigs(Lp,size(Lp,1)/2,'SA');
+[vc,ev] = eigs(Lp,size(Lp,1)/2,'smallestabs',opts);
 ev = diag(ev);
 
 % signs of eigenvectors on nodal domains form

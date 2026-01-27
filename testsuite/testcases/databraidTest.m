@@ -48,7 +48,7 @@ classdef databraidTest < matlab.unittest.TestCase
                            'BRAIDLAB:databraid:databraid:badarg');
       % Too many input arguments.
       % The error message id changed name from R2016b.
-      maxver = '9.1.0.441655'; maxrel = '2016b';
+      maxver = '9.1.0.441655'; maxrel = '2016b'; %#ok<NASGU>
       if verLessThan('matlab', maxver)
         maxrhs_id = 'MATLAB:maxrhs';
       else
@@ -171,7 +171,7 @@ classdef databraidTest < matlab.unittest.TestCase
     function test_databraid_subbraid(testCase)
 
       % Skip this test if MEX algorithms are disabled globally.
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
       if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
         testCase.assumeTrue(false, ...
           'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
@@ -181,7 +181,6 @@ classdef databraidTest < matlab.unittest.TestCase
       n = testCase.dbrtest.n;
       substrands = 1:2:n;
 
-      global BRAIDLAB_braid_nomex
       flagstate = BRAIDLAB_braid_nomex;
 
       BRAIDLAB_braid_nomex = false;

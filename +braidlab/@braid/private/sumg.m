@@ -33,7 +33,7 @@ function out = sumg( varargin )
 %   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
-if length(varargin) == 1 % single argument returns input value
+if isscalar(varargin) % single argument returns input value
   out = varargin{1};
 elseif length(varargin) > 2
   % More than two arguments recurse binomially;
@@ -48,7 +48,7 @@ else % two arguments are added
   % We will perform the check only on integers
   if isinteger(out) % Note that VPI type fails this check, which is ok.
     % For integers, we have an upper and a lower boundary.
-    if ~( out > intmin(class(out)) & out < intmax(class(out)) )
+    if ~( out > intmin(class(out)) && out < intmax(class(out)) )
       error('BRAIDLAB:braid:sumg:overflow',...
             'Summation of %d and %d has overflowed.', a1, a2)
     end

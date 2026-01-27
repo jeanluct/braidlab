@@ -1,4 +1,4 @@
-function varargout = length_helper(varargin)
+function length_helper(varargin)
 %LENGTH_HELPER   See length_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function

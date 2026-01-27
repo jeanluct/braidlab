@@ -89,7 +89,7 @@ function [varargout] = cycle(b,varargin)
 %   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
-global BRAIDLAB_debuglvl
+global BRAIDLAB_debuglvl %#ok<GVMIS>
 
 import braidlab.*
 import braidlab.util.debugmsg

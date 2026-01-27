@@ -151,7 +151,7 @@ classdef annbraidTest < matlab.unittest.TestCase
       ab2 = annbraid([1 2 1 -2 -1 -2]);
       testCase.verifyTrue(~istrivial(ab2))
 
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
       if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
         % Compact should respect this.
         % Skip this test if not using MEX, since compact is only MEX.

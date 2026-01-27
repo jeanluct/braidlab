@@ -147,11 +147,11 @@ end
 
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
-  case 'intaxis',
+  case 'intaxis'
     lenfun = @(l) l.intaxis;
-  case 'minlength',
+  case 'minlength'
     lenfun = @minlength;
-  case 'l2norm',
+  case 'l2norm'
     lenfun = @l2norm;
 end
 
@@ -191,7 +191,7 @@ end
 u = braidlab.loop(b.n,@double,'bp');
 
 %% determine if mex should be attempted
-global BRAIDLAB_braid_nomex
+global BRAIDLAB_braid_nomex %#ok<GVMIS>
 if ~exist('BRAIDLAB_braid_nomex','var') || ...
       isempty(BRAIDLAB_braid_nomex) || ...
       BRAIDLAB_braid_nomex == false

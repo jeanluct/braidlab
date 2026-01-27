@@ -230,7 +230,7 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
-      elseif ndims(b) == 2 && size(b,1) > 1 && size(b,2) > 1
+      elseif ismatrix(b) && size(b,1) > 1 && size(b,2) > 1
         if isreal(b) && size(b,2) == 2
           % This is a one-strand braid specified as real data.
           % If the user wants to create a braid of 2 complex trajectories
@@ -506,7 +506,7 @@ classdef braid < matlab.mixin.CustomDisplay
       wc = textwrap({c},sz(1)-4);
       for i = 1:length(wc)
         % Indent rows.
-        if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
+        if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
         % If the format is loose rather than compact, add a line break.
         if strcmp(get(0,'FormatSpacing'),'loose')
           wc{i} = sprintf('%s\n',wc{i});
