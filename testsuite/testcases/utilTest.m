@@ -108,5 +108,101 @@ classdef utilTest < matlab.unittest.TestCase
       testCase.verifyWarningFree(@() debugmsg('test message', 999));
     end
 
+    %% prop tests
+
+    function test_prop_returns_struct(testCase)
+      % Test prop with no arguments returns struct.
+      braidlab.prop('reset');
+      p = braidlab.prop();
+      testCase.verifyTrue(isstruct(p));
+    end
+
+    function test_prop_default_fields(testCase)
+      % Test prop struct has expected fields.
+      braidlab.prop('reset');
+      p = braidlab.prop();
+      testCase.verifyTrue(isfield(p, 'GenRotDir'));
+      testCase.verifyTrue(isfield(p, 'GenLoopActDir'));
+      testCase.verifyTrue(isfield(p, 'GenPlotOverUnder'));
+      testCase.verifyTrue(isfield(p, 'BraidPlotDir'));
+      testCase.verifyTrue(isfield(p, 'BraidAbsTol'));
+      testCase.verifyTrue(isfield(p, 'LoopCoordsBasePoint'));
+    end
+
+    function test_prop_default_values(testCase)
+      % Test prop default values.
+      braidlab.prop('reset');
+      testCase.verifyEqual(braidlab.prop('GenRotDir'), 1);
+      testCase.verifyEqual(braidlab.prop('GenLoopActDir'), 'lr');
+      testCase.verifyEqual(braidlab.prop('GenPlotOverUnder'), true);
+      testCase.verifyEqual(braidlab.prop('BraidPlotDir'), 'bt');
+      testCase.verifyEqual(braidlab.prop('BraidAbsTol'), 1e-10);
+      testCase.verifyEqual(braidlab.prop('LoopCoordsBasePoint'), 'right');
+    end
+
+    function test_prop_set_genrotdir(testCase)
+      % Test setting GenRotDir property.
+      braidlab.prop('reset');
+      braidlab.prop('GenRotDir', -1);
+      testCase.verifyEqual(braidlab.prop('GenRotDir'), -1);
+      braidlab.prop('reset');
+    end
+
+    function test_prop_set_genloopactdir(testCase)
+      % Test setting GenLoopActDir property.
+      braidlab.prop('reset');
+      braidlab.prop('GenLoopActDir', 'rl');
+      testCase.verifyEqual(braidlab.prop('GenLoopActDir'), 'rl');
+      braidlab.prop('reset');
+    end
+
+    function test_prop_set_braidplotdir(testCase)
+      % Test setting BraidPlotDir property.
+      braidlab.prop('reset');
+      braidlab.prop('BraidPlotDir', 'lr');
+      testCase.verifyEqual(braidlab.prop('BraidPlotDir'), 'lr');
+      braidlab.prop('reset');
+    end
+
+    function test_prop_set_braidabstol(testCase)
+      % Test setting BraidAbsTol property.
+      braidlab.prop('reset');
+      braidlab.prop('BraidAbsTol', 1e-5);
+      testCase.verifyEqual(braidlab.prop('BraidAbsTol'), 1e-5);
+      braidlab.prop('reset');
+    end
+
+    function test_prop_set_loopcoordsbasepoint(testCase)
+      % Test setting LoopCoordsBasePoint property.
+      braidlab.prop('reset');
+      braidlab.prop('LoopCoordsBasePoint', 'left');
+      testCase.verifyEqual(braidlab.prop('LoopCoordsBasePoint'), 'left');
+      braidlab.prop('reset');
+    end
+
+    function test_prop_dehornoy_option(testCase)
+      % Test 'dehornoy' sets basepoint to left and GenRotDir to -1.
+      braidlab.prop('reset');
+      braidlab.prop('LoopCoordsBasePoint', 'dehornoy');
+      testCase.verifyEqual(braidlab.prop('LoopCoordsBasePoint'), 'left');
+      testCase.verifyEqual(braidlab.prop('GenRotDir'), -1);
+      braidlab.prop('reset');
+    end
+
+    function test_prop_reset(testCase)
+      % Test reset restores default values.
+      braidlab.prop('GenRotDir', -1);
+      braidlab.prop('BraidAbsTol', 1e-3);
+      braidlab.prop('reset');
+      testCase.verifyEqual(braidlab.prop('GenRotDir'), 1);
+      testCase.verifyEqual(braidlab.prop('BraidAbsTol'), 1e-10);
+    end
+
+    function test_prop_badarg_error(testCase)
+      % Test error for unknown property name.
+      testCase.verifyError(@() braidlab.prop('garbage'), ...
+                           'BRAIDLAB:prop:badarg');
+    end
+
   end
 end
