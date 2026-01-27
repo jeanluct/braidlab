@@ -293,32 +293,12 @@ classdef braid < matlab.mixin.CustomDisplay
 
         br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
       else
-        if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
-          % I _think_ the complex braid constructor form has made this code
-          % block obsolete.  Go ahead and delete after a while.
-          error('BRAIDLAB:braid:braid:badlogic', ...
-                'This code block should be unreachable?')
-          % b is neither a row vector or a column vector.  Hopefully the
-          % user means a one-particle dataset.  Perhaps they're trying to
-          % create several braids at once (which is not currently
-          % allowed).  By default, print a warning.
-          if size(b,2) == 2
-            warning('BRAIDLAB:braid:braid:onetraj', ...
-                    [ 'Creating trivial braid from single ' ...
-                      'trajectory (did you mean that?).' ])
-            br.word = int32([]);
-            br.n = 1;
-          else
-            error('BRAIDLAB:braid:braid:badarg','Bad array size.')
-          end
+        b = b(:).';   % Store word as row vector.
+        br.word = int32(b);
+        if isempty(secnd)
+          br.n = max(abs(b))+1;
         else
-          b = b(:).';   % Store word as row vector.
-          br.word = int32(b);
-          if isempty(secnd)
-            br.n = max(abs(b))+1;
-          else
-            br.n = secnd;
-          end
+          br.n = secnd;
         end
       end
 
