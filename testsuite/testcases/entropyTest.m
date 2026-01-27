@@ -243,5 +243,83 @@ classdef entropyTest < matlab.unittest.TestCase
       end
     end
 
+    %% psiroots tests
+
+    function test_psiroots_returns_roots(testCase)
+      % Test psiroots returns roots by default.
+      e = braidlab.psiroots(5);
+      testCase.verifyTrue(isnumeric(e));
+      testCase.verifyTrue(~isempty(e));
+    end
+
+    function test_psiroots_sorted_descending(testCase)
+      % Test psiroots returns roots sorted by descending magnitude.
+      e = braidlab.psiroots(7);
+      mags = abs(e);
+      testCase.verifyEqual(mags, sort(mags, 'descend'));
+    end
+
+    function test_psiroots_poly_option(testCase)
+      % Test psiroots with 'Poly' option returns polynomial coefficients.
+      c = braidlab.psiroots(5, 'Poly');
+      testCase.verifyTrue(isnumeric(c));
+      testCase.verifyEqual(c(1), 1);  % Leading coefficient is 1.
+      testCase.verifyEqual(c(end), 1);  % Constant term is 1.
+    end
+
+    function test_psiroots_polynomial_option(testCase)
+      % Test psiroots with 'Polynomial' option.
+      c = braidlab.psiroots(6, 'Polynomial');
+      testCase.verifyTrue(isnumeric(c));
+    end
+
+    function test_psiroots_consistent_roots_poly(testCase)
+      % Test that roots of polynomial match psiroots output.
+      n = 8;
+      e = braidlab.psiroots(n);
+      c = braidlab.psiroots(n, 'Poly');
+      e_from_poly = roots(c);
+      % Sort both the same way for comparison.
+      [~,i] = sort(abs(e_from_poly), 'descend');
+      e_from_poly = e_from_poly(i);
+      testCase.verifyEqual(e, e_from_poly, 'AbsTol', 1e-12);
+    end
+
+    function test_psiroots_badarg_error(testCase)
+      % Test error for n < 3.
+      testCase.verifyError(@() braidlab.psiroots(2), ...
+                           'BRAIDLAB:psiroots:badarg');
+    end
+
+    function test_psiroots_bad_flag_error(testCase)
+      % Test error for unknown flag.
+      testCase.verifyError(@() braidlab.psiroots(5, 'garbage'), ...
+                           'BRAIDLAB:psiroots');
+    end
+
+    function test_psiroots_n3_special(testCase)
+      % Test n=3 case has 2 roots (degree 2 polynomial).
+      e = braidlab.psiroots(3);
+      testCase.verifyEqual(length(e), 2);
+    end
+
+    function test_psiroots_n6_special(testCase)
+      % Test n=6 exceptional case.
+      c = braidlab.psiroots(6, 'Poly');
+      % The n=6 case has a special polynomial.
+      testCase.verifyEqual(c, [1 1 -1 -4 -4 -1 1 1]);
+    end
+
+    function test_psiroots_largest_gives_entropy(testCase)
+      % Test largest root gives entropy of psi braid.
+      for n = 5:10
+        e = braidlab.psiroots(n);
+        expected_entropy = log(max(abs(e)));
+        br = braidlab.braid('psi', n);
+        actual_entropy = entropy(br, 'method', 'trains');
+        testCase.verifyEqual(actual_entropy, expected_entropy, 'AbsTol', 1e-9);
+      end
+    end
+
   end
 end
