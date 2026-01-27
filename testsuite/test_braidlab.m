@@ -87,7 +87,8 @@ if ~(nargin >= 1 && strcmpi(nomex,'NoMEX'))
   suites{end+1} = TestSuite.fromFile([tcfolder 'trainTest.m']);
 else
   disp(['Skipping MEX-dependent tests: ' ...
-        'cfbraidTest, compactTest, conjtestTest, randomwalkTest, taffyTest, trainTest.']);
+        'cfbraidTest, compactTest, conjtestTest, ' ...
+        'randomwalkTest, taffyTest, trainTest.']);
 end
 
 % Combine all test suites.

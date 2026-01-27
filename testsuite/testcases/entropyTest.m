@@ -24,189 +24,224 @@
 
 classdef entropyTest < matlab.unittest.TestCase
 
-  properties
-    b1
-    b2
-    b3
-    b4
-    b5
-    b6
-    e1ex
-    e2ex
-    e3ex
-    e4ex
-    e6ex
-  end
-
-  methods (TestMethodSetup)
-    function createBraid(testCase)
-      import braidlab.braid
-      testCase.b1 = braid([1 -2]);
-      testCase.b2 = braid([1 1 -2 -2]);
-      testCase.b3 = braid('VenzkePsi',16);
-      testCase.b4 = braid([1 2 -3],5);
-      testCase.b5 = braid([1 2]);  % finite-order (zero entropy)
-      testCase.b6 = braid('VenzkePsi',101);
-      testCase.e1ex = 2*log((1+sqrt(5))/2);
-      testCase.e2ex = 2*log(1+sqrt(2));
-      testCase.e3ex = 0.166609316967714;
-      testCase.e4ex = 0.831442945529311;
-      testCase.e6ex = 0.026080318192290;
-    end
-  end
-
   methods (Test)
-    function test_entropy_iter(testCase)
-      for tol = [1e-6 1e-10 1e-12 1e-14]
-        e = entropy(testCase.b1,'Tol',tol);
-        testCase.verifyTrue(abs(e - testCase.e1ex) < tol);
 
-        e = entropy(testCase.b2,'Tol',tol);
-        testCase.verifyTrue(abs(e - testCase.e2ex) < tol);
+    %% Basic entropy tests
 
-        e = entropy(testCase.b4,'Tol',tol);
-        testCase.verifyTrue(abs(e - testCase.e4ex) < tol);
-      end
-
-      tol = 1e-6;
-      testCase.verifyWarning(@() entropy(testCase.b5,'Tol',tol), ...
-                             'BRAIDLAB:braid:entropy:noconv');
-      % Low-entropy braid with too few iterations.
-      testCase.verifyWarning(@() entropy(testCase.b3,...
-                                         'Tol',tol, ...
-                                         'MaxIt', 100), ...
-                             'BRAIDLAB:braid:entropy:noconv');
-
-      global BRAIDLAB_braid_nomex
-      if ~(~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex)
-        % Too slow to do without MEX.
-
-        % The default gives enough iterations.
-        e = entropy(testCase.b3,'Tol',tol);
-        testCase.verifyTrue(abs(e - testCase.e3ex) < tol);
-
-        % Try a braid with more than 100 strings, so the maximum number of
-        % iterations is determined by asymptotic spectral gap.  Have to use
-        % higher tolerance, since the entropy converges slowly.
-        e = entropy(testCase.b6,'Tol',.01*tol);
-        testCase.verifyTrue(abs(e - testCase.e6ex) < tol);
-      end
-
-      % Specify 0 tolerance: should not issue a warning about lack of
-      % convergence.
-      testCase.verifyWarningFree(@() entropy(testCase.b5,'Tol',0, ...
-                                             'MaxIt',10));
-      testCase.verifyWarningFree(@() entropy(testCase.b5, ...
-                                             'finite', 'MaxIt',10));
-    end
-
-    function test_entropy_iter_conv(testCase)
-      % Verify that the iterative method always converges to the required
-      % tolerance, using the default number of steps, unless the braid is
-      % parabolic, finite-order, or reducible with no finite-order
-      % component.
-      %
-      % This particular random set has been checked to contain no
-      % finite-order or parabolic braids, which are rare for long random
-      % braids.
-      rng('default')
-      len = 50; tol = 1e-8; Nreal = 30;
-      for r = 1:Nreal
-        for n = 4:10
-          b = braidlab.braid('random',n,len);
-          testCase.verifyWarningFree(@() b.entropy('Tol',tol));
-        end
-      end
-    end
-
-    function test_low_entropy(testCase)
-      % Test entropy on Venzke's low-entropy braids.
-      % Stricter tolerance requires more maximum iterations.
-      tol = 1e-8;
-      for n = 5:16
-        b = braidlab.braid('psi',n);
-        e = entropy(b,'Tol',tol);
-
-        ee = log(max(abs(braidlab.psiroots(n))));
-        testCase.verifyTrue(abs(e - ee) < tol);
-      end
-    end
-
-    function test_huge_entropy(testCase)
-      % Test a braid with enormous entropy, which would overflow even one
-      % application of the update rules.
-      % See issue #138.
-      tol = 1e-6;
-      % The simplest pA braid and its entropy.
-      b0 = braidlab.braid([1 -2]);
-      entr0 = entropy(b0);
-      % Number of repetitions of the braid.
-      % This gives a braid with entropy about 1925!
-      Nrep = 2000;
-      entr = entropy(b0^Nrep,'Tol',tol,'Length','l2norm');
-      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
-      entr = entropy(b0^Nrep,'Tol',tol,'Length','intaxis');
-      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
-      entr = entropy(b0^Nrep,'Tol',tol,'Length','minlen');
-      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
-    end
-
-    function test_entropy_complexity(testCase)
-      % Test that complexity and one-iterate entropy are the same.
-        len = 40;
-        for n = 3:20
-          b = braidlab.braid('random',n,len);
-
-          diagnostic = sprintf('len = %d, n = %d, word = %s', ...
-                        len,n,mat2str(b.word) );
-
-          % minlength computation
-          testCase.verifyEqual(b.entropy('onestep','length','minlength'), ...
-                               b.complexity('length','minlength'), 'AbsTol',1e-12, ...
-                               ['minlength: ' diagnostic]);
-
-          % intaxis computation
-          testCase.verifyEqual(b.entropy('onestep','length','intaxis'), ...
-                               b.complexity, ...
-                               'AbsTol',1e-12, ['intaxis: ' diagnostic]);
-        end
-    end
-
-    function test_entropy_finite_order(testCase)
+    function test_basic_finiteorder(testCase)
       % Test entropy of finite-order braid is zero.
-      b = braidlab.braid([],4);
-      e = entropy(b);
-      testCase.verifyEqual(e,0);
+      br = braidlab.braid([], 4);
+      ent = entropy(br);
+      testCase.verifyEqual(ent, 0);
     end
 
-    function test_entropy_two_strings(testCase)
+    function test_basic_twostrings(testCase)
       % Test entropy of 2-string braid is zero.
-      b = braidlab.braid([1 1 1],2);
-      e = entropy(b);
-      testCase.verifyEqual(e,0);
+      br = braidlab.braid([1 1 1], 2);
+      ent = entropy(br);
+      testCase.verifyEqual(ent, 0);
     end
 
-    function test_entropy_pseudo_anosov(testCase)
+    function test_basic_pseudoanosov(testCase)
       % Test entropy of pseudo-Anosov braid is positive.
       % The braid [1 2 -3] is known to be pseudo-Anosov.
-      b = braidlab.braid([1 2 -3],4);
-      e = entropy(b);
-      testCase.verifyGreaterThan(e,0);
+      br = braidlab.braid([1 2 -3], 4);
+      ent = entropy(br);
+      testCase.verifyGreaterThan(ent, 0);
     end
 
-    function test_entropy_trefoil(testCase)
+    function test_basic_trefoil(testCase)
       % Test entropy of trefoil knot braid.
-      b = braidlab.braid('3_1');
-      e = entropy(b);
+      br = braidlab.braid('3_1');
+      ent = entropy(br);
       % Trefoil is finite-order (periodic), so entropy is 0.
-      testCase.verifyEqual(e,0);
+      testCase.verifyEqual(ent, 0);
     end
 
-    function test_entropy_with_tolerance(testCase)
-      % Test entropy computation with specified tolerance.
-      b = braidlab.braid([1 2 -3],4);
-      e = entropy(b,'Tol',1e-4);
-      testCase.verifyGreaterThan(e,0);
+    %% Tolerance tests
+
+    function test_tolerance_b1(testCase)
+      % Test entropy with multiple tolerances for braid [1 -2].
+      br = braidlab.braid([1 -2]);
+      expected = 2*log((1+sqrt(5))/2);
+      for tol = [1e-6 1e-10 1e-12 1e-14]
+        ent = entropy(br, 'Tol', tol);
+        testCase.verifyTrue(abs(ent - expected) < tol);
+      end
     end
-end
+
+    function test_tolerance_b2(testCase)
+      % Test entropy with multiple tolerances for braid [1 1 -2 -2].
+      br = braidlab.braid([1 1 -2 -2]);
+      expected = 2*log(1+sqrt(2));
+      for tol = [1e-6 1e-10 1e-12 1e-14]
+        ent = entropy(br, 'Tol', tol);
+        testCase.verifyTrue(abs(ent - expected) < tol);
+      end
+    end
+
+    function test_tolerance_b4(testCase)
+      % Test entropy with multiple tolerances for braid [1 2 -3].
+      br = braidlab.braid([1 2 -3], 5);
+      expected = 0.831442945529311;
+      for tol = [1e-6 1e-10 1e-12 1e-14]
+        ent = entropy(br, 'Tol', tol);
+        testCase.verifyTrue(abs(ent - expected) < tol);
+      end
+    end
+
+    function test_tolerance_specified(testCase)
+      % Test entropy computation with specified tolerance.
+      br = braidlab.braid([1 2 -3], 4);
+      ent = entropy(br, 'Tol', 1e-4);
+      testCase.verifyGreaterThan(ent, 0);
+    end
+
+    %% Warning tests
+
+    function test_warning_noconv_finiteorder(testCase)
+      % Finite-order braid should warn about non-convergence.
+      br = braidlab.braid([1 2]);  % finite-order
+      testCase.verifyWarning(@() entropy(br, 'Tol', 1e-6), ...
+                             'BRAIDLAB:braid:entropy:noconv');
+    end
+
+    function test_warning_noconv_fewiter(testCase)
+      % Low-entropy braid with too few iterations.
+      br = braidlab.braid('VenzkePsi', 16);
+      testCase.verifyWarning(@() entropy(br, 'Tol', 1e-6, 'MaxIt', 100), ...
+                             'BRAIDLAB:braid:entropy:noconv');
+    end
+
+    function test_warning_zerotol(testCase)
+      % Specify 0 tolerance: should not issue warning about lack of convergence.
+      br = braidlab.braid([1 2]);
+      testCase.verifyWarningFree(@() entropy(br, 'Tol', 0, 'MaxIt', 10));
+    end
+
+    function test_warning_finite(testCase)
+      % Using 'finite' flag should not issue warning.
+      br = braidlab.braid([1 2]);
+      testCase.verifyWarningFree(@() entropy(br, 'finite', 'MaxIt', 10));
+    end
+
+    %% Low entropy braid tests (require MEX)
+
+    function test_lowentropy_venzkepsi16(testCase)
+      % Test low-entropy Venzke braid (requires MEX for speed).
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.assumeTrue(false, ...
+          'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
+      end
+      br = braidlab.braid('VenzkePsi', 16);
+      tol = 1e-6;
+      expected = 0.166609316967714;
+      ent = entropy(br, 'Tol', tol);
+      testCase.verifyTrue(abs(ent - expected) < tol);
+    end
+
+    function test_lowentropy_venzkepsi101(testCase)
+      % Test braid with >100 strings (requires MEX for speed).
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
+      if ~isempty(BRAIDLAB_braid_nomex) && BRAIDLAB_braid_nomex
+        testCase.assumeTrue(false, ...
+          'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
+      end
+      br = braidlab.braid('VenzkePsi', 101);
+      tol = 1e-6;
+      expected = 0.026080318192290;
+      ent = entropy(br, 'Tol', 0.01*tol);
+      testCase.verifyTrue(abs(ent - expected) < tol);
+    end
+
+    function test_lowentropy_psi(testCase)
+      % Test entropy on Venzke's low-entropy braids.
+      tol = 1e-8;
+      for nstrands = 5:16
+        br = braidlab.braid('psi', nstrands);
+        ent = entropy(br, 'Tol', tol);
+        expected = log(max(abs(braidlab.psiroots(nstrands))));
+        testCase.verifyTrue(abs(ent - expected) < tol);
+      end
+    end
+
+    %% Convergence tests
+
+    function test_convergence_random(testCase)
+      % Verify iterative method converges to required tolerance.
+      % Uses random braids (checked to contain no finite-order/parabolic).
+      rng('default')
+      len = 50;
+      tol = 1e-8;
+      Nreal = 30;
+      for r = 1:Nreal
+        for nstrands = 4:10
+          br = braidlab.braid('random', nstrands, len);
+          testCase.verifyWarningFree(@() br.entropy('Tol', tol));
+        end
+      end
+    end
+
+    %% Huge entropy tests
+
+    function test_huge_l2norm(testCase)
+      % Test braid with enormous entropy using l2norm.  Issue #138.
+      tol = 1e-6;
+      br0 = braidlab.braid([1 -2]);
+      entr0 = entropy(br0);
+      Nrep = 2000;
+      entr = entropy(br0^Nrep, 'Tol', tol, 'Length', 'l2norm');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+    end
+
+    function test_huge_intaxis(testCase)
+      % Test braid with enormous entropy using intaxis.  Issue #138.
+      tol = 1e-6;
+      br0 = braidlab.braid([1 -2]);
+      entr0 = entropy(br0);
+      Nrep = 2000;
+      entr = entropy(br0^Nrep, 'Tol', tol, 'Length', 'intaxis');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+    end
+
+    function test_huge_minlen(testCase)
+      % Test braid with enormous entropy using minlen.  Issue #138.
+      tol = 1e-6;
+      br0 = braidlab.braid([1 -2]);
+      entr0 = entropy(br0);
+      Nrep = 2000;
+      entr = entropy(br0^Nrep, 'Tol', tol, 'Length', 'minlen');
+      testCase.verifyTrue(abs(entr - Nrep*entr0)/entr < tol);
+    end
+
+    %% Complexity comparison tests
+
+    function test_complexity_minlength(testCase)
+      % Test that complexity and one-iterate entropy are the same (minlength).
+      len = 40;
+      for nstrands = 3:20
+        br = braidlab.braid('random', nstrands, len);
+        diagnostic = sprintf('len = %d, n = %d, word = %s', ...
+                      len, nstrands, mat2str(br.word));
+        testCase.verifyEqual(br.entropy('onestep', 'length', 'minlength'), ...
+                             br.complexity('length', 'minlength'), ...
+                             'AbsTol', 1e-12, ['minlength: ' diagnostic]);
+      end
+    end
+
+    function test_complexity_intaxis(testCase)
+      % Test that complexity and one-iterate entropy are the same (intaxis).
+      len = 40;
+      for nstrands = 3:20
+        br = braidlab.braid('random', nstrands, len);
+        diagnostic = sprintf('len = %d, n = %d, word = %s', ...
+                      len, nstrands, mat2str(br.word));
+        testCase.verifyEqual(br.entropy('onestep', 'length', 'intaxis'), ...
+                             br.complexity, ...
+                             'AbsTol', 1e-12, ['intaxis: ' diagnostic]);
+      end
+    end
+
+  end
 end
