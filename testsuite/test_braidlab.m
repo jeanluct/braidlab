@@ -39,7 +39,9 @@ import matlab.unittest.*
 
 braidlab.prop('reset');
 
-tcfolder = [pwd '/testcases/'];
+% Get the folder where this script is located.
+scriptpath = fileparts(mfilename('fullpath'));
+tcfolder = [scriptpath '/testcases/'];
 
 if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_loop_nomex
