@@ -131,8 +131,20 @@ classdef braid < matlab.mixin.CustomDisplay
     %   This is a method for the BRAID class.
     %   See also BRAID, CFBRAID.
 
+      arguments
+        b = []
+        secnd = []
+        third = []
+      end
+
       % Allow default empty braid: return trivial braid with one string.
-      if nargin == 0, return; end
+      % If secnd is specified, use it as the number of strings.
+      if isempty(b)
+        if ~isempty(secnd)
+          br.n = secnd;
+        end
+        return
+      end
       if isa(b,'braidlab.annbraid')
         % This is a bit of a kludge.  annbraid needs a custom conversion
         % to braid.  b.braid calls the right function (annbraid.braid),
@@ -160,7 +172,7 @@ classdef braid < matlab.mixin.CustomDisplay
           br.word = [br.word br.word];
          case {'hironakakin','hironaka-kin','hk'}
           m = secnd;
-          if nargin < 3
+          if isempty(third)
             if m < 5
               error('BRAIDLAB:braid:braid:badarg', ...
                     'Need at least five strings.')
@@ -251,9 +263,10 @@ classdef braid < matlab.mixin.CustomDisplay
           br.n = 1;
         else
           % b is a 2-dim array of complex data.
-          if nargin > 2
+          if ~isempty(third)
             error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
-          elseif nargin < 2
+          end
+          if isempty(secnd)
             % Use a zero projection angle.
             secnd = 0;
           end
@@ -262,9 +275,10 @@ classdef braid < matlab.mixin.CustomDisplay
         end
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
-        if nargin > 2
+        if ~isempty(third)
           error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
-        elseif nargin < 2
+        end
+        if isempty(secnd)
           % Use a zero projection angle.
           secnd = 0;
         end
@@ -300,7 +314,7 @@ classdef braid < matlab.mixin.CustomDisplay
         else
           b = b(:).';   % Store word as row vector.
           br.word = int32(b);
-          if nargin < 2
+          if isempty(secnd)
             br.n = max(abs(b))+1;
           else
             br.n = secnd;
