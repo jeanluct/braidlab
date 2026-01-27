@@ -508,7 +508,9 @@ classdef braid < matlab.mixin.CustomDisplay
         % Indent rows.
         if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
         % If the format is loose rather than compact, add a line break.
-        if strcmp(get(0,'FormatSpacing'),'loose')
+        s = settings;
+        if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue, ...
+                  'loose')
           wc{i} = sprintf('%s\n',wc{i});
         end
       end

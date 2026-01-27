@@ -48,7 +48,8 @@ for i = 1:length(wc)
     wc{i} = ['   ' wc{i}];
   end
   % If the format is loose rather than compact, add a line break.
-  if strcmp(get(0,'FormatSpacing'),'loose')
+  s = settings;
+  if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue,'loose')
     if wrapped || i == length(wc)
       wc{i} = sprintf('%s\n',wc{i});
     end
