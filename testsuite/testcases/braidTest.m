@@ -644,5 +644,245 @@ classdef braidTest < matlab.unittest.TestCase
       testCase.verifyClass(br1.word,'int32');
       testCase.verifyClass(br2.word,'int32');
     end
+
+    %% char method tests
+
+    function test_braid_char_nonempty(testCase)
+      % Test char conversion for non-empty braid.
+      b = braidlab.braid([1 -2 3]);
+      str = char(b);
+      testCase.verifyTrue(contains(str,'<'));
+      testCase.verifyTrue(contains(str,'>'));
+      testCase.verifyTrue(contains(str,'1'));
+      testCase.verifyTrue(contains(str,'-2'));
+      testCase.verifyTrue(contains(str,'3'));
+    end
+
+    function test_braid_char_empty(testCase)
+      % Test char conversion for identity braid.
+      b = braidlab.braid([],5);
+      str = char(b);
+      testCase.verifyEqual(str,'< e >');
+    end
+
+    %% gencount method tests
+
+    function test_braid_gencount_basic(testCase)
+      % Test basic generator counting.
+      b = braidlab.braid([1 1 2 -1 -2 -2],4);
+      [c,i] = gencount(b);
+      % Generators are -3,-2,-1,1,2,3 for n=4.
+      testCase.verifyEqual(length(c),6);
+      testCase.verifyEqual(length(i),6);
+      testCase.verifyEqual(sum(c),length(b));
+    end
+
+    function test_braid_gencount_distribution(testCase)
+      % Test that gencount returns correct distribution.
+      b = braidlab.braid([1 1 1 -2 -2],4);
+      [c,i] = gencount(b);
+      % Find counts for specific generators.
+      idx1 = find(i == 1);
+      idx_neg2 = find(i == -2);
+      testCase.verifyEqual(c(idx1),3);
+      testCase.verifyEqual(c(idx_neg2),2);
+    end
+
+    function test_braid_gencount_empty(testCase)
+      % Test gencount on identity braid.
+      b = braidlab.braid([],4);
+      [c,i] = gencount(b);
+      testCase.verifyEqual(sum(c),0);
+      testCase.verifyEqual(length(i),6); % -3,-2,-1,1,2,3 for n=4.
+    end
+
+    %% lexeq method tests
+
+    function test_braid_lexeq_identical(testCase)
+      % Test lexeq on identical braids.
+      b = braidlab.braid([1 2 3],5);
+      testCase.verifyTrue(lexeq(b,b));
+    end
+
+    function test_braid_lexeq_different_word_same_braid(testCase)
+      % Test lexeq on equivalent but lexically different braids.
+      b1 = braidlab.braid([1 -1 2],4);
+      b2 = braidlab.braid([2],4);
+      % They are equal as braids.
+      testCase.verifyTrue(b1 == b2);
+      % But not lexically equal.
+      testCase.verifyFalse(lexeq(b1,b2));
+    end
+
+    function test_braid_lexeq_different_n(testCase)
+      % Test lexeq on braids with different n.
+      b1 = braidlab.braid([1 2],4);
+      b2 = braidlab.braid([1 2],5);
+      testCase.verifyFalse(lexeq(b1,b2));
+    end
+
+    %% mpower method tests
+
+    function test_braid_mpower_negative(testCase)
+      % Test negative powers.
+      b = braidlab.braid([1 2],4);
+      b_inv = b^(-1);
+      testCase.verifyEqual(b_inv,b.inv);
+      testCase.verifyTrue((b * b_inv) == braidlab.braid([],4));
+    end
+
+    function test_braid_mpower_zero(testCase)
+      % Test zero power returns identity.
+      b = braidlab.braid([1 2 3],5);
+      b0 = b^0;
+      testCase.verifyTrue(isempty(b0.word));
+      testCase.verifyEqual(b0.n,5);
+    end
+
+    function test_braid_mpower_negative_multiple(testCase)
+      % Test multiple negative powers.
+      b = braidlab.braid([1],3);
+      b_neg2 = b^(-2);
+      expected = braidlab.braid([-1 -1],3);
+      testCase.verifyTrue(lexeq(b_neg2,expected));
+    end
+
+    %% inv method tests
+
+    function test_braid_inv_double_inverse(testCase)
+      % Test that double inverse returns original.
+      b = braidlab.braid([1 -2 3],5);
+      testCase.verifyTrue(lexeq(b.inv.inv,b));
+    end
+
+    function test_braid_inv_empty(testCase)
+      % Test inverse of identity braid.
+      b = braidlab.braid([],5);
+      testCase.verifyTrue(isempty(b.inv.word));
+      testCase.verifyEqual(b.inv.n,5);
+    end
+
+    %% perm method tests
+
+    function test_braid_perm_single_generator(testCase)
+      % Test permutation of single generator.
+      b = braidlab.braid([1],3);
+      testCase.verifyEqual(b.perm,[2 1 3]);
+    end
+
+    function test_braid_perm_negative_generator(testCase)
+      % Test that negative generator gives same permutation as positive.
+      b_pos = braidlab.braid([2],4);
+      b_neg = braidlab.braid([-2],4);
+      testCase.verifyEqual(b_pos.perm,b_neg.perm);
+    end
+
+    function test_braid_perm_composition(testCase)
+      % Test permutation composition.
+      b1 = braidlab.braid([1],3);
+      b2 = braidlab.braid([2],3);
+      b12 = b1 * b2;
+      % Compute expected permutation manually.
+      % b1: [2 1 3], b2: [1 3 2].
+      % Composition: apply b1 then b2.
+      testCase.verifyEqual(b12.perm,[2 3 1]);
+    end
+
+    %% writhe method tests
+
+    function test_braid_writhe_positive(testCase)
+      % Test writhe of all positive generators.
+      b = braidlab.braid([1 2 3],5);
+      testCase.verifyEqual(b.writhe,3);
+    end
+
+    function test_braid_writhe_negative(testCase)
+      % Test writhe of all negative generators.
+      b = braidlab.braid([-1 -2 -3],5);
+      testCase.verifyEqual(b.writhe,-3);
+    end
+
+    function test_braid_writhe_mixed(testCase)
+      % Test writhe of mixed positive and negative generators.
+      b = braidlab.braid([1 -1 2 -2 3],5);
+      testCase.verifyEqual(b.writhe,1);
+    end
+
+    %% eq and ne method tests
+
+    function test_braid_eq_different_n_same_word(testCase)
+      % Test equality of braids with same word but different n.
+      b1 = braidlab.braid([1 2],4);
+      b2 = braidlab.braid([1 2],5);
+      testCase.verifyFalse(b1 == b2);
+      testCase.verifyTrue(b1 ~= b2);
+    end
+
+    function test_braid_eq_empty_braids(testCase)
+      % Test equality of two identity braids.
+      b1 = braidlab.braid([],5);
+      b2 = braidlab.braid([],5);
+      testCase.verifyTrue(b1 == b2);
+    end
+
+    function test_braid_eq_identity_vs_cancelling(testCase)
+      % Test that cancelling generators equal identity.
+      b1 = braidlab.braid([],4);
+      b2 = braidlab.braid([1 -1],4);
+      testCase.verifyTrue(b1 == b2);
+    end
+
+    %% set.n validation tests
+
+    function test_braid_set_n_valid_increase(testCase)
+      % Test increasing n to valid value.
+      b = braidlab.braid([1 2],4);
+      b.n = 10;
+      testCase.verifyEqual(b.n,10);
+    end
+
+    function test_braid_set_n_invalid_decrease(testCase)
+      % Test decreasing n below minimum required errors.
+      b = braidlab.braid([1 2 3],5);
+      testCase.verifyError(@() setfield(b,'n',3), ...
+                           'BRAIDLAB:braid:setn:badarg');
+    end
+
+    %% Normal distribution braid constructor
+
+    function test_braid_normal_distribution(testCase)
+      % Test normal/binomial distribution braid constructor.
+      % Requires Statistics Toolbox.
+      if ~exist('binornd','file')
+        return
+      end
+      rng(42);
+      b = braidlab.braid('normal',5,10);
+      testCase.verifyEqual(b.n,5);
+      testCase.verifyEqual(length(b.word),10);
+      % All generators should be in valid range.
+      testCase.verifyTrue(all(abs(b.word) >= 1));
+      testCase.verifyTrue(all(abs(b.word) <= 4));
+    end
+
+    %% FullTwist constructor
+
+    function test_braid_fulltwist_equals_halftwist_squared(testCase)
+      % Test FullTwist is square of HalfTwist.
+      n = 5;
+      ft = braidlab.braid('FullTwist',n);
+      ht = braidlab.braid('HalfTwist',n);
+      expected = ht^2;
+      testCase.verifyTrue(lexeq(ft,expected));
+    end
+
+    %% Copy constructor preserves n
+
+    function test_braid_copy_preserves_n(testCase)
+      % Test that copy constructor preserves n.
+      b1 = braidlab.braid([1],10);
+      b2 = braidlab.braid(b1);
+      testCase.verifyEqual(b2.n,10);
+    end
   end
 end
