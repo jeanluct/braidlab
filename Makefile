@@ -96,6 +96,7 @@ ifeq ($(GMP_CHECK),yes)
 	BRAIDLAB_USE_GMP = 1
 else
 	BRAIDLAB_USE_GMP = 0
+	$(info GMP libraries not found; building without GMP support.)
 endif
 endif
 
