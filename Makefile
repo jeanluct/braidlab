@@ -23,9 +23,13 @@
 # LICENSE>
 
 # Find architecture, set corresponding mex file suffix.
+# Linux and Darwin return exact matches from uname -s.
+# Windows environments (MINGW, MSYS, Cygwin) return version-specific strings
+# like MINGW64_NT-10.0-19045, so we use findstring to match the prefix.
 SYS = $(shell uname -s)
 ARCH = $(shell uname -m)
 ifeq ($(SYS), Linux)
+	# Linux: x86_64 (Intel/AMD 64-bit), aarch64 (ARM 64-bit), i686 (32-bit)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexa64
 	else ifeq ($(ARCH), aarch64)
@@ -34,6 +38,7 @@ ifeq ($(SYS), Linux)
 		MEXSUFFIX = mexglx
 	endif
 else ifeq ($(SYS), Darwin)
+	# macOS: x86_64 (Intel), arm64 (Apple Silicon M1/M2/M3)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexmaci64
 	else ifeq ($(ARCH), arm64)
