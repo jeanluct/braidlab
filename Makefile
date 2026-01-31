@@ -37,6 +37,27 @@ else ifeq ($(SYS), Darwin)
 	else ifeq ($(ARCH), arm64)
 		MEXSUFFIX = mexmaca64
 	endif
+else ifneq (,$(findstring MINGW,$(SYS)))
+	# MINGW64 or MINGW32 on Windows
+	ifeq ($(ARCH), x86_64)
+		MEXSUFFIX = mexw64
+	else
+		MEXSUFFIX = mexw32
+	endif
+else ifneq (,$(findstring MSYS,$(SYS)))
+	# MSYS2 on Windows
+	ifeq ($(ARCH), x86_64)
+		MEXSUFFIX = mexw64
+	else
+		MEXSUFFIX = mexw32
+	endif
+else ifneq (,$(findstring CYGWIN,$(SYS)))
+	# Cygwin on Windows
+	ifeq ($(ARCH), x86_64)
+		MEXSUFFIX = mexw64
+	else
+		MEXSUFFIX = mexw32
+	endif
 endif
 
 # Set MACOSX deployment target to the major SDK version (e.g. 15.0)
