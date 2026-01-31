@@ -16,7 +16,7 @@ OBJSOURCES = \
 SRCDIR = .
 
 CXX ?= g++
-CXXFLAGS = -Wall -O3 -ffast-math
+CXXFLAGS = -Wall -O3 -ffast-math -fPIC
 
 LIBS = -L../lib -ltrains
 
