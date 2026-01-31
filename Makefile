@@ -62,6 +62,8 @@ else ifneq (,$(findstring CYGWIN,$(SYS)))
 	endif
 endif
 
+export MEXSUFFIX
+
 # Set MACOSX deployment target to the major SDK version (e.g. 15.0)
 # when on Darwin
 ifeq ($(SYS), Darwin)
@@ -116,18 +118,18 @@ else
 	GMP_LD =
 endif
 
-MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
+MAKEMEX = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 	CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 	GMP_LD="$(GMP_LD)"
 
 .PHONY: all check-env doc clean distclean
 
 all: check-env
-	cd +braidlab/private; $(MAKE) all
-	cd +braidlab/+util; $(MAKE) all
-	cd +braidlab/@braid/private; $(MAKE) all
-	cd +braidlab/@loop/private; $(MAKE) all
-	cd +braidlab/@cfbraid/private; $(MAKE) all
+	cd +braidlab/private; $(MAKEMEX) all
+	cd +braidlab/+util; $(MAKEMEX) all
+	cd +braidlab/@braid/private; $(MAKEMEX) all
+	cd +braidlab/@loop/private; $(MAKEMEX) all
+	cd +braidlab/@cfbraid/private; $(MAKEMEX) all
 
 check-env:
 ifndef MEXSUFFIX
@@ -139,18 +141,18 @@ doc:
 
 # remove MEX files and object files.
 clean:
-	cd extern/cbraid/lib; $(MAKE) clean
-	cd extern/trains; $(MAKE) clean
-	cd +braidlab/@braid/private; $(MAKE) clean
-	cd +braidlab/@loop/private; $(MAKE) clean
-	cd +braidlab/@cfbraid/private; $(MAKE) clean
-	cd +braidlab/private; $(MAKE) clean
-	cd +braidlab/+util; $(MAKE) clean
-	cd doc; $(MAKE) clean
+	cd extern/cbraid/lib; make clean
+	cd extern/trains; make clean
+	cd +braidlab/@braid/private; make clean
+	cd +braidlab/@loop/private; make clean
+	cd +braidlab/@cfbraid/private; make clean
+	cd +braidlab/private; make clean
+	cd +braidlab/+util; make clean
+	cd doc; make clean
 
 # distclean also removes the libraries (useful for recompiling on
 # different OS) and the LaTeX-generated files.
 distclean: clean
 	rm -f extern/cbraid/lib/libcbraid-mex.a
-	cd extern/trains; $(MAKE) distclean
-	cd doc; $(MAKE) distclean
+	cd extern/trains; make distclean
+	cd doc; make distclean
