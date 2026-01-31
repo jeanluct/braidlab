@@ -38,7 +38,7 @@ ifeq ($(USE_CLN),1)
 endif
 CPPFLAGS = -Wall -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
-ARFLAGS = rv
+ARFLAGS = rcs
 CXX ?= g++
 
 MAKEDEPCMD = $(CXX)
