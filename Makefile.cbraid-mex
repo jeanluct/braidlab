@@ -38,7 +38,7 @@ endif
 CPPFLAGS = -Wall -std=c++11 -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
 ARFLAGS = rv
-CXX = g++
+CXX ?= g++
 
 MAKEDEPCMD = $(CXX)
 MAKEDEPFLAGS = -M
