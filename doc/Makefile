@@ -42,7 +42,9 @@ $(MASTERFILE).pdf: $(MASTERFILE).tex $(MASTERFILE).bib
 
 clean:
 	# Remove latex clutter.
-	rm -f *.aux *.bbl *.blg *.idx *.ilg *.ind *.log *.out *.toc
+	rm -f \
+		*.aux *.bbl *.blg \
+		*.fdb_latexmk *.fls *.idx *.ilg *.ind *.log *.out *.toc
 
 distclean: clean
 	# Revert PDF file to latest revision.
