@@ -28,6 +28,8 @@ ARCH = $(shell uname -m)
 ifeq ($(SYS), Linux)
 	ifeq ($(ARCH), x86_64)
 		MEXSUFFIX = mexa64
+	else ifeq ($(ARCH), aarch64)
+		MEXSUFFIX = mexa64
 	else ifeq ($(ARCH), i686)
 		MEXSUFFIX = mexglx
 	endif
