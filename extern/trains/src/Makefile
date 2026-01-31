@@ -17,6 +17,7 @@ SRCDIR = .
 
 CXX ?= g++
 CXXFLAGS = -Wall -O3 -ffast-math -fPIC
+ARFLAGS = rcs
 
 LIBS = -L../lib -ltrains
 
@@ -37,8 +38,7 @@ all: lib frontend train
 lib libtrains libtrains.a: ../lib/libtrains.a
 
 ../lib/libtrains.a: $(OBJS)
-	ar cr libtrains.a $(OBJS)
-	ranlib libtrains.a
+	$(AR) $(ARFLAGS) libtrains.a $(OBJS)
 	mv -f libtrains.a ../lib
 
 frontend: ../lib/libtrains.a frontend.o
