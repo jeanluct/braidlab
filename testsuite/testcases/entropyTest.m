@@ -312,7 +312,7 @@ classdef entropyTest < matlab.unittest.TestCase
 
     function test_psiroots_largest_gives_entropy(testCase)
       % Test largest root gives entropy of psi braid.
-      global BRAIDLAB_braid_nomex
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
       testCase.assumeTrue(isempty(BRAIDLAB_braid_nomex), ...
         'Skipping MEX-specific test when BRAIDLAB_braid_nomex is set.');
       for n = 5:10

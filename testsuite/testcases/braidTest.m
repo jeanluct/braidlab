@@ -813,7 +813,7 @@ classdef braidTest < matlab.unittest.TestCase
     function test_perm_composition(testCase)
       % Test permutation composition.
       br1 = braidlab.braid([1],3);
-      br2 = braidlab.braid([2],3);
+      br2 = braidlab.braid([2],3); %#ok<*NBRAK2>
       b12 = br1 * br2;
       % Compute expected permutation manually.
       % br1: [2 1 3], br2: [1 3 2].
@@ -952,7 +952,7 @@ classdef braidTest < matlab.unittest.TestCase
       % Find counts for specific generators.
       idx1 = find(i == 1);
       idx_neg2 = find(i == -2);
-      testCase.verifyEqual(c(idx1),3);
+      testCase.verifyEqual(c(idx1),3); %#ok<*FNDSB>
       testCase.verifyEqual(c(idx_neg2),2);
     end
 
