@@ -93,7 +93,9 @@ ifndef BRAIDLAB_USE_GMP
 # Test by attempting to link a tiny program against gmpxx and gmp.
 # Use a one-line shell command that pipes source to the compiler to avoid
 # issues with multi-line heredocs inside make's $(shell ...).
-GMP_CHECK := $(shell printf 'int main(void){return 0;}' | cc -x c - -lgmpxx -lgmp -o /tmp/_braidlab_gmp_test 2>/dev/null && echo yes || echo no; rm -f /tmp/_braidlab_gmp_test 2>/dev/null)
+GMP_CHECK := $(shell printf 'int main(void){return 0;}' \
+	| cc -x c - -lgmpxx -lgmp -o /tmp/_braidlab_gmp_test 2>/dev/null \
+	&& echo yes || echo no; rm -f /tmp/_braidlab_gmp_test 2>/dev/null)
 ifeq ($(GMP_CHECK),yes)
 	BRAIDLAB_USE_GMP = 1
 else
