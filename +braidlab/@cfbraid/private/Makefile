@@ -49,9 +49,8 @@ endif
 
 %.$(MEXSUFFIX): %.cpp
 	# Rebuild libcbraid-mex.a with the MEX-compatible compiler.
-	cd $(CBRAID_LIBDIR); \
-		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
+	$(MAKE) -C $(CBRAID_LIBDIR) -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
+	$(MEX) $(MEXFLAGS) $< \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
 clean:

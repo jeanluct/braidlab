@@ -52,15 +52,13 @@ endif
 
 %.$(MEXSUFFIX): %.cpp
 # Rebuild libcbraid-mex.a with the MEX-compatible compiler.
-	cd $(CBRAID_LIBDIR); \
-		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
+	$(MAKE) -C $(CBRAID_LIBDIR) -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
+	$(MEX) $(MEXFLAGS) $< \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
 train_helper.$(MEXSUFFIX): train_helper.cpp
-	cd $(TRAINS_DIR); \
-		make CXX="$(CXX) -fPIC" CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
+	$(MAKE) -C $(TRAINS_DIR) CXX="$(CXX) -fPIC" CC=$(CC)
+	$(MEX) $(MEXFLAGS) $< \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
