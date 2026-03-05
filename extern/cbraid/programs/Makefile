@@ -1,7 +1,7 @@
 # File names and directories
 SOURCES       = test.cpp speedtest.cpp braiding_main.cpp
 PROGRAMS      = $(SOURCES:.cpp=)
-OBJS	      = $(SOURCES:.cpp=.o)
+OBJS          = $(SOURCES:.cpp=.o)
 CBRAID_LIBDIR = ../lib
 CBRAID_INCDIR = ../include
 CBRAID_LIB    = $(CBRAID_LIBDIR)/libcbraid.a
@@ -14,8 +14,8 @@ MAKEDEPCMD   = $(CXX)
 # Compile options.
 # Use make USE_CLN=1 to compile with the CLN library.
 ifeq ($(USE_CLN),1)
-	CPPFLAGS_CLN = -DUSE_CLN
-	LIBFLAGS_CLN = -lcln
+        CPPFLAGS_CLN = -DUSE_CLN
+        LIBFLAGS_CLN = -lcln
 endif
 CPPFLAGS = -Wall -O -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid $(LIBFLAGS_CLN)

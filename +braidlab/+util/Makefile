@@ -38,8 +38,8 @@ all: check-env assignmentoptimal.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
-	# Variables not defined properly if run from local folder.
-	$(error Run make from braidlab root folder)
+        # Variables not defined properly if run from local folder.
+        $(error Run make from braidlab root folder)
 endif
 
 %.$(MEXSUFFIX): %.c

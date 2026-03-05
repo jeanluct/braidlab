@@ -29,43 +29,43 @@
 SYS = $(shell uname -s)
 ARCH = $(shell uname -m)
 ifeq ($(SYS), Linux)
-	# Linux: x86_64 (Intel/AMD 64-bit), aarch64 (ARM 64-bit), i686 (32-bit)
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexa64
-	else ifeq ($(ARCH), aarch64)
-		# MATLAB uses mexa64 for ARM64 Linux (same suffix as x86_64).
-		MEXSUFFIX = mexa64
-	else ifeq ($(ARCH), i686)
-		MEXSUFFIX = mexglx
-	endif
+        # Linux: x86_64 (Intel/AMD 64-bit), aarch64 (ARM 64-bit), i686 (32-bit)
+        ifeq ($(ARCH), x86_64)
+                MEXSUFFIX = mexa64
+        else ifeq ($(ARCH), aarch64)
+                # MATLAB uses mexa64 for ARM64 Linux (same suffix as x86_64).
+                MEXSUFFIX = mexa64
+        else ifeq ($(ARCH), i686)
+                MEXSUFFIX = mexglx
+        endif
 else ifeq ($(SYS), Darwin)
-	# macOS: x86_64 (Intel), arm64 (Apple Silicon M1/M2/M3)
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexmaci64
-	else ifeq ($(ARCH), arm64)
-		MEXSUFFIX = mexmaca64
-	endif
+        # macOS: x86_64 (Intel), arm64 (Apple Silicon M1/M2/M3)
+        ifeq ($(ARCH), x86_64)
+                MEXSUFFIX = mexmaci64
+        else ifeq ($(ARCH), arm64)
+                MEXSUFFIX = mexmaca64
+        endif
 else ifneq (,$(findstring MINGW,$(SYS)))
-	# MINGW64 or MINGW32 on Windows
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexw64
-	else
-		MEXSUFFIX = mexw32
-	endif
+        # MINGW64 or MINGW32 on Windows
+        ifeq ($(ARCH), x86_64)
+                MEXSUFFIX = mexw64
+        else
+                MEXSUFFIX = mexw32
+        endif
 else ifneq (,$(findstring MSYS,$(SYS)))
-	# MSYS2 on Windows
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexw64
-	else
-		MEXSUFFIX = mexw32
-	endif
+        # MSYS2 on Windows
+        ifeq ($(ARCH), x86_64)
+                MEXSUFFIX = mexw64
+        else
+                MEXSUFFIX = mexw32
+        endif
 else ifneq (,$(findstring CYGWIN,$(SYS)))
-	# Cygwin on Windows
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexw64
-	else
-		MEXSUFFIX = mexw32
-	endif
+        # Cygwin on Windows
+        ifeq ($(ARCH), x86_64)
+                MEXSUFFIX = mexw64
+        else
+                MEXSUFFIX = mexw32
+        endif
 endif
 
 export MEXSUFFIX
@@ -73,11 +73,11 @@ export MEXSUFFIX
 # Set MACOSX deployment target to the major SDK version (e.g. 15.0)
 # when on Darwin
 ifeq ($(SYS), Darwin)
-	SDKVER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null || echo)
-	ifneq ($(SDKVER),)
-		SDKMAJOR := $(firstword $(subst ., ,$(SDKVER)))
-		MACOSX_DEPLOYMENT_TARGET ?= $(SDKMAJOR).0
-	endif
+        SDKVER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null || echo)
+        ifneq ($(SDKVER),)
+                SDKMAJOR := $(firstword $(subst ., ,$(SDKVER)))
+                MACOSX_DEPLOYMENT_TARGET ?= $(SDKMAJOR).0
+        endif
 endif
 
 MEX = mex
@@ -95,42 +95,42 @@ ifndef BRAIDLAB_USE_GMP
 # Link to /dev/null to avoid temp file races on multi-user systems.
 # Use $(CC) so detection matches the compiler used for the actual build.
 GMP_CHECK := $(shell printf 'int main(void){return 0;}' \
-	| $(CC) -x c - -lgmpxx -lgmp -o /dev/null 2>/dev/null \
-	&& echo yes || echo no)
+        | $(CC) -x c - -lgmpxx -lgmp -o /dev/null 2>/dev/null \
+        && echo yes || echo no)
 ifeq ($(GMP_CHECK),yes)
-	BRAIDLAB_USE_GMP = 1
+        BRAIDLAB_USE_GMP = 1
 else
-	BRAIDLAB_USE_GMP = 0
-	$(info GMP libraries not found; building without GMP support.)
+        BRAIDLAB_USE_GMP = 0
+        $(info GMP libraries not found; building without GMP support.)
 endif
 endif
 
 ifneq ($(BRAIDLAB_USE_GMP), 0)
-	# If Homebrew installed gmp, prefer its lib/include paths.
-	# Not guarded by Darwin: also supports Homebrew on Linux.
-	BREW_GMP_PREFIX := $(shell brew --prefix gmp 2>/dev/null || echo)
-	ifneq ($(BREW_GMP_PREFIX),)
-		GMP_LD = -L$(BREW_GMP_PREFIX)/lib -lgmpxx -lgmp
-		CFLAGS += -I$(BREW_GMP_PREFIX)/include
-		CXXFLAGS += -I$(BREW_GMP_PREFIX)/include
-	else
-		GMP_LD = -lgmpxx -lgmp
-	endif
-	MEXFLAGS += -DBRAIDLAB_USE_GMP
+        # If Homebrew installed gmp, prefer its lib/include paths.
+        # Not guarded by Darwin: also supports Homebrew on Linux.
+        BREW_GMP_PREFIX := $(shell brew --prefix gmp 2>/dev/null || echo)
+        ifneq ($(BREW_GMP_PREFIX),)
+                GMP_LD = -L$(BREW_GMP_PREFIX)/lib -lgmpxx -lgmp
+                CFLAGS += -I$(BREW_GMP_PREFIX)/include
+                CXXFLAGS += -I$(BREW_GMP_PREFIX)/include
+        else
+                GMP_LD = -lgmpxx -lgmp
+        endif
+        MEXFLAGS += -DBRAIDLAB_USE_GMP
 else
-	GMP_LD =
+        GMP_LD =
 endif
 
 MAKEMEX_ARGS = MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
-	CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
-	GMP_LD="$(GMP_LD)"
+        CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
+        GMP_LD="$(GMP_LD)"
 
 # Sub-directory targets for parallel-safe builds with make -j.
 # Dependencies: @braid/private and @cfbraid/private both rebuild
 # libcbraid-mex.a, so they must not run concurrently.  The other three
 # sub-directories are independent and can build in parallel.
 SUBDIRS_INDEPENDENT = +braidlab/private +braidlab/+util +braidlab/@loop/private
-SUBDIRS_CBRAID     = +braidlab/@cfbraid/private +braidlab/@braid/private
+SUBDIRS_CBRAID      = +braidlab/@cfbraid/private +braidlab/@braid/private
 
 .PHONY: all check-env doc clean distclean \
 	$(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
