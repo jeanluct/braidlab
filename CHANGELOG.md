@@ -3,27 +3,31 @@
 
 ## [3.2.7-rc1] - 2026-01-27
 
+* Add dozens of new tests to the testsuite to improve coverage.  (Generated
+  with the help of CoPilot.)
+
 * Fix the testsuite so it properly excludes MEX-based tests when
   `NoMEX' option is passed as an argument.
 
-* Add dozens of tests to the testsuite to improve coverage.
-  (Generated with the help of copilot.)
+* General Makefile improvements: variables instead of flags, allow CXX
+  variable to be overwritten from parent Makefile.
 
 * Cross-platform compatibility:
 
+  - ARM64 Linux platform support.
+  - Windows support (MINGW, MSYS, Cygwin).
   - Auto-detect GMP at build and automatically disable if system libs missing.
   - Prefer Homebrew GMP; add its -I and -L flags when detected.
   - Make doc distclean portable: use Python `utime` instead of GNU `touch -d`.
-  - Fix `doc/Makefile` recipe parsing on macOS by using a portable,
-    core-OS timestamp adjustment (no Python/Perl); removes a makefile
-    syntax error during `make distclean`.
+  - Fix `doc/Makefile` recipe parsing on macOS by using a portable, core-OS
+    timestamp adjustment (no Python/Perl); removes a makefile syntax error
+    during `make distclean`.
 
 * macOS-only:
 
-  - Remove Linux-only `-z noexecstack` flag on Darwin to avoid linker
-    errors.
-  - Default `MACOSX_DEPLOYMENT_TARGET` to SDK major version (e.g.,
-    15.0) when unset, for consistent builds.
+  - Remove Linux-only `-z noexecstack` flag on Darwin to avoid linker errors.
+  - Default `MACOSX_DEPLOYMENT_TARGET` to SDK major version (e.g., 15.0) when
+    unset, for consistent builds.
   - Add Homebrew GMP -I/-L flags on macOS when detected so helpers link.
 
 
