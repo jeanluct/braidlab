@@ -8,8 +8,8 @@ CBRAID_LIB    = $(CBRAID_LIBDIR)/libcbraid.a
 DEPFILE       = .depends
 
 # Commands
-CPP          = g++
-MAKEDEPCMD   = $(CPP)
+CXX         ?= g++
+MAKEDEPCMD   = $(CXX)
 
 # Compile options.
 # Use make USE_CLN=1 to compile with the CLN library.
@@ -27,11 +27,11 @@ TEST_ARG =
 # Default compile rules
 # Rule to make an object file from a source file.
 %.o: %.cpp
-	$(CPP) -c $(CPPFLAGS) -I$(CBRAID_INCDIR) $<
+	$(CXX) -c $(CPPFLAGS) -I$(CBRAID_INCDIR) $<
 
 # Rule to make an executable from an object file.
 .o:
-	$(CPP) $(CPPFLAGS) $(OBJ) $@.o -o $(subst _main,,$@) $(LIBFLAGS)
+	$(CXX) $(CPPFLAGS) $(OBJ) $@.o -o $(subst _main,,$@) $(LIBFLAGS)
 
 # Default target.
 all: $(PROGRAMS)
@@ -42,7 +42,7 @@ $(PROGRAMS): $(DEPFILE) $(CBRAID_LIB)
 
 # Build library
 $(CBRAID_LIB):
-	cd $(CBRAID_LIBDIR); make libcbraid.a
+	$(MAKE) -C $(CBRAID_LIBDIR) libcbraid.a
 
 # Sample programs.
 do-test: test
@@ -54,12 +54,12 @@ do-speedtest: speedtest
 # Cleanup.
 clean:
 	rm -rf $(subst _main,,$(PROGRAMS)) $(OBJS) $(DEPFILE)
-	cd $(CBRAID_LIBDIR); make clean
+	$(MAKE) -C $(CBRAID_LIBDIR) clean
 
 # Make dependencies.
 depend:
 	rm -f $(DEPFILE)
-	make $(DEPFILE)
+	$(MAKE) $(DEPFILE)
 
 # Make dependencies file.
 $(DEPFILE):

@@ -66,7 +66,7 @@ clean:
 # Make dependencies.
 depend:
 	rm -f $(DEPFILE)
-	make $(DEPFILE)
+	$(MAKE) $(DEPFILE)
 
 # Make dependencies file.
 $(DEPFILE):
