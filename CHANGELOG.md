@@ -10,7 +10,8 @@
   `NoMEX' option is passed as an argument.
 
 * General Makefile improvements: variables instead of flags, allow CXX
-  variable to be overwritten from parent Makefile.
+  variable to be overwritten from parent Makefile.  Enable make -j parallel
+  builds.
 
 * Cross-platform compatibility:
 
@@ -22,13 +23,8 @@
   - Fix `doc/Makefile` recipe parsing on macOS by using a portable, core-OS
     timestamp adjustment (no Python/Perl); removes a makefile syntax error
     during `make distclean`.
-
-* macOS-only:
-
-  - Remove Linux-only `-z noexecstack` flag on Darwin to avoid linker errors.
-  - Default `MACOSX_DEPLOYMENT_TARGET` to SDK major version (e.g., 15.0) when
-    unset, for consistent builds.
-  - Add Homebrew GMP -I/-L flags on macOS when detected so helpers link.
+  - Darwin: default `MACOSX_DEPLOYMENT_TARGET` to SDK major version (e.g.,
+    15.0) when unset, for consistent builds.
 
 
 ## [3.2.6] - 2025-08-02
