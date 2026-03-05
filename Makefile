@@ -92,11 +92,10 @@ MEXFLAGS = -largeArrayDims -O
 # failing the build on systems without libgmp / libgmpxx installed.
 ifndef BRAIDLAB_USE_GMP
 # Test by attempting to link a tiny program against gmpxx and gmp.
-# Link to /dev/null to avoid temp file races on multi-user systems.
-# Use $(CC) so detection matches the compiler used for the actual build.
+# Use a one-line shell command that pipes source to the compiler to avoid.
 GMP_CHECK := $(shell printf 'int main(void){return 0;}' \
-        | $(CC) -x c - -lgmpxx -lgmp -o /dev/null 2>/dev/null \
-        && echo yes || echo no)
+        | $(CC) -x c - -lgmpxx -lgmp -o /tmp/_gmp_check 2>/dev/null \
+        && echo yes || echo no; rm -f /tmp/_gmp_check)
 ifeq ($(GMP_CHECK),yes)
         BRAIDLAB_USE_GMP = 1
 else
