@@ -22,53 +22,11 @@
 #   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 # LICENSE>
 
-# Find architecture, set corresponding mex file suffix.
-# Linux and Darwin return exact matches from uname -s.
-# Windows environments (MINGW, MSYS, Cygwin) return version-specific strings
-# like MINGW64_NT-10.0-19045, so we use findstring to match the prefix.
+# Detect the MEX file suffix by compiling a tiny test program with mex
+# and inspecting the output file extension.  This replaces the old
+# manual uname-based detection table and works on every platform that
+# MATLAB supports.
 SYS = $(shell uname -s)
-ARCH = $(shell uname -m)
-ifeq ($(SYS), Linux)
-    # Linux: x86_64 (Intel/AMD 64-bit), aarch64 (ARM 64-bit), i686 (32-bit)
-    ifeq ($(ARCH), x86_64)
-        MEXSUFFIX = mexa64
-    else ifeq ($(ARCH), aarch64)
-        # MATLAB uses mexa64 for ARM64 Linux (same suffix as x86_64).
-        MEXSUFFIX = mexa64
-    else ifeq ($(ARCH), i686)
-        MEXSUFFIX = mexglx
-    endif
-else ifeq ($(SYS), Darwin)
-    # macOS: x86_64 (Intel), arm64 (Apple Silicon M1/M2/M3)
-    ifeq ($(ARCH), x86_64)
-        MEXSUFFIX = mexmaci64
-    else ifeq ($(ARCH), arm64)
-        MEXSUFFIX = mexmaca64
-    endif
-else ifneq (,$(findstring MINGW,$(SYS)))
-    # MINGW64 or MINGW32 on Windows
-    ifeq ($(ARCH), x86_64)
-        MEXSUFFIX = mexw64
-    else
-        MEXSUFFIX = mexw32
-    endif
-else ifneq (,$(findstring MSYS,$(SYS)))
-    # MSYS2 on Windows
-    ifeq ($(ARCH), x86_64)
-        MEXSUFFIX = mexw64
-    else
-        MEXSUFFIX = mexw32
-    endif
-else ifneq (,$(findstring CYGWIN,$(SYS)))
-    # Cygwin on Windows
-    ifeq ($(ARCH), x86_64)
-        MEXSUFFIX = mexw64
-    else
-        MEXSUFFIX = mexw32
-    endif
-endif
-
-export MEXSUFFIX
 
 # Set MACOSX deployment target to the major SDK version (e.g. 15.0)
 # when on Darwin
@@ -81,13 +39,23 @@ ifeq ($(SYS), Darwin)
 endif
 
 MEX = mex
-MEX_CHECK := $(shell command -v "$(MEX)")
+MEX_CHECK := $(shell command -v $(MEX))
 ifndef MEX_CHECK
-    $(error $(MEX) not found in path.  Either set MEX variable in Makefile with full path or add $(MEX) to path)
-    exit 1
-else
-    $(info $(MEX) is available.)
+    $(error $(MEX) not found in PATH.  Set MEX variable with full path or add $(MEX) to PATH)
 endif
+
+# Auto-detect MEXSUFFIX by compiling a trivial MEX file and extracting
+# the file extension.  The whole sequence runs in a single $(shell ...)
+# so the result is available as a Make variable at parse time.
+MEX_TMP = /tmp/_mex_tmp
+MEXSUFFIX := $(shell \
+    echo 'void mexFunction(int a,void*b,int c,const void*d){}' > $(MEX_TMP).c && \
+    $(MEX) $(MEX_TMP).c -output $(MEX_TMP) >/dev/null 2>&1 && \
+    f=$$(ls $(MEX_TMP).mex* 2>/dev/null) && \
+    echo "$${f##*.}" ; \
+    rm -f $(MEX_TMP).*)
+
+export MEXSUFFIX
 
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
 # C++11 is needed for parallel code.
@@ -100,7 +68,7 @@ MEXFLAGS = -largeArrayDims -O
 # failing the build on systems without libgmp / libgmpxx installed.
 ifndef BRAIDLAB_USE_GMP
 # Test by attempting to link a tiny program against gmpxx and gmp.
-# Use a one-line shell command that pipes source to the compiler to avoid.
+# Use a one-line shell command that pipes source to the compiler.
 GMP_CHECK := $(shell printf 'int main(void){return 0;}' \
     | $(CC) -x c - -lgmpxx -lgmp -o /tmp/_gmp_check 2>/dev/null \
     && echo yes || echo no; rm -f /tmp/_gmp_check)
@@ -139,10 +107,10 @@ MAKEMEX_ARGS = MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
 SUBDIRS_INDEPENDENT = +braidlab/private +braidlab/+util +braidlab/@loop/private
 SUBDIRS_CBRAID      = +braidlab/@cfbraid/private +braidlab/@braid/private
 
-.PHONY: all check-env doc clean distclean \
+.PHONY: all doc clean distclean \
 	$(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
 
-all: check-env $(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
+all: $(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
 
 # Independent sub-directories (safe to build in parallel).
 $(SUBDIRS_INDEPENDENT):
@@ -155,12 +123,10 @@ $(SUBDIRS_INDEPENDENT):
 $(SUBDIRS_CBRAID):
 	$(MAKE) -C $@ $(MAKEMEX_ARGS) all
 
-check-env:
 ifndef MEXSUFFIX
-	$(error Unsupported system/architecture: $(SYS)/$(ARCH). \
-		Supported: Linux (x86_64, aarch64, i686), \
-		Darwin (x86_64, arm64), Windows/MINGW/MSYS/Cygwin (x86_64, x86))
+    $(error Could not detect MEX suffix.  Is mex in your PATH?)
 endif
+$(info MEXSUFFIX is $(MEXSUFFIX).)
 
 doc:
 	$(MAKE) -C doc
