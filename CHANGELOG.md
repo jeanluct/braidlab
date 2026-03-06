@@ -1,27 +1,32 @@
 # Change Log
 
 
-## [3.2.7-rc1] - 2026-01-27
+## [3.3-rc1] - 2026-03-06
 
 * Add dozens of new tests to the testsuite to improve coverage.  (Generated
   with the help of CoPilot.)
 
-* Fix a bug in loopsigma.m when using VPI (Variable Precision Integers)
-  toolbox.
-
 * Fix the testsuite so it properly excludes MEX-based tests when
-  `NoMEX' option is passed as an argument.
+  `NoMEX' option is passed as an argument (issue #158).
 
-* General Makefile improvements: variables instead of flags, allow CXX
-  variable to be overwritten from parent Makefile.  Enable make -j parallel
-  builds.
+* Fix a bug in `loopsigma.m` when using VPI (Variable Precision Integers)
+  toolbox (issue #160).
+
+* General Makefile improvements:
+
+  - Enable `make -j` parallel builds for much faster compilation.
+  - Variables instead of flags in many places.
+  - Allow CXX variable to be overwritten from parent Makefile.
+  - More informational messages to user.
 
 * Cross-platform compatibility:
 
-  - ARM64 Linux platform support.
-  - Windows support (MINGW, MSYS, Cygwin).
+  - Windows support (hopefully MINGW, MSYS, Cygwin; Giuseppe DiLabbio tested
+    on MSYS2).  See issue #112.
+  - Detect MEXSUFFIX by compiling a tiny MEX file, so that the Makefile should
+    work on any platform with POSIX compliant shell.
   - Auto-detect GMP at build and automatically disable if system libs missing.
-  - Prefer Homebrew GMP; add its -I and -L flags when detected.
+  - Prefer Homebrew GMP; add its -I and -L flags when detected (Darwin/Linux).
   - Make doc distclean portable: use Python `utime` instead of GNU `touch -d`.
   - Fix `doc/Makefile` recipe parsing on macOS by using a portable, core-OS
     timestamp adjustment (no Python/Perl); removes a makefile syntax error
@@ -32,7 +37,7 @@
 
 ## [3.2.6] - 2025-08-02
 
-* Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
+* Bugfix: Testsuite failed with Matlab R2025a because `cell2mat` no
   longer throws exception for mismatched data types.  See issue #155.
   (Thanks to Nick Tufillaro.)
 
@@ -103,7 +108,7 @@
 
 ## [3.2.2] - 2017-06-02
 
-* Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
+* Bugfix: error message `maxrhs` ID changed name in Matlab R2016b caused
   `databraidTest` to fail (issue #137).
 
 
