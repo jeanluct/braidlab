@@ -38,6 +38,11 @@ ifeq ($(SYS), Darwin)
     endif
 endif
 
+# Use TMPDIR from the environment if set, otherwise fall back to local dir.
+# The $(or ...) guarantees we never get an empty string (which would
+# cause temp files to be written to the filesystem root).
+TMPDIR := $(or $(TMPDIR),.)
+
 MEX = mex
 MEX_CHECK := $(shell command -v $(MEX))
 ifndef MEX_CHECK
@@ -47,7 +52,7 @@ endif
 # Auto-detect MEXSUFFIX by compiling a trivial MEX file and extracting
 # the file extension.  The whole sequence runs in a single $(shell ...)
 # so the result is available as a Make variable at parse time.
-MEX_TMP = /tmp/_mex_tmp
+MEX_TMP = $(TMPDIR)/_mex_tmp
 MEXSUFFIX := $(shell \
     echo 'void mexFunction(int a,void*b,int c,const void*d){}' > $(MEX_TMP).c && \
     $(MEX) $(MEX_TMP).c -output $(MEX_TMP) >/dev/null 2>&1 && \
@@ -67,11 +72,13 @@ MEXFLAGS = -largeArrayDims -O
 # and disable GMP automatically when they are not present. This avoids
 # failing the build on systems without libgmp / libgmpxx installed.
 ifndef BRAIDLAB_USE_GMP
-# Test by attempting to link a tiny program against gmpxx and gmp.
-# Use a one-line shell command that pipes source to the compiler.
-GMP_CHECK := $(shell printf 'int main(void){return 0;}' \
-    | $(CC) -x c - -lgmpxx -lgmp -o /tmp/_gmp_check 2>/dev/null \
-    && echo yes || echo no; rm -f /tmp/_gmp_check)
+# Test by writing a tiny program to a temp file, compiling and linking
+# it against gmpxx and gmp, then checking the exit status.
+GMP_TMP = $(TMPDIR)/_gmp_check
+GMP_CHECK := $(shell \
+    echo 'int main(void){return 0;}' > $(GMP_TMP).c && \
+    $(CC) $(GMP_TMP).c -lgmpxx -lgmp -o $(GMP_TMP) >/dev/null 2>&1 && \
+    echo yes || echo no; rm -f $(GMP_TMP).c $(GMP_TMP))
 ifeq ($(GMP_CHECK),yes)
     BRAIDLAB_USE_GMP = 1
 else
