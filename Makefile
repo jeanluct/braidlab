@@ -81,6 +81,14 @@ ifeq ($(SYS), Darwin)
 endif
 
 MEX = mex
+MEX_CHECK := $(shell command -v "$(MEX)")
+ifndef MEX_CHECK
+    $(error $(MEX) not found in path.  Either set MEX variable in Makefile with full path or add $(MEX) to path)
+    exit 1
+else
+    $(info $(MEX) is available.)
+endif
+
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
 # C++11 is needed for parallel code.
 CXXFLAGS = $(CFLAGS) -std=c++11
