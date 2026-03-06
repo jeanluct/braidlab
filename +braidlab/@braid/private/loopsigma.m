@@ -127,7 +127,9 @@ n = size(loop_in,2)/2 + 2;
 a = loop_in(:,1:n-2); b = loop_in(:,(n-1):end);
 ap = a; bp = b;
 
-pos = @(x)max(x,0); neg = @(x)min(x,0);
+% 0*x(1) returns a zero with the same type (class) as elements of x.
+% This is necessary for vpi (variable precision integer package).
+pos = @(x)max(x,0*x(1)); neg = @(x)min(x,0*x(1));
 
 % If nargout > 1, record the state of pos/neg operators.
 % There are at most maxopSign such choices for each generator.

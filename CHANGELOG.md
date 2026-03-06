@@ -6,6 +6,9 @@
 * Add dozens of new tests to the testsuite to improve coverage.  (Generated
   with the help of CoPilot.)
 
+* Fix a bug in loopsigma.m when using VPI (Variable Precision Integers)
+  toolbox.
+
 * Fix the testsuite so it properly excludes MEX-based tests when
   `NoMEX' option is passed as an argument.
 
