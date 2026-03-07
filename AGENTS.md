@@ -221,7 +221,7 @@ devel/tests/iss141-handle-for-loop-plot/
 ### Making Changes
 
 1. **Create feature branch**: `issXXX-description` from `develop`
-2. **Follow style guide**: See `devel/STYLE.md` and `MATLAB_STYLE_GUIDE.md`
+2. **Follow style guide**: See `devel/STYLE.md` and `devel/MATLAB_STYLE_GUIDE.md`
 3. **Test thoroughly**: Visual + functional tests
 4. **Update documentation**: Help text + CHANGELOG.md
 
@@ -281,7 +281,7 @@ options = parser.Results;
 
 ### Style Guides
 
-- **MATLAB Style**: `MATLAB_STYLE_GUIDE.md` (detailed formatting)
+- **MATLAB Style**: `devel/MATLAB_STYLE_GUIDE.md` (detailed formatting)
 - **Braidlab Style**: `devel/STYLE.md` (project-specific conventions)
 - **Workflow**: https://github.com/jeanluct/braidlab/wiki/braidlab-workflow
 
@@ -293,7 +293,7 @@ options = parser.Results;
 
 1. ✓ Read this AGENTS.md
 2. ✓ Review `devel/LOOP_PLOT_REFACTOR_PLAN.md` (current task)
-3. ✓ Check `devel/STYLE.md` and `MATLAB_STYLE_GUIDE.md`
+3. ✓ Check `devel/STYLE.md` and `devel/MATLAB_STYLE_GUIDE.md`
 4. ✓ Look at existing code in `+braidlab/@loop/`
 
 ### During Coding
