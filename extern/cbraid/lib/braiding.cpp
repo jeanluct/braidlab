@@ -28,11 +28,15 @@
 #include <iomanip>
 #include <fstream>
 
-using namespace CBraid;
-using namespace std;
-
 
 namespace Braiding {
+
+using CBraid::ArtinBraid;
+using CBraid::ArtinFactor;
+using CBraid::sint16;
+using std::list;
+using std::cout;
+using std::endl;
 
 // typedef ArtinPresentation P;
 
@@ -261,7 +265,7 @@ void PrintBraidWord(ArtinBraid B)
 
 void PrintBraidWord(ArtinBraid B, char * file)
 {
-  ofstream f(file,ios::app);
+  std::ofstream f(file,std::ios::app);
 
   if(B.LeftDelta==1)
     {
@@ -353,7 +357,7 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 {
   list<sint16>::iterator itw;
-  ofstream f(file,ios::app);
+  std::ofstream f(file,std::ios::app);
 
   if(power!=1)
     f << "( ";
@@ -1947,8 +1951,8 @@ sint16 ReadIndex()
 {
   sint16 n;
   cout << endl << "Set the number of strands: ";
-  cin >> n;
-  cin.ignore();
+  std::cin >> n;
+  std::cin.ignore();
   return n;
 }
 
@@ -1968,12 +1972,12 @@ list<sint16> ReadWord(sint16 n)
   cout << endl << "Type a braid with " << n << " strands: "
        << "('" << n << "' = Delta)"
        << endl << endl;
-  while(cin.peek()!='\n')
+  while(std::cin.peek()!='\n')
     {
-      cin >> ws >> a;
+      std::cin >> std::ws >> a;
       word.push_back(a);
     }
-  cin.ignore();
+  std::cin.ignore();
 
   return word;
 
@@ -1991,8 +1995,8 @@ sint16 ReadPower()
 {
   sint16 power;
   cout << endl << "Raise it to power... ";
-  cin >> power;
-  cin.ignore();
+  std::cin >> power;
+  std::cin.ignore();
   return power;
 }
 
@@ -2037,7 +2041,7 @@ char* ReadFileName()
 {
   char *f=new char[30];
   cout << endl << "Type the name of the output file: ";
-  cin.getline(f,30);
+  std::cin.getline(f,30);
   cout << endl;
 
   return f;
@@ -2054,7 +2058,7 @@ char* ReadFileName()
 void PrintUSS(list<list<ArtinBraid> > &  uss, list<sint16> word, sint16 n,
 	      sint16 power, char * file, sint16 type, sint16 rigidity)
 {
-  ofstream f(file);
+  std::ofstream f(file);
 
   sint16 orbits=0;
 
@@ -2178,11 +2182,11 @@ void PrintUSS(list<list<ArtinBraid> > &  uss, list<sint16> word, sint16 n,
       size=1;
       for(oit=(*it).begin(); oit!=(*it).end(); oit++)
 	{
-	  f << endl << setw(5) << size++;
+	  f << endl << std::setw(5) << size++;
 	  f << ":   ";
 	  f.close();
 	  PrintBraidWord(*oit,file);
-	  f.open(file,ios::app);
+	  f.open(file,std::ios::app);
 	}
       f << endl << endl << endl;
     }
@@ -2941,7 +2945,7 @@ list<list<ArtinBraid> > SC(ArtinBraid B)
 void PrintSC(list<list<ArtinBraid> > &  sc, list<sint16> word, sint16 n,
 	      sint16 power, char * file, sint16 type)
 {
-  ofstream f(file);
+  std::ofstream f(file);
 
   sint16 orbits=0;
 
@@ -3047,11 +3051,11 @@ void PrintSC(list<list<ArtinBraid> > &  sc, list<sint16> word, sint16 n,
       size=1;
       for(oit=(*it).begin(); oit!=(*it).end(); oit++)
 	{
-	  f << endl << setw(5) << size++;
+	  f << endl << std::setw(5) << size++;
 	  f << ":   ";
 	  f.close();
 	  PrintBraidWord(*oit,file);
-	  f.open(file,ios::app);
+	  f.open(file,std::ios::app);
 	}
       f << endl << endl << endl;
     }

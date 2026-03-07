@@ -4,10 +4,10 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                            Marko Budisic          <marko@clarkson.edu>
+//   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic          <mbudisic@gmail.com>
 //
 //   This file is part of Braidlab.
 //
@@ -22,7 +22,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 
@@ -53,7 +53,7 @@ int BRAIDLAB_debuglvl = -1; // set externally after the include
 #endif // gcc
 
 // CLANG: feature list:
-// http://clang.llvm.org/cxx_status.html
+// https://clang.llvm.org/cxx_status.html
 #if (defined __clang__)
 
 #define CLANGVERSION (__clang_major__ * 10000   \
@@ -69,7 +69,7 @@ int BRAIDLAB_debuglvl = -1; // set externally after the include
 
 #ifndef BRAIDLAB_NOTHREADING
 #include <mutex>
-#include "ThreadPool.h" // (c) Jakob Progsch
+#include "ThreadPool.h" // (c) Jakob Progsch, Václav Zeman
                         // https://github.com/progschj/ThreadPool
 #endif
 
@@ -241,7 +241,7 @@ template <class T>
 void BraidInPlace<T>::run(size_t NThreadsRequested) {
 
 #ifndef BRAIDLAB_NOTHREADING
-  // restrict the number of threads if there are less jobs than available
+  // restrict the number of threads if there are fewer jobs than available
   // threads
   NThreadsRequested = NThreadsRequested > Nloops ? Nloops : NThreadsRequested;
 #else
@@ -254,7 +254,7 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
 
   // unthreaded version
   if (NThreadsRequested == 1) {
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("loopsigma_helper: multiplication running UNTHREADED.\n" );
       mexEvalString("pause(0.001);"); //flush
     }
@@ -264,13 +264,13 @@ void BraidInPlace<T>::run(size_t NThreadsRequested) {
   }
 #ifndef BRAIDLAB_NOTHREADING
   else {   // threaded version
-    if (1 <= BRAIDLAB_debuglvl)  {
+    if (2 <= BRAIDLAB_debuglvl)  {
       printf("loopsigma_helper: multiplication running THREADED (%d threads).\n",
              NThreadsRequested);
       mexEvalString("pause(0.001);"); //flush
     }
     // scheduler for threads
-    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch
+    ThreadPool pool(NThreadsRequested); // (c) Jakob Progsch, Václav Zeman
 
     // std::bind creates a function reference to a member function
     // needed here b/c passing references to member functions

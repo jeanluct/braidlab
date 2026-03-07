@@ -9,6 +9,9 @@ loop.getgraph
 loop.loop('Enum')
 loop.l2norm
 debugmsg
+ttmap('Inverses')
+ttmap('BoldMain')
+ttmap('BoldPeripheral')
 
 @cfbraid class
 loop pre-allocation (see devel/test/loop_speedtest)

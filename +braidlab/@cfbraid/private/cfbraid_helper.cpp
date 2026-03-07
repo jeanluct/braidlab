@@ -7,10 +7,10 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                            Marko Budisic          <marko@clarkson.edu>
+//   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic          <mbudisic@gmail.com>
 //
 //   This file is part of Braidlab.
 //
@@ -25,7 +25,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 #include <iostream>
@@ -46,7 +46,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   const mxArray *wA = prhs[0];
   const int *w = (int *)mxGetData(wA); // wA contains int32's.
-  const mwSize N = max(mxGetM(wA),mxGetN(wA));
+  const mwSize N = std::max(mxGetM(wA),mxGetN(wA));
   int n = (int)mxGetScalar(prhs[1]);
   int ityp = (int)mxGetScalar(prhs[2]);
 

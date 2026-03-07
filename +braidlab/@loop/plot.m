@@ -26,10 +26,10 @@ function [varargout] = plot(L, varargin)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -44,7 +44,7 @@ function [varargout] = plot(L, varargin)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 
@@ -56,7 +56,7 @@ parser = inputParser;
 parser.addRequired('L', @(x)isa(x,'braidlab.loop') )
 
 % Function that checks for valid color inputs
-iscolor = @(a) (ischar(a) && numel(a)==1) || ...
+iscolor = @(a) (ischar(a) && isscalar(a)) || ...
           (all(isfinite(a) & a >= 0) && ...
            numel(a) >= 3 && numel(a) <= 4);
 
@@ -131,7 +131,7 @@ end
 % punctures in the loop coordinate
 
 % The default position of the punctures are the integers along the x-axis
-if isempty(options.PuncturePositions);
+if isempty(options.PuncturePositions)
   options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 

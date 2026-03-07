@@ -3,3 +3,5 @@
 As Toby only maintains a version of *trains* with a graphical interface for Windows, this is based on the last command-line version (trains4).  **Toby Hall is not responsible for bugs in this GitHub version of the software, since he is not involved in its maintenance.**
 
 The code is maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.edu/~jeanluc)**.  It is being updated to run on current C++ compilers.
+
+[![Analytics](https://ga-beacon.appspot.com/UA-58116885-1/braidlab/readme)](https://github.com/igrigorik/ga-beacon)

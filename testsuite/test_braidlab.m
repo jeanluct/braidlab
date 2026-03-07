@@ -7,10 +7,10 @@ function res = test_braidlab(nomex)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -25,7 +25,7 @@ function res = test_braidlab(nomex)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 % Unit Testing Framework not implemented prior to 2013a.
@@ -39,39 +39,62 @@ import matlab.unittest.*
 
 braidlab.prop('reset');
 
-tcfolder = [pwd '/testcases/'];
+% Get the folder where this script is located.
+scriptpath = fileparts(mfilename('fullpath'));
+tcfolder = [scriptpath '/testcases/'];
 
 if nargin < 1 || isempty(nomex)
   clear global BRAIDLAB_loop_nomex
   clear global BRAIDLAB_braid_nomex
-  if ~braidlab.util.assertmex(['+braidlab/@braid/private/compact_helper'])
-    msg = ['Requested MEX tests but braidlab looks uncompiled.  ' ...
-           'Either compile braidlab or pass ''nomex'' to test_braidlab; ' ...
+  if ~braidlab.util.assertmex('+braidlab/@braid/private/compact_helper')
+    msg = ['Requested MEX tests but braidlab appears uncompiled.  ' ...
+           'Either compile braidlab or pass ''NoMEX'' to test_braidlab; ' ...
            'otherwise there will be LOTS of errors.'];
-    warning(msg);
+    warning('BRAIDLAB:test_braidlab:mex_uncompiled',msg);
     pause(1);
   end
   disp('Testing braidlab with MEX algorithms.');
-else
-  % disable MEX algorithms
-  global BRAIDLAB_loop_nomex; %#ok<TLEV>
+elseif strcmpi(nomex,'NoMEX')
+  % Disable MEX algorithms.
+  global BRAIDLAB_loop_nomex; %#ok<*GVMIS,TLEV>
   global BRAIDLAB_braid_nomex; %#ok<TLEV>
   BRAIDLAB_braid_nomex = true;
   BRAIDLAB_loop_nomex = true;
   disp('Testing braidlab without MEX algorithms.');
+else
+  error('BRAIDLAB:test_braidlab:badarg', ...
+        'Unknown option ''%s''.',nomex)
 end
 
-suite = TestSuite.fromFolder(tcfolder);
-%suite = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'braidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'compactTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'cycleTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'databraidTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'entropyTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'loopTest.m']);
-%suite = TestSuite.fromFile([tcfolder 'taffyTest.m']);
+% Create test suite with explicit test modules
+% Skip tests that completely depend on MEX when running in nomex mode.
+suites = {};
+
+% Always included tests.
+suites{end+1} = TestSuite.fromFile([tcfolder 'braidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'annbraidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'databraidTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'loopTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'utilTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'cycleTest.m']);
+suites{end+1} = TestSuite.fromFile([tcfolder 'entropyTest.m']);
+
+% Tests that require MEX.
+if ~(nargin >= 1 && strcmpi(nomex,'NoMEX'))
+  suites{end+1} = TestSuite.fromFile([tcfolder 'cfbraidTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'compactTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'conjtestTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'randomwalkTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'taffyTest.m']);
+  suites{end+1} = TestSuite.fromFile([tcfolder 'trainTest.m']);
+else
+  disp(['Skipping MEX-dependent tests: ' ...
+        'cfbraidTest, compactTest, conjtestTest, ' ...
+        'randomwalkTest, taffyTest, trainTest.']);
+end
+
+% Combine all test suites.
+suite = [suites{:}];
 runner = TestRunner.withTextOutput;
 res = runner.run(suite);
 

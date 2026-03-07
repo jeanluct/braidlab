@@ -1,10 +1,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -19,13 +19,13 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef annbraidTest < matlab.unittest.TestCase
 
   properties
-    ab1m2
+    ab1m2   % Test annbraid [1 -2].
   end
 
   methods (TestMethodSetup)
@@ -37,125 +37,322 @@ classdef annbraidTest < matlab.unittest.TestCase
   end
 
   methods (Test)
-    function test_annbraid_constructor(testCase)
+
+    %% Constructor tests
+
+    function test_constructor_from_braid(testCase)
+      % Test constructor from braid (adds a string).
       import braidlab.annbraid
       import braidlab.braid
 
-      % Add a string to a braid.
       b = annbraid(braid([1 -2]));
       testCase.verifyEqual(braid(b),braid([1 -2],4));
+    end
 
-      % Empty annbraid
+    function test_constructor_empty(testCase)
+      % Test empty annbraid constructor.
+      import braidlab.annbraid
+
       b = annbraid([]);
-      testCase.verifyTrue(istrivial(b))
+      testCase.verifyTrue(istrivial(b));
       testCase.verifyEqual(b.n,2);
       testCase.verifyEqual(b.nann,1);
+    end
+
+    function test_constructor_empty_with_n(testCase)
+      % Test empty annbraid with specified string count.
+      import braidlab.annbraid
+
       b = annbraid([],4);
       testCase.verifyEqual(b.nann,4);
+    end
 
-      % Random annbraid
-      rng('default')
+    function test_constructor_random(testCase)
+      % Test random annbraid constructor.
+      import braidlab.annbraid
+
+      rng('default');
       b = annbraid('random',5,5);
       testCase.verifyEqual(b.word,int32([1 2 -3 5 5]));
-      testCase.verifyEqual(b.n,6);  % has a basepoint
+      testCase.verifyEqual(b.n,6);  % Has a basepoint.
+    end
 
-      % Other string arguments not supported.
-      testCase.verifyError(@() annbraid('halftwist'), ...
-                           'BRAIDLAB:annbraid:annbraid:badstrarg')
+    function test_constructor_from_word(testCase)
+      % Test annbraid from word array.
+      import braidlab.annbraid
+      import braidlab.braid
 
-      % annbraid from a word
       b = annbraid([1 -2]);
       testCase.verifyEqual(b.word,int32([1 -2]));
       % Convert to braid.
       testCase.verifyEqual(braid(b),braid([1 2 2 -1 -2 -2]));
-      % Again but not involving the basepoint.
+    end
+
+    function test_constructor_from_word_with_n(testCase)
+      % Test annbraid from word not involving basepoint.
+      import braidlab.annbraid
+      import braidlab.braid
+
       b = annbraid([1 -2],3);
       testCase.verifyEqual(b.word,int32([1 -2]));
-      % Convert to braid: this time equal to same generators.
+      % Convert to braid: equal to same generators when not involving basepoint.
       testCase.verifyEqual(braid(b),braid([1 -2],4));
-      % Can set number of strings to 2+1:
+    end
+
+    function test_constructor_set_nann(testCase)
+      % Test setting nann property.
+      import braidlab.annbraid
+
+      b = annbraid([1 -2],3);
       b.nann = 2;
       testCase.verifyEqual(b.n,3);
     end
 
-    function test_annbraid_mtimes(testCase)
+    function test_constructor_error_bad_string_arg(testCase)
+      % Test that unsupported string arguments error.
+      import braidlab.annbraid
+
+      testCase.verifyError(@() annbraid('halftwist'), ...
+                           'BRAIDLAB:annbraid:annbraid:badstrarg');
+    end
+
+    %% Property tests
+
+    function test_property_n(testCase)
+      % Test n property (total strings including basepoint).
+      ab = testCase.ab1m2;
+      testCase.verifyEqual(ab.n,3);
+    end
+
+    function test_property_nann(testCase)
+      % Test nann property (annular strings, excluding basepoint).
+      ab = testCase.ab1m2;
+      testCase.verifyEqual(ab.nann,2);
+    end
+
+    function test_property_word(testCase)
+      % Test word property.
+      ab = testCase.ab1m2;
+      testCase.verifyEqual(ab.word,int32([1 -2]));
+    end
+
+    %% Conversion tests
+
+    function test_convert_to_braid(testCase)
+      % Test converting annbraid to braid.
       import braidlab.annbraid
       import braidlab.braid
-      import braidlab.loop
+
+      ab = annbraid([1 -2 3],4);
+      b = braid(ab);
+
+      testCase.verifyClass(b,'braidlab.braid');
+      testCase.verifyEqual(b.n,ab.n);
+    end
+
+    function test_convert_to_braid_simple(testCase)
+      % Test converting simple annbraid to braid.
+      import braidlab.annbraid
+      import braidlab.braid
+
+      ab = testCase.ab1m2;
+      b = braid(ab);
+      testCase.verifyClass(b,'braidlab.braid');
+    end
+
+    %% mtimes method tests
+
+    function test_mtimes_annbraid_times_braid(testCase)
+      % Test annbraid times braid returns braid.
+      import braidlab.braid
 
       ab = testCase.ab1m2;
       b = braid([1 2]);
-      % annbraid times braid is a braid.
-      testCase.verifyTrue(isa(ab*b,'braidlab.braid'))
-      % braid times annbraid is a braid.
-      testCase.verifyTrue(isa(b*ab,'braidlab.braid'))
-      % annbraid times annbraid is an annbraid.
-      testCase.verifyTrue(isa(ab*ab,'braidlab.annbraid'))
-      testCase.verifyEqual(ab*ab,annbraid([1 -2 1 -2]))
+      testCase.verifyTrue(isa(ab*b,'braidlab.braid'));
+    end
 
-      % Act on a loop without basepoint is an error.
+    function test_mtimes_braid_times_annbraid(testCase)
+      % Test braid times annbraid returns braid.
+      import braidlab.braid
+
+      ab = testCase.ab1m2;
+      b = braid([1 2]);
+      testCase.verifyTrue(isa(b*ab,'braidlab.braid'));
+    end
+
+    function test_mtimes_annbraid_times_annbraid(testCase)
+      % Test annbraid times annbraid returns annbraid.
+      import braidlab.annbraid
+
+      ab = testCase.ab1m2;
+      testCase.verifyTrue(isa(ab*ab,'braidlab.annbraid'));
+      testCase.verifyEqual(ab*ab,annbraid([1 -2 1 -2]));
+    end
+
+    function test_mtimes_on_loop_error_no_basepoint(testCase)
+      % Test that acting on loop without basepoint errors.
+      import braidlab.loop
+
+      ab = testCase.ab1m2;
       l = loop(ab.n);
-      testCase.verifyError(@() ab*l, 'BRAIDLAB:annbraid:mtimes:nobasepoint')
+      testCase.verifyError(@() ab*l, 'BRAIDLAB:annbraid:mtimes:nobasepoint');
+    end
 
-      % Ok with basepoint.
+    function test_mtimes_on_loop_with_basepoint(testCase)
+      % Test acting on loop with basepoint.
+      import braidlab.loop
+
+      ab = testCase.ab1m2;
       l = loop(ab.nann,'bp');
       l2 = ab*l;
-      testCase.verifyEqual(l2,loop([2 -1],'bp'))
+      testCase.verifyEqual(l2,loop([2 -1],'bp'));
     end
 
-    function test_inv_mpower(testCase)
+    %% inv method tests
+
+    function test_inv_basic(testCase)
+      % Test inverse of annbraid.
       import braidlab.annbraid
 
       ab = testCase.ab1m2;
-      % inv and mpower act only on word (no conversion to braid).
+      ab_inv = inv(ab);
+      testCase.verifyEqual(ab_inv,annbraid([2 -1]));
+    end
+
+    function test_inv_double_inverse(testCase)
+      % Test that double inverse returns original.
+      import braidlab.annbraid
+
+      ab = testCase.ab1m2;
+      testCase.verifyEqual(inv(inv(ab)),ab);
+    end
+
+    %% mpower method tests
+
+    function test_mpower_positive(testCase)
+      % Test positive power of annbraid.
+      import braidlab.annbraid
+
+      ab = testCase.ab1m2;
       ab2 = ab^2;
-      testCase.verifyEqual(ab2,annbraid([1 -2 1 -2]))
-      ab2 = inv(ab);
-      testCase.verifyEqual(ab2,annbraid([2 -1]))
+      testCase.verifyEqual(ab2,annbraid([1 -2 1 -2]));
     end
 
-    function test_perm(testCase)
+    function test_mpower_negative(testCase)
+      % Test negative power of annbraid.
       import braidlab.annbraid
 
-      % perm drops the basepoint, since it shouldn't move.
       ab = testCase.ab1m2;
-      testCase.verifyEqual(perm(ab),[1 2])
+      ab_inv = ab^(-1);
+      testCase.verifyEqual(ab_inv,annbraid([2 -1]));
     end
 
-    function test_annbraid_hidden(testCase)
-      % Make sure some hidden methods inherited from braid class give error.
+    function test_mpower_zero(testCase)
+      % Test zero power returns identity.
+      import braidlab.annbraid
+
+      ab = testCase.ab1m2;
+      ab0 = ab^0;
+      testCase.verifyTrue(istrivial(ab0));
+    end
+
+    %% perm method tests
+
+    function test_perm_basic(testCase)
+      % Test permutation (drops basepoint since it shouldn't move).
+      ab = testCase.ab1m2;
+      testCase.verifyEqual(perm(ab),[1 2]);
+    end
+
+    function test_perm_identity(testCase)
+      % Test permutation of identity annbraid.
+      import braidlab.annbraid
+
+      ab = annbraid([],3);
+      testCase.verifyEqual(perm(ab),1:3);
+    end
+
+    %% Hidden inherited method tests
+
+    function test_hidden_tensor_error(testCase)
+      % Test that tensor method errors for annbraid.
       ab = testCase.ab1m2;
       testCase.verifyError(@() tensor(ab,ab), ...
                            'BRAIDLAB:annbraid:tensor:undefined');
+    end
+
+    function test_hidden_subbraid_error(testCase)
+      % Test that subbraid method errors for annbraid.
+      ab = testCase.ab1m2;
       testCase.verifyError(@() subbraid(ab), ...
                            'BRAIDLAB:annbraid:subbraid:undefined');
     end
 
-    function test_annbraid_compact(testCase)
+    %% istrivial method tests
+
+    function test_istrivial_identity(testCase)
+      % Test istrivial on identity annbraid.
+      import braidlab.annbraid
+
+      ab = annbraid([]);
+      testCase.verifyTrue(istrivial(ab));
+    end
+
+    function test_istrivial_nontrivial(testCase)
+      % Test istrivial on non-identity annbraid.
+      ab = testCase.ab1m2;
+      testCase.verifyFalse(istrivial(ab));
+    end
+
+    %% compact method tests (annbraid-specific behavior)
+
+    function test_compact_braid_vs_annbraid_commuting(testCase)
+      % Test that generators n-1 and 1 commute for braids but not annbraids.
       import braidlab.annbraid
       import braidlab.braid
 
-      % See issue #99.
-      % The generators n-1 and 1 commute for ordinary braids...
-      b1 = braid([1 3 -1 -3]);
-      testCase.verifyTrue(istrivial(b1))
+      % Generators n-1 and 1 commute for ordinary braids...
+      br = braid([1 3 -1 -3]);
+      testCase.verifyTrue(istrivial(br));
       % ...but not for annbraids.
-      ab1 = annbraid([1 3 -1 -3]);
-      testCase.verifyTrue(~istrivial(ab1))
-
-      % Similaly, when generator n-1 is involved the braid relation holds
-      % for ordinary braids...
-      b2 = braid([1 2 1 -2 -1 -2]);
-      testCase.verifyTrue(istrivial(b2))
-      % ...but not for annbraids.
-      ab2 = annbraid([1 2 1 -2 -1 -2]);
-      testCase.verifyTrue(~istrivial(ab2))
-
-      % Compact should respect this.
-      testCase.verifyTrue(lexeq(compact(b1),braid([],4)))
-      testCase.verifyTrue(lexeq(compact(b2),braid([],3)))
-      testCase.verifyTrue(~lexeq(compact(ab1),braid([],4)))
-      testCase.verifyTrue(~lexeq(compact(ab2),braid([],3)))
+      ab = annbraid([1 3 -1 -3]);
+      testCase.verifyFalse(istrivial(ab));
     end
+
+    function test_compact_braid_vs_annbraid_relation(testCase)
+      % Test braid relation behavior differs for annbraids.
+      import braidlab.annbraid
+      import braidlab.braid
+
+      % When generator n-1 is involved, braid relation holds for braids...
+      br = braid([1 2 1 -2 -1 -2]);
+      testCase.verifyTrue(istrivial(br));
+      % ...but not for annbraids.
+      ab = annbraid([1 2 1 -2 -1 -2]);
+      testCase.verifyFalse(istrivial(ab));
+    end
+
+    function test_compact_respects_annbraid_rules(testCase)
+      % Test that compact respects annbraid-specific rules.
+      import braidlab.annbraid
+      import braidlab.braid
+
+      global BRAIDLAB_braid_nomex %#ok<GVMIS>
+      if isempty(BRAIDLAB_braid_nomex) || ~BRAIDLAB_braid_nomex
+        br1 = braid([1 3 -1 -3]);
+        br2 = braid([1 2 1 -2 -1 -2]);
+        ab1 = annbraid([1 3 -1 -3]);
+        ab2 = annbraid([1 2 1 -2 -1 -2]);
+
+        testCase.verifyTrue(lexeq(compact(br1),braid([],4)));
+        testCase.verifyTrue(lexeq(compact(br2),braid([],3)));
+        testCase.verifyFalse(lexeq(compact(ab1),braid([],4)));
+        testCase.verifyFalse(lexeq(compact(ab2),braid([],3)));
+      else
+        testCase.assumeTrue(false, ...
+          'Skipping compact test when BRAIDLAB_braid_nomex is set.');
+      end
+    end
+
   end
 end

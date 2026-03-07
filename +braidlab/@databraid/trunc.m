@@ -13,10 +13,10 @@ function bt = trunc(b,interval)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -31,7 +31,7 @@ function bt = trunc(b,interval)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 bt = b;
@@ -45,7 +45,7 @@ if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
 end
 
 % select the desired crossing times
-if numel(interval) == 1
+if isscalar(interval)
   sel = bt.tcross <= interval;
 else
   sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);

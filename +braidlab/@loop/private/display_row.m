@@ -4,10 +4,10 @@ function wc = display_row(obj)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -22,7 +22,7 @@ function wc = display_row(obj)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 % Input should be at most a row-vector.
@@ -48,7 +48,8 @@ for i = 1:length(wc)
     wc{i} = ['   ' wc{i}];
   end
   % If the format is loose rather than compact, add a line break.
-  if strcmp(get(0,'FormatSpacing'),'loose')
+  s = settings;
+  if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue,'loose')
     if wrapped || i == length(wc)
       wc{i} = sprintf('%s\n',wc{i});
     end

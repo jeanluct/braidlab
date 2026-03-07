@@ -1,10 +1,10 @@
 # <LICENSE
 #   Braidlab: a Matlab package for analyzing data using braids
 #
-#   http://github.com/jeanluct/braidlab
+#   https://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-#                            Marko Budisic          <marko@clarkson.edu>
+#   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#                            Marko Budisic          <mbudisic@gmail.com>
 #
 #   This file is part of Braidlab.
 #
@@ -19,7 +19,7 @@
 #   GNU General Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License
-#   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+#   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 # LICENSE>
 
 LATEXCMD = pdflatex -shell-escape
@@ -42,11 +42,14 @@ $(MASTERFILE).pdf: $(MASTERFILE).tex $(MASTERFILE).bib
 
 clean:
 	# Remove latex clutter.
-	rm -f *.aux *.bbl *.blg *.idx *.ilg *.ind *.log *.out *.toc
+	rm -f \
+		*.aux *.bbl *.blg \
+		*.fdb_latexmk *.fls *.idx *.ilg *.ind *.log *.out *.toc
 
 distclean: clean
 	# Revert PDF file to latest revision.
 	git checkout $(MASTERFILE).pdf
-	# Update timestamp so make knows to remake the file.
-	touch -d "`git log -1 --date=iso --format=%cd $(MASTERFILE).pdf`" \
-		$(MASTERFILE).pdf
+	# Update timestamp so make knows to remake the file. Use a single
+	# sh -c invocation to avoid multi-line continuation issues in make.
+	@sh -c 'os=$$(uname -s); if [ "$$os" = "Linux" ]; then touch -r "$(MASTERFILE).pdf" -d "-1 second" "$(MASTERFILE).pdf"; elif [ "$$os" = "Darwin" ]; then T=$$(stat -f %m "$(MASTERFILE).pdf"); Tprev=$$((T-1)); DATE=$$(date -r $$Tprev +%Y%m%d%H%M.%S); touch -t $$DATE "$(MASTERFILE).pdf"; else echo "Warning: unknown OS ($$os); PDF mtime not adjusted"; fi'
+	touch $(MASTERFILE).tex

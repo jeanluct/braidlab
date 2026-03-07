@@ -44,10 +44,10 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -62,14 +62,14 @@ function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex;
+global BRAIDLAB_braid_nomex; %#ok<GVMIS>
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
 if any(isnan(XY) | isinf(XY))
@@ -89,7 +89,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
+debugmsg('colorbraiding: Initialize parameters for crossing analysis',2);
 tic
 n = size(XY,3); % number of punctures
 
@@ -137,7 +137,7 @@ if checkclosure
   end
 end
 
-debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
+debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000),2);
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -145,20 +145,20 @@ debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 try % trapping to ensure proper identification of strands
 
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
+    assert(~useMatlabVersion, 'BRAIDLAB:NoMEX', ['Matlab version ' ...
                         'forced']);
 
-    debugmsg('Using MEX algorithm')
+    debugmsg('Using MEX algorithm',2)
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
     [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
-    if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NoMEX', 'once') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')
+    debugmsg('Using MATLAB algorithm',2)
       %% MATLAB version of the algorithm
       [gen,tcr,~] = cross2gen(XY,t,delta);
     end

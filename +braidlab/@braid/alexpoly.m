@@ -12,7 +12,7 @@ function p = alexpoly(b,x,opt)
 %   Supported objects are X=laurpoly(1,1) (from the Matlab wavelet toolbox,
 %   the default) and X=sym('x') (from the Matlab symbolic toolbox). X can
 %   also be a numeric type (a real or complex number), but in that case the
-%   'centered' option below is unavailable.
+%   'Centered' option below is unavailable.
 %
 %   P = ALEXPOLY(B,X,'Centered') or ALEXPOLY(B,'Centered') centers the
 %   polynomial so that P(X) = (+/-)P(1/X).  (The + sign always applies if
@@ -61,7 +61,7 @@ function p = alexpoly(b,x,opt)
 %   References:
 %
 %   E. Weisstein, "Alexander Polynomial." From MathWorld -- A Wolfram Web
-%   Resource. http://mathworld.wolfram.com/AlexanderPolynomial.html
+%   Resource. https://mathworld.wolfram.com/AlexanderPolynomial.html
 %
 %   D. Rolfsen, "Knots and Links," AMS Chelsea (2003).
 %
@@ -71,10 +71,10 @@ function p = alexpoly(b,x,opt)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2017  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic          <marko@clarkson.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -89,7 +89,7 @@ function p = alexpoly(b,x,opt)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 center = false;
@@ -123,8 +123,6 @@ if stringopt
       error('BRAIDLAB:braid:alexpoly:cantcenter', ...
             'Can''t center polynomial for numeric types.')
     end
-  elseif any(strcmpi(opt,{'center','centre','centered','centred'}))
-    center = true;
   elseif any(strcmpi(opt, ...
              {'nocenter','uncentered','uncentred','uncenter','uncentre'}))
     center = false;
@@ -138,7 +136,7 @@ errnotmono = {'BRAIDLAB:braid:alexpoly:notmonomial', ...
               'p(z) = p(1/z) cannot be enforced.'};
 errfracpow = {'BRAIDLAB:braid:alexpoly:fracpoly', ...
               ['Polynomial with fractional powers.  Remove ' ...
-               '''centered'' option or use the symbolic toolbox.']};
+               '''Centered'' option or use the symbolic toolbox.']};
 
 % Compute reduced Burau representation of the braid.
 bu = burau(b,x);
