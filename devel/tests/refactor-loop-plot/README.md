@@ -10,6 +10,7 @@ This directory contains test scripts and output images created during the
 - `test_fix.m` - Tests for endpoint matching fix
 - `test_visual_review.m` - Visual inspection tests (creates PNG outputs)
 - `test_patch_handles.m` - Tests for Phase 1.4 (patch object return)
+- `test_spacing_control.m` - Tests for Phase 2 (spacing control parameters)
 - `test_visual_inspection.m` - Interactive visual tests with pauses
 - `test_debug_component.m` - Debugging component closure issues
 - `test_debug.m` - General debugging
@@ -27,12 +28,16 @@ This directory contains test scripts and output images created during the
 ## Status
 
 **Phase 1: Core Architecture Refactor** - ✅ COMPLETE (2026-03-07)
+**Phase 2: Enhanced Spacing Control** - ✅ COMPLETE (2026-03-07)
 
-All four sub-phases successfully implemented:
+Completed phases:
 - ✅ Phase 1.1: Extract geometry computation  
 - ✅ Phase 1.2: Coordinate-only helpers
 - ✅ Phase 1.3: Segment ordering with DFS
 - ✅ Phase 1.4: Switch to patch objects
+- ✅ Phase 2.1: Add spacing parameters
+- ✅ Phase 2.2: Improve layout algorithm
+- ✅ Phase 2.3: Test spacing control
 
 ### Completed Work
 
@@ -60,13 +65,22 @@ All four sub-phases successfully implemented:
 - `FaceColor` set to `'none'` (no fill yet - that's Phase 4)
 - Backward compatible - works without output capture
 
+**4. Enhanced spacing control (#129):**
+- Added `PunctureGap` parameter (scalar gap multiplier)
+- Added `PunctureGapVector` parameter (per-puncture gaps)
+- Added `PunctureRadius` parameter (explicit puncture size)
+- All parameters validated with clear error messages
+- Maintains backward compatibility - defaults unchanged
+
 ### Test Results
 
 All tests passing:
 - ✅ `test_visual_review.m` - Visual regression (5 test cases, no warnings)
 - ✅ `test_patch_handles.m` - Handle type, count, properties verification
 - ✅ `test_component_assignment.m` - Component discovery logic
+- ✅ `test_spacing_control.m` - Spacing parameters (7 test cases, 8 images)
 
 ### Next Steps
 
-Ready for Phase 2: Enhanced spacing control (#129)
+Ready for Phase 3: Handle return system (already complete from Phase 1.4!)
+Moving to Phase 4: Fill loop interiors (#144)

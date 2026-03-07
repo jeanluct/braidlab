@@ -297,7 +297,45 @@ All sub-phases (1.1-1.4) successfully implemented and tested.
 
 ### Phase 2: Enhanced Spacing Control (#129)
 
-#### 2.1 Add New Spacing Options
+**Status:** ✅ COMPLETE (2026-03-07)
+
+All sub-phases successfully implemented and tested.
+
+#### 2.1 Add New Spacing Options ✅ COMPLETE
+**Implemented parameters:**
+
+```matlab
+parser.addParameter('PunctureGap', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
+parser.addParameter('PunctureGapVector', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isvector(x) && all(x > 0)));
+parser.addParameter('PunctureRadius', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
+```
+
+**Testing:** ✅ All parameters validated correctly
+
+#### 2.2 Improve Layout Algorithm ✅ COMPLETE
+**Implementation:**
+- Modified gap calculation (lines 167-179) to check new parameters first
+- Priority: `PunctureGapVector` > `PunctureGap` > auto-calculate
+- Modified puncture radius (lines 182-205) to use `PunctureRadius` if specified
+- Maintains backward compatibility - default behavior unchanged
+- Added validation error for wrong-length `PunctureGapVector`
+
+**Testing:** ✅ All tests pass
+- Default spacing unchanged (backward compatible)
+- PunctureGap works with scalar values
+- PunctureGapVector works with per-puncture values
+- PunctureRadius independent from spacing
+- Validation correctly rejects bad inputs
+- Components work with custom spacing
+
+#### 2.3 Testing ✅ COMPLETE
+**Test file:** `test_spacing_control.m`
+- 7 test cases covering all parameter combinations
+- Generated 8 visual outputs showing spacing variations
+- Backward compatibility verified with existing tests ✅ COMPLETE
 **New parameters:**
 
 ```matlab

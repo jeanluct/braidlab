@@ -5,7 +5,8 @@ function varargout = plot(L,varargin)
 %
 %   H = PLOT(L) returns a column vector of handles to the plotted loop
 %   components.  Each handle is a patch object representing one connected
-%   component of the loop.
+%   component of the loop. Coordinates can be accessed via GET(H(i),'XData')
+%   and GET(H(i),'YData').
 %
 %   PLOT(L,'PropName',VALUE,...) can be used to set property PropName to
 %   VALUE.  Valid properties are
@@ -20,9 +21,23 @@ function varargout = plot(L,varargin)
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
+%   PunctureGap        Scalar multiplier for spacing between loop lines
+%                      at punctures. Overrides automatic calculation.
+%   PunctureGapVector  Per-puncture gap sizes (n×1 vector). Overrides
+%                      PunctureGap if both specified.
+%   PunctureRadius     Explicit puncture radius for display. Independent
+%                      from loop spacing control.
 %   BasePointColor     The color of the basepoint puncture, if any.
 %   Components         [true/false] Plot connected components in
 %                      different colors.  LineColor and LineStyle are ignored.
+%
+%   Examples:
+%     L = loop([1 0 0 0]);
+%     plot(L);                              % Basic plot
+%     h = plot(L,'LineColor','r');          % Red loop, return handle
+%     plot(L,'PunctureGap',0.15);           % Custom spacing
+%     plot(L,'PunctureRadius',0.05);        % Small punctures
+%     xdata = get(h(1),'XData');            % Extract coordinates
 %
 %   This is a method for the LOOP class.
 %   See also LOOP, LOOP.LOOP.
@@ -75,6 +90,12 @@ parser.addParameter('PunctureEdgeColor', 'k', iscolor);
 parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
 parser.addParameter('PunctureSize', [], @isfinite);
 parser.addParameter('PuncturePositions', [], @isnumeric);
+parser.addParameter('PunctureGap', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
+parser.addParameter('PunctureGapVector', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isvector(x) && all(x > 0)));
+parser.addParameter('PunctureRadius', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
 
 % With 'Components' option, LineColor and LineStyle set automatically
 parser.addParameter('Components', false, @islogical);
@@ -160,27 +181,43 @@ for i = 1:n-1
   space_between_loop_lines(i) = min(d(i)/M_coord(i),d(i)/N_coord(i))*.7;
 end
 
-% Set the gap size to half the minimum distance between lines
-pgap = min(space_between_loop_lines)/2+zeros(n,1);
+% Set the gap size based on user parameters or auto-calculate
+if ~isempty(options.PunctureGapVector)
+  % User specified per-puncture gaps
+  pgap = options.PunctureGapVector(:);
+  assert(length(pgap) == n,'BRAIDLAB:loop:plot:badgapvec', ...
+         'PunctureGapVector must have length n (number of punctures).');
+elseif ~isempty(options.PunctureGap)
+  % User specified scalar gap multiplier
+  pgap = options.PunctureGap*ones(n,1);
+else
+  % Auto-calculate (backward compatible)
+  pgap = min(space_between_loop_lines)/2+zeros(n,1);
+end
 
 %% Set the radius of the puncture
-% TODO: Keep punctures same size (need special gap near x-axis).
-% set the default puncture radius if no property value was input
-if isempty(options.PunctureSize)
-  options.PunctureSize = .15*min(space_between_loop_lines);
-  if isinf(options.PunctureSize)
-    options.PunctureSize = .05;
+% Visual puncture radius (for drawing only)
+% Can be set independently from loop spacing via PunctureRadius parameter
+
+if ~isempty(options.PunctureRadius)
+  % User specified explicit radius
+  prad = options.PunctureRadius;
+elseif ~isempty(options.PunctureSize)
+  % User specified PunctureSize (legacy parameter)
+  prad = options.PunctureSize;
+else
+  % Auto-calculate based on loop spacing (backward compatible)
+  prad = .15*min(space_between_loop_lines);
+  if isinf(prad)
+    prad = .05;
   end
 end
 
-prad = options.PunctureSize;
-% check to make sure puncture radius is not so large that it hits the loop
-
+% Warn if puncture radius conflicts with loop spacing
 if prad > min(space_between_loop_lines)
   warning('BRAIDLAB:loop:plot:badrad', ...
           ['Puncture radius is too large.  For this loop the value ' ...
-           'can''t exceed %f.'],min(space_between_loop_lines))
-  prad = .15*min(space_between_loop_lines);
+           'can''t exceed %f.'],min(space_between_loop_lines));
 end
 
 %% Identify hold state of the current figure
