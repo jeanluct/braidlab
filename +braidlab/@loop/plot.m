@@ -1,7 +1,11 @@
-function plot(L, varargin)
+function varargout = plot(L,varargin)
 %PLOT   Plot a loop.
 %   PLOT(L) plots a representative of the equivalence class
 %   defined by the loop L.
+%
+%   H = PLOT(L) returns a column vector of handles to the plotted loop
+%   components.  Each handle is a patch object representing one connected
+%   component of the loop.
 %
 %   PLOT(L,'PropName',VALUE,...) can be used to set property PropName to
 %   VALUE.  Valid properties are
@@ -103,11 +107,11 @@ if options.Components
 
   % initialize hash functions - conversion of puncture-intersection coordinates
   % to linear index of vertices used in adjacency matrix
-  keytohash = @(PV)graph_keytohash(PV, M_coord, T_sum);
+  keytohash = @(PV)graph_keytohash(PV,M_coord,T_sum);
 
   % compute components of the vertices
   [~,Lp] = L.getgraph;
-  [components, Nc] = laplaceToComponents(Lp);
+  [components,Nc] = laplaceToComponents(Lp);
 
   % assign a unique color to each component
   if Nc > 1
@@ -115,6 +119,11 @@ if options.Components
   else
     compcolors = options.LineColor;
   end
+else
+  components = [];
+  keytohash = [];
+  Nc = 1;
+  compcolors = options.LineColor;
 end
 
 %% Set position of punctures
@@ -210,38 +219,157 @@ if prad > 0
   end
 end
 
-%% Draw semicircles
-% 'left' semicircles are C-shaped
-% 'right' semicircles are D-shaped
+%% Compute loop geometry
+geom = computeLoopGeometry(L,puncture_position,pgap,components,keytohash);
 
+%% Order segments by component
+ordered_comps = orderSegmentsByComponent(geom);
 
-% Cycle through each puncture.
+%% Draw each component as a continuous closed curve
+handles = gobjects(length(ordered_comps),1);
+for c = 1:length(ordered_comps)
+  seg_list = ordered_comps{c};
+  
+  if isempty(seg_list)
+    continue;
+  end
+  
+  % Concatenate coordinates from all segments in this component
+  % Need to properly join segments - check if endpoints match
+  xdata = geom(seg_list(1)).xdata;
+  ydata = geom(seg_list(1)).ydata;
+  
+  for k = 2:length(seg_list)
+    idx = seg_list(k);
+    seg_x = geom(idx).xdata;
+    seg_y = geom(idx).ydata;
+    
+    % Check if this segment's start matches our current end
+    current_end_x = xdata(end);
+    current_end_y = ydata(end);
+    seg_start_x = seg_x(1);
+    seg_start_y = seg_y(1);
+    seg_end_x = seg_x(end);
+    seg_end_y = seg_y(end);
+    
+    % Tolerance for floating point comparison
+    tol = 1e-10;
+    
+    if abs(current_end_x - seg_start_x) < tol && ...
+       abs(current_end_y - seg_start_y) < tol
+      % Start matches end, append normally (skip first point to avoid duplicate)
+      xdata = [xdata seg_x(2:end)]; %#ok<AGROW>
+      ydata = [ydata seg_y(2:end)]; %#ok<AGROW>
+    elseif abs(current_end_x - seg_end_x) < tol && ...
+           abs(current_end_y - seg_end_y) < tol
+      % End matches end, reverse and append (skip first point)
+      xdata = [xdata seg_x(end-1:-1:1)]; %#ok<AGROW>
+      ydata = [ydata seg_y(end-1:-1:1)]; %#ok<AGROW>
+    else
+      % Endpoints don't match - this shouldn't happen in a valid loop
+      % Just append anyway for debugging
+      xdata = [xdata seg_x]; %#ok<AGROW>
+      ydata = [ydata seg_y]; %#ok<AGROW>
+    end
+  end
+  
+  % Determine color for this component
+  if options.Components
+    comp_id = geom(seg_list(1)).component;
+    if comp_id > 0 && comp_id <= size(compcolors,1)
+      mycolor = compcolors(comp_id,:);
+    else
+      mycolor = options.LineColor;
+    end
+  else
+    mycolor = options.LineColor;
+  end
+  
+  % Plot this component
+  handles(c) = plot(xdata,ydata, ...
+                    'Color',mycolor,'LineWidth',options.LineWidth, ...
+                    'LineStyle',options.LineStyle);
+end
+
+% Return handles if requested
+if nargout > 0
+  varargout{1} = handles;
+end
+
+if ~holdstate
+  hold off
+  axis equal
+  axis off
+  % Add a gap around the edges, to avoid clipping the figure.
+  axis tight
+  ax = axis;
+  sc = .1*max(abs(ax(1)),abs(ax(2)));
+  axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
+end
+
+% ============================================================================
+function geom = computeLoopGeometry(L,puncture_position,pgap,components, ...
+                                    keytohash)
+%COMPUTELOOPGEOMETRY  Compute geometric segments for loop visualization.
+%   GEOM = COMPUTELOOPGEOMETRY(L,PUNCTURE_POSITION,PGAP,COMPONENTS,KEYTOHASH)
+%   computes all geometric segments (semicircles and line segments) needed
+%   to visualize the loop L.
+%
+%   Inputs:
+%     L                 - Loop object
+%     puncture_position - n x 2 matrix of puncture positions
+%     pgap              - n x 1 vector of gaps at each puncture
+%     components        - Component assignment vector (empty if not using)
+%     keytohash         - Function handle for vertex hashing (empty if not using)
+%
+%   Output:
+%     geom - Structure array with one element per segment, fields:
+%       .type      - 'semicircle' or 'line'
+%       .puncture  - [p1 p2] puncture indices (p1==p2 for semicircles)
+%       .vertex    - [v1 v2] vertex indices (signed)
+%       .component - Component ID (0 if not using components)
+%       .xdata     - x-coordinates of segment
+%       .ydata     - y-coordinates of segment
+
+[n,b_coord,M_coord,N_coord] = getcoords(L);
+
+% Initialize segment storage
+segments = {};
+segcount = 0;
+
+% Determine if we are tracking components
+use_components = ~isempty(components);
+
+% Draw semicircles around each puncture
 for p = 1:n
-
-  % Determine number of semicircles are at the present loop
+  % Determine number of semicircles at the present puncture
   if p == n
-    nl = M_coord(n); % this is equal to N_coord(n) ?
+    nl = M_coord(n);
   else
     nl = b_coord(p);
   end
 
   % Draw this number of semicircles taking into account the direction
-  % (left/right) around the puncture.
   for sc = 1:abs(nl)
-    if options.Components
-      mycomp = components( keytohash([p, -sign(nl)*sc]) );
-      mycolor = compcolors(mycomp,:);
-      options.LineColor = mycolor;
+    segcount = segcount + 1;
+    segments{segcount}.type = 'semicircle';
+    segments{segcount}.puncture = [p p];
+    segments{segcount}.vertex = [p,-sign(nl)*sc; p,sign(nl)*sc];
+    
+    if use_components
+      segments{segcount}.component = components(keytohash([p,-sign(nl)*sc]));
+    else
+      segments{segcount}.component = 0;
     end
-
-    joinpoints( [p, -sign(nl)*sc],[p, sign(nl)*sc], ...
-                puncture_position, pgap, options );
+    
+    [segments{segcount}.xdata,segments{segcount}.ydata] = ...
+      computeSemicircle([p,-sign(nl)*sc],[p,sign(nl)*sc], ...
+                        puncture_position,pgap);
   end
 end
 
-%%  Draw segments above the puncture line (M_coord).
+% Draw segments above the puncture line (M_coord)
 for p = 1:n-1
-
   % How many right-semicircles (b>0) around this puncture?
   if p == 1
     nr = 0;
@@ -258,53 +386,52 @@ for p = 1:n-1
     else
       nl = 0;
     end
-    % We can't joint to these left-facing loops from the left.
+    % We can't join to these left-facing loops from the left.
     tojoinup = M_coord(p+1)-nl;
     tojoindown = max(tojoin-tojoinup,0);
     % The lines that join downwards.
     for s = 1:tojoindown
-      % idx_mine and _next are indices of vertices of the current (mine)
-      % and following (next) puncture that will be connected
-      % idx_ > 0 -- vertex is above puncture
-      % idx_ < 0 -- vertex is below puncture
-      idx_mine = nr + s; % index of the vertex
+      idx_mine = nr + s;
       idx_next = -(nl-s+tojoindown+1);
-
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
+      
+      segcount = segcount + 1;
+      segments{segcount}.type = 'line';
+      segments{segcount}.puncture = [p p+1];
+      segments{segcount}.vertex = [p,idx_mine; p+1,idx_next];
+      
+      if use_components
+        segments{segcount}.component = components(keytohash([p,idx_mine]));
+      else
+        segments{segcount}.component = 0;
       end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
-
+      
+      [segments{segcount}.xdata,segments{segcount}.ydata] = ...
+        computeLine([p,idx_mine],[p+1,idx_next],puncture_position,pgap);
     end
     % The lines that join upwards (on the same side).
     for s = tojoindown+1:tojoin
-      % idx_mine and _next are indices of vertices of the current (mine)
-      % and following (next) puncture that will be connected
-      % idx_ > 0 -- vertex is above puncture
-      % idx_ < 0 -- vertex is below puncture
       idx_mine = nr+s;
       idx_next = nl+s - (tojoin-tojoinup);
-
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
+      
+      segcount = segcount + 1;
+      segments{segcount}.type = 'line';
+      segments{segcount}.puncture = [p p+1];
+      segments{segcount}.vertex = [p,idx_mine; p+1,idx_next];
+      
+      if use_components
+        segments{segcount}.component = components(keytohash([p,idx_mine]));
+      else
+        segments{segcount}.component = 0;
       end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      
+      [segments{segcount}.xdata,segments{segcount}.ydata] = ...
+        computeLine([p,idx_mine],[p+1,idx_next],puncture_position,pgap);
     end
   end
 end
 
-%% Draw segments below the puncture line (N_coord)
-
+% Draw segments below the puncture line (N_coord)
 for p = 1:n-1
-
   % How many right-semicircles (b>0) around this puncture?
   if p == 1
     nr = 0;
@@ -321,59 +448,243 @@ for p = 1:n-1
     else
       nl = 0;
     end
-    % We can't joint to these left-facing loops from the left.
+    % We can't join to these left-facing loops from the left.
     tojoindown = N_coord(p+1)-nl;
     tojoinup = max(tojoin-tojoindown,0);
     % The lines that join upwards.
     for s = 1:tojoinup
-      % idx_mine and _next are indices of vertices of the current (mine)
-      % and following (next) puncture that will be connected
-      % idx_ > 0 -- vertex is above puncture
-      % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = (nl-s+tojoinup+1);
-
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
+      
+      segcount = segcount + 1;
+      segments{segcount}.type = 'line';
+      segments{segcount}.puncture = [p p+1];
+      segments{segcount}.vertex = [p,idx_mine; p+1,idx_next];
+      
+      if use_components
+        segments{segcount}.component = components(keytohash([p,idx_mine]));
+      else
+        segments{segcount}.component = 0;
       end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      
+      [segments{segcount}.xdata,segments{segcount}.ydata] = ...
+        computeLine([p,idx_mine],[p+1,idx_next],puncture_position,pgap);
     end
     % The lines that join downwards (on the same side).
     for s = tojoinup+1:tojoin
-      % idx_mine and _next are indices of vertices of the current (mine)
-      % and following (next) puncture that will be connected
-      % idx_ > 0 -- vertex is above puncture
-      % idx_ < 0 -- vertex is below puncture
       idx_mine = -(nr+s);
       idx_next = -(nl+s - (tojoin-tojoindown));
-
-      if options.Components
-        mycomp = components( keytohash([p,idx_mine]) );
-        mycolor = compcolors(mycomp,:);
-        options.LineColor = mycolor;
+      
+      segcount = segcount + 1;
+      segments{segcount}.type = 'line';
+      segments{segcount}.puncture = [p p+1];
+      segments{segcount}.vertex = [p,idx_mine; p+1,idx_next];
+      
+      if use_components
+        segments{segcount}.component = components(keytohash([p,idx_mine]));
+      else
+        segments{segcount}.component = 0;
       end
-
-      joinpoints( [p,idx_mine], [p+1,idx_next], ...
-                  puncture_position, pgap, options );
+      
+      [segments{segcount}.xdata,segments{segcount}.ydata] = ...
+        computeLine([p,idx_mine],[p+1,idx_next],puncture_position,pgap);
     end
   end
 end
 
-if ~holdstate
-  hold off
-  axis equal
-  axis off
-  % Add a gap around the edges, to avoid clipping the figure.
-  axis tight
-  ax = axis;
-  sc = .1*max(abs(ax(1)),abs(ax(2)));
-  axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
+% Convert cell array to structure array
+geom = [segments{:}];
+
+% ============================================================================
+function ordered = orderSegmentsByComponent(geom)
+%ORDERSEGMENTSBYCOMPONENT  Order segments into continuous loop paths.
+%   ORDERED = ORDERSEGMENTSBYCOMPONENT(GEOM) takes an array of unordered
+%   segments and groups them by component, ordering each component's
+%   segments to form a continuous closed path.
+%
+%   Input:
+%     geom - Structure array of segments (from computeLoopGeometry)
+%
+%   Output:
+%     ordered - Cell array where ordered{k} contains the ordered segment
+%               indices for component k
+
+if isempty(geom)
+  ordered = {};
+  return;
 end
 
+% Get unique components
+components = [geom.component];
+unique_comps = unique(components);
+num_comps = length(unique_comps);
+
+% Initialize output
+ordered = cell(num_comps,1);
+
+% For each component, order its segments
+for c = 1:num_comps
+  comp_id = unique_comps(c);
+  
+  % Find all segments belonging to this component
+  seg_idx = find(components == comp_id);
+  
+  if isempty(seg_idx)
+    continue;
+  end
+  
+  num_segs = length(seg_idx);
+  
+  if num_segs == 1
+    % Single segment forms a closed loop (rare case)
+    ordered{c} = seg_idx(1);
+    continue;
+  end
+  
+  % Build adjacency map: vertex -> list of (segment_index, endpoint_type)
+  % endpoint_type: 1 = start, 2 = end
+  vertex_map = containers.Map('KeyType','char','ValueType','any');
+  
+  for k = 1:num_segs
+    idx = seg_idx(k);
+    v1 = geom(idx).vertex(1,:);
+    v2 = geom(idx).vertex(2,:);
+    
+    % Convert vertex to string key
+    key1 = sprintf('%d_%d',v1(1),v1(2));
+    key2 = sprintf('%d_%d',v2(1),v2(2));
+    
+    % Add to adjacency map
+    if ~isKey(vertex_map,key1)
+      vertex_map(key1) = {};
+    end
+    if ~isKey(vertex_map,key2)
+      vertex_map(key2) = {};
+    end
+    
+    % Store which segment connects to this vertex and which endpoint
+    temp = vertex_map(key1);
+    temp{end+1} = struct('seg',k,'endpoint',1);
+    vertex_map(key1) = temp;
+    
+    temp = vertex_map(key2);
+    temp{end+1} = struct('seg',k,'endpoint',2);
+    vertex_map(key2) = temp;
+  end
+  
+  % Start from first segment
+  path = zeros(num_segs,1);
+  path(1) = seg_idx(1);
+  used = false(num_segs,1);
+  used(1) = true;
+  
+  % Track current endpoint
+  v_current = geom(seg_idx(1)).vertex(2,:);
+  
+  % Build path by following connections
+  for step = 2:num_segs
+    key_current = sprintf('%d_%d',v_current(1),v_current(2));
+    
+    if ~isKey(vertex_map,key_current)
+      % No connections - shouldn't happen
+      warning('BRAIDLAB:loop:plot:noconnection', ...
+              ['Component %d: No vertex map entry for vertex (%d,%d) ' ...
+               'at step %d/%d'],c,v_current(1),v_current(2),step,num_segs);
+      path = path(1:step-1);
+      break;
+    end
+    
+    % Find unused segment connected to current vertex
+    connections = vertex_map(key_current);
+    found = false;
+    
+    for j = 1:length(connections)
+      seg_local = connections{j}.seg;
+      endpoint = connections{j}.endpoint;
+      
+      if used(seg_local)
+        continue;
+      end
+      
+      % Found unused segment
+      idx = seg_idx(seg_local);
+      path(step) = idx;
+      used(seg_local) = true;
+      
+      % Move to other endpoint of this segment
+      if endpoint == 1
+        % We entered via start, exit via end
+        v_current = geom(idx).vertex(2,:);
+      else
+        % We entered via end, exit via start
+        v_current = geom(idx).vertex(1,:);
+      end
+      
+      found = true;
+      break;
+    end
+    
+    if ~found
+      % No unused segment found
+      warning('BRAIDLAB:loop:plot:incomplete', ...
+              ['Component %d: Path incomplete at step %d/%d. ' ...
+               'Current vertex (%d,%d) has %d connections, all used.'], ...
+              c,step,num_segs,v_current(1),v_current(2),length(connections));
+      path = path(1:step-1);
+      break;
+    end
+  end
+  
+  ordered{c} = path;
+end
+
+
+% ============================================================================
+function [xdata,ydata] = computeSemicircle(mine,next,positions,gaps)
+%COMPUTESEMICIRCLE  Compute coordinates for a semicircular segment.
+%   [XDATA,YDATA] = COMPUTESEMICIRCLE(MINE,NEXT,POSITIONS,GAPS)
+%   computes the x and y coordinates for a semicircular loop segment.
+%
+%   Inputs:
+%     mine, next - [puncture, vertex] pairs (both same puncture)
+%     positions  - n x 2 matrix of puncture positions
+%     gaps       - n x 1 vector of gaps at each puncture
+%
+%   Outputs:
+%     xdata, ydata - Coordinate vectors for the semicircle
+
+order = abs(mine(2));
+rad = order*gaps(mine(1));
+cirsign = sign(next(2)-mine(2));
+
+loop_curve_x = cirsign*linspace(0,rad,50);
+loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
+loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
+
+xdata = positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)];
+ydata = positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom];
+
+% ============================================================================
+function [xdata,ydata] = computeLine(mine,next,positions,gaps)
+%COMPUTELINE  Compute coordinates for a straight line segment.
+%   [XDATA,YDATA] = COMPUTELINE(MINE,NEXT,POSITIONS,GAPS)
+%   computes the x and y coordinates for a straight line loop segment.
+%
+%   Inputs:
+%     mine, next - [puncture, vertex] pairs (consecutive punctures)
+%     positions  - n x 2 matrix of puncture positions
+%     gaps       - n x 1 vector of gaps at each puncture
+%
+%   Outputs:
+%     xdata, ydata - Coordinate vectors for the line segment
+
+y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
+y2 = next(2)*gaps(next(1))+positions(next(1),2);
+
+xdata = [positions(mine(1),1) positions(next(1),1)];
+ydata = [y1 y2];
+
+% ============================================================================
 function [n, b_coord, M_coord, N_coord] = getcoords( L )
 %% getcoords( L )
 %
@@ -403,81 +714,3 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
-
-function joinpoints( mine, next, positions, gaps, options )
-%% joinpoints( mine, next, positions, gaps, options )
-%
-% Function that plots segments of loops - either straight lines or semicircles
-%
-% *** Inputs: ***
-% mine and next are pairs (puncture index, vertex index) defining
-%    vertices that the function joins using a line.
-%
-% -- Function will return an error if puncture indices are not the same
-%    or consecutive ascending: k, k+1
-% -- Vertex indices are integers, excluding 0: positive indices are
-%    interpreted as above the puncture, negative as below
-% -- when mine(1) == next(1), semicircles are drawn. In this case
-%    it has to hold vertex numbers are the same as well, but with
-%    opposite signs. Semicircles are drawn in positive orientation,
-%    so mine(2) < next(2) will result in D-shaped line, whereas
-%    mine(2) > next(2) will result in a C-shaped line.
-%
-%
-% positions - n x 2 matrix of puncture positions
-% gaps      - 1 x n vector of gaps between loop lines at each puncture
-% options   - options data for line plotting
-%
-% *** Warning: *** This function is for internal use, error
-% checking is not bullet proof.
-
-
-dp = next(1) - mine(1); % index distance between punctures
-assert( dp == 1 || dp == 0, 'BRAIDLAB:loop:plot:joinpoints',...
-        'Requests one or two consecutive punctures');
-
-assert( mine(2)~=0 && next(2)~=0, 'BRAIDLAB:loop:plot:joinpoints',...
-        'Vertex indices must be nonzero') ;
-
-if dp == 0
-  %% Draw semicircles
-
-  assert( abs(mine(2)) == abs(next(2)) && ...
-          sign(mine(2)) ~= sign(next(2)),...
-          'BRAIDLAB:loop:plot:joinpoints',...
-          ['For semicircles, vertex indices must be equal value, ' ...
-           'opposite sign']);
-
-  order = abs(mine(2));      % order of the loop from the puncture
-  rad = order*gaps(mine(1)); % semi circle radius
-  cirsign = sign(next(2)-mine(2)); % 1 == D shaped, -1 == C shaped
-
-  loop_curve_x = cirsign*linspace(0,rad,50);
-  loop_curve_y_top = sqrt(rad^2 - loop_curve_x.^2);
-  loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
-  if options.Components
-    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-         'Color', options.LineColor,'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
-  else
-    plot(positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)], ...
-         positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom], ...
-         options.LineColor,'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
-  end
-
-else
-  %% Draw straight lines
-  y1 = mine(2)*gaps(mine(1))+positions(mine(1),2);
-  y2 = next(2)*gaps(next(1))+positions(next(1),2);
-  if options.Components
-    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-         'Color',options.LineColor, 'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
-  else
-    plot([positions(mine(1),1) positions(next(1),1)],[y1 y2], ...
-         options.LineColor, 'LineWidth',options.LineWidth, ...
-         'LineStyle',options.LineStyle)
-  end
-end

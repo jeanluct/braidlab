@@ -191,6 +191,14 @@ function output = helper(input)
 
 ## Testing Approach
 
+### Test Organization
+
+- **`testsuite/`** - Unit tests for the entire project (permanent test suite)
+- **`devel/tests/`** - Short-term development testing and experiments
+  - Created during active development
+  - May contain incomplete or exploratory code
+  - Not part of the permanent test suite
+
 ### For `loop.plot` Refactoring
 
 1. **Visual Regression**: Compare plots before/after refactoring
@@ -198,7 +206,7 @@ function output = helper(input)
 3. **Edge Cases**: Single puncture, zero b-coords, many components
 4. **Backward Compatibility**: Existing code must work unchanged
 
-### Test Location
+### Development Test Location
 
 ```
 devel/tests/iss141-handle-for-loop-plot/
