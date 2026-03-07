@@ -307,6 +307,8 @@ if ~holdstate
   axis([ax(1)-sc ax(2)+sc ax(3)-sc ax(4)+sc])
 end
 
+end  % plot
+
 % ============================================================================
 function geom = computeLoopGeometry(L,puncture_position,pgap,components, ...
                                     keytohash)
@@ -495,12 +497,18 @@ end
 % Convert cell array to structure array
 geom = [segments{:}];
 
+end  % computeLoopGeometry
+
 % ============================================================================
 function ordered = orderSegmentsByComponent(geom)
 %ORDERSEGMENTSBYCOMPONENT  Order segments into continuous loop paths.
 %   ORDERED = ORDERSEGMENTSBYCOMPONENT(GEOM) takes an array of unordered
-%   segments and groups them by component, ordering each component's
+%   segments and discovers connected components, ordering each component's
 %   segments to form a continuous closed path.
+%
+%   Note: The geom.component field (which comes from vertex components)
+%   is IGNORED. This function finds segment components from scratch using
+%   graph connectivity.
 %
 %   Input:
 %     geom - Structure array of segments (from computeLoopGeometry)
@@ -514,129 +522,104 @@ if isempty(geom)
   return;
 end
 
-% Get unique components
-components = [geom.component];
-unique_comps = unique(components);
-num_comps = length(unique_comps);
+num_segs = length(geom);
 
-% Initialize output
-ordered = cell(num_comps,1);
+% Build global vertex-to-segment adjacency map
+% Key: vertex string 'p_v', Value: list of segment indices
+vertex_to_segs = containers.Map('KeyType','char','ValueType','any');
 
-% For each component, order its segments
-for c = 1:num_comps
-  comp_id = unique_comps(c);
+for s = 1:num_segs
+  v1 = geom(s).vertex(1,:);
+  v2 = geom(s).vertex(2,:);
   
-  % Find all segments belonging to this component
-  seg_idx = find(components == comp_id);
+  key1 = sprintf('%d_%d',v1(1),v1(2));
+  key2 = sprintf('%d_%d',v2(1),v2(2));
   
-  if isempty(seg_idx)
-    continue;
+  % Add segment to vertex adjacency lists
+  if ~isKey(vertex_to_segs,key1)
+    vertex_to_segs(key1) = [];
+  end
+  if ~isKey(vertex_to_segs,key2)
+    vertex_to_segs(key2) = [];
   end
   
-  num_segs = length(seg_idx);
+  vertex_to_segs(key1) = [vertex_to_segs(key1) s];
+  vertex_to_segs(key2) = [vertex_to_segs(key2) s];
+end
+
+% Find connected components using DFS
+visited = false(num_segs,1);
+ordered = {};
+
+while any(~visited)
+  % Start new component from first unvisited segment
+  seed_idx = find(~visited,1);
   
-  if num_segs == 1
-    % Single segment forms a closed loop (rare case)
-    ordered{c} = seg_idx(1);
-    continue;
-  end
+  % Traverse this component using DFS
+  component_segs = traverseComponent(geom,seed_idx,vertex_to_segs);
   
-  % Build adjacency map: vertex -> list of (segment_index, endpoint_type)
-  % endpoint_type: 1 = start, 2 = end
-  vertex_map = containers.Map('KeyType','char','ValueType','any');
+  % Mark as visited
+  visited(component_segs) = true;
   
-  for k = 1:num_segs
-    idx = seg_idx(k);
-    v1 = geom(idx).vertex(1,:);
-    v2 = geom(idx).vertex(2,:);
-    
-    % Convert vertex to string key
-    key1 = sprintf('%d_%d',v1(1),v1(2));
-    key2 = sprintf('%d_%d',v2(1),v2(2));
-    
-    % Add to adjacency map
-    if ~isKey(vertex_map,key1)
-      vertex_map(key1) = {};
-    end
-    if ~isKey(vertex_map,key2)
-      vertex_map(key2) = {};
-    end
-    
-    % Store which segment connects to this vertex and which endpoint
-    temp = vertex_map(key1);
-    temp{end+1} = struct('seg',k,'endpoint',1);
-    vertex_map(key1) = temp;
-    
-    temp = vertex_map(key2);
-    temp{end+1} = struct('seg',k,'endpoint',2);
-    vertex_map(key2) = temp;
-  end
+  % Add to output
+  ordered{end+1} = component_segs(:)';  % Row vector
+end
+
+% Helper function: traverse connected component starting from seed
+function path = traverseComponent(geom,seed,vertex_to_segs)
+  % Build path by following segment connections
+  num_segs = length(geom);
   
-  % Start from first segment
-  path = zeros(num_segs,1);
-  path(1) = seg_idx(1);
+  % Start from seed segment
+  path = seed;
   used = false(num_segs,1);
-  used(1) = true;
+  used(seed) = true;
   
-  % Track current endpoint
-  v_current = geom(seg_idx(1)).vertex(2,:);
+  % Track current endpoint (end of last segment added)
+  v_current = geom(seed).vertex(2,:);
   
-  % Build path by following connections
-  for step = 2:num_segs
+  % Follow connections until we return to start or run out
+  while true
     key_current = sprintf('%d_%d',v_current(1),v_current(2));
     
-    if ~isKey(vertex_map,key_current)
-      % No connections - shouldn't happen
-      warning('BRAIDLAB:loop:plot:noconnection', ...
-              ['Component %d: No vertex map entry for vertex (%d,%d) ' ...
-               'at step %d/%d'],c,v_current(1),v_current(2),step,num_segs);
-      path = path(1:step-1);
+    if ~isKey(vertex_to_segs,key_current)
+      % Dead end (shouldn't happen for closed loop)
       break;
     end
     
-    % Find unused segment connected to current vertex
-    connections = vertex_map(key_current);
-    found = false;
+    % Get all segments touching this vertex
+    candidates = vertex_to_segs(key_current);
     
-    for j = 1:length(connections)
-      seg_local = connections{j}.seg;
-      endpoint = connections{j}.endpoint;
-      
-      if used(seg_local)
-        continue;
+    % Find first unused candidate
+    next_seg = 0;
+    for k = 1:length(candidates)
+      if ~used(candidates(k))
+        next_seg = candidates(k);
+        break;
       end
-      
-      % Found unused segment
-      idx = seg_idx(seg_local);
-      path(step) = idx;
-      used(seg_local) = true;
-      
-      % Move to other endpoint of this segment
-      if endpoint == 1
-        % We entered via start, exit via end
-        v_current = geom(idx).vertex(2,:);
-      else
-        % We entered via end, exit via start
-        v_current = geom(idx).vertex(1,:);
-      end
-      
-      found = true;
+    end
+    
+    if next_seg == 0
+      % No unused segments - we've closed the loop
       break;
     end
     
-    if ~found
-      % No unused segment found
-      warning('BRAIDLAB:loop:plot:incomplete', ...
-              ['Component %d: Path incomplete at step %d/%d. ' ...
-               'Current vertex (%d,%d) has %d connections, all used.'], ...
-              c,step,num_segs,v_current(1),v_current(2),length(connections));
-      path = path(1:step-1);
-      break;
+    % Add to path
+    path(end+1) = next_seg;
+    used(next_seg) = true;
+    
+    % Move to other endpoint of this segment
+    if isequal(geom(next_seg).vertex(1,:),v_current)
+      % Entered via vertex 1, exit via vertex 2
+      v_current = geom(next_seg).vertex(2,:);
+    else
+      % Entered via vertex 2, exit via vertex 1
+      v_current = geom(next_seg).vertex(1,:);
     end
   end
-  
-  ordered{c} = path;
-end
+end  % traverseComponent
+
+end  % orderSegmentsByComponent
 
 
 % ============================================================================
@@ -664,6 +647,8 @@ loop_curve_y_bottom = -sqrt(rad^2 - loop_curve_x(end:-1:1).^2);
 xdata = positions(mine(1),1) + [loop_curve_x loop_curve_x(end:-1:1)];
 ydata = positions(mine(1),2) + [loop_curve_y_top loop_curve_y_bottom];
 
+end  % computeSemicircle
+
 % ============================================================================
 function [xdata,ydata] = computeLine(mine,next,positions,gaps)
 %COMPUTELINE  Compute coordinates for a straight line segment.
@@ -683,6 +668,8 @@ y2 = next(2)*gaps(next(1))+positions(next(1),2);
 
 xdata = [positions(mine(1),1) positions(next(1),1)];
 ydata = [y1 y2];
+
+end  % computeLine
 
 % ============================================================================
 function [n, b_coord, M_coord, N_coord] = getcoords( L )
@@ -714,3 +701,5 @@ b_coord = [-nu(1)/2 b_coord nu(end)/2];
 M_coord = [nu(1)/2 mu(2*(1:(n-2))-1) nu(n-1)/2];
 % intersections below punctures
 N_coord = [nu(1)/2 mu(2*(1:(n-2))) nu(n-1)/2];
+
+end  % getcoords

@@ -21,16 +21,18 @@ This directory contains test scripts and output images created during the
 - `test*.png` - Various test outputs
 - `debug_components.png` - Component debugging visualization
 
-## Known Issues
+## Status
 
-As of 2026-03-07, there is a known bug in the segment ordering algorithm
-(`orderSegmentsByComponent`) where multi-component loops are not properly
-closed. Component 1 completes correctly but Component 2 remains open.
+As of 2026-03-07, Phase 1.3 is **complete** and all tests pass.
 
-See warnings in test output:
-- Component 1: Path incomplete at step 11/18
-- Component 2: Path incomplete at step 9/26
+### Fixed Issues
 
-The algorithm stops early when all connections to a vertex are marked as
-used, suggesting either incorrect component assignment or a flaw in the
-traversal logic.
+**Multi-component loop closure bug (FIXED):**
+- **Root cause:** The original algorithm used pre-assigned `geom.component` IDs
+  from vertex components, but vertex components don't correspond 1-to-1 with
+  loop components (44 vertices vs 13 segments in test case).
+- **Solution:** Completely rewrote `orderSegmentsByComponent()` to discover
+  connected components from scratch using DFS on a global vertex-to-segment
+  adjacency map.
+- **Result:** All test cases now pass - both simple and complex multi-component
+  loops close properly with no warnings.

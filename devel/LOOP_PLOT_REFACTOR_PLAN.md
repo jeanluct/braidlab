@@ -193,7 +193,9 @@ No separate coordinate output argument needed.
 
 ### Phase 1: Core Architecture Refactor
 
-#### 1.1 Extract Geometry Computation
+**Status:** Phase 1.1-1.3 ✅ COMPLETE (2026-03-07)
+
+#### 1.1 Extract Geometry Computation ✅ COMPLETE
 - **Task:** Create `computeLoopGeometry()` private method
 - **Location:** New private method in `@loop` folder or within `plot.m`
 - **Implementation:**
@@ -203,8 +205,9 @@ No separate coordinate output argument needed.
   - Return structured data (see Technical Architecture §1)
 - **Testing:** Unit test with known loop coordinates
 
-#### 1.2 Refactor `joinpoints()` Helper
+#### 1.2 Refactor `joinpoints()` Helper ✅ COMPLETE
 - **Task:** Change from plotting to coordinate return
+- **Completed:** Renamed to `computeSemicircle()` and `computeLine()` for clarity
 - **Changes:**
   ```matlab
   % OLD:
@@ -223,8 +226,14 @@ No separate coordinate output argument needed.
   - Return `[x, y]` arrays
 - **Testing:** Verify coordinate generation matches current implementation
 
-#### 1.3 Implement Segment Ordering
+#### 1.3 Implement Segment Ordering ✅ COMPLETE
 - **Task:** Order segments to form continuous, closed paths per component
+- **Completed:** Implemented DFS-based component discovery in `orderSegmentsByComponent()`
+  - Builds global vertex-to-segment adjacency map
+  - Discovers connected components from scratch (ignores pre-assigned vertex components)
+  - Uses greedy traversal within nested `traverseComponent()` helper
+  - All test cases pass - multi-component loops close properly
+- **Testing:** ✅ Visual verification complete - all loops render correctly
 - **Challenge:** Current code uses hash table (`keytohash`) to map segment→component
   - Semicircles: lines 230-239
   - Above segments: lines 265-300
@@ -244,8 +253,8 @@ No separate coordinate output argument needed.
   - Concept: "sort linked two-tuples"
 - **Testing:** Visual verification (loops should look identical to current)
 
-#### 1.4 Integrate Geometry Computation into Main Plot
-- **Task:** Refactor main `plot()` to use new architecture
+#### 1.4 Integrate Geometry Computation into Main Plot ⏳ TODO
+- **Task:** Switch from `plot()` to `patch()` objects for rendering
 - **Flow:**
   ```matlab
   function h = plot(L, varargin)

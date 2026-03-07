@@ -55,7 +55,7 @@ function [vertexComponent, Nc] = laplaceToComponents( Lp )
 %   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
-opts.issym = true; opts.isreal=true;
+opts.isreal = true;
 [vc,ev] = eigs(Lp,size(Lp,1)/2,'smallestabs',opts);
 ev = diag(ev);
 
