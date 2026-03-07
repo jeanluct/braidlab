@@ -1,5 +1,4 @@
-BRAIDLAB STYLE GUIDE
---------------------
+# BRAIDLAB STYLE GUIDE
 
 If you wish to participate in developing Braidlab, below are some
 stylistic guidelines to adhere to.  The easiest way to ensure
@@ -7,8 +6,7 @@ compliance, of course, is to simply start a new file by copying an
 appropriate existing one.
 
 
-GENERAL
--------
+## GENERAL
 
 * No tabs; always use spaces instead.
 * Delete extra whitespace at the end of lines, or at the end of files.
@@ -21,8 +19,7 @@ GENERAL
   We're not animals: we try to write well.
 
 
-VERSION CONTROL
----------------
+## VERSION CONTROL
 
 * See https://github.com/jeanluct/braidlab/wiki/braidlab-workflow.
 * Create a branch off develop to implement a new feature or bugfix.
@@ -44,8 +41,7 @@ VERSION CONTROL
   be careful not to say "does not resolve issue #45"!
 
 
-MATLAB .m FILES
----------------
+## MATLAB .m FILES
 
 * Here is an example of formatting for function help:
 
@@ -94,8 +90,7 @@ function [varargout] = tntype(b)
   the latter part in all lowercase.
 
 
-C/C++ FILES
------------
+## C/C++ FILES
 
 * Braidlab-specific macros and compiler flags should have the form
   BRAIDLAB_COMPILER_FLAG, all in uppercase.
