@@ -193,7 +193,9 @@ No separate coordinate output argument needed.
 
 ### Phase 1: Core Architecture Refactor
 
-**Status:** Phase 1.1-1.3 ✅ COMPLETE (2026-03-07)
+**Status:** ✅ COMPLETE (2026-03-07)
+
+All sub-phases (1.1-1.4) successfully implemented and tested.
 
 #### 1.1 Extract Geometry Computation ✅ COMPLETE
 - **Task:** Create `computeLoopGeometry()` private method
@@ -253,8 +255,18 @@ No separate coordinate output argument needed.
   - Concept: "sort linked two-tuples"
 - **Testing:** Visual verification (loops should look identical to current)
 
-#### 1.4 Integrate Geometry Computation into Main Plot ⏳ TODO
+#### 1.4 Switch to Patch Objects ✅ COMPLETE
 - **Task:** Switch from `plot()` to `patch()` objects for rendering
+- **Completed:** Changed line 289-293 to use `patch()` instead of `plot()`
+  - Set `'EdgeColor'` for line color (instead of `'Color'`)
+  - Set `'FaceColor'` to `'none'` (no fill yet - that's Phase 4)
+  - Maintains all LineWidth and LineStyle options
+  - Returns column vector of patch handles (N×1)
+- **Testing:** ✅ All tests pass
+  - Visual output identical to previous implementation
+  - Handles are `matlab.graphics.primitive.Patch` objects
+  - Can access coordinates via `get(h,'XData')` and `get(h,'YData')`
+  - Backward compatible - works without output capture
 - **Flow:**
   ```matlab
   function h = plot(L, varargin)
