@@ -37,10 +37,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -55,7 +55,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef loop < matlab.mixin.CustomDisplay
@@ -86,23 +86,23 @@ classdef loop < matlab.mixin.CustomDisplay
     %   array used in its construction (usually double by default).  For
     %   example, to construct a loop of 64-bit integers, use LOOP(int64(D)).
     %
-    %   L = LOOP(N) where N is an integer (N>1) creates a loop object L with
-    %   N+1 punctures.  The loop L is a (nonoriented) generating set for the
-    %   fundamental group of the sphere with N punctures, with the extra
+    %   L = LOOP(N) where N is an integer (N>2) creates a loop object L with
+    %   N punctures.  The loop L is a (nonoriented) generating set for the
+    %   fundamental group of the sphere with N-1 punctures, with the Nth
     %   puncture serving as the basepoint.  This sort of object is
-    %   convenient when looking for growth of loops under braid action, or
-    %   for testing for braid equality.
+    %   convenient when looking for growth of loops under braid action.
     %
     %   L = LOOP(N,M) where N and M are integers creates a loop object L
     %   with M identical loops.  This can be used to pre-allocate memory for
     %   a large number of loops.
     %
     %   L = LOOP(N,'BasePoint') or LOOP(N,M,'BasePoint') adds a basepoint
-    %   puncture so the resulting loop has N+1 punctures.  The loop L is a
-    %   (nonoriented) generating set for the fundamental group of the sphere
-    %   with N punctures, with the extra puncture serving as the basepoint.
-    %   This sort of object is convenient when looking for growth of loops
-    %   under braid action, or for testing for braid equality.
+    %   puncture so the resulting loop has N+1 punctures (N>1).  The loop L
+    %   is a (nonoriented) generating set for the fundamental group of the
+    %   sphere with N punctures, with the extra puncture serving as the
+    %   basepoint.  This sort of object is convenient when looking for
+    %   growth of loops under braid action, or for testing for braid
+    %   equality.
     %
     %   L = LOOP(...,'BasePoint',B) specifies the basepoint to be puncture
     %   B, with 0 <= B <= N.  B=0 means no basepoint.
@@ -203,9 +203,13 @@ classdef loop < matlab.mixin.CustomDisplay
       if isscalar(c) && ~isa(c,'braidlab.loop')
         % Nested generators of the fundamental group of a sphere with c
         % punctures with an extra basepoint puncture on the right.
-        if c < 2
+        if nobase && c < 3
           error('BRAIDLAB:loop:loop:toofewpunc', ...
-                'Need at least two punctures.');
+                'Need at least three punctures.');
+        end
+        if ~nobase && c < 2
+          error('BRAIDLAB:loop:loop:toofewpunc', ...
+                'Need at least two punctures in addition to basepoint.');
         end
         if nobase
           n1 = c-2;
@@ -240,7 +244,7 @@ classdef loop < matlab.mixin.CustomDisplay
         return
       end
 
-      if length(varargin) == 1
+      if isscalar(varargin)
         % Create from an array with an even number of columns.
         if ndims(c) > 2 %#ok<ISMAT>
           error('BRAIDLAB:loop:loop:badarg', ...
@@ -352,7 +356,7 @@ classdef loop < matlab.mixin.CustomDisplay
     %
     %   This is a method for the LOOP class.
     %   See also LOOP, BRAID.EQ.
-      ee = [l1.n] == [l2.n] && [l1.basepoint] == [l2.basepoint];
+      ee = l1.n == l2.n && l1.basepoint == l2.basepoint;
       if ee, ee = all([l1.coords] == [l2.coords],2); end
     end
 
@@ -389,7 +393,7 @@ classdef loop < matlab.mixin.CustomDisplay
       % check that all inputs are loops
       assert( all(cellfun( @(x)isa(x,'braidlab.loop'), varargin )),...
              'BRAIDLAB:loop:vertcat:nonloops',...
-             ['Only braidlab/loops can be stacked'] );
+             'Only braidlab/loops can be stacked' );
 
       % all loops have to have the same basepoint
       basepoints = cellfun( @(x)x.basepoint, varargin );
@@ -412,11 +416,11 @@ classdef loop < matlab.mixin.CustomDisplay
 
       catch me
         switch me.identifier
-          case 'MATLAB:cell2mat:MixedDataTypes',
+          case 'MATLAB:cell2mat:MixedDataTypes'
             error('BRAIDLAB:loop:vertcat:mixeddatatypes',...
                   ['Only loops of the matching data type'...
-                   ' can be stacked']);
-          case 'MATLAB:catenate:dimensionMismatch',
+                   ' can be stacked with Matlab < 2025a']);
+          case 'MATLAB:catenate:dimensionMismatch'
             error('BRAIDLAB:loop:vertcat:mixedpuncturecount',...
                   ['Only loops with matching number '...
                    'of punctures can be stacked']);
@@ -427,12 +431,12 @@ classdef loop < matlab.mixin.CustomDisplay
     end
 
     % Currently, concatenation other than vertical is not allowed
-    function varargout = horzcat(varargin)
+    function varargout = horzcat(varargin) %#ok<STOUT>
       error('BRAIDLAB:loop:noarrays',...
             'Only vertical concatenation of loops is allowed.')
     end
 
-    function varargout = cat(varargin)
+    function varargout = cat(varargin) %#ok<STOUT>
       error('BRAIDLAB:loop:noarrays',...
             'Only vertical concatenation of loops is allowed.')
     end

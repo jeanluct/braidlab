@@ -1,10 +1,10 @@
 # <LICENSE
 #   Braidlab: a Matlab package for analyzing data using braids
 #
-#   http://github.com/jeanluct/braidlab
+#   https://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-#                            Marko Budisic         <marko@math.wisc.edu>
+#   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#                            Marko Budisic          <mbudisic@gmail.com>
 #
 #   This file is part of Braidlab.
 #
@@ -19,71 +19,139 @@
 #   GNU General Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License
-#   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+#   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 # LICENSE>
 
-# Find architecture, set corresponding mex file suffix.
+# Detect the MEX file suffix by compiling a tiny test program with mex
+# and inspecting the output file extension.  This replaces the old
+# manual uname-based detection table and works on every platform that
+# MATLAB supports.
 SYS = $(shell uname -s)
-ARCH = $(shell uname -m)
-ifeq ($(SYS), Linux)
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexa64
-	endif
-	ifeq ($(ARCH), i686)
-		MEXSUFFIX = mexglx
-	endif
-endif
+
+# Set MACOSX deployment target to the major SDK version (e.g. 15.0)
+# when on Darwin
 ifeq ($(SYS), Darwin)
-	ifeq ($(ARCH), x86_64)
-		MEXSUFFIX = mexmaci64
-	endif
+    SDKVER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null || echo)
+    ifneq ($(SDKVER),)
+        SDKMAJOR := $(firstword $(subst ., ,$(SDKVER)))
+        MACOSX_DEPLOYMENT_TARGET ?= $(SDKMAJOR).0
+    endif
 endif
+
+# Use TMPDIR from the environment if set, otherwise fall back to local dir.
+# The $(or ...) guarantees we never get an empty string (which would
+# cause temp files to be written to the filesystem root).
+TMPDIR := $(or $(TMPDIR),.)
 
 MEX = mex
+MEX_CHECK := $(shell command -v $(MEX))
+ifndef MEX_CHECK
+    $(error $(MEX) not found in PATH.  Set MEX variable with full path or add $(MEX) to PATH)
+endif
+
+# Auto-detect MEXSUFFIX by compiling a trivial MEX file and extracting
+# the file extension.  The whole sequence runs in a single $(shell ...)
+# so the result is available as a Make variable at parse time.
+MEX_TMP = $(TMPDIR)/_mex_tmp
+MEXSUFFIX := $(shell \
+    echo 'void mexFunction(int a,void*b,int c,const void*d){}' > $(MEX_TMP).c && \
+    $(MEX) $(MEX_TMP).c -output $(MEX_TMP) >/dev/null 2>&1 && \
+    f=$$(ls $(MEX_TMP).mex* 2>/dev/null) && \
+    echo "$${f##*.}" ; \
+    rm -f $(MEX_TMP).*)
+
+export MEXSUFFIX
+
 CFLAGS = -O -DMATLAB_MEX_FILE -fPIC
-# C++0x is needed for parallel code.
-CXXFLAGS = $(CFLAGS) -std=c++0x
-MEXFLAGS  = -largeArrayDims -O
+# C++11 is needed for parallel code.
+CXXFLAGS = $(CFLAGS) -std=c++11
+MEXFLAGS = -largeArrayDims -O
 
-# Use BRAIDLAB_USE_GMP=0 on command line to compile with GMP.
+# Use BRAIDLAB_USE_GMP=0 on command line to disable GMP if desired.
+# If BRAIDLAB_USE_GMP is not set, try to detect available GMP libraries
+# and disable GMP automatically when they are not present. This avoids
+# failing the build on systems without libgmp / libgmpxx installed.
+ifndef BRAIDLAB_USE_GMP
+# Test by writing a tiny program to a temp file, compiling and linking
+# it against gmpxx and gmp, then checking the exit status.
+GMP_TMP = $(TMPDIR)/_gmp_check
+GMP_CHECK := $(shell \
+    echo 'int main(void){return 0;}' > $(GMP_TMP).c && \
+    $(CC) $(GMP_TMP).c -lgmpxx -lgmp -o $(GMP_TMP) >/dev/null 2>&1 && \
+    echo yes || echo no; rm -f $(GMP_TMP).c $(GMP_TMP))
+ifeq ($(GMP_CHECK),yes)
+    BRAIDLAB_USE_GMP = 1
+else
+    BRAIDLAB_USE_GMP = 0
+    $(info GMP libraries not found; building without GMP support.)
+endif
+endif
+
 ifneq ($(BRAIDLAB_USE_GMP), 0)
-	GMP_LD = -lgmpxx -lgmp
-	MEXFLAGS += -DBRAIDLAB_USE_GMP
+    # If Homebrew installed gmp, prefer its lib/include paths.
+    # Not guarded by Darwin: also supports Homebrew on Linux.
+    BREW_GMP_PREFIX := $(shell brew --prefix gmp 2>/dev/null || echo)
+    ifneq ($(BREW_GMP_PREFIX),)
+        GMP_LD = -L$(BREW_GMP_PREFIX)/lib -lgmpxx -lgmp
+        CFLAGS += -I$(BREW_GMP_PREFIX)/include
+        CXXFLAGS += -I$(BREW_GMP_PREFIX)/include
+    else
+        GMP_LD = -lgmpxx -lgmp
+    endif
+    MEXFLAGS += -DBRAIDLAB_USE_GMP
+else
+    GMP_LD =
 endif
 
-MAKE = make MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
-	CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
-	GMP_LD="$(GMP_LD)"
+MAKEMEX_ARGS = MEX=$(MEX) MEXSUFFIX=$(MEXSUFFIX) MEXFLAGS="$(MEXFLAGS)" \
+    CXX="$(CXX)" CC="$(CC)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
+    GMP_LD="$(GMP_LD)"
 
-.PHONY: all check-env doc clean distclean
+# Sub-directory targets for parallel-safe builds with make -j.
+# Dependencies: @braid/private and @cfbraid/private both rebuild
+# libcbraid-mex.a, so they must not run concurrently.  The other three
+# sub-directories are independent and can build in parallel.
+SUBDIRS_INDEPENDENT = +braidlab/private +braidlab/+util +braidlab/@loop/private
+SUBDIRS_CBRAID      = +braidlab/@cfbraid/private +braidlab/@braid/private
 
-all: check-env
-	cd +braidlab/private; $(MAKE) all
-	cd +braidlab/@braid/private; $(MAKE) all
-	cd +braidlab/@loop/private; $(MAKE) all
-	cd +braidlab/@cfbraid/private; $(MAKE) all
+.PHONY: all doc clean distclean \
+	$(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
 
-check-env:
+all: $(SUBDIRS_INDEPENDENT) $(SUBDIRS_CBRAID)
+
+# Independent sub-directories (safe to build in parallel).
+$(SUBDIRS_INDEPENDENT):
+	$(MAKE) -C $@ $(MAKEMEX_ARGS) all
+
+# cbraid-dependent sub-directories must be serialized to avoid
+# concurrent libcbraid-mex.a rebuilds.
+# Force ordering: @cfbraid builds before @braid (arbitrary choice).
++braidlab/@braid/private: +braidlab/@cfbraid/private
+$(SUBDIRS_CBRAID):
+	$(MAKE) -C $@ $(MAKEMEX_ARGS) all
+
 ifndef MEXSUFFIX
-	$(error Unknown system/architecture $(SYS)/$(ARCH))
+    $(error Could not detect MEX suffix.  Is mex in your PATH?)
 endif
+$(info MEXSUFFIX is $(MEXSUFFIX).)
 
 doc:
-	cd doc; make
+	$(MAKE) -C doc
 
 # remove MEX files and object files.
 clean:
-	cd extern/cbraid/lib; $(MAKE) clean
-	cd extern/trains; $(MAKE) clean
-	cd +braidlab/@braid/private; $(MAKE) clean
-	cd +braidlab/@loop/private; $(MAKE) clean
-	cd +braidlab/@cfbraid/private; $(MAKE) clean
-	cd +braidlab/private; $(MAKE) clean
-	cd doc; $(MAKE) clean
+	$(MAKE) -C extern/cbraid/lib clean
+	$(MAKE) -C extern/trains clean
+	$(MAKE) -C +braidlab/@braid/private clean
+	$(MAKE) -C +braidlab/@loop/private clean
+	$(MAKE) -C +braidlab/@cfbraid/private clean
+	$(MAKE) -C +braidlab/private clean
+	$(MAKE) -C +braidlab/+util clean
+	$(MAKE) -C doc clean
 
 # distclean also removes the libraries (useful for recompiling on
 # different OS) and the LaTeX-generated files.
 distclean: clean
 	rm -f extern/cbraid/lib/libcbraid-mex.a
-	cd extern/trains; $(MAKE) distclean
-	cd doc; $(MAKE) distclean
+	$(MAKE) -C extern/trains distclean
+	$(MAKE) -C doc distclean

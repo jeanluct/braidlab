@@ -13,10 +13,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -31,7 +31,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef annbraid < braidlab.braid
@@ -234,7 +234,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = conjtest@braidlab.braid(b1.braid,b2.braid);
+      [varargout{1:nargout}] = conjtest@braidlab.braid(b1.braid,b2.braid);
     end
 
     function [varargout] = cycle(b,varargin)
@@ -242,7 +242,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = cycle@braidlab.braid(b.braid,varargin{:});
+      [varargout{1:nargout}] = cycle@braidlab.braid(b.braid,varargin{:});
     end
 
     function [varargout] = entropy(b,varargin)
@@ -250,7 +250,7 @@ classdef annbraid < braidlab.braid
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = entropy@braidlab.braid(b.braid,varargin{:});
+      [varargout{1:nargout}] = entropy@braidlab.braid(b.braid,varargin{:});
     end
 
     function l = loopcoords(b,varargin)
@@ -276,12 +276,12 @@ classdef annbraid < braidlab.braid
       end
     end
 
-    function [varargout] = tntype(b)
+    function [varargout] = train(b)
       ; %#ok<NOSEM>
       % Do not put comments above the first line of code, so the help
       % message from braid superclass is displayed.
 
-      varargout{1:nargout} = tntype@braidlab.braid(b.braid);
+      [varargout{1:nargout}] = train@braidlab.braid(b.braid);
     end
 
   end % methods block

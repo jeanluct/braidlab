@@ -19,10 +19,10 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                            Marko Budisic         <marko@math.wisc.edu>
+//   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic          <mbudisic@gmail.com>
 //
 //   This file is part of Braidlab.
 //
@@ -37,7 +37,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 #define P_SIGMA_IDX prhs[0]
@@ -48,8 +48,10 @@
 #define P_LOOP_OUT plhs[0]
 #define P_OPSIGN  plhs[1]
 
+#ifdef BRAIDLAB_USE_GMP
 void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn);
 void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop );
+#endif
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
@@ -129,6 +131,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 }
 
+#ifdef BRAIDLAB_USE_GMP
 void convertGMPToCellLoop( mpz_class * loopOut, mxArray* cellLoop ) {
 
   const mwSize Ncoord = mxGetM(cellLoop);
@@ -171,3 +174,5 @@ void convertCellLoopToGMP( const mxArray* cellLoop, mpz_class * loopIn) {
   }
 
 }
+
+#endif

@@ -1,6 +1,6 @@
-function [out, varargout] = mtimes(b1,b2)
+function [out,varargout] = mtimes(b1,b2)
 %MTIMES   Multiply two braids together or act on a loop with a braid.
-%   C = B1*B2, where B1 and B2 are braid objects, return the product of
+%   C = B1*B2, where B1 and B2 are braid objects, returns the product of
 %   the two braids.  The product is the group operation in the braid
 %   group (braid concatenation).
 %
@@ -19,10 +19,10 @@ function [out, varargout] = mtimes(b1,b2)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -37,7 +37,7 @@ function [out, varargout] = mtimes(b1,b2)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 if isa(b2,'braidlab.annbraid')
@@ -84,7 +84,7 @@ elseif isa(b2,'braidlab.loop')
     out = loopsigma(b1.word,b2.coords,b1.n);
     out = braidlab.loop(out,'bp',b2.basepoint);
   else
-    [out, opsigns] = loopsigma(b1.word,b2.coords,b1.n);
+    [out,opsigns] = loopsigma(b1.word,b2.coords,b1.n);
     out = braidlab.loop(out,'bp',b2.basepoint);
     varargout{1} = linact(b1,opsigns,size(b2(1).coords,2));
   end

@@ -19,10 +19,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -37,7 +37,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef cfbraid < matlab.mixin.CustomDisplay
@@ -122,14 +122,14 @@ classdef cfbraid < matlab.mixin.CustomDisplay
       ee = isempty(b.factors) && b.delta == 0;
     end
 
-    function ee = ispositive(obj)
+    function ee = ispositive(b)
     %ISPOSITIVE   Return true if braid is positive.
     %   ISPOSITIVE(B) returns true if the braid B can be written with only
     %   positive crossings.
     %
     %   This is a method for the CFBRAID class.
     %   See also CFBRAID, BRAID.
-      ee = obj.delta >= 0;
+      ee = b.delta >= 0;
     end
 
     function w = braid(b)
@@ -191,9 +191,11 @@ classdef cfbraid < matlab.mixin.CustomDisplay
        wc = textwrap({c},sz(1)-4);
        for i = 1:length(wc)
          % Indent rows.
-         if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
+         if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
          % If the format is loose rather than compact, add a line break.
-         if strcmp(get(0,'FormatSpacing'),'loose')
+         s = settings;
+         if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue, ...
+                   'loose')
            wc{i} = sprintf('%s\n',wc{i});
          end
        end

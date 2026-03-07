@@ -1,22 +1,23 @@
 OBJSOURCES = \
-	Batch.cpp \
-	braid.cpp \
-	edgevert.cpp \
-	embedding.cpp \
-	General.cpp \
-	Graphalg.cpp \
-	graph.cpp \
-	Graphset.cpp \
-	Graputil.cpp \
-	help.cpp \
-	hshoe.cpp \
-	Matrix.cpp \
-	ttt.cpp
+    Batch.cpp \
+    braid.cpp \
+    edgevert.cpp \
+    embedding.cpp \
+    General.cpp \
+    Graphalg.cpp \
+    graph.cpp \
+    Graphset.cpp \
+    Graputil.cpp \
+    help.cpp \
+    hshoe.cpp \
+    Matrix.cpp \
+    ttt.cpp
 
 SRCDIR = .
 
-CXX = g++
-CXXFLAGS = -Wall -O3 -ffast-math
+CXX ?= g++
+CXXFLAGS ?= -Wall -O3 -ffast-math -fPIC
+ARFLAGS = rcs
 
 LIBS = -L../lib -ltrains
 
@@ -34,11 +35,10 @@ OBJS = $(OBJSOURCES:.cpp=.o)
 
 all: lib frontend train
 
-lib libtrains: ../lib/libtrains.a
+lib libtrains libtrains.a: ../lib/libtrains.a
 
 ../lib/libtrains.a: $(OBJS)
-	ar cr libtrains.a $(OBJS)
-	ranlib libtrains.a
+	$(AR) $(ARFLAGS) libtrains.a $(OBJS)
 	mv -f libtrains.a ../lib
 
 frontend: ../lib/libtrains.a frontend.o
@@ -47,7 +47,7 @@ train: ../lib/libtrains.a train.o
 
 # Clean up directory.  Remove object files and dependencies file.
 clean:
-	rm -f $(OBJS) $(DEPFILE)
+	rm -f $(OBJS) frontend.o train.o $(DEPFILE)
 
 # Clean up everything, including executables and library.
 distclean:

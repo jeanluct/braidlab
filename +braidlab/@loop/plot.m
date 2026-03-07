@@ -26,11 +26,10 @@ function plot(L, varargin)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
-%                        Michael Allshouse <mallshouse@chaos.utexas.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -45,7 +44,7 @@ function plot(L, varargin)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 
@@ -57,7 +56,7 @@ parser = inputParser;
 parser.addRequired('L', @(x)isa(x,'braidlab.loop') )
 
 % Function that checks for valid color inputs
-iscolor = @(a) (ischar(a) && numel(a)==1) || ...
+iscolor = @(a) (ischar(a) && isscalar(a)) || ...
           (all(isfinite(a) & a >= 0) && ...
            numel(a) >= 3 && numel(a) <= 4);
 
@@ -67,7 +66,7 @@ parser.addParameter('LineStyle', '-', @ischar);
 parser.addParameter('LineWidth', 2, @isfinite);
 parser.addParameter('LineColor', 'b', iscolor);
 parser.addParameter('PunctureColor', 'r', iscolor);
-parser.addParameter('BasePointColor', 'g', iscolor);  
+parser.addParameter('BasePointColor', 'g', iscolor);
 parser.addParameter('PunctureEdgeColor', 'k', iscolor);
 parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
 parser.addParameter('PunctureSize', [], @isfinite);
@@ -78,6 +77,11 @@ parser.addParameter('Components', false, @islogical);
 
 parser.parse( L, varargin{:} );
 options = parser.Results;
+
+assert( size(L.coords,1) == 1, ...
+        'BRAIDLAB:loop:plot:multiloop',...
+        ['Argument cannot be a loop vector. ' ...
+         'Use plot(L(k)) to plot the k-th loop.'] );
 
 %%% Process options
 
@@ -118,7 +122,7 @@ end
 % punctures in the loop coordinate
 
 % The default position of the punctures are the integers along the x-axis
-if isempty(options.PuncturePositions);
+if isempty(options.PuncturePositions)
   options.PuncturePositions = [(1:n)' 0*(1:n)'];
 end
 

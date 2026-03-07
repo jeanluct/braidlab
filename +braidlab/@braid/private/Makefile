@@ -3,10 +3,10 @@
 # <LICENSE
 #   Braidlab: a Matlab package for analyzing data using braids
 #
-#   http://github.com/jeanluct/braidlab
+#   https://github.com/jeanluct/braidlab
 #
-#   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-#                            Marko Budisic         <marko@math.wisc.edu>
+#   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+#                            Marko Budisic          <mbudisic@gmail.com>
 #
 #   This file is part of Braidlab.
 #
@@ -21,7 +21,7 @@
 #   GNU General Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License
-#   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+#   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 # LICENSE>
 
 CBRAID_DIR        = ../../../extern/cbraid
@@ -42,7 +42,7 @@ override MEXFLAGS += CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
 
 .PHONY: check-env all clean
 
-all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) tntype_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX) subbraid_helper.$(MEXSUFFIX)
+all: check-env compact_helper.$(MEXSUFFIX) loopsigma_helper.$(MEXSUFFIX) entropy_helper.$(MEXSUFFIX) train_helper.$(MEXSUFFIX) cross2gen_helper.$(MEXSUFFIX) subbraid_helper.$(MEXSUFFIX)
 
 check-env:
 ifndef MEX
@@ -52,19 +52,17 @@ endif
 
 %.$(MEXSUFFIX): %.cpp
 # Rebuild libcbraid-mex.a with the MEX-compatible compiler.
-	cd $(CBRAID_LIBDIR); \
-		make -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
+	$(MAKE) -C $(CBRAID_LIBDIR) -f ../../../Makefile.cbraid-mex CXX=$(CXX) CC=$(CC)
+	$(MEX) $(MEXFLAGS) $< \
 		-I$(CBRAID_INCLUDEDIR) -L$(CBRAID_LIBDIR) $(CBRAID_LD)
 
-tntype_helper.$(MEXSUFFIX): tntype_helper.cpp
-	cd $(TRAINS_DIR); \
-		make CXX="$(CXX) -fPIC" CC=$(CC)
-	$(MEX) $(MEXFLAGS) $^ \
+train_helper.$(MEXSUFFIX): train_helper.cpp
+	$(MAKE) -C $(TRAINS_DIR) CXX="$(CXX) -fPIC" CC=$(CC)
+	$(MEX) $(MEXFLAGS) $< \
 		-I$(TRAINS_INCLUDEDIR) -L$(TRAINS_LIBDIR) $(TRAINS_LD)
 
 loopsigma_helper.$(MEXSUFFIX): loopsigma_helper.cpp \
-	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp ThreadPool_nofuture.h ThreadPool.h
+	loopsigma_helper_common.hpp update_rules.hpp sumg.hpp ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
@@ -74,7 +72,7 @@ entropy_helper.$(MEXSUFFIX): entropy_helper.cpp \
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 
 cross2gen_helper.$(MEXSUFFIX): cross2gen_helper.cpp \
-	cross2gen_helper.hpp ThreadPool_nofuture.h ThreadPool.h
+	cross2gen_helper.hpp ThreadPool.h
 # $< is the first dependency (the .cpp file).
 	$(MEX) $(MEXFLAGS) $< $(GMP_LD)
 

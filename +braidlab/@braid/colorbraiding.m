@@ -1,4 +1,4 @@
-function [varargout] = colorbraiding(XY,t,proj)
+function [varargout] = colorbraiding(XY,t,proj,checkclosure)
 %COLORBRAIDING   Find braid generators from trajectories using colored braids.
 %   B = COLORBRAIDING(XY,T) takes the inputs XY (the trajectory set) and T
 %   (vector of times) and calculates the corresponding braid B via a color
@@ -12,6 +12,14 @@ function [varargout] = colorbraiding(XY,t,proj)
 %
 %   The projection line angle PROJANG can be specified as an optional
 %   third argument (default 0).
+%
+%   When two strands project onto the same point at any time instance, it
+%   is not generally possible to robustly determine their identities. In
+%   such events, the function issues the error
+%   BRAIDLAB:braid:colorbraiding:coincidentprojection
+%   identifying the offending pair of strands. To resolve this issue,
+%   either change the PROJANG parameter or reduce the value of the braidlab
+%   parameter BraidAbsTol using braidlab.prop('BraidAbsTol', VALUE) command.
 %
 %   COLORBRAIDING is a protected static method of the BRAID class.  It
 %   is also used by the DATABRAID subclass.
@@ -31,16 +39,15 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   you want to manually set the number of threads used, set a global MATLAB
 %   variable BRAIDLAB_threads to a positive integer.
 %
-%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID.
+%   See also BRAID, BRAID.BRAID, DATABRAID, DATABRAID.DATABRAID, BRAIDLAB.PROP
 
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
-%                        Michael Allshouse <mallshouse@chaos.utexas.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -55,14 +62,14 @@ function [varargout] = colorbraiding(XY,t,proj)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_braid_nomex;
+global BRAIDLAB_braid_nomex; %#ok<GVMIS>
 useMatlabVersion = any(BRAIDLAB_braid_nomex);
 
 if any(isnan(XY) | isinf(XY))
@@ -71,7 +78,7 @@ if any(isnan(XY) | isinf(XY))
 end
 
 validateattributes(t,{'numeric'},...
-                   {'real','finite','vector','increasing', 'nonnan'},...
+                   {'real','finite','vector','increasing','nonnan'},...
                    'BRAIDLAB.braid.colorbraiding','t',2 );
 
 validateattributes(XY,{'numeric'},...
@@ -82,7 +89,7 @@ validateattributes(proj,{'numeric'},...
                    {'real','finite','scalar','nonnan','nonempty'},...
                    'BRAIDLAB.braid.colorbraiding','proj',3 );
 
-debugmsg(['colorbraiding: Initialize parameters for crossing analysis']);
+debugmsg('colorbraiding: Initialize parameters for crossing analysis',2);
 tic
 n = size(XY,3); % number of punctures
 
@@ -102,9 +109,35 @@ if proj ~= 0, XY = rotate_data_clockwise(XY,proj); end
 % X coord; IDX contains the indices of the sort.
 [~,idx] = sortrows(squeeze(XY(1,:,:)).');
 % Sort all the trajectories trajectories according to IDX:
-XYtraj = XY(:,:,idx);
+XY = XY(:,:,idx);
 
-debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
+if checkclosure
+  % Check if the final points are close enough to the initial points (setwise).
+  % Otherwise this could be an error with the user's data.
+  % Suggest user call 'closure(XY)' first.
+
+  % Use optimal assignment to match the ends.
+  % This piece of code is basically pasted from closure.m.
+  XY0 = squeeze(XY(1,:,:));
+  XY1 = sortrows(squeeze(XY(end,:,:))')';
+  % Create matrix of distances.
+  D = zeros(n,n);
+  for i = 1:n
+    for j = 1:n
+      D(i,j) = norm(XY1(:,i)-XY0(:,j));
+    end
+  end
+  % Solve the optimal assignment problem.
+  perm = braidlab.util.assignmentoptimal(D);
+
+  if any(sqrt(sum((XY0(:,perm) - XY1).^2,1)) > delta)
+    warning('BRAIDLAB:braid:colorbraiding:notclosed',...
+            ['The trajectories do not form a closed braid.  ' ...
+             'Consider calling ''closure'' on the data first.']);
+  end
+end
+
+debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000),2);
 
 % Convert the physical braid to the list of braid generators (gen).
 % tcr - times of generator occurrence
@@ -112,22 +145,22 @@ debugmsg(sprintf('colorbraiding: initialization took %f msec',toc*1000));
 try % trapping to ensure proper identification of strands
 
   try % trapping to switch between MEX and Matlab versions
-    assert(~useMatlabVersion, 'BRAIDLAB:NOMEX', ['Matlab version ' ...
+    assert(~useMatlabVersion, 'BRAIDLAB:NoMEX', ['Matlab version ' ...
                         'forced']);
 
-    debugmsg('Using MEX algorithm')
+    debugmsg('Using MEX algorithm',2)
 
     %% C++ version of the algorithm
     Nthreads = getAvailableThreadNumber(); % defined at the end
-    [gen,tcr] = cross2gen_helper(XYtraj,t,delta,Nthreads);
+    [gen,tcr] = cross2gen_helper(XY,t,delta,Nthreads);
 
   catch me
-    if isempty( regexpi(me.identifier, 'BRAIDLAB:NOMEX') )
+    if isempty( regexpi(me.identifier, 'BRAIDLAB:NoMEX', 'once') )
       rethrow(me);
     else
-    debugmsg('Using MATLAB algorithm')
+    debugmsg('Using MATLAB algorithm',2)
       %% MATLAB version of the algorithm
-      [gen,tcr,~] = cross2gen(XYtraj,t,delta);
+      [gen,tcr,~] = cross2gen(XY,t,delta);
     end
   end
 
@@ -150,7 +183,7 @@ catch me
     case 'BRAIDLAB:braid:colorbraiding:coincidentprojection'
 
       % strtok splits the [ ind, ind ] part of the string
-      % and text explanation of what happened        
+      % and text explanation of what happened
       localPair = eval(strtok(me.message,'|'));
       sortedPair = idx(localPair);
 

@@ -7,10 +7,10 @@ function obj = subsasgn(obj,s,val)
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -25,7 +25,7 @@ function obj = subsasgn(obj,s,val)
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 if ~isempty(obj) && ~isscalar(obj)
@@ -34,7 +34,7 @@ if ~isempty(obj) && ~isscalar(obj)
          ' for how to create multiple loops.'])
 end
 
-if isempty(s) && strcmp(class(val),'braidlab.loop')
+if isempty(s) && isa(val,'braidlab.loop')
   obj = val;
 end
 
@@ -47,7 +47,7 @@ switch s(1).type
       error('BRAIDLAB:loop:subsasgn','Cannot use more than one index.')
     end
     if length(s) < 2
-      if ~strcmp(class(val),'braidlab.loop')
+      if ~isa(val,'braidlab.loop')
         error('BRAIDLAB:loop:subsasgn:needscalar', ...
               'Can only assign a scalar loop.')
       end
@@ -99,7 +99,7 @@ switch s(1).type
       % Maybe should error here?
       warning('BRAIDLAB:loop:subsasgn:unsure', ...
               'Not sure if we should ever get here...')
-      sref = builtin('subsasgn',obj,s,val);
+      sref = builtin('subsasgn',obj,s,val); %#ok<NASGU>
     end
   case '{}'
     % No support for indexing using '{}'

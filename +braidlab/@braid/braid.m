@@ -13,10 +13,10 @@
 % <LICENSE
 %   Braidlab: a Matlab package for analyzing data using braids
 %
-%   http://github.com/jeanluct/braidlab
+%   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-%                            Marko Budisic         <marko@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
 %
@@ -31,7 +31,7 @@
 %   GNU General Public License for more details.
 %
 %   You should have received a copy of the GNU General Public License
-%   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+%   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
 classdef braid < matlab.mixin.CustomDisplay
@@ -46,8 +46,6 @@ classdef braid < matlab.mixin.CustomDisplay
   % compatible with a new value of n.  But if n is a class data member then
   % it is not allowed to refer to obj.word, because there is no guarantee of
   % the order in which the data members are created.
-  %
-  % See http://www.mathworks.com/help/matlab/matlab_oop/tips-for-saving-and-loading.html
   properties (Dependent)
     n                % number of strings
   end
@@ -69,7 +67,9 @@ classdef braid < matlab.mixin.CustomDisplay
     %
     %   B = BRAID(XY) constucts a braid from a trajectory dataset XY.
     %   The data format is XY(1:NSTEPS,1:2,1:N), where NSTEPS is the number
-    %   of time steps and N is the number of particles.
+    %   of time steps and N is the number of particles.  XY can also be
+    %   specified as a complex array XY(1:NSTEPS,1:N), with the real and
+    %   imaginary parts corresponding to the coordinates.
     %
     %   B = BRAID(XY,PROJANG) uses a projection line with angle PROJANG (in
     %   radians) from the X axis to determine crossings.  The default is to
@@ -110,7 +110,7 @@ classdef braid < matlab.mixin.CustomDisplay
     %   BRAID('HironakaKin',(N+2)/2,(N-4)/2), which is pseudo-Anosov but
     %   does not minimize entropy for even N.
     %
-    %   B = BRAID('VenzkePsi',N) or BRAID('PSI',N) returns a member of
+    %   B = BRAID('VenzkePsi',N) or BRAID('Psi',N) returns a member of
     %   the Venzke family of psi-braids on N strings (N>4).
     %
     %   B = BRAID(K) returns a braid representative B for the knot K.  The
@@ -131,8 +131,20 @@ classdef braid < matlab.mixin.CustomDisplay
     %   This is a method for the BRAID class.
     %   See also BRAID, CFBRAID.
 
+      arguments
+        b = []
+        secnd = []
+        third = []
+      end
+
       % Allow default empty braid: return trivial braid with one string.
-      if nargin == 0, return; end
+      % If secnd is specified, use it as the number of strings.
+      if isempty(b)
+        if ~isempty(secnd)
+          br.n = secnd;
+        end
+        return
+      end
       if isa(b,'braidlab.annbraid')
         % This is a bit of a kludge.  annbraid needs a custom conversion
         % to braid.  b.braid calls the right function (annbraid.braid),
@@ -160,7 +172,7 @@ classdef braid < matlab.mixin.CustomDisplay
           br.word = [br.word br.word];
          case {'hironakakin','hironaka-kin','hk'}
           m = secnd;
-          if nargin < 3
+          if isempty(third)
             if m < 5
               error('BRAIDLAB:braid:braid:badarg', ...
                     'Need at least five strings.')
@@ -218,11 +230,55 @@ classdef braid < matlab.mixin.CustomDisplay
             error('BRAIDLAB:braid:braid:badarg','Unrecognized string argument.')
           end
         end
+      elseif ismatrix(b) && size(b,1) > 1 && size(b,2) > 1
+        if isreal(b) && size(b,2) == 2
+          % This is a one-strand braid specified as real data.
+          % If the user wants to create a braid of 2 complex trajectories
+          % that happens to be on the real axis, convert to complex.
+          %
+          % Example:
+          %
+          % >> Z = [1 1 1 ; 2 2 2]'
+          % >> braid(Z)
+          %
+          % will return the identity braid on one strand (and print warning).
+          %
+          % >> braid(complex(Z))
+          %
+          % will return the identity braid on two strands.
+          %
+          warning('BRAIDLAB:braid:braid:onetraj', ...
+                  [ 'Creating trivial braid from single ' ...
+                    'trajectory (did you mean that?).' ])
+
+          % Check check if braid is closed using tolerance.
+          delta = braidlab.prop('BraidAbsTol');
+          if any(abs(b(1,:) - b(end,:)) > delta)
+            warning('BRAIDLAB:braid:braid:notclosed',...
+                    ['The trajectories do not form a closed braid.  ' ...
+                     'Consider calling ''closure'' on the data first.']);
+          end
+
+          br.word = int32([]);
+          br.n = 1;
+        else
+          % b is a 2-dim array of complex data.
+          if ~isempty(third)
+            error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
+          end
+          if isempty(secnd)
+            % Use a zero projection angle.
+            secnd = 0;
+          end
+          XY = reshape([real(b);imag(b)], [size(b,1) 2 size(b,2)]);
+          br = braidlab.braid(XY,secnd);
+        end
       elseif ndims(b) == 3
         % b is a 3-dim array of data.  secnd contains the projection angle.
-        if nargin > 2
+        if ~isempty(third)
           error('BRAIDLAB:braid:braid:badarg','Too many input arguments.')
-        elseif nargin < 2
+        end
+        if isempty(secnd)
           % Use a zero projection angle.
           secnd = 0;
         end
@@ -235,30 +291,14 @@ classdef braid < matlab.mixin.CustomDisplay
                            {'real','finite','scalar','nonnan','nonempty'},...
                            'BRAIDLAB.databraid','projection angle');
 
-        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd);
+        br = braidlab.braid.colorbraiding(b,1:size(b,1),secnd,true);
       else
-        if size(b,1) ~= 1 && size(b,2) ~= 1 && ~isempty(b)
-          % b is neither a row vector or a column vector.  Hopefully the
-          % user means a one-particle dataset.  Perhaps he/she is trying to
-          % create several braids at once (which is not currently
-          % allowed).  By default, print a warning.
-          if size(b,2) == 2
-            warning('BRAIDLAB:braid:braid:onetraj', ...
-                    [ 'Creating trivial braid from single ' ...
-                      'trajectory (did you mean that?).' ])
-            br.word = int32([]);
-            br.n = 1;
-          else
-            error('BRAIDLAB:braid:braid:badarg','Bad array size.')
-          end
+        b = b(:).';   % Store word as row vector.
+        br.word = int32(b);
+        if isempty(secnd)
+          br.n = max(abs(b))+1;
         else
-          b = b(:).';   % Store word as row vector.
-          br.word = int32(b);
-          if nargin < 2
-            br.n = max(abs(b))+1;
-          else
-            br.n = secnd;
-          end
+          br.n = secnd;
         end
       end
 
@@ -450,7 +490,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
       highestIndex = (b.n-1);
       i = double(-highestIndex:highestIndex);
-      c = hist(b.word,i);
+      c = histcounts(b.word, [i-0.5, i(end)+0.5]);
       i(highestIndex+1) = [];
       c(highestIndex+1) = [];
     end
@@ -466,9 +506,11 @@ classdef braid < matlab.mixin.CustomDisplay
       wc = textwrap({c},sz(1)-4);
       for i = 1:length(wc)
         % Indent rows.
-        if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
+        if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
         % If the format is loose rather than compact, add a line break.
-        if strcmp(get(0,'FormatSpacing'),'loose')
+        s = settings;
+        if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue, ...
+                  'loose')
           wc{i} = sprintf('%s\n',wc{i});
         end
       end
@@ -487,7 +529,7 @@ classdef braid < matlab.mixin.CustomDisplay
 
   % The subclass databraid has access to colorbraiding.
   methods (Static = true, Access = {?braidlab.databraid})
-    [varargout] = colorbraiding(XY,t,proj)
+    [varargout] = colorbraiding(XY,t,proj,checkclosure)
   end % methods block
 
 end % braid classdef

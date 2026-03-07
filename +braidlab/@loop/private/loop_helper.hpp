@@ -7,10 +7,10 @@
 // <LICENSE
 //   Braidlab: a Matlab package for analyzing data using braids
 //
-//   http://github.com/jeanluct/braidlab
+//   https://github.com/jeanluct/braidlab
 //
-//   Copyright (C) 2013-2015  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
-//                            Marko Budisic         <marko@math.wisc.edu>
+//   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+//                            Marko Budisic          <mbudisic@gmail.com>
 //
 //   This file is part of Braidlab.
 //
@@ -25,7 +25,7 @@
 //   GNU General Public License for more details.
 //
 //   You should have received a copy of the GNU General Public License
-//   along with Braidlab.  If not, see <http://www.gnu.org/licenses/>.
+//   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 // LICENSE>
 
 #include "mex.h"
@@ -38,7 +38,7 @@
 
 ////////////////// DECLARATIONS  /////////////////////////
 
-/* print loop 
+/* print loop
 
 T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
@@ -53,7 +53,7 @@ T - numerical type that has to allow additions and multiplications.
 N - sum of lengths of coordinate vectors a,b - one-indexed vectors
 */
 template <class T>
-T l2norm2(const int N, const T *a, const T *b);
+T l2norm(const int N, const T *a, const T *b);
 
 /*
 Compute minimal topological length of a loop represented by Dynnikov
@@ -105,14 +105,32 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu);
 
 // algorithm as written is 1-indexed
 template <class T>
-T l2norm2(const int N, const T *a, const T *b)
+T l2norm(const int N, const T *a, const T *b)
 {
+#ifdef BRAIDLAB_OVERFLOWING_L2NORM
   T l2 = 0;
 
   for (size_t k = 1; k <= N/2; ++k)
     l2 += a[k]*a[k] + b[k]*b[k];
 
-  return l2;
+  return std::sqrt(l2);
+#else
+  // Find the maximum element in |a| and |b|.
+  auto abscomp = [](T const& x, T const& y)
+    { return (std::abs(x) < std::abs(y)); };
+  T c = std::max(std::abs(*(std::max_element(a+1,a+1+N/2,abscomp))),
+                 std::abs(*(std::max_element(b+1,b+1+N/2,abscomp))));
+  if (c == 0) return 0;
+
+  T l2 = 0;
+
+  // Avoid overflow by dividing by c as we go.
+  // Underflow is ok, since it means component doesn't contribute.
+  for (size_t k = 1; k <= N/2; ++k)
+    l2 += (a[k]/c)*(a[k]/c) + (b[k]/c)*(b[k]/c);
+
+  return c*std::sqrt(l2);
+#endif
 }
 
 // algorithm as written is 1-indexed
@@ -153,7 +171,7 @@ T minlength(const int N, const T *a, const T *b) {
 template <class T>
 T intaxis(const int N, const T *a, const T *b) {
   // N - length(a) + length(b)
-  // n - number of punctures =  N/2 + 2 
+  // n - number of punctures =  N/2 + 2
   // a  - 1 x (n-2) == 1 x (N/2)
   // b  - 1 x (n-2) == 1 x (N/2)
 
@@ -163,7 +181,7 @@ T intaxis(const int N, const T *a, const T *b) {
   T sumDelA = static_cast<T>( 0 );
   T sumAbsB = static_cast<T>( 0 );
   T sumB = static_cast<T>( 0 );
-  T maxTerm = std::abs( a[1] ) 
+  T maxTerm = std::abs( a[1] )
     + std::max<T>( b[1], 0  ) + sumB;
 
   // MAIN LOOP
@@ -171,22 +189,22 @@ T intaxis(const int N, const T *a, const T *b) {
 
     if ( k > 1 )
       sumB += b[k-1];
-    
+
     if (k <= n-3)
       sumDelA += std::abs( a[k+1] - a[k] );
 
     sumAbsB += std::abs( b[k] );
 
-    maxTerm = std::max<T>( maxTerm, 
-                           std::abs( a[k] ) 
-                           + std::max<T>( b[k], 0  ) 
+    maxTerm = std::max<T>( maxTerm,
+                           std::abs( a[k] )
+                           + std::max<T>( b[k], 0  )
                            + sumB );
   }
   // last term in sumB is not used to maxTerm, but it is for total sum
   sumB += b[n-2];
 
-  T retval = std::abs( a[1] ) + std::abs( a[n-2] ) + 
-    sumAbsB + sumDelA + maxTerm + 
+  T retval = std::abs( a[1] ) + std::abs( a[n-2] ) +
+    sumAbsB + sumDelA + maxTerm +
     std::abs( maxTerm - sumB  );
 
   return retval;
@@ -230,7 +248,7 @@ void intersec(const int n, const T *a, const T *b, T* mu, T* nu) {
 
     // two-element loop 2k-1 and 2k
     for ( i = 2*k-1; i <= 2*k ; i++ ) {
-      mu[i] = ( i % 2 == 0 ? a[k] : -a[k] ) + 
+      mu[i] = ( i % 2 == 0 ? a[k] : -a[k] ) +
         ( b[k] >= 0  ? nu[k]/2 : nu[k+1]/2 );
     }
   }
