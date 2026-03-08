@@ -402,7 +402,18 @@ end
 
 ### Phase 3: Handle Return System (#141)
 
-#### 3.1 Function Signature
+**Status:** ✅ COMPLETE (2026-03-07)
+
+**Note:** Phase 3 was completed as part of Phase 1.4 when we switched to patch objects. The handle return system works as designed.
+
+**Verification:**
+- Returns column vector (N×1) of patch handles
+- One handle per loop component
+- Coordinates accessible via `get(h(i),'XData')` and `get(h(i),'YData')`
+- Backward compatible - works without output capture
+- Tested in `test_patch_handles.m` - all tests pass
+
+#### 3.1 Function Signature ✅ COMPLETE
 **Change:**
 ```matlab
 % OLD:
@@ -485,7 +496,11 @@ plot(xdata*2, ydata*2, 'r--');  % Reuse coordinates
 
 ### Phase 4: Fill Loop Interiors (#144)
 
-#### 4.1 Add Fill Options
+**Status:** ✅ COMPLETE (2026-03-07)
+
+All sub-phases successfully implemented and tested.
+
+#### 4.1 Add Fill Options ✅ COMPLETE
 **New parameters:**
 ```matlab
 parser.addParameter('FillLoop', false, @islogical);
@@ -495,10 +510,43 @@ parser.addParameter('FillAlpha', 0.3, @(x) isnumeric(x) && isscalar(x) && x >= 0
 
 **Parameter descriptions:**
 - `FillLoop`: Enable loop interior filling (default: false)
-- `FillColor`: Fill color (default: lighter version of edge color)
+- `FillColor`: Fill color (default: lighter version of edge color via 50% blend with white)
 - `FillAlpha`: Fill transparency, 0=transparent, 1=opaque (default: 0.3)
 
-#### 4.2 Implementation
+**Testing:** ✅ All parameters validated correctly
+
+#### 4.2 Implementation ✅ COMPLETE
+**Completed implementation:**
+- Added fill parameters to inputParser (lines 100-106 in plot.m)
+- Implemented auto-color generation with character-to-RGB conversion
+- Uses 50% blend with white for lighter fill colors: `edgecolor*0.5 + [1 1 1]*0.5`
+- Fill logic integrated into patch rendering loop (lines 332-361)
+- Correctly handles both character colors ('b', 'r', etc.) and RGB triplets
+- Custom fill colors and alpha values work as expected
+
+**Testing:** ✅ Comprehensive test suite created (test_fill_loops.m)
+
+#### 4.3 Testing ✅ COMPLETE
+**Test file:** `devel/tests/refactor-loop-plot/test_fill_loops.m`
+
+**Test coverage:**
+- ✅ Test 1: No fill (baseline comparison)
+- ✅ Test 2: Fill with auto-generated color (lighter version of edge)
+- ✅ Test 3: Custom fill color (yellow)
+- ✅ Test 4: Different alpha values (0.1, 0.3, 0.7, 1.0)
+- ✅ Test 5: Multi-component without fill
+- ✅ Test 6: Multi-component with auto fill colors
+- ✅ Test 7: Complex multi-component with custom alpha (0.5)
+- ✅ Test 8: Multi-component with custom fill color (cyan)
+
+**Results:**
+- All 8 tests pass successfully
+- Visual output matches expectations
+- Fill colors properly auto-generated (light blue = `[0.5 0.5 1]` from blue edge)
+- Alpha transparency works correctly (0.1 to 1.0 range)
+- Multi-component loops maintain individual edge colors with consistent fills
+- Components option works correctly with fill enabled
+
 **Modify patch creation (from Phase 3.2):**
 ```matlab
 h = zeros(numComponents, 1);

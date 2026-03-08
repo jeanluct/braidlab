@@ -30,6 +30,13 @@ function varargout = plot(L,varargin)
 %   BasePointColor     The color of the basepoint puncture, if any.
 %   Components         [true/false] Plot connected components in
 %                      different colors.  LineColor and LineStyle are ignored.
+%   FillLoop           [true/false] Fill the interior of loop components.
+%                      Default: false.
+%   FillColor          Color for filling loop interiors. Can be RGB triplet
+%                      or color character. Default: auto-generated lighter
+%                      version of edge color (50% blend with white).
+%   FillAlpha          Transparency for filled loops (0 to 1, where 0 is
+%                      fully transparent and 1 is opaque). Default: 0.3.
 %
 %   Examples:
 %     L = loop([1 0 0 0]);
@@ -37,6 +44,9 @@ function varargout = plot(L,varargin)
 %     h = plot(L,'LineColor','r');          % Red loop, return handle
 %     plot(L,'PunctureGap',0.15);           % Custom spacing
 %     plot(L,'PunctureRadius',0.05);        % Small punctures
+%     plot(L,'FillLoop',true);              % Filled loop (auto color)
+%     plot(L,'FillLoop',true,...            % Custom fill color
+%       'FillColor',[1 1 0],'FillAlpha',0.5);
 %     xdata = get(h(1),'XData');            % Extract coordinates
 %
 %   This is a method for the LOOP class.
@@ -96,6 +106,13 @@ parser.addParameter('PunctureGapVector', [], ...
   @(x) isempty(x) || (isnumeric(x) && isvector(x) && all(x > 0)));
 parser.addParameter('PunctureRadius', [], ...
   @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
+
+% Fill options
+parser.addParameter('FillLoop', false, @islogical);
+parser.addParameter('FillColor', [], ...
+  @(x) isempty(x) || iscolor(x));
+parser.addParameter('FillAlpha', 0.3, ...
+  @(x) isnumeric(x) && isscalar(x) && x >= 0 && x <= 1);
 
 % With 'Components' option, LineColor and LineStyle set automatically
 parser.addParameter('Components', false, @islogical);
@@ -310,23 +327,48 @@ for c = 1:length(ordered_comps)
     end
   end
   
-  % Determine color for this component
+  % Determine edge color for this component
   if options.Components
     comp_id = geom(seg_list(1)).component;
     if comp_id > 0 && comp_id <= size(compcolors,1)
-      mycolor = compcolors(comp_id,:);
+      edgecolor = compcolors(comp_id,:);
     else
-      mycolor = options.LineColor;
+      edgecolor = options.LineColor;
     end
   else
-    mycolor = options.LineColor;
+    edgecolor = options.LineColor;
   end
   
-  % Plot this component using patch (for future fill support)
-  handles(c) = patch(xdata,ydata,mycolor, ...
-                     'EdgeColor',mycolor,'LineWidth',options.LineWidth, ...
+  % Determine fill color and alpha
+  if options.FillLoop
+    if ~isempty(options.FillColor)
+      % User specified fill color
+      facecolor = options.FillColor;
+    else
+      % Auto-generate lighter version of edge color
+      % Convert character color to RGB if needed
+      if ischar(edgecolor)
+        % Get RGB from character color using a temporary line object
+        h_temp = line(NaN,NaN,'Color',edgecolor);
+        edgecolor_rgb = get(h_temp,'Color');
+        delete(h_temp);
+      else
+        edgecolor_rgb = edgecolor;
+      end
+      % Lighten by blending with white (better than multiplication)
+      facecolor = edgecolor_rgb*0.5 + [1 1 1]*0.5;
+    end
+    facealpha = options.FillAlpha;
+  else
+    facecolor = 'none';
+    facealpha = 1;
+  end
+  
+  % Plot this component using patch
+  handles(c) = patch('XData',xdata,'YData',ydata, ...
+                     'EdgeColor',edgecolor,'LineWidth',options.LineWidth, ...
                      'LineStyle',options.LineStyle, ...
-                     'FaceColor','none');
+                     'FaceColor',facecolor,'FaceAlpha',facealpha);
 end
 
 % Return handles if requested
