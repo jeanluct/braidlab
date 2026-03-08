@@ -3,6 +3,26 @@
 
 ## [3.3-rc1] - 2026-03-06
 
+* Major refactoring of `loop.plot` method:
+
+  - Return graphics handles for programmatic access to plotted elements.
+    Each handle is a MATLAB patch object allowing coordinate access via
+    `get(h,'XData')` and `get(h,'YData')`. (Issue #141)
+
+  - Enhanced spacing control with three new parameters: `PunctureGap`
+    (scalar multiplier), `PunctureGapVector` (per-puncture gaps), and
+    `PunctureRadius` (explicit radius). (Issue #129)
+
+  - Fill loop interiors with new parameters: `FillLoop` (enable/disable),
+    `FillColor` (auto-generated lighter shade or custom color), and
+    `FillAlpha` (transparency 0-1). (Issue #144)
+
+  - Switched from `plot()` to `patch()` objects for better fill support
+    and handle return.
+
+  - Fixed multi-component loop ordering bug using depth-first search for
+    proper component discovery.
+
 * Add dozens of new tests to the testsuite to improve coverage.  (Generated
   with the help of CoPilot.)
 
