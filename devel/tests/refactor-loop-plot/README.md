@@ -12,6 +12,7 @@ This directory contains test scripts and output images created during the
 - `test_patch_handles.m` - Tests for Phase 1.4 (patch object return)
 - `test_spacing_control.m` - Tests for Phase 2 (spacing control parameters)
 - `test_fill_loops.m` - Tests for Phase 4 (fill loop interiors)
+- `test_unit_helpers.m` - **Unit tests for helper functions and features**
 - `test_visual_inspection.m` - Interactive visual tests with pauses
 - `test_debug_component.m` - Debugging component closure issues
 - `test_debug.m` - General debugging
@@ -91,12 +92,65 @@ Completed phases:
 
 ### Test Results
 
-All tests passing:
+**Permanent Test Suite (`testsuite/testcases/loopTest.m`):**
+- ✅ Added 13 new plot method tests to permanent test suite
+- ✅ All 86 tests in loopTest.m pass (73 existing + 13 new)
+
+**Development Tests (this directory):**
 - ✅ `test_visual_review.m` - Visual regression (5 test cases, no warnings)
 - ✅ `test_patch_handles.m` - Handle type, count, properties verification
 - ✅ `test_component_assignment.m` - Component discovery logic
 - ✅ `test_spacing_control.m` - Spacing parameters (7 test cases, 8 images)
 - ✅ `test_fill_loops.m` - Fill functionality (8 test cases, 8 images)
+- ✅ `test_unit_helpers.m` - Unit tests (13 tests, all passing)
+  - **Note:** Core functionality now tested in permanent testsuite
+
+### Unit Test Coverage
+
+**Permanent Testsuite (`testsuite/testcases/loopTest.m`):**
+
+Added 13 comprehensive plot method tests (lines 525-682):
+
+1. **test_plot_returns_closed_path** - Simple loop produces closed path
+2. **test_plot_multicomponent_closed** - Multi-component loops all close
+3. **test_plot_handle_return_type** - Returns patch objects in column vector
+4. **test_plot_coordinate_access** - XData/YData accessible via handles
+5. **test_plot_puncture_gap_affects_geometry** - Gap parameter changes extent
+6. **test_plot_puncture_gap_vector** - Per-puncture gap control works
+7. **test_plot_puncture_gap_validation** - Rejects negative gaps
+8. **test_plot_puncture_gap_vector_validation** - Rejects wrong-size vectors
+9. **test_plot_fill_color_auto_generation** - Auto-lightens edge color
+10. **test_plot_fill_color_custom** - Custom fill color works
+11. **test_plot_fill_alpha_control** - Alpha transparency control
+12. **test_plot_puncture_positions** - Custom positions affect geometry
+13. **test_plot_error_multiloop** - Errors on loop vectors (pre-existing)
+
+**Development tests (`test_unit_helpers.m`):**
+
+The `test_unit_helpers.m` file provides comprehensive unit testing:
+
+**Geometry Computation Tests:**
+1. Simple loop produces closed path
+2. Complex loop produces closed paths for all components
+
+**Component Ordering Tests:**
+3. Multi-component loops are properly separated and closed
+
+**Spacing Control Tests:**
+4. Puncture positioning affects geometry
+5. Gap parameter affects loop geometry
+6. GapVector parameter provides per-puncture control
+7. PunctureGap validation (rejects negative values)
+8. PunctureGapVector validation (rejects wrong-size vectors)
+
+**Fill Functionality Tests:**
+9. Fill color auto-generation (50% blend with white)
+10. Custom fill color specification
+11. Fill alpha transparency control (0 to 1)
+
+**Handle Return Tests:**
+12. Handle return type (patch) and count (column vector)
+13. Coordinate access via handles (XData/YData)
 
 ### Next Steps
 

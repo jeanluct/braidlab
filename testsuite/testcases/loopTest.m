@@ -522,6 +522,153 @@ classdef loopTest < matlab.unittest.TestCase
                            'BRAIDLAB:loop:plot:multiloop');
     end
 
+    function test_plot_returns_closed_path(testCase)
+      % Test that plot produces a closed path.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l);
+      xdata = get(h,'XData');
+      ydata = get(h,'YData');
+      testCase.verifyEqual(xdata(1),xdata(end), ...
+                           'Path should be closed in X');
+      testCase.verifyEqual(ydata(1),ydata(end), ...
+                           'Path should be closed in Y');
+      testCase.verifyGreaterThan(length(xdata),10, ...
+                                 'Should have multiple points');
+      delete(h);
+    end
+
+    function test_plot_multicomponent_closed(testCase)
+      % Test that multi-component loops all close properly.
+      l = braidlab.loop([3 2 1 0 -1 -2]);
+      h = plot(l);
+      for i = 1:length(h)
+        xdata = get(h(i),'XData');
+        ydata = get(h(i),'YData');
+        testCase.verifyEqual(xdata(1),xdata(end), ...
+                             sprintf('Component %d should close in X',i));
+        testCase.verifyEqual(ydata(1),ydata(end), ...
+                             sprintf('Component %d should close in Y',i));
+      end
+      delete(h);
+    end
+
+    function test_plot_handle_return_type(testCase)
+      % Test that plot returns patch object handles.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l);
+      testCase.verifyClass(h,'matlab.graphics.primitive.Patch', ...
+                           'Should return patch object');
+      testCase.verifyEqual(size(h,2),1,'Should be column vector');
+      delete(h);
+    end
+
+    function test_plot_coordinate_access(testCase)
+      % Test coordinate access via handles.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l);
+      xdata = get(h,'XData');
+      ydata = get(h,'YData');
+      testCase.verifyTrue(isvector(xdata),'XData should be vector');
+      testCase.verifyTrue(isvector(ydata),'YData should be vector');
+      testCase.verifyEqual(length(xdata),length(ydata), ...
+                           'X and Y should have same length');
+      delete(h);
+    end
+
+    function test_plot_puncture_gap_affects_geometry(testCase)
+      % Test that PunctureGap parameter affects geometry.
+      l = braidlab.loop([1 0 0 0]);
+      h1 = plot(l,'PunctureGap',0.05);
+      ydata1 = get(h1,'YData');
+      extent1 = max(abs(ydata1));
+      h2 = plot(l,'PunctureGap',0.3);
+      ydata2 = get(h2,'YData');
+      extent2 = max(abs(ydata2));
+      testCase.verifyGreaterThan(extent2,extent1, ...
+                                 'Larger gap should increase extent');
+      delete(h1);
+      delete(h2);
+    end
+
+    function test_plot_puncture_gap_vector(testCase)
+      % Test per-puncture gap control.
+      l = braidlab.loop([1 0 0 0]);  % 4 punctures
+      h1 = plot(l,'PunctureGapVector',[0.1; 0.1; 0.1; 0.1]);
+      ydata1 = get(h1,'YData');
+      h2 = plot(l,'PunctureGapVector',[0.05; 0.3; 0.05; 0.3]);
+      ydata2 = get(h2,'YData');
+      testCase.verifyNotEqual(ydata1,ydata2, ...
+                              'Different gaps should change geometry');
+      delete(h1);
+      delete(h2);
+    end
+
+    function test_plot_puncture_gap_validation(testCase)
+      % Test that invalid gap values are rejected.
+      l = braidlab.loop([1 0 0 0]);
+      testCase.verifyError(@()plot(l,'PunctureGap',-0.1), ...
+                           'MATLAB:InputParser:ArgumentFailedValidation');
+    end
+
+    function test_plot_puncture_gap_vector_validation(testCase)
+      % Test that wrong-size gap vector is rejected.
+      l = braidlab.loop([1 0 0 0]);  % 4 punctures
+      % Wrong size (only 2 elements instead of 4)
+      testCase.verifyError(@()plot(l,'PunctureGapVector',[0.1; 0.2]), ...
+                           'BRAIDLAB:loop:plot:badgapvec');
+    end
+
+    function test_plot_fill_color_auto_generation(testCase)
+      % Test automatic fill color generation.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l,'LineColor','b','FillLoop',true);
+      facecolor = get(h,'FaceColor');
+      % Blue [0 0 1] should become light blue [0.5 0.5 1]
+      testCase.verifyEqual(facecolor,[0.5 0.5 1], ...
+                           'Auto fill should be lightened edge color');
+      delete(h);
+    end
+
+    function test_plot_fill_color_custom(testCase)
+      % Test custom fill color specification.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l,'FillLoop',true,'FillColor',[1 1 0]);
+      facecolor = get(h,'FaceColor');
+      testCase.verifyEqual(facecolor,[1 1 0], ...
+                           'Custom fill color should be used');
+      delete(h);
+    end
+
+    function test_plot_fill_alpha_control(testCase)
+      % Test fill alpha transparency control.
+      l = braidlab.loop([1 0 0 0]);
+      alphas = [0,0.3,0.7,1];
+      for i = 1:length(alphas)
+        h = plot(l,'FillLoop',true,'FillAlpha',alphas(i));
+        facealpha = get(h,'FaceAlpha');
+        testCase.verifyEqual(facealpha,alphas(i), ...
+                             sprintf('Alpha should be %g',alphas(i)));
+        delete(h);
+      end
+    end
+
+    function test_plot_puncture_positions(testCase)
+      % Test that custom puncture positions affect geometry.
+      l = braidlab.loop([1 0 0 0]);  % 4 punctures
+      h1 = plot(l);
+      xdata1 = get(h1,'XData');
+      ydata1 = get(h1,'YData');
+      % Custom positions with Y offset
+      h2 = plot(l,'PuncturePositions',[1 0.5; 2 0.5; 3 0.5; 4 0.5]);
+      xdata2 = get(h2,'XData');
+      ydata2 = get(h2,'YData');
+      geometry_changed = ~isequal(xdata1,xdata2) || ~isequal(ydata1,ydata2);
+      testCase.verifyTrue(geometry_changed, ...
+                          'Different positions should change geometry');
+      delete(h1);
+      delete(h2);
+    end
+
     %% Braid action on loop tests
 
     function test_braid_action_empty_braid(testCase)
