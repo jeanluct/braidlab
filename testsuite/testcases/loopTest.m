@@ -575,13 +575,13 @@ classdef loopTest < matlab.unittest.TestCase
       delete(h);
     end
 
-    function test_plot_puncture_gap_affects_geometry(testCase)
-      % Test that PunctureGap parameter affects geometry.
+    function test_plot_line_gap_affects_geometry(testCase)
+      % Test that LineGap parameter affects geometry.
       l = braidlab.loop([1 0 0 0]);
-      h1 = plot(l,'PunctureGap',0.05);
+      h1 = plot(l,'LineGap',0.05);
       ydata1 = get(h1,'YData');
       extent1 = max(abs(ydata1));
-      h2 = plot(l,'PunctureGap',0.3);
+      h2 = plot(l,'LineGap',0.3);
       ydata2 = get(h2,'YData');
       extent2 = max(abs(ydata2));
       testCase.verifyGreaterThan(extent2,extent1, ...
@@ -590,12 +590,12 @@ classdef loopTest < matlab.unittest.TestCase
       delete(h2);
     end
 
-    function test_plot_puncture_gap_vector(testCase)
-      % Test per-puncture gap control.
+    function test_plot_line_gap_vector(testCase)
+      % Test per-puncture gap control with LineGap vector.
       l = braidlab.loop([1 0 0 0]);  % 4 punctures
-      h1 = plot(l,'PunctureGapVector',[0.1; 0.1; 0.1; 0.1]);
+      h1 = plot(l,'LineGap',[0.1; 0.1; 0.1; 0.1]);
       ydata1 = get(h1,'YData');
-      h2 = plot(l,'PunctureGapVector',[0.05; 0.3; 0.05; 0.3]);
+      h2 = plot(l,'LineGap',[0.05; 0.3; 0.05; 0.3]);
       ydata2 = get(h2,'YData');
       testCase.verifyNotEqual(ydata1,ydata2, ...
                               'Different gaps should change geometry');
@@ -603,19 +603,19 @@ classdef loopTest < matlab.unittest.TestCase
       delete(h2);
     end
 
-    function test_plot_puncture_gap_validation(testCase)
+    function test_plot_line_gap_validation(testCase)
       % Test that invalid gap values are rejected.
       l = braidlab.loop([1 0 0 0]);
-      testCase.verifyError(@()plot(l,'PunctureGap',-0.1), ...
+      testCase.verifyError(@()plot(l,'LineGap',-0.1), ...
                            'MATLAB:InputParser:ArgumentFailedValidation');
     end
 
-    function test_plot_puncture_gap_vector_validation(testCase)
+    function test_plot_line_gap_vector_validation(testCase)
       % Test that wrong-size gap vector is rejected.
       l = braidlab.loop([1 0 0 0]);  % 4 punctures
       % Wrong size (only 2 elements instead of 4)
-      testCase.verifyError(@()plot(l,'PunctureGapVector',[0.1; 0.2]), ...
-                           'BRAIDLAB:loop:plot:badgapvec');
+      testCase.verifyError(@()plot(l,'LineGap',[0.1; 0.2]), ...
+                           'BRAIDLAB:loop:plot:badlinegap');
     end
 
     function test_plot_fill_color_auto_generation(testCase)
@@ -630,9 +630,9 @@ classdef loopTest < matlab.unittest.TestCase
     end
 
     function test_plot_fill_color_custom(testCase)
-      % Test custom fill color specification.
+      % Test custom fill color specification (auto-enables filling).
       l = braidlab.loop([1 0 0 0]);
-      h = plot(l,'FillLoop',true,'FillColor',[1 1 0]);
+      h = plot(l,'FillColor',[1 1 0]);
       facecolor = get(h,'FaceColor');
       testCase.verifyEqual(facecolor,[1 1 0], ...
                            'Custom fill color should be used');
@@ -640,16 +640,51 @@ classdef loopTest < matlab.unittest.TestCase
     end
 
     function test_plot_fill_alpha_control(testCase)
-      % Test fill alpha transparency control.
+      % Test fill alpha transparency control (auto-enables filling).
       l = braidlab.loop([1 0 0 0]);
       alphas = [0,0.3,0.7,1];
       for i = 1:length(alphas)
-        h = plot(l,'FillLoop',true,'FillAlpha',alphas(i));
+        h = plot(l,'FillAlpha',alphas(i));
         facealpha = get(h,'FaceAlpha');
         testCase.verifyEqual(facealpha,alphas(i), ...
                              sprintf('Alpha should be %g',alphas(i)));
         delete(h);
       end
+    end
+
+    function test_plot_fillcolor_auto_enables_fill(testCase)
+      % Test that FillColor automatically enables filling.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l,'FillColor',[1 0 0]);
+      facecolor = get(h,'FaceColor');
+      testCase.verifyEqual(facecolor,[1 0 0], ...
+                           'FillColor should auto-enable filling');
+      testCase.verifyNotEqual(facecolor,'none', ...
+                              'Fill should be enabled');
+      delete(h);
+    end
+
+    function test_plot_fillalpha_auto_enables_fill(testCase)
+      % Test that FillAlpha automatically enables filling.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l,'FillAlpha',0.5);
+      facecolor = get(h,'FaceColor');
+      facealpha = get(h,'FaceAlpha');
+      testCase.verifyNotEqual(facecolor,'none', ...
+                              'FillAlpha should auto-enable filling');
+      testCase.verifyEqual(facealpha,0.5, ...
+                           'Alpha should be set correctly');
+      delete(h);
+    end
+
+    function test_plot_fillcolor_overrides_fillloop_false(testCase)
+      % Test that FillColor overrides explicit FillLoop=false.
+      l = braidlab.loop([1 0 0 0]);
+      h = plot(l,'FillLoop',false,'FillColor',[0 1 0]);
+      facecolor = get(h,'FaceColor');
+      testCase.verifyEqual(facecolor,[0 1 0], ...
+                           'FillColor should override FillLoop=false');
+      delete(h);
     end
 
     function test_plot_puncture_positions(testCase)

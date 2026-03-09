@@ -121,18 +121,18 @@ end
 disp(' ');
 
 %% Test 5: Gap parameter affects geometry
-disp('Test 5: Gap parameter affects loop geometry');
+disp('Test 5: LineGap parameter affects loop geometry');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);
   
   % Small gap
-  h1 = plot(L,'PunctureGap',0.05);
+  h1 = plot(L,'LineGap',0.05);
   ydata1 = get(h1,'YData');
   max_extent1 = max(abs(ydata1));
   
   % Large gap
-  h2 = plot(L,'PunctureGap',0.3);
+  h2 = plot(L,'LineGap',0.3);
   ydata2 = get(h2,'YData');
   max_extent2 = max(abs(ydata2));
   
@@ -141,25 +141,25 @@ try
   
   delete(h1);
   delete(h2);
-  disp('  PASS: Gap affects geometry');
+  disp('  PASS: LineGap affects geometry');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);
 end
 disp(' ');
 
-%% Test 6: GapVector parameter - per-puncture control
-disp('Test 6: GapVector parameter - per-puncture control');
+%% Test 6: LineGap vector parameter - per-puncture control
+disp('Test 6: LineGap vector parameter - per-puncture control');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);  % 4 punctures
   
   % Uniform gaps (4 punctures)
-  h1 = plot(L,'PunctureGapVector',[0.1; 0.1; 0.1; 0.1]);
+  h1 = plot(L,'LineGap',[0.1; 0.1; 0.1; 0.1]);
   ydata1 = get(h1,'YData');
   
   % Non-uniform gaps (4 punctures)
-  h2 = plot(L,'PunctureGapVector',[0.05; 0.3; 0.05; 0.3]);
+  h2 = plot(L,'LineGap',[0.05; 0.3; 0.05; 0.3]);
   ydata2 = get(h2,'YData');
   
   % Should produce different geometries
@@ -167,7 +167,7 @@ try
   
   delete(h1);
   delete(h2);
-  disp('  PASS: GapVector per-puncture control');
+  disp('  PASS: LineGap vector per-puncture control');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);
@@ -175,44 +175,44 @@ end
 disp(' ');
 
 %% Test 7: Spacing parameter validation (via plot)
-disp('Test 7: Spacing parameters - PunctureGap validation');
+disp('Test 7: Spacing parameters - LineGap validation');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);
   
   % Valid scalar gap
-  h = plot(L,'PunctureGap',0.2);
+  h = plot(L,'LineGap',0.2);
   delete(h);
   
   % Invalid gap (negative)
   try
-    h = plot(L,'PunctureGap',-0.1);
+    h = plot(L,'LineGap',-0.1);
     delete(h);
     error('Should reject negative gap');
   catch ME
     assert(contains(ME.identifier,'MATLAB:'),'Should throw validation error');
   end
   
-  disp('  PASS: PunctureGap validation');
+  disp('  PASS: LineGap validation');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);
 end
 disp(' ');
 
-%% Test 8: Spacing parameter - PunctureGapVector validation
-disp('Test 8: Spacing parameters - PunctureGapVector validation');
+%% Test 8: Spacing parameter - LineGap vector validation
+disp('Test 8: Spacing parameters - LineGap vector validation');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);  % 4 punctures
   
   % Valid gap vector (4 elements)
-  h = plot(L,'PunctureGapVector',[0.1; 0.2; 0.15; 0.1]);
+  h = plot(L,'LineGap',[0.1; 0.2; 0.15; 0.1]);
   delete(h);
   
   % Invalid gap vector (wrong size - only 2 elements)
   try
-    h = plot(L,'PunctureGapVector',[0.1; 0.2]);
+    h = plot(L,'LineGap',[0.1; 0.2]);
     delete(h);
     error('Should reject wrong-size gap vector');
   catch ME
@@ -221,7 +221,7 @@ try
            'Should throw size error');
   end
   
-  disp('  PASS: PunctureGapVector validation');
+  disp('  PASS: LineGap vector validation');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);
@@ -252,42 +252,44 @@ catch ME
 end
 disp(' ');
 
-%% Test 10: Fill color custom specification
+%% Test 10: Fill color custom specification (auto-enables FillLoop)
 disp('Test 10: Fill color custom specification');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);
   
-  % Custom yellow fill
-  h = plot(L,'FillLoop',true,'FillColor',[1 1 0]);
+  % Custom yellow fill - should auto-enable filling
+  h = plot(L,'FillColor',[1 1 0]);
   facecolor = get(h,'FaceColor');
   
   assert(isequal(facecolor,[1 1 0]),'Custom fill color should be used');
   
   delete(h);
-  disp('  PASS: Custom fill color');
+  disp('  PASS: Custom fill color (auto-enabled)');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);
 end
 disp(' ');
 
-%% Test 11: Fill alpha control
+%% Test 11: Fill alpha control (auto-enables FillLoop)
 disp('Test 11: Fill alpha transparency control');
 total_tests = total_tests + 1;
 try
   L = loop([1 0 0 0]);
   
-  % Test different alpha values
+  % Test different alpha values - should auto-enable filling
   alphas = [0,0.3,0.7,1];
   for i = 1:length(alphas)
-    h = plot(L,'FillLoop',true,'FillAlpha',alphas(i));
+    h = plot(L,'FillAlpha',alphas(i));
     facealpha = get(h,'FaceAlpha');
     assert(facealpha == alphas(i),['Alpha should be ' num2str(alphas(i))]);
+    facecolor = get(h,'FaceColor');
+    assert(~strcmp(facecolor,'none'),'Fill should be enabled');
     delete(h);
   end
   
-  disp('  PASS: Fill alpha control');
+  disp('  PASS: Fill alpha control (auto-enabled)');
   passed_tests = passed_tests + 1;
 catch ME
   disp(['  FAIL: ' ME.message]);

@@ -21,10 +21,10 @@ function varargout = plot(L,varargin)
 %   PuncturePositions  A vector of positions for the punctures, one
 %                      coordinate pair per row.  The default is to have
 %                      the punctures at integer values on the X-axis.
-%   PunctureGap        Scalar multiplier for spacing between loop lines
-%                      at punctures. Overrides automatic calculation.
-%   PunctureGapVector  Per-puncture gap sizes (n×1 vector). Overrides
-%                      PunctureGap if both specified.
+%   LineGap            Spacing between loop strands at punctures. Can be:
+%                      - scalar: uniform gap at all punctures
+%                      - n×1 vector: per-puncture gap values
+%                      Default: auto-calculated based on loop topology.
 %   PunctureRadius     Explicit puncture radius for display. Independent
 %                      from loop spacing control.
 %   BasePointColor     The color of the basepoint puncture, if any.
@@ -42,11 +42,12 @@ function varargout = plot(L,varargin)
 %     L = loop([1 0 0 0]);
 %     plot(L);                              % Basic plot
 %     h = plot(L,'LineColor','r');          % Red loop, return handle
-%     plot(L,'PunctureGap',0.15);           % Custom spacing
+%     plot(L,'LineGap',0.15);               % Uniform line spacing
+%     plot(L,'LineGap',[0.1; 0.2; 0.1; 0.2]);  % Variable spacing
 %     plot(L,'PunctureRadius',0.05);        % Small punctures
-%     plot(L,'FillLoop',true);              % Filled loop (auto color)
-%     plot(L,'FillLoop',true,...            % Custom fill color
-%       'FillColor',[1 1 0],'FillAlpha',0.5);
+%     plot(L,'FillColor',[1 1 0]);          % Filled yellow loop
+%     plot(L,'FillAlpha',0.5);              % Semi-transparent fill
+%     plot(L,'FillColor','r','FillAlpha',0.7);  % Red semi-transparent
 %     xdata = get(h(1),'XData');            % Extract coordinates
 %
 %   This is a method for the LOOP class.
@@ -100,10 +101,8 @@ parser.addParameter('PunctureEdgeColor', 'k', iscolor);
 parser.addParameter('PunctureEdgeWidth', 1, @isnumeric);
 parser.addParameter('PunctureSize', [], @isfinite);
 parser.addParameter('PuncturePositions', [], @isnumeric);
-parser.addParameter('PunctureGap', [], ...
-  @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
-parser.addParameter('PunctureGapVector', [], ...
-  @(x) isempty(x) || (isnumeric(x) && isvector(x) && all(x > 0)));
+parser.addParameter('LineGap', [], ...
+  @(x) isempty(x) || (isnumeric(x) && isvector(x) && all(x(:) > 0)));
 parser.addParameter('PunctureRadius', [], ...
   @(x) isempty(x) || (isnumeric(x) && isscalar(x) && x > 0));
 
@@ -126,6 +125,13 @@ assert( size(L.coords,1) == 1, ...
          'Use plot(L(k)) to plot the k-th loop.'] );
 
 %%% Process options
+
+%% Auto-enable FillLoop if FillColor or FillAlpha is specified
+% If user specifies fill appearance, they clearly want to fill the loop
+if ~options.FillLoop && (~isempty(options.FillColor) || ...
+    any(strcmp('FillAlpha', varargin(1:2:end))))
+  options.FillLoop = true;
+end
 
 %%
 % Extract loop properties useful for plotting
@@ -187,10 +193,10 @@ puncture_position = sortrows(options.PuncturePositions);
 % Calculate the distance between punctures
 d =  hypot(diff(puncture_position(:,1)),diff(puncture_position(:,2)));
 
-%% Set the distance between the puncture and the lines forming the loop
+%% Set the distance between loop strands (line-to-line gap)
 
-% Calculate the distance between the lines making up the loop.  This is
-% based on the number of times the loop passes above or below a given
+% Calculate the automatic spacing between the lines making up the loop.
+% This is based on the number of times the loop passes above or below a given
 % puncture and the distance to the two nearest punctures.
 
 space_between_loop_lines = zeros(size(d));
@@ -199,17 +205,21 @@ for i = 1:n-1
 end
 
 % Set the gap size based on user parameters or auto-calculate
-if ~isempty(options.PunctureGapVector)
-  % User specified per-puncture gaps
-  pgap = options.PunctureGapVector(:);
-  assert(length(pgap) == n,'BRAIDLAB:loop:plot:badgapvec', ...
-         'PunctureGapVector must have length n (number of punctures).');
-elseif ~isempty(options.PunctureGap)
-  % User specified scalar gap multiplier
-  pgap = options.PunctureGap*ones(n,1);
+if ~isempty(options.LineGap)
+  lgap = options.LineGap(:);  % Force column vector
+  if isscalar(lgap)
+    % Scalar: uniform gap at all punctures
+    pgap = lgap * ones(n,1);
+  elseif length(lgap) == n
+    % Vector: per-puncture gaps
+    pgap = lgap;
+  else
+    error('BRAIDLAB:loop:plot:badlinegap', ...
+          'LineGap must be scalar or have length n=%d (number of punctures).', n);
+  end
 else
-  % Auto-calculate (backward compatible)
-  pgap = min(space_between_loop_lines)/2+zeros(n,1);
+  % Auto-calculate
+  pgap = min(space_between_loop_lines)/2 + zeros(n,1);
 end
 
 %% Set the radius of the puncture

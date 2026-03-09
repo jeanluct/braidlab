@@ -1,8 +1,7 @@
 %TEST_SPACING_CONTROL  Test Phase 2 spacing control parameters.
 %
-% This script tests the new spacing parameters added in Phase 2:
-% - PunctureGap: Scalar gap multiplier
-% - PunctureGapVector: Per-puncture gap sizes
+% This script tests the spacing parameters:
+% - LineGap: Scalar gap or n×1 vector for per-puncture gaps
 % - PunctureRadius: Explicit puncture radius
 
 % Add braidlab to path
@@ -25,25 +24,25 @@ fprintf('  ✓ Default spacing works\n');
 saveas(gcf,'spacing_test_1_default.png');
 close(gcf);
 
-%% Test 2: PunctureGap scalar parameter
-fprintf('\nTest 2: PunctureGap parameter\n');
+%% Test 2: LineGap scalar parameter
+fprintf('\nTest 2: LineGap scalar parameter\n');
 
 % Small gap
 figure('Visible','off');
-h2a = plot(L,'PunctureGap',0.05);
-fprintf('  ✓ PunctureGap=0.05 (tight spacing)\n');
+h2a = plot(L,'LineGap',0.05);
+fprintf('  ✓ LineGap=0.05 (tight spacing)\n');
 saveas(gcf,'spacing_test_2a_small_gap.png');
 close(gcf);
 
 % Large gap
 figure('Visible','off');
-h2b = plot(L,'PunctureGap',0.3);
-fprintf('  ✓ PunctureGap=0.3 (wide spacing)\n');
+h2b = plot(L,'LineGap',0.3);
+fprintf('  ✓ LineGap=0.3 (wide spacing)\n');
 saveas(gcf,'spacing_test_2b_large_gap.png');
 close(gcf);
 
-%% Test 3: PunctureGapVector parameter
-fprintf('\nTest 3: PunctureGapVector parameter\n');
+%% Test 3: LineGap vector parameter
+fprintf('\nTest 3: LineGap vector parameter\n');
 
 % Get number of punctures from loop
 n = L.totaln;
@@ -51,8 +50,8 @@ n = L.totaln;
 % Variable gaps (increasing)
 gaps = linspace(0.05,0.25,n)';
 figure('Visible','off');
-h3 = plot(L,'PunctureGapVector',gaps);
-fprintf('  ✓ PunctureGapVector=[0.05...0.25] (variable spacing)\n');
+h3 = plot(L,'LineGap',gaps);
+fprintf('  ✓ LineGap=[0.05...0.25] (variable spacing)\n');
 fprintf('  Number of punctures: %d\n',n);
 saveas(gcf,'spacing_test_3_variable_gaps.png');
 close(gcf);
@@ -77,21 +76,21 @@ close(gcf);
 %% Test 5: Combined parameters
 fprintf('\nTest 5: Combined parameters\n');
 figure('Visible','off');
-h5 = plot(L,'PunctureGap',0.15,'PunctureRadius',0.05);
-fprintf('  ✓ PunctureGap=0.15 + PunctureRadius=0.05\n');
+h5 = plot(L,'LineGap',0.15,'PunctureRadius',0.05);
+fprintf('  ✓ LineGap=0.15 + PunctureRadius=0.05\n');
 saveas(gcf,'spacing_test_5_combined.png');
 close(gcf);
 
-%% Test 6: Validation - bad PunctureGapVector length
+%% Test 6: Validation - bad LineGap vector length
 fprintf('\nTest 6: Validation - incorrect vector length\n');
 try
   figure('Visible','off');
-  plot(L,'PunctureGapVector',[0.1 0.2]);  % Wrong length (2 instead of 4)
+  plot(L,'LineGap',[0.1 0.2]);  % Wrong length (2 instead of n)
   fprintf('  ✗ Should have thrown error\n');
   close(gcf);
 catch ME
-  if strcmp(ME.identifier,'BRAIDLAB:loop:plot:badgapvec')
-    fprintf('  ✓ Correctly rejects wrong-length PunctureGapVector\n');
+  if strcmp(ME.identifier,'BRAIDLAB:loop:plot:badlinegap')
+    fprintf('  ✓ Correctly rejects wrong-length LineGap vector\n');
   else
     fprintf('  ✗ Wrong error: %s\n',ME.identifier);
   end
@@ -100,8 +99,8 @@ end
 %% Test 7: Components with custom spacing
 fprintf('\nTest 7: Components with custom spacing\n');
 figure('Visible','off');
-h7 = plot(L,'Components',true,'PunctureGap',0.2);
-fprintf('  ✓ Components work with PunctureGap\n');
+h7 = plot(L,'Components',true,'LineGap',0.2);
+fprintf('  ✓ Components work with LineGap\n');
 fprintf('  Number of components: %d\n',length(h7));
 saveas(gcf,'spacing_test_7_components.png');
 close(gcf);
