@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+
+## [3.3] - 2026-03-22
+
 * Add dozens of new tests to the testsuite to improve coverage.  (Generated
   with the help of CoPilot.)
 
@@ -430,6 +433,7 @@ First release of braidlab.
 
 
 [unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...develop
+[3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
