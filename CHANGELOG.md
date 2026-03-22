@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [3.3-rc1] - 2026-03-06
+## [Unreleased][unreleased]
 
 * Add dozens of new tests to the testsuite to improve coverage.  (Generated
   with the help of CoPilot.)
@@ -429,6 +429,7 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...develop
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
