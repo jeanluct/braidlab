@@ -1,4 +1,4 @@
-function varargout = length_helper(varargin)
+function length_helper(varargin)
 %LENGTH_HELPER   See length_helper.cpp.
 %
 %   This M-file is invoked only when the corresponding MEX function
@@ -9,7 +9,7 @@ function varargout = length_helper(varargin)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.

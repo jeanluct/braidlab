@@ -5,7 +5,7 @@
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -28,8 +28,8 @@ classdef NoMEXException < MException
 
   methods
     function obj = NoMEXException(varargin)
-      obj = obj@MException('BRAIDLAB:NOMEX', varargin{:});
-      obj.message = ['Missing MEX: ' obj.message char(10) ...
+      obj = obj@MException('BRAIDLAB:NoMEX', varargin{:});
+      obj.message = ['Missing MEX: ' obj.message newline ...
                      'Compile braidlab to access full functionality.'];
     end
   end

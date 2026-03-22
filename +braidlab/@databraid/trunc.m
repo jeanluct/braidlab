@@ -15,7 +15,7 @@ function bt = trunc(b,interval)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -45,7 +45,7 @@ if isempty(interval) || numel(interval) < 1 || numel(interval) > 2
 end
 
 % select the desired crossing times
-if numel(interval) == 1
+if isscalar(interval)
   sel = bt.tcross <= interval;
 else
   sel = bt.tcross >= interval(1) & bt.tcross <= interval(2);

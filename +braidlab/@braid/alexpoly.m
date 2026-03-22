@@ -73,7 +73,7 @@ function p = alexpoly(b,x,opt)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -123,8 +123,6 @@ if stringopt
       error('BRAIDLAB:braid:alexpoly:cantcenter', ...
             'Can''t center polynomial for numeric types.')
     end
-  elseif any(strcmpi(opt,{'center','centre','centered','centred'}))
-    center = true;
   elseif any(strcmpi(opt, ...
              {'nocenter','uncentered','uncentred','uncenter','uncentre'}))
     center = false;

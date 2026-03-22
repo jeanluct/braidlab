@@ -9,7 +9,7 @@ function str = char(obj)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -34,7 +34,7 @@ if isscalar(obj)
   else
     % The VPI num2str command is buggy on arrays.
     objstr = num2str(obj.coords(1));
-    if obj.coords(1) < 0, objstr(1:3) = ''; else objstr(1:4) = ''; end
+    if obj.coords(1) < 0, objstr(1:3) = ''; else, objstr(1:4) = ''; end
     for i = 2:length(obj.coords)
       oo = num2str(obj.coords(i)); oo(1:2) = '';
       objstr = [objstr oo]; %#ok<AGROW>

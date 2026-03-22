@@ -70,7 +70,7 @@ function [varargout] = cycle(b,varargin)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -89,7 +89,7 @@ function [varargout] = cycle(b,varargin)
 %   along with Braidlab.  If not, see <https://www.gnu.org/licenses/>.
 % LICENSE>
 
-global BRAIDLAB_debuglvl
+global BRAIDLAB_debuglvl %#ok<GVMIS>
 
 import braidlab.*
 import braidlab.util.debugmsg

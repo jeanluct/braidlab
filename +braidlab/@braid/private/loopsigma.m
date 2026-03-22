@@ -20,7 +20,7 @@ function [loop_out,opSign] = loopsigma(sigma_idx,loop_in,Npunc)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -45,7 +45,7 @@ import braidlab.util.debugmsg
 import braidlab.util.getAvailableThreadNumber
 
 % set to true to use Matlab instead of C++ version of the algorithm
-global BRAIDLAB_loop_nomex;
+global BRAIDLAB_loop_nomex; %#ok<GVMIS>
 useMatlabVersion = any(BRAIDLAB_loop_nomex);
 
 if isempty(sigma_idx)
@@ -127,7 +127,9 @@ n = size(loop_in,2)/2 + 2;
 a = loop_in(:,1:n-2); b = loop_in(:,(n-1):end);
 ap = a; bp = b;
 
-pos = @(x)max(x,0); neg = @(x)min(x,0);
+% 0*x(1) returns a zero with the same type (class) as elements of x.
+% This is necessary for vpi (variable precision integer package).
+pos = @(x)max(x,0*x(1)); neg = @(x)min(x,0*x(1));
 
 % If nargout > 1, record the state of pos/neg operators.
 % There are at most maxopSign such choices for each generator.

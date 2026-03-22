@@ -21,7 +21,7 @@
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -191,9 +191,11 @@ classdef cfbraid < matlab.mixin.CustomDisplay
        wc = textwrap({c},sz(1)-4);
        for i = 1:length(wc)
          % Indent rows.
-         if i > 1, wc{i} = ['   ' wc{i}]; else wc{i} = [' ' wc{i}]; end
+         if i > 1, wc{i} = ['   ' wc{i}]; else, wc{i} = [' ' wc{i}]; end
          % If the format is loose rather than compact, add a line break.
-         if strcmp(get(0,'FormatSpacing'),'loose')
+         s = settings;
+         if strcmp(s.matlab.commandwindow.DisplayLineSpacing.ActiveValue, ...
+                   'loose')
            wc{i} = sprintf('%s\n',wc{i});
          end
        end

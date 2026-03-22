@@ -58,7 +58,7 @@ function [varargout] = entropy(b,varargin)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -147,11 +147,11 @@ end
 
 %% ITERATIVE ALGORITHM LENGTH CHOICE
 switch params.length
-  case 'intaxis',
+  case 'intaxis'
     lenfun = @(l) l.intaxis;
-  case 'minlength',
+  case 'minlength'
     lenfun = @minlength;
-  case 'l2norm',
+  case 'l2norm'
     lenfun = @l2norm;
 end
 
@@ -191,7 +191,7 @@ end
 u = braidlab.loop(b.n,@double,'bp');
 
 %% determine if mex should be attempted
-global BRAIDLAB_braid_nomex
+global BRAIDLAB_braid_nomex %#ok<GVMIS>
 if ~exist('BRAIDLAB_braid_nomex','var') || ...
       isempty(BRAIDLAB_braid_nomex) || ...
       BRAIDLAB_braid_nomex == false

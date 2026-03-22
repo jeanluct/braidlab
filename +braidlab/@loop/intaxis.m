@@ -14,7 +14,7 @@ function l = intaxis(obj)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -36,8 +36,8 @@ function l = intaxis(obj)
 validateattributes(obj, {'braidlab.loop'},{'scalar'},'intersec');
 
 %% determine if mex should be attempted
-global BRAIDLAB_loop_nomex
-if ~exist('BRAIDLAB_loop_nomex') || ...
+global BRAIDLAB_loop_nomex %#ok<GVMIS>
+if ~exist('BRAIDLAB_loop_nomex','var') || ...
       isempty(BRAIDLAB_loop_nomex) || ...
       BRAIDLAB_loop_nomex == false
   usematlab = false;

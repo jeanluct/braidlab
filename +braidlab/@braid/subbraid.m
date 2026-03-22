@@ -12,7 +12,7 @@ function [varargout] = subbraid(b,s)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -45,7 +45,7 @@ if min(s) < 1 || max(s) > b.n
 end
 
 %% determine if MEX implementation should be used
-global BRAIDLAB_braid_nomex
+global BRAIDLAB_braid_nomex %#ok<GVMIS>
 if ~exist('BRAIDLAB_braid_nomex','var') || ...
       isempty(BRAIDLAB_braid_nomex) || ...
       BRAIDLAB_braid_nomex == false

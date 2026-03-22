@@ -16,7 +16,7 @@ function b = taffy(ptype,projang)
 %
 %   https://github.com/jeanluct/braidlab
 %
-%   Copyright (C) 2013-2025  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
+%   Copyright (C) 2013-2026  Jean-Luc Thiffeault <jeanluc@math.wisc.edu>
 %                            Marko Budisic          <mbudisic@gmail.com>
 %
 %   This file is part of Braidlab.
@@ -157,6 +157,6 @@ axis equal, hold off
 ax = axis; axis(1.2*ax); axis off
 set(gcf,'color','w')
 
-if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end
+if false, print('-dpdf',sprintf('taffy_%s.pdf',ptype)); end %#ok<UNRCH>
 
 b = braid(z,projang);

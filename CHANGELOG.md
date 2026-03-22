@@ -1,9 +1,43 @@
 # Change Log
 
 
+## [3.3] - 2026-03-22
+
+* Add dozens of new tests to the testsuite to improve coverage.  (Generated
+  with the help of CoPilot.)
+
+* Fix the testsuite so it properly excludes MEX-based tests when
+  `NoMEX' option is passed as an argument (issue #158).
+
+* Fix a bug in `loopsigma.m` when using VPI (Variable Precision Integers)
+  toolbox (issue #160).
+
+* General Makefile improvements:
+
+  - Enable `make -j` parallel builds for much faster compilation.
+  - Variables instead of flags in many places.
+  - Allow CXX variable to be overwritten from parent Makefile.
+  - More informational messages to user.
+
+* Cross-platform compatibility:
+
+  - Windows support (hopefully MINGW, MSYS, Cygwin; Giuseppe DiLabbio tested
+    on MSYS2).  See issue #112.
+  - Detect MEXSUFFIX by compiling a tiny MEX file, so that the Makefile should
+    work on any platform with POSIX compliant shell.
+  - Auto-detect GMP at build and automatically disable if system libs missing.
+  - Prefer Homebrew GMP; add its -I and -L flags when detected (Darwin/Linux).
+  - Make doc distclean portable: use Python `utime` instead of GNU `touch -d`.
+  - Fix `doc/Makefile` recipe parsing on macOS by using a portable, core-OS
+    timestamp adjustment (no Python/Perl); removes a makefile syntax error
+    during `make distclean`.
+  - Darwin: default `MACOSX_DEPLOYMENT_TARGET` to SDK major version (e.g.,
+    15.0) when unset, for consistent builds.
+
+
 ## [3.2.6] - 2025-08-02
 
-* Bugfix: Testsuite failed with Matlab R2025a because cell2mat no
+* Bugfix: Testsuite failed with Matlab R2025a because `cell2mat` no
   longer throws exception for mismatched data types.  See issue #155.
   (Thanks to Nick Tufillaro.)
 
@@ -74,7 +108,7 @@
 
 ## [3.2.2] - 2017-06-02
 
-* Bugfix: error message maxrhs ID changed name in Matlab R2016b caused
+* Bugfix: error message `maxrhs` ID changed name in Matlab R2016b caused
   `databraidTest` to fail (issue #137).
 
 
@@ -395,6 +429,7 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
+[3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5
 [3.2.4]: https://github.com/jeanluct/braidlab/compare/release-3.2.3...release-3.2.4
