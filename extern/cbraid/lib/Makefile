@@ -66,7 +66,11 @@ clean:
 # Make dependencies.
 depend:
 	rm -f $(DEPFILE)
+<<<<<<< HEAD
 	$(MAKE) $(DEPFILE)
+=======
+	make $(DEPFILE)
+>>>>>>> cbraid-branch
 
 # Make dependencies file.
 $(DEPFILE):
