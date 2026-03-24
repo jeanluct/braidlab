@@ -1,15 +1,15 @@
 .PHONY: all lib libtrains clean distclean
 
 all:
-	cd src; make all
+	$(MAKE) -C src all
 
 lib libtrains libtrains.a:
-	cd src; make lib
+	$(MAKE) -C src lib
 
 # Clean up directory.  Remove object files and dependencies file.
 clean:
-	cd src; make clean
+	$(MAKE) -C src clean
 
 # Clean up everything, including executables and library.
 distclean:
-	cd src; make distclean
+	$(MAKE) -C src distclean
