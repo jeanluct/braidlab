@@ -36,10 +36,10 @@ ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
-CPPFLAGS = -Wall -O -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
+CPPFLAGS = -Wall -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
-ARFLAGS = rv
-CXX = g++
+ARFLAGS = rcs
+CXX ?= g++
 
 MAKEDEPCMD = $(CXX)
 MAKEDEPFLAGS = -M
@@ -66,7 +66,7 @@ clean:
 # Make dependencies.
 depend:
 	rm -f $(DEPFILE)
-	make $(DEPFILE)
+	$(MAKE) $(DEPFILE)
 
 # Make dependencies file.
 $(DEPFILE):
