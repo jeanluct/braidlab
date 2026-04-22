@@ -141,6 +141,9 @@ jobs:
           MATLAB_TOKEN="matlab-${BRAIDLAB_RELEASE_MATLAB}"
           BASE_NAME="braidlab-${VERSION}_${{ matrix.platform_token }}-${ARCH_TOKEN}_${MATLAB_TOKEN}"
 
+          cp README.md LICENSE COPYING CHANGELOG.md stage/
+          cp -a testsuite stage/
+
           {
             echo "commit=${GITHUB_SHA}"
             echo "matlab_release=${BRAIDLAB_RELEASE_MATLAB}"
@@ -152,10 +155,10 @@ jobs:
 
           if [ "${{ matrix.archive_ext }}" = "tar.gz" ]; then
             ARCHIVE_NAME="${BASE_NAME}.tar.gz"
-            tar -C stage -czf "${ARCHIVE_NAME}" +braidlab doc BUILD-MANIFEST.txt
+            tar -C stage -czf "${ARCHIVE_NAME}" +braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md
           else
             ARCHIVE_NAME="${BASE_NAME}.zip"
-            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip +braidlab doc BUILD-MANIFEST.txt
+            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip +braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md
           fi
 
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
