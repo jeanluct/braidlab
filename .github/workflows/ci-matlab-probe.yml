@@ -1,0 +1,87 @@
+name: CI MATLAB Probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      matlab-release:
+        description: MATLAB release to probe
+        required: true
+        default: R2024b
+        type: string
+
+jobs:
+  probe:
+    name: Probe (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MATLAB
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          release: ${{ inputs.matlab-release }}
+
+      - name: Run MATLAB feasibility probe
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            fprintf('MATLAB probe start on %s\n', getenv('RUNNER_OS'));
+            fprintf('MATLAB version: %s\n', version);
+
+            v = ver('MATLAB');
+            if isempty(v)
+                matlabRelease = 'unknown';
+            else
+                matlabRelease = strtrim(v.Release);
+            end
+            fprintf('MATLAB release: %s\n', matlabRelease);
+
+            cCfg = mex.getCompilerConfigurations('C', 'Selected');
+            if isempty(cCfg)
+                error('No selected C compiler for mex on this runner.');
+            end
+            fprintf('Selected C compiler: %s\n', cCfg.Name);
+
+            cppCfg = mex.getCompilerConfigurations('C++', 'Selected');
+            if isempty(cppCfg)
+                error('No selected C++ compiler for mex on this runner.');
+            end
+            fprintf('Selected C++ compiler: %s\n', cppCfg.Name);
+
+            outDir = fullfile('devel', 'ci-probe', 'build');
+            if ~isfolder(outDir)
+                mkdir(outDir);
+            end
+
+            mex(fullfile('devel', 'ci-probe', 'mex_probe.c'), ...
+                '-outdir', outDir, ...
+                '-output', 'mex_probe');
+
+            probeMex = fullfile(outDir, ['mex_probe.' mexext]);
+            if ~isfile(probeMex)
+                error('Probe MEX file was not created: %s', probeMex);
+            end
+            fprintf('Probe MEX output: %s\n', probeMex);
+
+            summaryPath = getenv('GITHUB_STEP_SUMMARY');
+            if ~isempty(summaryPath)
+                fid = fopen(summaryPath, 'a');
+                if fid ~= -1
+                    fprintf(fid, '## MATLAB probe (%s)\n', getenv('RUNNER_OS'));
+                    fprintf(fid, '- Result: PASS\n');
+                    fprintf(fid, '- MATLAB release: %s\n', matlabRelease);
+                    fprintf(fid, '- C compiler: %s\n', cCfg.Name);
+                    fprintf(fid, '- C++ compiler: %s\n', cppCfg.Name);
+                    fprintf(fid, '- Built probe: `%s`\n\n', probeMex);
+                    fclose(fid);
+                end
+            end
