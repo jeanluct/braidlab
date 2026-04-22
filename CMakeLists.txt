@@ -56,7 +56,10 @@ function(braidlab_add_mex target source install_dir)
     set(BLM_OUTPUT_NAME "${target}")
   endif()
 
-  matlab_add_mex(NAME ${target} SRC ${source} OUTPUT_NAME ${BLM_OUTPUT_NAME})
+  # Force legacy MEX API mode so generated binaries do not depend on
+  # C++ Data API/Engine runtime libraries that are not consistently present
+  # across GitHub-hosted MATLAB installations (notably macOS arm64).
+  matlab_add_mex(NAME ${target} SRC ${source} OUTPUT_NAME ${BLM_OUTPUT_NAME} R2017b)
 
   if(BLM_INCLUDE_DIRS)
     target_include_directories(${target} PRIVATE ${BLM_INCLUDE_DIRS})
