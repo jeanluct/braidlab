@@ -102,6 +102,17 @@ jobs:
           command: |
             root = getenv('MW_ORIG_WORKING_FOLDER');
             stageRoot = fullfile(root,'stage');
+            if ismac
+              engineLibDir = fullfile(matlabroot,'extern','bin',computer('arch'));
+              if isfolder(engineLibDir)
+                prev = getenv('DYLD_LIBRARY_PATH');
+                if isempty(prev)
+                  setenv('DYLD_LIBRARY_PATH',engineLibDir);
+                else
+                  setenv('DYLD_LIBRARY_PATH',[engineLibDir pathsep prev]);
+                end
+              end
+            end
             cd(stageRoot);
             addpath(stageRoot,'-begin');
             import braidlab.*;
@@ -188,6 +199,10 @@ jobs:
             end
             [status, cmdout] = system(sprintf('cmake --install "%s" --prefix "%s" --config Release', buildRoot, stageCompat));
             assert(status == 0, cmdout);
+            if isunix && ~ismac
+              % Prefer runner libstdc++ over MATLAB-bundled one for newest GCC ABI.
+              setenv('LD_PRELOAD','/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
+            end
             cd(buildRoot);
             addpath(stageCompat,'-begin');
             import braidlab.*;
