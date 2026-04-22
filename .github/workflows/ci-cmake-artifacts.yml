@@ -45,7 +45,6 @@ jobs:
     name: Release Pinned (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: docs_pdf
-    if: ${{ github.event_name != 'pull_request' || matrix.pr_enabled }}
     strategy:
       fail-fast: false
       matrix:
@@ -53,15 +52,12 @@ jobs:
           - os: ubuntu-22.04
             platform_token: linux-ubuntu-22.04
             archive_ext: tar.gz
-            pr_enabled: true
           - os: macos-latest
             platform_token: macos
             archive_ext: zip
-            pr_enabled: false
           - os: windows-latest
             platform_token: windows
             archive_ext: zip
-            pr_enabled: false
 
     steps:
       - name: Checkout
