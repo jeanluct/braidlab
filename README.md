@@ -2,9 +2,21 @@
 
 *braidlab* is a [Matlab][1] package for analyzing data using braids, written by [Jean-Luc Thiffeault][2] and [Marko Budisic][3].
 
-### documentation and installation
+### installation
 
-The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file and make sure the folder containing `+braidlab` is on your Matlab path.  Run `import braidlab.*` to access the *braidlab* namespace.  You can then create a braid with
+The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file.
+
+To compile from source, you can still use the Makefile build (`make`) or the CMake build:
+```
+cmake -S . -B build
+cmake --build build -j
+cmake --install build --prefix stage
+```
+In many setups CMake auto-detects the Matlab installation (including MEX toolchain/libraries).  If it does not, pass `-DMatlab_ROOT_DIR=/path/to/MATLAB/R20XXx` to the `cmake -S` command above.
+
+### example and documentation
+
+To use *braidlab* from within Matlab, make sure the folder containing `+braidlab` is on your Matlab path.  Run `import braidlab.*` to access the *braidlab* namespace.  You can then create a braid with
 ```
 > b = braid([1 2 -3])
 
@@ -66,7 +78,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [2]: https://people.math.wisc.edu/~thiffeault/
 [3]: https://mbudisic.wordpress.com/
 [4]: https://github.com/jeanluct/braidlab/releases
-[5]: https://github.com/jeanluct/braidlab/raw/master/doc/braidlab_guide.pdf
+[5]: https://github.com/jeanluct/braidlab/blob/master/doc/braidlab_guide.tex
 [6]: https://arxiv.org/abs/1410.0849
 [7]: https://coe.northeastern.edu/people/allshouse-michael/
 [8]: https://github.com/jeanluct/trains

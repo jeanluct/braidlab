@@ -2370,6 +2370,21 @@ you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly. %
 \index{Matlab!MEX files|)}
 
+As an alternative to \lstinline{make}, \braidlab\ can also be compiled with
+\href{https://cmake.org/}{CMake}:
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ cd braidlab
+$ cmake -S . -B build
+$ cmake --build build -j
+$ cmake --install build --prefix stage
+\end{lstlisting}
+If CMake cannot automatically locate Matlab, pass
+\lstinline{-DMatlab_ROOT_DIR=/path/to/MATLAB/R20XXx} to the
+\lstinline{cmake -S} command above.
+On many systems this is not needed because CMake can find Matlab
+automatically.
+
 \index{GMP|(}%
 If you receive error messages because \href{https://gmplib.org/}{GMP} (the GNU
 MultiPrecision library) is not installed on your system, instead of the above
