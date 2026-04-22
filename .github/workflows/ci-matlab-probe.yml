@@ -1,6 +1,9 @@
 name: CI MATLAB Probe
 
 on:
+  push:
+    branches:
+      - iss161-ci-matlab-probe
   workflow_dispatch:
     inputs:
       matlab-release:
