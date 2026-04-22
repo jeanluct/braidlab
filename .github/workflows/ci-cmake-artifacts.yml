@@ -101,7 +101,9 @@ jobs:
         with:
           command: |
             root = getenv('MW_ORIG_WORKING_FOLDER');
-            addpath(fullfile(root,'stage'),'-begin');
+            stageRoot = fullfile(root,'stage');
+            cd(stageRoot);
+            addpath(root,'-begin');
             assert(braidlab.util.assertmex('+braidlab/@braid/private/compact_helper'));
             import braidlab.*;
             b = braid([1 2 -3]);
@@ -180,7 +182,9 @@ jobs:
         with:
           command: |
             root = getenv('MW_ORIG_WORKING_FOLDER');
-            addpath(fullfile(root,'build-compat'),'-begin');
+            buildRoot = fullfile(root,'build-compat');
+            cd(buildRoot);
+            addpath(root,'-begin');
             assert(braidlab.util.assertmex('+braidlab/@braid/private/compact_helper'));
             import braidlab.*;
             b = braid([1 2 -3]);
