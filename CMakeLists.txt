@@ -119,12 +119,19 @@ target_include_directories(trains PUBLIC "${CMAKE_SOURCE_DIR}/extern/trains")
 
 set(BRAIDLAB_GMP_LINK_LIBS)
 set(BRAIDLAB_GMP_DEFINITIONS)
+set(BRAIDLAB_GMP_INCLUDE_DIRS)
 # Keep behavior aligned with the Makefiles: enable GMP-dependent code paths
 # only when both gmp and gmpxx are available.
 if(BRAIDLAB_USE_GMP)
+  find_path(BRAIDLAB_GMP_INCLUDE_DIR NAMES gmp.h)
+  find_path(BRAIDLAB_GMPXX_INCLUDE_DIR NAMES gmpxx.h)
   find_library(BRAIDLAB_GMP_LIBRARY NAMES gmp)
   find_library(BRAIDLAB_GMPXX_LIBRARY NAMES gmpxx)
-  if(BRAIDLAB_GMP_LIBRARY AND BRAIDLAB_GMPXX_LIBRARY)
+
+  if(BRAIDLAB_GMP_INCLUDE_DIR AND BRAIDLAB_GMPXX_INCLUDE_DIR
+     AND BRAIDLAB_GMP_LIBRARY AND BRAIDLAB_GMPXX_LIBRARY)
+    list(APPEND BRAIDLAB_GMP_INCLUDE_DIRS "${BRAIDLAB_GMP_INCLUDE_DIR}" "${BRAIDLAB_GMPXX_INCLUDE_DIR}")
+    list(REMOVE_DUPLICATES BRAIDLAB_GMP_INCLUDE_DIRS)
     list(APPEND BRAIDLAB_GMP_LINK_LIBS "${BRAIDLAB_GMPXX_LIBRARY}" "${BRAIDLAB_GMP_LIBRARY}")
     list(APPEND BRAIDLAB_GMP_DEFINITIONS BRAIDLAB_USE_GMP)
     message(STATUS "GMP enabled")
@@ -139,6 +146,9 @@ braidlab_add_mex_rel(randomwalk_helper
   "+braidlab/private/randomwalk_helper.cpp"
   "${BRAIDLAB_DIR_PRIVATE}"
 )
+if(MSVC)
+  target_compile_definitions(randomwalk_helper PRIVATE _USE_MATH_DEFINES)
+endif()
 
 braidlab_add_mex_rel(assignmentoptimal
   "extern/assignmentoptimal/assignmentoptimal.c"
@@ -195,19 +205,21 @@ braidlab_add_mex_rel(train_helper
 braidlab_add_mex_rel(cross2gen_helper
   "+braidlab/@braid/private/cross2gen_helper.cpp"
   "${BRAIDLAB_DIR_BRAID_PRIVATE}"
+  INCLUDE_DIRS ${BRAIDLAB_GMP_INCLUDE_DIRS}
   LINK_LIBS ${BRAIDLAB_GMP_LINK_LIBS}
   COMPILE_DEFINITIONS ${BRAIDLAB_GMP_DEFINITIONS}
 )
 braidlab_add_mex_rel(loopsigma_helper
   "+braidlab/@braid/private/loopsigma_helper.cpp"
   "${BRAIDLAB_DIR_BRAID_PRIVATE}"
+  INCLUDE_DIRS ${BRAIDLAB_GMP_INCLUDE_DIRS}
   LINK_LIBS ${BRAIDLAB_GMP_LINK_LIBS}
   COMPILE_DEFINITIONS ${BRAIDLAB_GMP_DEFINITIONS}
 )
 braidlab_add_mex_rel(entropy_helper
   "+braidlab/@braid/private/entropy_helper.cpp"
   "${BRAIDLAB_DIR_BRAID_PRIVATE}"
-  INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/${BRAIDLAB_DIR_LOOP_PRIVATE}"
+  INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/${BRAIDLAB_DIR_LOOP_PRIVATE}" ${BRAIDLAB_GMP_INCLUDE_DIRS}
   LINK_LIBS ${BRAIDLAB_GMP_LINK_LIBS}
   COMPILE_DEFINITIONS ${BRAIDLAB_GMP_DEFINITIONS}
 )

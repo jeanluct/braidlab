@@ -70,7 +70,17 @@ jobs:
 
       - name: Configure CMake
         shell: bash
-        run: cmake -S . -B build -DBRAIDLAB_USE_GMP=ON
+        run: |
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            if brew --prefix gmp >/dev/null 2>&1; then
+              GMP_PREFIX="$(brew --prefix gmp)"
+              cmake -S . -B build -DBRAIDLAB_USE_GMP=ON -DCMAKE_PREFIX_PATH="${GMP_PREFIX}"
+            else
+              cmake -S . -B build -DBRAIDLAB_USE_GMP=OFF
+            fi
+          else
+            cmake -S . -B build -DBRAIDLAB_USE_GMP=ON
+          fi
 
       - name: Build CMake targets
         shell: bash
@@ -167,7 +177,7 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            addpath('.');
+            addpath(fullfile(pwd,'build-compat'));
             import braidlab.*;
             b = braid([1 2 -3]);
             c = b.compact;
