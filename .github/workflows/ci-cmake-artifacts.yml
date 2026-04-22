@@ -103,8 +103,7 @@ jobs:
             root = getenv('MW_ORIG_WORKING_FOLDER');
             stageRoot = fullfile(root,'stage');
             cd(stageRoot);
-            addpath(root,'-begin');
-            assert(braidlab.util.assertmex('+braidlab/@braid/private/compact_helper'));
+            addpath(stageRoot,'-begin');
             import braidlab.*;
             b = braid([1 2 -3]);
             c = b.compact;
@@ -183,9 +182,14 @@ jobs:
           command: |
             root = getenv('MW_ORIG_WORKING_FOLDER');
             buildRoot = fullfile(root,'build-compat');
+            stageCompat = fullfile(root,'stage-compat');
+            if ~isfolder(stageCompat)
+              mkdir(stageCompat);
+            end
+            [status, cmdout] = system(sprintf('cmake --install "%s" --prefix "%s" --config Release', buildRoot, stageCompat));
+            assert(status == 0, cmdout);
             cd(buildRoot);
-            addpath(root,'-begin');
-            assert(braidlab.util.assertmex('+braidlab/@braid/private/compact_helper'));
+            addpath(stageCompat,'-begin');
             import braidlab.*;
             b = braid([1 2 -3]);
             c = b.compact;

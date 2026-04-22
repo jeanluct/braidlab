@@ -88,6 +88,16 @@ function(braidlab_add_mex_rel target relative_source install_dir)
   braidlab_add_mex(${target} "${CMAKE_SOURCE_DIR}/${relative_source}" "${install_dir}" ${ARGN})
 endfunction()
 
+# Install MATLAB source files so staged artifacts are directly usable after
+# adding the staging root to MATLAB path.
+install(
+  DIRECTORY "${CMAKE_SOURCE_DIR}/+braidlab/"
+  DESTINATION "+braidlab"
+  FILES_MATCHING
+    PATTERN "*.m"
+    PATTERN "*.mat"
+)
+
 set(CBRAID_SOURCES
   extern/cbraid/lib/cbraid.cpp
   extern/cbraid/lib/braiding.cpp
