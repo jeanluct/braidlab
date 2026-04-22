@@ -6,7 +6,7 @@ on:
       - iss161-ci-matlab-probe
   workflow_dispatch:
     inputs:
-      matlab-release:
+      matlab_release:
         description: MATLAB release to probe
         required: true
         default: R2024b
@@ -16,6 +16,8 @@ jobs:
   probe:
     name: Probe (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    env:
+      MATLAB_RELEASE: ${{ github.event.inputs.matlab_release || 'R2024b' }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +33,7 @@ jobs:
       - name: Setup MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
-          release: ${{ inputs.matlab-release }}
+          release: ${{ env.MATLAB_RELEASE }}
 
       - name: Run MATLAB feasibility probe
         uses: matlab-actions/run-command@v2
