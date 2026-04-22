@@ -100,7 +100,9 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            addpath('stage');
+            addpath(fullfile(pwd,'stage'),'-begin');
+            w = which('braidlab.braid');
+            assert(contains(w,[filesep 'stage' filesep '+braidlab']));
             import braidlab.*;
             b = braid([1 2 -3]);
             c = b.compact;
@@ -177,7 +179,9 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            addpath(fullfile(pwd,'build-compat'));
+            addpath(fullfile(pwd,'build-compat'),'-begin');
+            w = which('braidlab.braid');
+            assert(contains(w,[filesep 'build-compat' filesep '+braidlab']));
             import braidlab.*;
             b = braid([1 2 -3]);
             c = b.compact;
