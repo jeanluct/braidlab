@@ -67,7 +67,7 @@ function(braidlab_add_mex target source install_dir)
     NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
   )
 
-  target_link_libraries(${target} PRIVATE Matlab::mex Matlab::mx)
+  target_link_libraries(${target} Matlab::mex Matlab::mx)
 
   if(BLM_INCLUDE_DIRS)
     target_include_directories(${target} PRIVATE ${BLM_INCLUDE_DIRS})
