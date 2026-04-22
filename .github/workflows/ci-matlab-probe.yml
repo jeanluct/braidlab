@@ -90,3 +90,11 @@ jobs:
                     fclose(fid);
                 end
             end
+
+      - name: Upload probe MEX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mex-probe-${{ matrix.os }}-${{ env.MATLAB_RELEASE }}
+          path: devel/ci-probe/build/mex_probe.*
+          if-no-files-found: error
+          retention-days: 7
