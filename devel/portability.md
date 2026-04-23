@@ -1,0 +1,217 @@
+# Braidlab Package Portability Analysis
+
+This document analyzes how portable the binary archives produced by the
+GitHub Actions CI workflow are, and what users need on their systems to
+run them.  It covers MATLAB version compatibility, native dependencies
+(notably GMP), the C++ runtime, and an assessment of whether the current
+"versions can be specified" workflow design is appropriate.
+
+Companion documents:
+
+- `devel/ci-workflow.md` — operational use of the workflow.
+- `devel/release-config.md` — what is pinned and how to override it.
+
+## Summary recommendation
+
+- **MATLAB version**: not a major concern.  One pinned-release archive
+  per OS/arch is correct, given the legacy MEX ABI selected in
+  `CMakeLists.txt`.
+- **GMP**: this is the main real portability hazard.  Recommended
+  default is dynamic linking with bundled GMP runtime libraries on
+  macOS/Windows archives, plus an optional `no-gmp` package flavor.
+  Static linking is technically possible but is not the recommended
+  default (see issue #165).
+- **Workflow weight**: the current three-job design is appropriate for
+  a multi-platform native packaging pipeline.  Optimization should
+  focus on caching and scheduling, not redesign.
+
+## What the current pipeline produces
+
+Three jobs, configured in `.github/workflows/build-braidlab-packages.yml`:
+
+1. `docs_pdf` — builds `braidlab_guide.pdf` once on Ubuntu.
+2. `release_pinned` — matrix over Linux / macOS / Windows, pinned MATLAB
+   release, produces the distributable archives, runs a MATLAB smoke
+   test against the staged install.
+3. `compat_latest` — Ubuntu lane on the latest available MATLAB with a
+   pinned GCC major; non-blocking early-warning lane.
+
+Pinned defaults are centralized in workflow `env`, with override
+precedence: `workflow_dispatch` input → repository variable → workflow
+default.
+
+Archive naming standard:
+
+```
+braidlab-<version>_<platform>-<arch>_matlab-<release>.<ext>
+```
+
+Each archive ships with `BUILD-MANIFEST.txt` recording commit, MATLAB
+release, runner OS/arch, and timestamp.
+
+## Dimension 1: MATLAB version compatibility
+
+`CMakeLists.txt` uses:
+
+```cmake
+matlab_add_mex(
+  NAME ${target}
+  ...
+  R2017b
+  NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
+)
+target_link_libraries(${target} Matlab::mex Matlab::mx)
+```
+
+This forces the legacy MEX C API (`R2017b` mode) and avoids implicit
+linkage to MATLAB's C++ Data API / Engine runtime libraries.  As a
+result, MEX binaries depend only on `libmex` and `libmx`, which is the
+stable C MEX ABI MATLAB has preserved across many releases.
+
+Practical implications:
+
+- A MEX built on R2024b will load on roughly R2018a → current.
+  Forward-compatibility (newer MATLAB than build) is generally fine.
+  Backward-compatibility (older MATLAB than build) is more fragile.
+- One pinned-release archive per OS/arch is normally sufficient.  A
+  multi-MATLAB matrix (for example R2022b/R2023b/R2024b/R2025a × 3 OS
+  = 12 jobs) would be overkill unless a specific incompatibility is
+  reported by users.
+
+Real risk areas to monitor:
+
+- macOS arm64 arrived later (R2023b+).  Archive names already encode
+  arch, so this is handled.
+- Windows MSVC runtime: MEX binaries link against the same MSVC CRT
+  MATLAB ships, so if built on the matching `windows-latest` runner
+  this is largely a non-issue.
+
+Conclusion: do not worry much about MATLAB version skew for users.
+
+## Dimension 2: GMP
+
+GMP is the only realistic portability hazard for users today.
+
+Current behavior:
+
+- `BRAIDLAB_USE_GMP=ON` (default in `CMakeLists.txt`) — links
+  `cross2gen_helper`, `loopsigma_helper`, and `entropy_helper` against
+  `libgmp` and `libgmpxx`.
+- macOS workflow step gracefully flips to `BRAIDLAB_USE_GMP=OFF` if
+  Homebrew GMP is not available on the runner.
+- Linux runners always build with GMP.
+
+Per-OS user impact:
+
+- **Linux**: GMP is widely available (`libgmp10`, `libgmpxx4ldbl`) but
+  not always preinstalled.  Stripped containers, older distros, or
+  minimal base images can fail to load MEX with
+  `libgmp.so.10: cannot open shared object file`.
+- **macOS**: GMP is *not* a system library.  Users without Homebrew GMP
+  cannot load `cross2gen_helper.mexmaca64`, `loopsigma_helper`, or
+  `entropy_helper`.
+- **Windows**: GMP is not packaged on hosted runners by default.  Any
+  Windows build with GMP enabled will fail at MEX load on a clean user
+  system unless GMP DLLs are bundled.
+
+There is also a deterministic-artifact concern: the macOS lane today
+silently produces GMP-on or GMP-off archives depending on Homebrew
+availability.  Two archives with the same name can therefore differ in
+feature set, which is undesirable.
+
+Three reasonable shipping strategies:
+
+1. **Document dependency, ship dynamic only.**  Cheapest.  Acceptable
+   on Linux for users who can install `libgmp10`/`libgmpxx4ldbl`.
+   Painful on macOS and Windows for casual users.
+2. **Bundle GMP runtime libraries inside the package** and use
+   `rpath` / `@loader_path` / DLL co-location so MEX files find them.
+   Medium effort, good user experience, LGPL-clean for dynamic
+   redistribution if the LGPL text and a relink note are included.
+3. **Static link GMP** (issue #165).  Smallest user-facing footprint,
+   but LGPL static linking imposes obligations (users must be able to
+   relink against a different GMP), and it complicates the build per
+   platform.  Not recommended as default.
+
+Recommended policy:
+
+- Default: **dynamic linking with bundled GMP runtime on macOS and
+  Windows** archives.  Linux can stay dependency-on-system with a clear
+  note in the README.
+- Add a **`no-gmp` package flavor** (`BRAIDLAB_USE_GMP=OFF`) for users
+  who do not need the GMP-backed code paths.  This guarantees a fully
+  portable fallback at near-zero CI cost.
+- Encode the GMP policy explicitly in the build instead of relying on
+  environment detection, so artifact contents are deterministic for a
+  given workflow input.  Consider encoding `_no-gmp` in the archive
+  name when applicable.
+
+## Dimension 3: C++ runtime and other native dependencies
+
+The C++ runtime (`libstdc++` / `libc++` / MSVC CRT) is the other
+classic gotcha for native MATLAB extensions.  Mitigations already in
+place:
+
+- The `compat_latest` lane forces GCC 12 on Ubuntu, which aligns with
+  MATLAB's bundled `libstdc++` ABI window.
+- The compat smoke test uses `LD_PRELOAD` of the runner's newer
+  `libstdc++` so loaded MEX files can resolve against it.
+
+No other exotic shared libraries are pulled in by the build.  This area
+is in good shape.
+
+## Is the "versions can be specified" approach optimal?
+
+For braidlab's release model: yes, with one tweak.
+
+What is good about it:
+
+- One pinned MATLAB release per archive name is the right granularity,
+  given the legacy MEX ABI choice.
+- Repository variables plus `workflow_dispatch` input give the right
+  escape hatch for occasional rebuilds against a newer MATLAB.
+- Hardcoding the rest (LaTeX packages, GCC major, parallelism) in
+  workflow `env` is fine for a small project; centralization gives the
+  "one place to change" property.
+
+The tweak: make GMP policy a first-class build flavor rather than an
+environment-detected fallback.  Today the macOS lane silently flips
+GMP on/off.  Better:
+
+- Explicit matrix dimension or job parameter `gmp: on|off`, or always
+  install GMP per OS so the result is deterministic.
+- Encode the choice in the archive name when off, e.g. `_no-gmp`.
+
+## Is the workflow heavy?
+
+Honestly, no.  Three jobs, around 260 lines, with concurrency
+cancellation.  That is lean for a multi-platform native packaging
+pipeline.  What may *feel* heavy:
+
+- LaTeX install is the single slowest step (~1–2 min).  The `docs_pdf`
+  split already amortizes this across the matrix.
+- The MATLAB smoke test boots MATLAB on each OS.  This is intrinsic to
+  packaging native MATLAB code, not a workflow design issue.
+- `compat_latest` adds a 4th MATLAB boot.  Skipping it on tag pushes
+  (already configured) is appropriate.
+
+Low-effort optimizations worth considering:
+
+- Cache APT packages (`actions/cache` on `/var/cache/apt/archives`) to
+  cut LaTeX install time on PR runs.
+- Cache the CMake `build/` directory keyed on source hash for faster
+  PR iteration.
+- Run `compat_latest` only on `schedule` (nightly) instead of every PR
+  if desired — it is the lane least tied to PR validation.
+
+The three-job design itself is appropriate; redesign is not warranted.
+
+## Bottom line
+
+- MATLAB version skew for users: low concern, current setup is
+  appropriate.
+- GMP availability for users: real concern, addressed by issue #165
+  and the GMP portability plan.  Recommended path is bundled dynamic
+  GMP on macOS/Windows plus a `no-gmp` flavor.
+- Workflow weight: appropriate.  Optimization leverage is in caching
+  and scheduling, not in restructuring the workflow.

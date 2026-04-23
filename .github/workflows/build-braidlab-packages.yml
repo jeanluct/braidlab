@@ -1,0 +1,259 @@
+name: Build Braidlab Packages
+
+permissions:
+  contents: read
+
+concurrency:
+  # Avoid burning runner minutes on superseded commits for the same ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      # Temporary branch scope while CI migration settles.
+      # Switch this to master/develop (or equivalent) when ready.
+      - iss163-continuous-integration-github
+    tags:
+      - "release-*"
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      matlab_release:
+        description: MATLAB release for the release-pinned lane
+        required: true
+        # Keep in sync with BRAIDLAB_RELEASE_MATLAB_DEFAULT below.
+        default: R2024b
+        type: string
+
+env:
+  # Centralized workflow defaults.  Repository variables can override selected
+  # values without editing this file.
+  BRAIDLAB_RELEASE_MATLAB_DEFAULT: R2024b
+  BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT: '12'
+  BRAIDLAB_LATEX_PACKAGES_DEFAULT: texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make
+  BRAIDLAB_BUILD_PARALLEL_DEFAULT: '4'
+
+  # Release lanes use a pinned MATLAB version for reproducible archives.
+  # Resolution order:
+  # 1) workflow_dispatch input, 2) repository variable, 3) workflow default.
+  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || vars.BRAIDLAB_RELEASE_MATLAB || env.BRAIDLAB_RELEASE_MATLAB_DEFAULT }}
+  # Compat lane toolchain pin.  Can be moved forward via repo variable.
+  BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || env.BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT }}
+  # Docs toolchain packages.
+  BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || env.BRAIDLAB_LATEX_PACKAGES_DEFAULT }}
+  # Build parallelism for CMake builds.
+  BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || env.BRAIDLAB_BUILD_PARALLEL_DEFAULT }}
+
+jobs:
+  docs_pdf:
+    # Build docs once and reuse in all platform package jobs.
+    name: Build Braidlab Guide PDF
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install LaTeX tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${BRAIDLAB_LATEX_PACKAGES}
+
+      - name: Build guide PDF
+        run: make -C doc braidlab_guide.pdf
+
+      - name: Upload guide PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-pdf
+          path: doc/braidlab_guide.pdf
+          if-no-files-found: error
+
+  release_pinned:
+    name: Build Package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: docs_pdf
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux token includes distro baseline per artifact naming policy.
+          - os: ubuntu-22.04
+            platform_token: linux-ubuntu-22.04
+            archive_ext: tar.gz
+          - os: macos-latest
+            platform_token: macos
+            archive_ext: zip
+          - os: windows-latest
+            platform_token: windows
+            archive_ext: zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MATLAB (release-pinned)
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          # macOS runners can differ in Homebrew GMP availability.
+          # If unavailable, build without GMP-dependent code paths.
+          if [ "${{ matrix.os }}" = "macos-latest" ]; then
+            if brew --prefix gmp >/dev/null 2>&1; then
+              GMP_PREFIX="$(brew --prefix gmp)"
+              cmake -S . -B build -DBRAIDLAB_USE_GMP=ON -DCMAKE_PREFIX_PATH="${GMP_PREFIX}"
+            else
+              cmake -S . -B build -DBRAIDLAB_USE_GMP=OFF
+            fi
+          else
+            cmake -S . -B build -DBRAIDLAB_USE_GMP=ON
+          fi
+
+      - name: Build CMake targets
+        shell: bash
+        run: cmake --build build --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
+
+      - name: Install staged package
+        shell: bash
+        # Assemble the final package layout in an isolated staging folder.
+        run: cmake --install build --prefix stage --config Release
+
+      - name: Download guide PDF
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-pdf
+          path: stage/doc
+
+      - name: MATLAB smoke test
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            % Keep CI lightweight here: sanity-check package load and key MEX calls.
+            root = getenv('MW_ORIG_WORKING_FOLDER');
+            stageRoot = fullfile(root,'stage');
+            if ismac
+              engineLibDir = fullfile(matlabroot,'extern','bin',computer('arch'));
+              if isfolder(engineLibDir)
+                prev = getenv('DYLD_LIBRARY_PATH');
+                if isempty(prev)
+                  setenv('DYLD_LIBRARY_PATH',engineLibDir);
+                else
+                  setenv('DYLD_LIBRARY_PATH',[engineLibDir pathsep prev]);
+                end
+              end
+            end
+            cd(stageRoot);
+            addpath(stageRoot,'-begin');
+            import braidlab.*;
+            b = braid([1 2 -3]);
+            c = b.compact;
+            t = b.train;
+            assert(~isempty(c));
+            assert(isfield(t,'tntype'));
+            disp(t.tntype);
+
+      - name: Build package archive
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/release-* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/release-}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+
+          case "${RUNNER_ARCH}" in
+            X64) ARCH_TOKEN="x86_64" ;;
+            ARM64) ARCH_TOKEN="arm64" ;;
+            *) ARCH_TOKEN="$(printf '%s' "${RUNNER_ARCH}" | tr '[:upper:]' '[:lower:]')" ;;
+          esac
+
+          MATLAB_TOKEN="matlab-${BRAIDLAB_RELEASE_MATLAB}"
+          # Archive naming standard:
+          # braidlab-<version>_<platform>-<arch>_matlab-<release>
+          BASE_NAME="braidlab-${VERSION}_${{ matrix.platform_token }}-${ARCH_TOKEN}_${MATLAB_TOKEN}"
+
+          # Include distribution metadata and tests in package output.
+          cp README.md LICENSE COPYING CHANGELOG.md stage/
+          cp -a testsuite stage/
+          PACKAGE_PATHS="+braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
+
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "matlab_release=${BRAIDLAB_RELEASE_MATLAB}"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_arch=${RUNNER_ARCH}"
+            echo "platform_token=${{ matrix.platform_token }}"
+            echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > stage/BUILD-MANIFEST.txt
+
+          if [ "${{ matrix.archive_ext }}" = "tar.gz" ]; then
+            ARCHIVE_NAME="${BASE_NAME}.tar.gz"
+            tar -C stage -czf "${ARCHIVE_NAME}" ${PACKAGE_PATHS}
+          else
+            ARCHIVE_NAME="${BASE_NAME}.zip"
+            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip ${PACKAGE_PATHS}
+          fi
+
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload packaged artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARCHIVE_NAME }}
+          path: ${{ env.ARCHIVE_NAME }}
+          if-no-files-found: error
+
+  compat_latest:
+    name: Compatibility Check (ubuntu)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/release-') }}
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MATLAB (latest available)
+        uses: matlab-actions/setup-matlab@v2
+
+      - name: Install GCC toolchain
+        shell: bash
+        run: |
+          # Keep compat lane ABI aligned with MATLAB runtime libraries.
+          sudo apt-get update
+          sudo apt-get install -y gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
+
+      - name: Configure CMake
+        shell: bash
+        # Force pinned GCC major to avoid GLIBCXX mismatches on latest MATLAB lane.
+        run: cmake -S . -B build-compat -DBRAIDLAB_USE_GMP=ON -DCMAKE_C_COMPILER=gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} -DCMAKE_CXX_COMPILER=g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
+
+      - name: Build CMake targets
+        shell: bash
+        run: cmake --build build-compat --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
+
+      - name: MATLAB smoke test
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            root = getenv('MW_ORIG_WORKING_FOLDER');
+            buildRoot = fullfile(root,'build-compat');
+            stageCompat = fullfile(root,'stage-compat');
+            if ~isfolder(stageCompat)
+              mkdir(stageCompat);
+            end
+            [status, cmdout] = system(sprintf('cmake --install "%s" --prefix "%s" --config Release', buildRoot, stageCompat));
+            assert(status == 0, cmdout);
+            if isunix && ~ismac
+              % Prefer runner libstdc++ over MATLAB-bundled one for newest GCC ABI.
+              setenv('LD_PRELOAD','/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
+            end
+            cd(buildRoot);
+            addpath(stageCompat,'-begin');
+            import braidlab.*;
+            b = braid([1 2 -3]);
+            c = b.compact;
+            assert(~isempty(c));
