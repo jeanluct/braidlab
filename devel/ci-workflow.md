@@ -349,6 +349,31 @@ If you want, this file can be split into:
     variables.
   - `devel/release-config.md` documents what to bump and where.
 
-## Open questions
-
 - Q: Is there a way to run the testsuite through `ctest`?
+  A: Yes. The clean approach is to add a CTest test that shells out to MATLAB
+  in batch mode and returns nonzero on failure. Practical implementation:
+  - In `CMakeLists.txt`, call `enable_testing()`.
+  - Add a test like:
+    - `matlab -batch "cd('<repo>'); addpath(pwd); addpath(fullfile(pwd,'testsuite')); res=test_braidlab; nfail=sum([res.Failed]); if nfail>0, exit(1); end"`
+  - Keep this opt-in for CI (for example `BRAIDLAB_ENABLE_FULL_TESTSUITE=ON`),
+    because full tests are slower than smoke tests.
+  Recommended policy:
+  - Keep smoke tests in package lanes.
+  - Add full testsuite via `ctest` in a dedicated job (nightly or required on
+    `master` only).
+
+- Q: Follow-up to GMP question above: can we statically-link GMP so the user
+  doesn't have to have it installed on their system?
+  A: Technically possible, but usually not the best default for this project.
+  Tradeoffs:
+  - Pros: fewer runtime dependency surprises on user machines.
+  - Cons: larger binaries, harder cross-platform maintenance, and potential
+    licensing/distribution review overhead for shipped static libs.
+  Practical recommendation:
+  - Keep dynamic linking as default.
+  - Publish clear dependency notes for Linux/macOS artifacts built with
+    `BRAIDLAB_USE_GMP=ON`.
+  - Optionally add a separate "portable/no-GMP" build flavor with
+    `BRAIDLAB_USE_GMP=OFF` for users who want zero GMP runtime dependency.
+  - If static linking is still desired later, gate it behind an explicit
+    CMake option and treat it as a release-engineering feature, not default.
