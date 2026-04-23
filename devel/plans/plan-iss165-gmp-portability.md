@@ -30,8 +30,10 @@ The GMP-using MEX targets are:
 Per `devel/portability.md`, GMP is the only realistic portability hazard
 for distributed archives:
 
-- Linux: GMP usually present, but not on minimal containers/older
-  distros.
+- Linux: GMP is widely available (`libgmp10`, `libgmpxx4ldbl`) on
+  workstation distros, but minimal containers, HPC compute nodes, and
+  older base images frequently lack it; users without root cannot
+  `apt install` to fix it.
 - macOS: GMP not in the base system; users without Homebrew GMP cannot
   load these MEX files.
 - Windows: GMP is not available by default; current Windows archives
@@ -45,9 +47,10 @@ non-deterministic with respect to feature set.
 ## Decision
 
 - Default policy: **bundle dynamic GMP runtime libraries inside the
-  package** for macOS and Windows archives.  Linux archives stay as
-  system-dependency (with documented `apt`/`dnf` install instructions)
-  for now.
+  package** for all three OS archives (Linux, macOS, Windows).  Linux
+  baseline runner is `ubuntu-22.04`, matching the existing pinned
+  release lane; the resulting archive runs on glibc/libstdc++ from
+  Ubuntu 22.04 or newer (and equivalent on RHEL/Fedora).
 - Provide an alternate **`no-gmp` package flavor**
   (`BRAIDLAB_USE_GMP=OFF`) per OS for users who want zero GMP runtime
   dependency or who use a stripped environment.
@@ -58,6 +61,8 @@ non-deterministic with respect to feature set.
 - Make the GMP policy a **first-class build flavor** rather than an
   environment-detected fallback, so artifacts are deterministic for a
   given workflow input.
+- Bundling is a **CI/packaging concern only**.  Local developer builds
+  remain `system` linkage by default and are unchanged from today.
 
 ## Per-OS bundling design
 
@@ -91,59 +96,88 @@ non-deterministic with respect to feature set.
 
 ### Linux
 
-- Keep dynamic system linkage as default for the standard archive.
-- Document required runtime packages in README:
-  - Debian/Ubuntu: `apt install libgmp10 libgmpxx4ldbl`.
-  - RHEL/Fedora: `dnf install gmp gmp-c++`.
-- Optional follow-up (out of scope unless requested): produce a
-  fully-bundled Linux variant by copying `libgmp.so.*`/`libgmpxx.so.*`
-  into a sibling `lib/` directory and setting `RPATH=$ORIGIN/_lib` on
-  MEX files via `patchelf` or `CMAKE_INSTALL_RPATH`.
+- Baseline runner: `ubuntu-22.04` (matches existing release-pinned
+  matrix entry).  Resulting GMP shared libs are compatible with any
+  Linux distro running glibc >= 2.35 / libstdc++ from GCC 11 or newer,
+  which covers all currently-supported mainstream distros.
+- Install GMP in CI deterministically via apt
+  (`sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10`).
+- After `cmake --install`, copy `libgmp.so.<ver>` and
+  `libgmpxx.so.<ver>` from the system path into the staged package
+  (proposed location: `+braidlab/private/_lib/`).
+- Set `INSTALL_RPATH` to `$ORIGIN/_lib` (with `$ORIGIN` properly
+  escaped for CMake) on the GMP-using MEX targets when bundling is
+  enabled, so they resolve GMP from the bundled location at MEX load
+  time.  No `patchelf` post-processing required.
+- Verify with `ldd <mex>` in the smoke-test step that GMP resolves to
+  the bundled `_lib/` location, not a system path.
 
 ## CMake changes
 
-Proposed additions to `CMakeLists.txt`:
+Proposed additions to `CMakeLists.txt`, kept intentionally minimal:
 
-- Replace the boolean `BRAIDLAB_USE_GMP` with a string option
-  (or supplement it):
-  - `BRAIDLAB_GMP_LINKAGE` with values `system` (default), `bundled`,
-    `static`, `off`.
-  - `system` → current behavior (link to system GMP, no copying).
-  - `bundled` → link to system GMP at build time but install GMP
-    runtime libs into the staged package and adjust rpaths/install
-    names.
+- New string option `BRAIDLAB_GMP_LINKAGE` with values
+  `system` (default), `bundled`, `static`, `off`.
+  - `system` → current behavior: link to system GMP, copy nothing.
+    Used by local developer builds.
+  - `bundled` → link to system GMP at build time, install GMP runtime
+    libs into the staged package, set rpaths/install-names so MEX
+    files resolve them locally.  Used by CI release jobs.
   - `static` → link `libgmp.a`/`libgmpxx.a` statically (gated, opt-in,
     per-platform care; not enabled in default CI).
   - `off` → equivalent to current `BRAIDLAB_USE_GMP=OFF`.
-- New install rules (when `BRAIDLAB_GMP_LINKAGE=bundled`) that copy
-  GMP shared libraries into the install tree at the OS-appropriate
-  location.
-- macOS: handle install names with `install_name_tool` in a post-install
-  script; or use `BUNDLE`/`fixup_bundle`-style helpers.
-- Linux (deferred): set `INSTALL_RPATH` to `$ORIGIN/_lib` on the GMP
-  MEX targets when bundling is enabled.
+- Backward compatibility: keep `BRAIDLAB_USE_GMP=ON|OFF` working as an
+  alias mapping to `BRAIDLAB_GMP_LINKAGE=system|off` so existing
+  scripts do not break.
 
-Backward compatibility: keep `BRAIDLAB_USE_GMP=ON|OFF` working as an
-alias mapping to `BRAIDLAB_GMP_LINKAGE=system|off` so existing scripts
-do not break.
+GMP-not-found diagnostic policy (replaces today's silent fallback to
+`OFF`):
+
+- If `BRAIDLAB_GMP_LINKAGE` is `system`, `bundled`, or `static`
+  (whether explicitly set or inherited from the default), and
+  `find_package`/`find_library` cannot locate GMP and gmpxx, emit a
+  single `FATAL_ERROR` with a short multi-line diagnostic that
+  suggests per-OS install commands and points to
+  `-DBRAIDLAB_GMP_LINKAGE=off` as the explicit opt-out.
+- If `BRAIDLAB_GMP_LINKAGE=off` is explicitly set, emit a normal
+  `STATUS` message confirming the no-GMP build (no warning).
+- The diagnostic stays in a single `message(FATAL_ERROR ...)` call to
+  keep `CMakeLists.txt` readable.
+
+Install-rule additions (only active when
+`BRAIDLAB_GMP_LINKAGE=bundled`):
+
+- Resolve the actual GMP shared library files via
+  `get_filename_component(... REALPATH)` so symlink chains are followed
+  to the versioned `.so`/`.dylib`/`.dll`.
+- Install those resolved files into a per-package staging location.
+- macOS: post-install fix-up step using `install_name_tool` to rewrite
+  GMP install-name references to `@loader_path/...`.  Implemented as
+  an `install(CODE ...)` block to keep it self-contained.
+- Linux: set `INSTALL_RPATH` on the GMP-using MEX targets to
+  `\$ORIGIN/_lib` (escaped for CMake), with `INSTALL_RPATH_USE_LINK_PATH OFF`
+  to avoid leaking absolute paths.
+- Windows: no install-name/rpath fix-up needed; DLL co-location with
+  the MEX file is sufficient.
 
 ## Workflow changes
 
 In `.github/workflows/build-braidlab-packages.yml`:
 
-- Add a deterministic GMP install step per OS (Homebrew, vcpkg/MSYS2,
-  apt) instead of relying on runner default state.
-- Add a `flavor` matrix dimension or a parallel job to produce both:
-  - default flavor with GMP bundled (macOS/Windows) or system-dep
-    (Linux);
-  - `no-gmp` flavor with `BRAIDLAB_GMP_LINKAGE=off`.
-- Archive-name suffix `_no-gmp` on the no-GMP flavor.
-  - Open question: should the GMP-on archive remain unsuffixed or be
-    explicitly tagged `_with-gmp`?  Recommend unsuffixed for the
-    primary download.
+- Add a deterministic GMP install step per OS (apt on Linux, Homebrew
+  on macOS, vcpkg or MSYS2 on Windows) instead of relying on runner
+  default state.  Replace the existing macOS conditional GMP-on/off
+  branch with an unconditional install + bundled build.
+- Pass `-DBRAIDLAB_GMP_LINKAGE=bundled` in the `release_pinned` matrix
+  for all three OSes.
+- Add a `flavor` matrix dimension producing both archives:
+  - default flavor with GMP bundled on all OSes;
+  - `no-gmp` flavor with `-DBRAIDLAB_GMP_LINKAGE=off`.
+- Archive-name suffix `_no-gmp` on the no-GMP flavor; primary
+  GMP-bundled archive remains unsuffixed.
+- Build the `no-gmp` flavor only on tagged releases (`refs/tags/release-*`)
+  to keep CI minutes contained on PR runs.
 - Update `BUILD-MANIFEST.txt` to record `gmp_linkage=<value>`.
-- Replace the macOS conditional GMP-on/off step with an explicit, fixed
-  policy per flavor.
 
 ## Smoke-test additions
 
@@ -157,8 +191,8 @@ Augment the existing MATLAB smoke test to:
   - Linux: `ldd`.
   - Windows: `dumpbin /dependents` or PowerShell `Get-ItemProperty`.
 - Fail the job if any GMP-related symbol resolves to an unexpected
-  absolute path on macOS/Windows (i.e., not `@loader_path` / co-located
-  DLL).
+  absolute path on macOS/Linux (i.e., not `@loader_path` / `_lib/`)
+  or to a missing DLL on Windows.
 
 ## Licensing
 
@@ -202,36 +236,41 @@ Recommended merge order:
 ## Open questions
 
 - Windows GMP source: **vcpkg** vs **MSYS2 mingw64**?  Decision affects
-  toolchain compatibility with MATLAB MEX.
-- Should Linux archives also bundle GMP for a uniform UX, or stay as
-  system-dependency?  Default plan: stay as system-dependency unless
-  users complain.
-- Should every release ship both GMP-on and `no-gmp` flavors, or only
-  on demand?  Default plan: ship both for tagged releases; ship only
-  GMP-on flavor for `dev-*` PR artifacts to keep CI minutes down.
-- Archive naming: keep GMP-on archive unsuffixed (recommended) or tag
-  it `_with-gmp` for symmetry with `_no-gmp`?
+  toolchain compatibility with MATLAB MEX on `windows-latest`.
 - `BRAIDLAB_GMP_LINKAGE` value names: `system|bundled|static|off` vs
-  `dynamic|bundled|static|off` — second option is clearer for the
-  end-user-relevant axis (system vs bundled).
+  `dynamic|bundled|static|off`.  Current plan uses `system|bundled|...`
+  because `system` more clearly contrasts with `bundled` along the
+  end-user-relevant axis.
+- Linux baseline upgrade: keep `ubuntu-22.04` until end of support, or
+  proactively introduce a second `ubuntu-24.04` baseline lane?  Default
+  plan: stay on 22.04 for now; revisit when 22.04 nears EOL.
 
 ## Acceptance criteria
 
-- `BRAIDLAB_GMP_LINKAGE` (or equivalent) implemented in CMake with at
-  least `system`, `bundled`, and `off` values.
-- macOS and Windows release-pinned archives ship with bundled GMP and
-  load on a clean user system without any GMP install.
+- `BRAIDLAB_GMP_LINKAGE` implemented in CMake with at least `system`,
+  `bundled`, and `off` values, plus the `BRAIDLAB_USE_GMP` alias for
+  backward compatibility.
+- `FATAL_ERROR` GMP-not-found diagnostic with per-OS install hints in
+  place; silent fallback to no-GMP removed.
+- All three release-pinned archives (Linux/macOS/Windows) ship with
+  bundled GMP and load on a clean user system without any GMP install.
 - A `no-gmp` flavor archive is produced per OS for tagged releases.
 - Smoke-test step verifies MEX dependency paths and exercises at least
-  one GMP-using code path.
-- README updated with runtime requirements per flavor and
-  per OS.
+  one GMP-using code path on every flavor.
+- README updated with runtime requirements per flavor and per OS, plus
+  install hints mirroring the CMake diagnostic.
 - `devel/ci-workflow.md` and `devel/release-config.md` updated with the
   new flavor knobs.
+- Local developer build behavior (default `system` linkage) confirmed
+  unchanged from today.
 - Issue #165 closed with a recorded decision (default policy =
-  `bundled` on macOS/Windows; static link kept as opt-in).
+  `bundled` on all OSes; static link kept as opt-in).
 
 ## Status
 
 - 2026-04-23: branch created from
   `iss163-continuous-integration-github`; plan drafted.
+- 2026-04-23: plan revised — Linux now in the bundling default with
+  `ubuntu-22.04` baseline; GMP-not-found diagnostic policy added;
+  `no-gmp` flavor scoped to tagged releases only; open questions
+  trimmed.
