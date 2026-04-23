@@ -23,28 +23,28 @@ on:
       matlab_release:
         description: MATLAB release for the release-pinned lane
         required: true
-        # Keep in sync with BRAIDLAB_RELEASE_MATLAB_DEFAULT below.
+        # Keep in sync with the inline default in BRAIDLAB_RELEASE_MATLAB below.
         default: R2024b
         type: string
 
 env:
   # Centralized workflow defaults.  Repository variables can override selected
   # values without editing this file.
-  BRAIDLAB_RELEASE_MATLAB_DEFAULT: R2024b
-  BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT: '12'
-  BRAIDLAB_LATEX_PACKAGES_DEFAULT: texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make
-  BRAIDLAB_BUILD_PARALLEL_DEFAULT: '4'
+  #
+  # GitHub does not allow self-references inside an env: block, so the
+  # default values are inlined directly in each fallback expression
+  # rather than defined as separate _DEFAULT entries.
 
   # Release lanes use a pinned MATLAB version for reproducible archives.
   # Resolution order:
-  # 1) workflow_dispatch input, 2) repository variable, 3) workflow default.
-  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || vars.BRAIDLAB_RELEASE_MATLAB || env.BRAIDLAB_RELEASE_MATLAB_DEFAULT }}
+  # 1) workflow_dispatch input, 2) repository variable, 3) inline default.
+  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || vars.BRAIDLAB_RELEASE_MATLAB || 'R2024b' }}
   # Compat lane toolchain pin.  Can be moved forward via repo variable.
-  BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || env.BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT }}
+  BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || '12' }}
   # Docs toolchain packages.
-  BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || env.BRAIDLAB_LATEX_PACKAGES_DEFAULT }}
+  BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || 'texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make' }}
   # Build parallelism for CMake builds.
-  BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || env.BRAIDLAB_BUILD_PARALLEL_DEFAULT }}
+  BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || '4' }}
 
 jobs:
   docs_pdf:
@@ -74,8 +74,6 @@ jobs:
     name: Build Package (${{ matrix.os }}, ${{ matrix.flavor }})
     runs-on: ${{ matrix.os }}
     needs: docs_pdf
-    # Skip the no-gmp flavor on non-tag builds to keep CI minutes contained.
-    if: ${{ matrix.flavor != 'no-gmp' || startsWith(github.ref, 'refs/tags/release-') }}
     strategy:
       fail-fast: false
       matrix:
@@ -97,7 +95,9 @@ jobs:
             archive_ext: zip
             flavor: default
             gmp_linkage: bundled
-          # no-gmp flavor: built only on tagged releases (gated below).
+          # no-gmp flavor: built on every push to catch GMP-free
+          # build regressions early.  Cheap because no GMP install
+          # and no bundled-layout verification.
           - os: ubuntu-22.04
             platform_token: linux-ubuntu-22.04
             archive_ext: tar.gz

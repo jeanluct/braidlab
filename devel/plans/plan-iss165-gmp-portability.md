@@ -181,8 +181,11 @@ In `.github/workflows/build-braidlab-packages.yml`:
   - `no-gmp` flavor with `-DBRAIDLAB_GMP_LINKAGE=off`.
 - Archive-name suffix `_no-gmp` on the no-GMP flavor; primary
   GMP-bundled archive remains unsuffixed.
-- Build the `no-gmp` flavor only on tagged releases (`refs/tags/release-*`)
-  to keep CI minutes contained on PR runs.
+- Build the `no-gmp` flavor on every push so GMP-free build
+  regressions surface immediately.  (Original plan was to gate on
+  `refs/tags/release-*`, but matrix context is not allowed in
+  job-level `if`, and the no-gmp jobs are cheap because they skip
+  GMP install and bundled-layout verification.)
 - Update `BUILD-MANIFEST.txt` to record `gmp_linkage=<value>`.
 
 ## Smoke-test additions
@@ -284,7 +287,7 @@ order of operations:
   place; silent fallback to no-GMP removed.
 - All three release-pinned archives (Linux/macOS/Windows) ship with
   bundled GMP and load on a clean user system without any GMP install.
-- A `no-gmp` flavor archive is produced per OS for tagged releases.
+- A `no-gmp` flavor archive is produced per OS on every push.
 - Smoke-test step verifies MEX dependency paths and exercises at least
   one GMP-using code path on every flavor.
 - README updated with runtime requirements per flavor and per OS, plus
@@ -322,3 +325,9 @@ order of operations:
   iss163 branch to `develop`/`master`.  `compat_latest` left on the
   `BRAIDLAB_USE_GMP=ON` alias.  Awaiting first CI run on `develop` to
   validate macOS install_name_tool block and Windows vcpkg path.
+- 2026-04-23: workflow YAML rejected by GitHub on first push.  Fixed
+  two issues: (a) `env.X_DEFAULT` self-references in the `env:` block
+  are not allowed — defaults inlined into each `||` fallback chain;
+  (b) `matrix` context is not allowed in job-level `if` — dropped the
+  tag-gate and now run the `no-gmp` flavor on every push (cheap and
+  catches GMP-free regressions early).

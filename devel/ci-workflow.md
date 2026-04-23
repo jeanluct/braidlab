@@ -162,10 +162,11 @@ Each platform produces two flavors:
 - `default` (always built): GMP runtime libraries are bundled inside the
   archive (`-DBRAIDLAB_GMP_LINKAGE=bundled`).  Users do not need GMP
   installed on their system.
-- `no-gmp` (tagged releases only, `refs/tags/release-*`): GMP-using code
-  paths are compiled out (`-DBRAIDLAB_GMP_LINKAGE=off`).  Smaller archive
-  with zero GMP runtime dependency, for users on stripped or
-  GMP-incompatible environments.
+- `no-gmp`: GMP-using code paths are compiled out
+  (`-DBRAIDLAB_GMP_LINKAGE=off`).  Smaller archive with zero GMP
+  runtime dependency, for users on stripped or GMP-incompatible
+  environments.  Built on every push so GMP-free build regressions
+  surface immediately.
 
 GMP is installed deterministically per OS in CI before configuring CMake:
 
@@ -342,8 +343,8 @@ If you want, this file can be split into:
     with the GMP-using MEX files in `+braidlab/@braid/private/`.  The
     MEX files load these via `$ORIGIN` (Linux) / `@loader_path` (macOS)
     / DLL co-location (Windows).  Users do not need GMP installed.
-  - A `no-gmp` flavor archive (built only on tagged releases) compiles
-    out the GMP-using code paths (`-DBRAIDLAB_GMP_LINKAGE=off`) for
+  - A `no-gmp` flavor archive (built on every push) compiles out
+    the GMP-using code paths (`-DBRAIDLAB_GMP_LINKAGE=off`) for
     users who explicitly want zero GMP runtime dependency.
   - Per-OS dependency-check steps (`ldd`/`otool -L`) verify in CI that
     the bundled-flavor MEX files resolve GMP to the co-located library,
