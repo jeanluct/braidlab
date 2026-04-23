@@ -10,7 +10,7 @@ To compile from source, you can still use the Makefile build (`make`) or the CMa
 ```
 cmake -S . -B build
 cmake --build build -j
-cmake --install build --prefix stage
+cmake --install build --prefix .
 ```
 In many setups CMake auto-detects the Matlab installation (including MEX toolchain/libraries).  If it does not, pass `-DMatlab_ROOT_DIR=/path/to/MATLAB/R20XXx` to the `cmake -S` command above.
 
