@@ -12,12 +12,25 @@ on:
       matlab_release:
         description: MATLAB release for the release-pinned lane
         required: true
+        # Keep in sync with BRAIDLAB_RELEASE_MATLAB_DEFAULT below.
         default: R2024b
         type: string
 
 env:
+  # Centralized workflow defaults.  Repository variables can override selected
+  # values without editing this file.
+  BRAIDLAB_RELEASE_MATLAB_DEFAULT: R2024b
+  BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT: '12'
+  BRAIDLAB_LATEX_PACKAGES_DEFAULT: texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make
+
   # Release lanes use a pinned MATLAB version for reproducible archives.
-  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || 'R2024b' }}
+  # Resolution order:
+  # 1) workflow_dispatch input, 2) repository variable, 3) workflow default.
+  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || vars.BRAIDLAB_RELEASE_MATLAB || env.BRAIDLAB_RELEASE_MATLAB_DEFAULT }}
+  # Compat lane toolchain pin.  Can be moved forward via repo variable.
+  BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || env.BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT }}
+  # Docs toolchain packages.
+  BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || env.BRAIDLAB_LATEX_PACKAGES_DEFAULT }}
 
 jobs:
   docs_pdf:
@@ -31,7 +44,7 @@ jobs:
       - name: Install LaTeX tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make
+          sudo apt-get install -y ${BRAIDLAB_LATEX_PACKAGES}
 
       - name: Build guide PDF
         run: make -C doc braidlab_guide.pdf
@@ -191,17 +204,17 @@ jobs:
       - name: Setup MATLAB (latest available)
         uses: matlab-actions/setup-matlab@v2
 
-      - name: Install GCC 12 toolchain
+      - name: Install GCC toolchain
         shell: bash
         run: |
           # Keep compat lane ABI aligned with MATLAB runtime libraries.
           sudo apt-get update
-          sudo apt-get install -y gcc-12 g++-12
+          sudo apt-get install -y gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
 
       - name: Configure CMake
         shell: bash
-        # Force GCC 12 to avoid GLIBCXX mismatches on latest MATLAB lane.
-        run: cmake -S . -B build-compat -DBRAIDLAB_USE_GMP=ON -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12
+        # Force pinned GCC major to avoid GLIBCXX mismatches on latest MATLAB lane.
+        run: cmake -S . -B build-compat -DBRAIDLAB_USE_GMP=ON -DCMAKE_C_COMPILER=gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} -DCMAKE_CXX_COMPILER=g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
 
       - name: Build CMake targets
         shell: bash
