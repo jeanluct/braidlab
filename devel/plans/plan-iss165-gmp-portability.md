@@ -70,12 +70,14 @@ non-deterministic with respect to feature set.
 
 - Install GMP in CI deterministically via Homebrew (`brew install gmp`).
 - After `cmake --install`, copy `libgmp.<ver>.dylib` and
-  `libgmpxx.<ver>.dylib` from the Homebrew prefix into the staged
-  package (proposed location: `+braidlab/private/_lib/`).
+  `libgmpxx.<ver>.dylib` from the Homebrew prefix into the same
+  directory as the GMP-using MEX files
+  (`+braidlab/@braid/private/`).  Co-locating with the MEX files
+  keeps the rpath/install-name handling uniform across all three OSes
+  and avoids a separate `_lib/` directory.
 - Adjust install names so MEX files resolve GMP via `@loader_path`:
   - On each MEX file: `install_name_tool -change <abs path>
-    @loader_path/../../private/_lib/libgmp.<ver>.dylib <mex>`
-    (and same for `libgmpxx`).
+    @loader_path/libgmp.<ver>.dylib <mex>` (and same for `libgmpxx`).
   - Adjust the bundled `libgmpxx` to find `libgmp` via
     `@loader_path/libgmp.<ver>.dylib`.
 - Verify with `otool -L <mex>` in the smoke-test step that GMP resolves
@@ -103,14 +105,15 @@ non-deterministic with respect to feature set.
 - Install GMP in CI deterministically via apt
   (`sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10`).
 - After `cmake --install`, copy `libgmp.so.<ver>` and
-  `libgmpxx.so.<ver>` from the system path into the staged package
-  (proposed location: `+braidlab/private/_lib/`).
-- Set `INSTALL_RPATH` to `$ORIGIN/_lib` (with `$ORIGIN` properly
-  escaped for CMake) on the GMP-using MEX targets when bundling is
-  enabled, so they resolve GMP from the bundled location at MEX load
+  `libgmpxx.so.<ver>` from the system path into the same directory as
+  the GMP-using MEX files (`+braidlab/@braid/private/`), matching the
+  macOS and Windows layouts.
+- Set `INSTALL_RPATH` to `$ORIGIN` (with `$ORIGIN` properly escaped
+  for CMake) on the GMP-using MEX targets when bundling is enabled,
+  so they resolve GMP from the bundled co-located copy at MEX load
   time.  No `patchelf` post-processing required.
 - Verify with `ldd <mex>` in the smoke-test step that GMP resolves to
-  the bundled `_lib/` location, not a system path.
+  the bundled co-located library, not a system path.
 
 ## CMake changes
 
@@ -150,12 +153,15 @@ Install-rule additions (only active when
 - Resolve the actual GMP shared library files via
   `get_filename_component(... REALPATH)` so symlink chains are followed
   to the versioned `.so`/`.dylib`/`.dll`.
-- Install those resolved files into a per-package staging location.
+- Install those resolved files into the same directory as the
+  GMP-using MEX files (`+braidlab/@braid/private/`), giving a uniform
+  co-located layout across all three OSes.
 - macOS: post-install fix-up step using `install_name_tool` to rewrite
-  GMP install-name references to `@loader_path/...`.  Implemented as
-  an `install(CODE ...)` block to keep it self-contained.
+  GMP install-name references to `@loader_path/<libname>`.
+  Implemented as an `install(CODE ...)` block to keep it
+  self-contained.
 - Linux: set `INSTALL_RPATH` on the GMP-using MEX targets to
-  `\$ORIGIN/_lib` (escaped for CMake), with `INSTALL_RPATH_USE_LINK_PATH OFF`
+  `\$ORIGIN` (escaped for CMake), with `INSTALL_RPATH_USE_LINK_PATH OFF`
   to avoid leaking absolute paths.
 - Windows: no install-name/rpath fix-up needed; DLL co-location with
   the MEX file is sufficient.
@@ -298,3 +304,7 @@ order of operations:
   `ubuntu-22.04` baseline; GMP-not-found diagnostic policy added;
   `no-gmp` flavor scoped to tagged releases only; open questions
   trimmed.
+- 2026-04-23: rebased onto `develop` after `iss163` merged; bundled
+  GMP layout simplified to co-locate libs with the GMP-using MEX
+  files (`+braidlab/@braid/private/`) on all three OSes, replacing
+  the earlier `+braidlab/private/_lib/` proposal.

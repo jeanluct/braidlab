@@ -146,6 +146,42 @@ Recommended policy:
   given workflow input.  Consider encoding `_no-gmp` in the archive
   name when applicable.
 
+### Update (2026-04-23): Linux now also bundles, with a caveat
+
+The policy above was revised under issue #165: Linux now also bundles
+GMP by default for uniform UX (containers, HPC nodes, stripped images
+where users cannot `apt install`).  See
+`devel/plans/plan-iss165-gmp-portability.md` for the implementation.
+
+Empirical finding from local validation on Ubuntu 24 + MATLAB R2025a:
+
+- A bundled-mode install correctly co-locates `libgmp.so.10` and
+  `libgmpxx.so.4` next to the GMP-using MEX files, sets
+  `INSTALL_RPATH=$ORIGIN` on those targets, and `ldd` confirms the
+  loader resolves `libgmp.so.10` to the bundled file outside MATLAB.
+- Inside MATLAB, however, `/proc/<pid>/maps` shows the **system**
+  `libgmp.so.10` loaded, not the bundled one.  Root cause: MATLAB
+  loads `libgnutls.so.30` at startup, which transitively requires
+  `libgmp.so.10`, so by the time braidlab's MEX is loaded the symbol
+  is already resolved against the system library and the loader does
+  not re-search rpath.
+- Practical consequence on Linux: bundling helps only on systems with
+  no system GMP at all.  But on such systems MATLAB itself may fail to
+  start (gnutls would not load), so Linux bundling may be largely
+  redundant in practice on modern MATLAB Linux installs.
+
+We keep Linux bundling for now because:
+
+- It costs ~554 KB per archive and a few CMake lines we already wrote.
+- Future MATLAB releases or stripped Linux installs may not pull in
+  gnutls; bundling is defense in depth.
+- It keeps the per-OS build logic uniform with macOS/Windows where
+  bundling is genuinely required.
+- Removing it later if it stays redundant is straightforward.
+
+Revisit during Phase B (workflow) once we have CI evidence from the
+`ubuntu-22.04` runner across MATLAB versions.
+
 ## Dimension 3: C++ runtime and other native dependencies
 
 The C++ runtime (`libstdc++` / `libc++` / MSVC CRT) is the other
