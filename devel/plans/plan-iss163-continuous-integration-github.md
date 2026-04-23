@@ -1,13 +1,24 @@
 # Issue 163 Plan: Continuous Integration on GitHub
 
+Status: Active, mostly implemented (Apr 2026)
+
 ## Objective
 
 Create a GitHub Actions pipeline that builds and publishes braidlab binary artifacts for supported operating systems from the CMake build.
+
+Current workflow file:
+
+- `.github/workflows/build-braidlab-packages.yml`
 
 ## Dependencies
 
 - Stacked on `iss162-cmake-conversion`.
 - Uses probe findings from `iss161-ci-matlab-probe` to select hosted, self-hosted, or hybrid runner strategy.
+
+Operational docs:
+
+- `devel/ci-workflow.md`
+- `devel/release-config.md`
 
 ## Scope
 
@@ -45,6 +56,10 @@ Out of scope:
 
 Chosen option must be recorded in issue notes with rationale.
 
+Current status:
+
+- Option A (fully GitHub-hosted) is in use for Linux/macOS/Windows package lanes.
+
 ## Workflow Design
 
 ### CI Lanes
@@ -63,6 +78,10 @@ Policy notes:
 - Release artifacts are generated only from `release-pinned`.
 - `compat-latest` failures should open/update a compatibility tracking issue but should not block artifact publication when `release-pinned` is green.
 
+Current status:
+
+- `compat_latest` is configured as non-blocking (`continue-on-error: true`).
+
 ### Triggers
 
 - `workflow_dispatch` for manual runs.
@@ -76,6 +95,11 @@ Recommended trigger behavior:
 - On pushes to integration branches, run full `release-pinned` matrix.
 - On tags, run full `release-pinned` matrix and publish artifacts.
 
+Current status:
+
+- Workflow currently targets the issue branch for `push` triggers plus PR, tags, and manual dispatch.
+- Final `master`/`develop` push trigger policy remains an open decision.
+
 ### Jobs
 
 1. Build matrix job:
@@ -88,7 +112,12 @@ Recommended trigger behavior:
 2. Optional verify job:
    - Run MATLAB smoke tests against staged artifacts.
 3. Optional release job:
-   - On tags, download artifacts and attach to GitHub Release.
+    - On tags, download artifacts and attach to GitHub Release.
+
+Current status:
+
+- Build matrix + smoke verification are implemented.
+- Release attachment automation is not yet enabled; artifacts are uploaded by workflow and attached manually if needed.
 
 ### Matrix Dimensions
 
@@ -104,6 +133,7 @@ Recommended trigger behavior:
   - Linux example: `braidlab-3.3.1_linux-ubuntu-22.04-x86_64_matlab-R2024b.tar.gz`
 - Archive contents should mirror runtime package layout expected by users.
 - Release archives should include `doc/braidlab_guide.pdf` built in CI.
+- Release archives should include `testsuite/` and distribution metadata files.
 - Include short manifest file with:
   - git commit,
   - MATLAB release,
@@ -132,6 +162,11 @@ Token normalization rules:
 - Confirm artifact extraction works and paths are correct.
 - For release flow, verify assets appear on draft or test release before enabling production tagging.
 
+Validation status:
+
+- Matrix packaging and smoke tests have been exercised and stabilized.
+- Compatibility lane behavior and toolchain notes are documented.
+
 ## Success Criteria
 
 All must be true:
@@ -153,13 +188,30 @@ All must be true:
 
 ## Task Checklist
 
-- [ ] Confirm issue number and branch name.
-- [ ] Choose runner strategy from probe results.
-- [ ] Add CI workflow with matrix build and artifact upload.
-- [ ] Add packaging script or CMake packaging commands.
-- [ ] Add smoke verification step.
+- [x] Confirm issue number and branch name.
+- [x] Choose runner strategy from probe results.
+- [x] Add CI workflow with matrix build and artifact upload.
+- [x] Add packaging script or CMake packaging commands.
+- [x] Add smoke verification step.
 - [ ] Add release asset attachment flow (optional initial draft mode).
-- [ ] Document workflow operation and maintenance.
+- [x] Document workflow operation and maintenance.
+
+## Open Follow-ups
+
+- Finalize push-branch trigger policy after branch migration.
+- Decide whether to add full-testsuite CTest lane beyond smoke tests.
+- Decide whether to keep compat lane non-blocking long-term.
+- Track optional static GMP linkage in issue #165.
+
+## Further Work Candidates
+
+- Add optional release-publish automation on `release-*` tags.
+  - Download packaged artifacts and attach them directly to GitHub Releases.
+  - Keep manual attach flow as fallback until automation proves stable.
+- Introduce PR-time reduced matrix policy to lower cycle time and cost.
+  - Keep full matrix on `master` pushes and release tags.
+- Add explicit compatibility issue management policy.
+  - When `compat_latest` fails and `release_pinned` passes, auto-open or update a tracking issue.
 
 ## Exit Decision
 
