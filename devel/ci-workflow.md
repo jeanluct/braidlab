@@ -5,6 +5,8 @@ practice for day-to-day development and release packaging.
 
 Workflow file: `.github/workflows/build-braidlab-packages.yml`
 
+Config knobs reference: `devel/release-config.md`
+
 ## What the CI pipeline does
 
 At a high level, CI does three things:
@@ -32,6 +34,9 @@ This is the practical model to run CI long-term:
 
 Manual runs can override the pinned MATLAB release via input
 `matlab_release` (default `R2024b`).
+
+All pinned/overridable workflow values are documented in
+`devel/release-config.md`.
 
 ### Recommended trigger configuration
 
@@ -215,6 +220,19 @@ If local MATLAB tests do not find braidlab:
 - Keep `compat_latest` non-blocking, or promote to required later?
 - How often to bump the default pinned MATLAB release from `R2024b`?
 
+## Where to change pinned values
+
+For maintainers, use `devel/release-config.md` as the source of truth for:
+
+- what values are pinned,
+- which repository variables can override them, and
+- what to bump during a release cycle.
+
+When changing CI defaults, update both:
+
+1. `.github/workflows/build-braidlab-packages.yml`
+2. `devel/release-config.md`
+
 ---
 
 If you want, this file can be split into:
@@ -261,14 +279,13 @@ If you want, this file can be split into:
 
 - Q: Lots of things are hardwired in YAML (versions, etc.). Is that a problem?
   A: Some pinning is intentional for reproducibility, but you are right that
-  hardcoding should be minimized. Good split:
-  - Keep pinned defaults in one place (`env` at top of workflow), e.g.
-    `BRAIDLAB_RELEASE_MATLAB`.
-  - Keep dynamic values derived at runtime (tag version, commit SHA, arch).
-  - Move values likely to change into workflow inputs (manual dispatch) or
-    repository variables for maintainers.
-  Recommended near-term cleanup:
-  - Add comments near each pinned value explaining why it is pinned.
-  - Avoid duplicating literals in multiple steps.
-  - Consider a tiny `devel/release-config.md` documenting what to bump per
-    release cycle.
+  hardcoding should be minimized. This is now implemented:
+  - Pinned defaults are centralized in workflow `env`.
+  - Dynamic values remain runtime-derived (tag version, commit SHA, arch).
+  - Maintainer overrides are available via workflow input and repository
+    variables.
+  - `devel/release-config.md` documents what to bump and where.
+
+## Open questions
+
+- Q: Is there a way to run the testsuite through `ctest`?

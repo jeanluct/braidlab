@@ -1,8 +1,18 @@
 name: Build Braidlab Packages
 
+permissions:
+  contents: read
+
+concurrency:
+  # Avoid burning runner minutes on superseded commits for the same ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
+      # Temporary branch scope while CI migration settles.
+      # Switch this to master/develop (or equivalent) when ready.
       - iss163-continuous-integration-github
     tags:
       - "release-*"
@@ -22,6 +32,7 @@ env:
   BRAIDLAB_RELEASE_MATLAB_DEFAULT: R2024b
   BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT: '12'
   BRAIDLAB_LATEX_PACKAGES_DEFAULT: texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make
+  BRAIDLAB_BUILD_PARALLEL_DEFAULT: '4'
 
   # Release lanes use a pinned MATLAB version for reproducible archives.
   # Resolution order:
@@ -31,6 +42,8 @@ env:
   BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || env.BRAIDLAB_COMPAT_GCC_MAJOR_DEFAULT }}
   # Docs toolchain packages.
   BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || env.BRAIDLAB_LATEX_PACKAGES_DEFAULT }}
+  # Build parallelism for CMake builds.
+  BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || env.BRAIDLAB_BUILD_PARALLEL_DEFAULT }}
 
 jobs:
   docs_pdf:
@@ -102,7 +115,7 @@ jobs:
 
       - name: Build CMake targets
         shell: bash
-        run: cmake --build build --config Release -j 4
+        run: cmake --build build --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
 
       - name: Install staged package
         shell: bash
@@ -119,6 +132,7 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
+            % Keep CI lightweight here: sanity-check package load and key MEX calls.
             root = getenv('MW_ORIG_WORKING_FOLDER');
             stageRoot = fullfile(root,'stage');
             if ismac
@@ -165,6 +179,7 @@ jobs:
           # Include distribution metadata and tests in package output.
           cp README.md LICENSE COPYING CHANGELOG.md stage/
           cp -a testsuite stage/
+          PACKAGE_PATHS="+braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
 
           {
             echo "commit=${GITHUB_SHA}"
@@ -177,10 +192,10 @@ jobs:
 
           if [ "${{ matrix.archive_ext }}" = "tar.gz" ]; then
             ARCHIVE_NAME="${BASE_NAME}.tar.gz"
-            tar -C stage -czf "${ARCHIVE_NAME}" +braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md
+            tar -C stage -czf "${ARCHIVE_NAME}" ${PACKAGE_PATHS}
           else
             ARCHIVE_NAME="${BASE_NAME}.zip"
-            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip +braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md
+            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip ${PACKAGE_PATHS}
           fi
 
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
@@ -218,7 +233,7 @@ jobs:
 
       - name: Build CMake targets
         shell: bash
-        run: cmake --build build-compat --config Release -j 4
+        run: cmake --build build-compat --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
 
       - name: MATLAB smoke test
         uses: matlab-actions/run-command@v2
