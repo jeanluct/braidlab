@@ -59,6 +59,8 @@ function(braidlab_add_mex target source install_dir)
   # Force legacy MEX API mode so generated binaries do not depend on
   # C++ Data API/Engine runtime libraries that are not consistently present
   # across GitHub-hosted MATLAB installations (notably macOS arm64).
+  # Also disable implicit MATLAB library linkage and link explicitly to
+  # mex/mx so MEX targets do not accidentally pick up Engine/DataArray libs.
   matlab_add_mex(
     NAME ${target}
     SRC ${source}
