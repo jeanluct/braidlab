@@ -729,8 +729,9 @@ void PairCrossings::run( size_t NThreadsRequested ) {
 Strings::Strings( mwIndex _N ) {
 
   Nstrings = _N;
-  locationToColor.reserve(_N);
-  colorToLocation.reserve(_N);
+  // reserve() only sets capacity; resize() is required before indexed writes.
+  locationToColor.resize(_N);
+  colorToLocation.resize(_N);
 
   for (mwIndex i = 0; i < _N; i++ ) {
     locationToColor[i] = i;
