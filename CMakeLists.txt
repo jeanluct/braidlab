@@ -26,6 +26,13 @@ cmake_minimum_required(VERSION 3.20)
 
 project(braidlab LANGUAGES C CXX)
 
+# Match the Makefile workflow's optimized default build behavior.
+# On single-config generators (e.g., Ninja/Unix Makefiles), an empty
+# CMAKE_BUILD_TYPE means no optimization flags, which can slow the MEX tests.
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 11)
