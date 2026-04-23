@@ -1,10 +1,23 @@
 # Issue 162 Plan: CMake Conversion
 
+Status: Active, largely implemented (Apr 2026)
+
 ## Objective
 
 Introduce a CMake build system for braidlab MEX components and supporting native libraries while preserving current behavior and output layout.
 
 This conversion is valuable independent of final CI hosting model.
+
+## Current State Snapshot
+
+- Root `CMakeLists.txt` exists and builds all baseline MEX targets.
+- CMake install layout matches package-relative MATLAB paths.
+- Local in-place install flow is documented and used:
+  - `cmake -S . -B build`
+  - `cmake --build build -j`
+  - `cmake --install build --prefix .`
+- Single-config build default now falls back to `Release` for performance parity.
+- `doc/Makefile distclean` portability cleanup landed and is compatible with CMake-era docs flow.
 
 ## Why This Exists
 
@@ -27,6 +40,10 @@ Out of scope:
 - Altering MATLAB runtime behavior or algorithm semantics.
 - Release automation details (handled in issue 163 plan).
 - Reintroducing committed PDF artifacts into git history.
+
+Follow-on scope now tracked elsewhere:
+
+- Optional static GMP linkage investigation (issue #165).
 
 ## Existing Build Inventory (Target Baseline)
 
@@ -102,6 +119,11 @@ Native static libraries:
 - If possible, compare built module list against Makefile-produced module list.
 - Verify CMake doc target can build the latest PDF when explicitly invoked.
 
+Validation status:
+
+- Build/install/smoke validation: passed on active conversion branch.
+- Full testsuite parity: currently manual via MATLAB command; CTest integration remains optional follow-up.
+
 ## Success Criteria
 
 All must be true:
@@ -124,14 +146,28 @@ All must be true:
 
 ## Task Checklist
 
-- [ ] Confirm issue number and branch name.
-- [ ] Add root CMake scaffolding.
-- [ ] Add cbraid and trains library targets.
-- [ ] Add MEX targets for each current output.
-- [ ] Add install rules for staged package layout.
-- [ ] Update documentation for CMake usage.
-- [ ] Run Linux validation build and smoke checks.
+- [x] Confirm issue number and branch name.
+- [x] Add root CMake scaffolding.
+- [x] Add cbraid and trains library targets.
+- [x] Add MEX targets for each current output.
+- [x] Add install rules for staged package layout.
+- [x] Update documentation for CMake usage.
+- [x] Run Linux validation build and smoke checks.
 - [ ] Open PR with mapping table (Make target -> CMake target).
+
+## Backports and Related Commits
+
+- `0eecd36` fixed a runtime bug in `cross2gen_helper.hpp` (reserve/resize) and was cherry-picked to `develop`.
+- `258e438` set single-config CMake default build type to `Release`.
+- `e8a8750` fixed `doc/Makefile` `distclean` behavior.
+
+## Further Work Candidates
+
+- Add optional CTest integration for full MATLAB testsuite execution.
+  - Add `enable_testing()` and a guarded full-testsuite test invocation.
+  - Gate behind a CMake option (for example `BRAIDLAB_ENABLE_FULL_TESTSUITE`) so local default remains fast.
+- Keep Makefile wrapper compatibility as migration convenience.
+  - Preserve `make`, `make clean`, and `make install` ergonomics while delegating to CMake where feasible.
 
 ## Exit Decision
 
