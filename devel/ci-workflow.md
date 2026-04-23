@@ -38,6 +38,69 @@ Manual runs can override the pinned MATLAB release via input
 All pinned/overridable workflow values are documented in
 `devel/release-config.md`.
 
+## Manual runs and overrides
+
+Use manual runs when you want to validate packaging behavior without pushing a
+new commit.
+
+### Run manually from GitHub UI
+
+1. Open repository -> `Actions` -> `Build Braidlab Packages`.
+2. Click `Run workflow`.
+3. Select the branch to run.
+4. Set `matlab_release` if you want to override the pinned MATLAB for this run.
+5. Start the run and inspect `release_pinned` artifacts when complete.
+
+### Run manually from CLI
+
+From repository root:
+
+```bash
+gh workflow run build-braidlab-packages.yml --ref master -f matlab_release=R2024b
+```
+
+Track runs:
+
+```bash
+gh run list --workflow "Build Braidlab Packages"
+gh run watch <run-id>
+```
+
+### Override precedence (important)
+
+For `BRAIDLAB_RELEASE_MATLAB`, the workflow resolves values in this order:
+
+1. Manual input `matlab_release` (workflow_dispatch only)
+2. Repository variable `BRAIDLAB_RELEASE_MATLAB`
+3. Workflow default `BRAIDLAB_RELEASE_MATLAB_DEFAULT`
+
+For other knobs there is no manual input currently, so precedence is:
+
+1. Repository variable
+2. Workflow default
+
+Current repository-variable override knobs:
+
+- `BRAIDLAB_RELEASE_MATLAB`
+- `BRAIDLAB_COMPAT_GCC_MAJOR`
+- `BRAIDLAB_LATEX_PACKAGES`
+- `BRAIDLAB_BUILD_PARALLEL`
+
+Set these under:
+
+- `Settings` -> `Secrets and variables` -> `Actions` -> `Variables`
+
+### Practical examples
+
+- One-off test against a newer MATLAB without changing defaults:
+  - Run manually with `matlab_release=R2025a`.
+- Team-wide pin update for routine runs:
+  - Set repo variable `BRAIDLAB_RELEASE_MATLAB=R2025a`.
+- Slow or overloaded runners:
+  - Reduce `BRAIDLAB_BUILD_PARALLEL` to `2`.
+- Toolchain refresh in compat lane:
+  - Set `BRAIDLAB_COMPAT_GCC_MAJOR=13` and watch compat results.
+
 ### Recommended trigger configuration
 
 Use this shape once workflow validation on the issue branch is complete:
