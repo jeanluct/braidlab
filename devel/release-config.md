@@ -46,6 +46,34 @@ For values that support overrides, resolution is:
 - GCC compat pin: bump only when needed for ABI/runtime changes.
 - LaTeX package list: keep minimal and stable.
 
+## Package flavor and GMP linkage (issue #165)
+
+The `release_pinned` job builds two flavors per OS, controlled by
+`BRAIDLAB_GMP_LINKAGE` in the matrix rather than by a repository
+variable:
+
+- `default` flavor: `BRAIDLAB_GMP_LINKAGE=bundled`.  GMP shared
+  libraries are bundled inside the archive, co-located with the
+  GMP-using MEX files in `+braidlab/@braid/private/`.  Built on every
+  push to `develop`/`master`, on PRs, and on release tags.
+- `no-gmp` flavor: `BRAIDLAB_GMP_LINKAGE=off`.  GMP-using code paths
+  are compiled out.  Built only on `refs/tags/release-*` to keep CI
+  minutes contained.
+
+These values are intentionally not exposed as repository variables;
+they describe the shipped artifacts and changing them per build would
+defeat reproducibility.  To change the flavor lineup, edit the matrix
+directly in `.github/workflows/build-braidlab-packages.yml`.
+
+GMP install sources used in CI per OS:
+
+- Linux: `apt-get install libgmp-dev libgmpxx4ldbl libgmp10`.
+- macOS: `brew install gmp`.
+- Windows: `vcpkg install gmp:x64-windows`.
+
+A future `static` value for `BRAIDLAB_GMP_LINKAGE` is reserved but not
+implemented; CMake currently rejects it at configure time.
+
 ## Notes
 
 - Keep pins centralized in workflow `env` and avoid duplicating literals in

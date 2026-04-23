@@ -308,3 +308,17 @@ order of operations:
   GMP layout simplified to co-locate libs with the GMP-using MEX
   files (`+braidlab/@braid/private/`) on all three OSes, replacing
   the earlier `+braidlab/private/_lib/` proposal.
+- 2026-04-23: Phase A landed (commit `39f3823`).  CMake-only changes:
+  `BRAIDLAB_GMP_LINKAGE` option, `BRAIDLAB_USE_GMP` alias, GMP-not-found
+  `FATAL_ERROR` with per-OS hints, SONAME-resolving install rules for
+  bundled mode, and macOS install_name_tool fix-up.  Validated locally
+  on Ubuntu 24 + MATLAB R2025a.
+- 2026-04-23: Phase B drafted.  Workflow updated with per-OS GMP
+  install steps (apt/brew/vcpkg), `flavor` matrix dimension producing
+  `default` (bundled) and tag-gated `no-gmp` archives, per-OS
+  bundled-layout verification (`ldd`/`otool`/PowerShell), GMP-using
+  smoke-test code path (`braid.entropy`), `flavor`/`gmp_linkage`
+  fields in `BUILD-MANIFEST.txt`, and triggers switched from the
+  iss163 branch to `develop`/`master`.  `compat_latest` left on the
+  `BRAIDLAB_USE_GMP=ON` alias.  Awaiting first CI run on `develop` to
+  validate macOS install_name_tool block and Windows vcpkg path.

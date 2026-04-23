@@ -11,9 +11,10 @@ concurrency:
 on:
   push:
     branches:
-      # Temporary branch scope while CI migration settles.
-      # Switch this to master/develop (or equivalent) when ready.
-      - iss163-continuous-integration-github
+      - develop
+      - master
+      # TODO: remove before merging iss165 to develop.
+      - iss165-GMP-portability
     tags:
       - "release-*"
   pull_request:
@@ -70,23 +71,48 @@ jobs:
           if-no-files-found: error
 
   release_pinned:
-    name: Build Package (${{ matrix.os }})
+    name: Build Package (${{ matrix.os }}, ${{ matrix.flavor }})
     runs-on: ${{ matrix.os }}
     needs: docs_pdf
+    # Skip the no-gmp flavor on non-tag builds to keep CI minutes contained.
+    if: ${{ matrix.flavor != 'no-gmp' || startsWith(github.ref, 'refs/tags/release-') }}
     strategy:
       fail-fast: false
       matrix:
         include:
+          # Default flavor: GMP bundled into the archive.
           # Linux token includes distro baseline per artifact naming policy.
           - os: ubuntu-22.04
             platform_token: linux-ubuntu-22.04
             archive_ext: tar.gz
+            flavor: default
+            gmp_linkage: bundled
           - os: macos-latest
             platform_token: macos
             archive_ext: zip
+            flavor: default
+            gmp_linkage: bundled
           - os: windows-latest
             platform_token: windows
             archive_ext: zip
+            flavor: default
+            gmp_linkage: bundled
+          # no-gmp flavor: built only on tagged releases (gated below).
+          - os: ubuntu-22.04
+            platform_token: linux-ubuntu-22.04
+            archive_ext: tar.gz
+            flavor: no-gmp
+            gmp_linkage: 'off'
+          - os: macos-latest
+            platform_token: macos
+            archive_ext: zip
+            flavor: no-gmp
+            gmp_linkage: 'off'
+          - os: windows-latest
+            platform_token: windows
+            archive_ext: zip
+            flavor: no-gmp
+            gmp_linkage: 'off'
 
     steps:
       - name: Checkout
@@ -97,21 +123,39 @@ jobs:
         with:
           release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
 
+      - name: Install GMP (Linux, bundled flavor)
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10
+
+      - name: Install GMP (macOS, bundled flavor)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: brew install gmp
+
+      - name: Install GMP (Windows, bundled flavor)
+        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          # vcpkg ships preinstalled on windows-latest runners.
+          vcpkg install gmp:x64-windows
+          # Expose vcpkg toolchain location for the configure step.
+          echo "VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
+
       - name: Configure CMake
         shell: bash
         run: |
-          # macOS runners can differ in Homebrew GMP availability.
-          # If unavailable, build without GMP-dependent code paths.
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            if brew --prefix gmp >/dev/null 2>&1; then
-              GMP_PREFIX="$(brew --prefix gmp)"
-              cmake -S . -B build -DBRAIDLAB_USE_GMP=ON -DCMAKE_PREFIX_PATH="${GMP_PREFIX}"
-            else
-              cmake -S . -B build -DBRAIDLAB_USE_GMP=OFF
-            fi
-          else
-            cmake -S . -B build -DBRAIDLAB_USE_GMP=ON
+          CMAKE_ARGS=(-S . -B build "-DBRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }}")
+          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
+            GMP_PREFIX="$(brew --prefix gmp)"
+            CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=${GMP_PREFIX}")
           fi
+          if [ "${{ runner.os }}" = "Windows" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
+            CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+          fi
+          cmake "${CMAKE_ARGS[@]}"
 
       - name: Build CMake targets
         shell: bash
@@ -127,6 +171,77 @@ jobs:
         with:
           name: docs-pdf
           path: stage/doc
+
+      - name: Verify bundled GMP layout (Linux)
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          PRIV="stage/+braidlab/@braid/private"
+          echo "Contents of ${PRIV}:"
+          ls -la "${PRIV}"
+          for lib in libgmp.so.10 libgmpxx.so.4; do
+            test -f "${PRIV}/${lib}" || { echo "Missing bundled lib: ${lib}"; exit 1; }
+          done
+          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
+            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
+            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
+            echo "--- ldd ${MEX_FILE} ---"
+            ldd "${MEX_FILE}"
+            # Confirm the MEX resolves libgmp to the co-located bundled copy,
+            # not to a system path.
+            RESOLVED=$(ldd "${MEX_FILE}" | awk '/libgmp\.so/ {print $3}')
+            case "${RESOLVED}" in
+              */+braidlab/@braid/private/libgmp.so*) echo "OK: ${mex} -> ${RESOLVED}" ;;
+              *) echo "FAIL: ${mex} resolves libgmp to ${RESOLVED}"; exit 1 ;;
+            esac
+          done
+
+      - name: Verify bundled GMP layout (macOS)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          PRIV="stage/+braidlab/@braid/private"
+          echo "Contents of ${PRIV}:"
+          ls -la "${PRIV}"
+          # Bundled SONAMEs on macOS look like libgmp.10.dylib / libgmpxx.4.dylib.
+          ls "${PRIV}"/libgmp*.dylib >/dev/null || { echo "Missing bundled libgmp dylib"; exit 1; }
+          ls "${PRIV}"/libgmpxx*.dylib >/dev/null || { echo "Missing bundled libgmpxx dylib"; exit 1; }
+          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
+            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
+            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
+            echo "--- otool -L ${MEX_FILE} ---"
+            otool -L "${MEX_FILE}"
+            # Confirm GMP references are rewritten to @loader_path,
+            # not absolute Homebrew paths.
+            if otool -L "${MEX_FILE}" | grep -E '\s+/.*libgmp' >/dev/null; then
+              echo "FAIL: ${mex} still has absolute libgmp reference"
+              otool -L "${MEX_FILE}" | grep libgmp
+              exit 1
+            fi
+            otool -L "${MEX_FILE}" | grep -q '@loader_path/libgmp' || {
+              echo "FAIL: ${mex} missing @loader_path/libgmp reference"; exit 1; }
+          done
+
+      - name: Verify bundled GMP layout (Windows)
+        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+        shell: pwsh
+        run: |
+          $priv = "stage/+braidlab/@braid/private"
+          Write-Host "Contents of ${priv}:"
+          Get-ChildItem $priv
+          $gmpDlls = Get-ChildItem -Path $priv -Filter "libgmp*.dll"
+          if ($gmpDlls.Count -eq 0) {
+            Write-Error "No bundled libgmp DLL found in ${priv}"
+            exit 1
+          }
+          foreach ($mex in @('cross2gen_helper', 'loopsigma_helper', 'entropy_helper')) {
+            $mexFiles = Get-ChildItem -Path $priv -Filter "${mex}.mexw*"
+            if ($mexFiles.Count -eq 0) {
+              Write-Error "Missing MEX: ${mex}"
+              exit 1
+            }
+            Write-Host "Found ${mex}: $($mexFiles[0].Name)"
+          }
 
       - name: MATLAB smoke test
         uses: matlab-actions/run-command@v2
@@ -155,6 +270,17 @@ jobs:
             assert(~isempty(c));
             assert(isfield(t,'tntype'));
             disp(t.tntype);
+            % Exercise a GMP-using code path when GMP is enabled.
+            % entropy() uses the GMP-backed loopsigma_helper on long words.
+            gmpFlavor = '${{ matrix.gmp_linkage }}';
+            if ~strcmp(gmpFlavor, 'off')
+              bLong = braid([1 2 -3 1 -2 3 1 2 -3]);
+              e = bLong.entropy;
+              assert(isfinite(e) && e > 0, 'entropy must be a finite positive number');
+              fprintf('entropy = %g (gmp_linkage=%s)\n', e, gmpFlavor);
+            else
+              fprintf('Skipping GMP-dependent entropy check (gmp_linkage=off)\n');
+            end
 
       - name: Build package archive
         shell: bash
@@ -173,8 +299,11 @@ jobs:
 
           MATLAB_TOKEN="matlab-${BRAIDLAB_RELEASE_MATLAB}"
           # Archive naming standard:
-          # braidlab-<version>_<platform>-<arch>_matlab-<release>
+          # braidlab-<version>_<platform>-<arch>_matlab-<release>[_no-gmp]
           BASE_NAME="braidlab-${VERSION}_${{ matrix.platform_token }}-${ARCH_TOKEN}_${MATLAB_TOKEN}"
+          if [ "${{ matrix.flavor }}" = "no-gmp" ]; then
+            BASE_NAME="${BASE_NAME}_no-gmp"
+          fi
 
           # Include distribution metadata and tests in package output.
           cp README.md LICENSE COPYING CHANGELOG.md stage/
@@ -187,6 +316,8 @@ jobs:
             echo "runner_os=${RUNNER_OS}"
             echo "runner_arch=${RUNNER_ARCH}"
             echo "platform_token=${{ matrix.platform_token }}"
+            echo "flavor=${{ matrix.flavor }}"
+            echo "gmp_linkage=${{ matrix.gmp_linkage }}"
             echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           } > stage/BUILD-MANIFEST.txt
 
