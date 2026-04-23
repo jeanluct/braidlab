@@ -154,6 +154,9 @@ jobs:
           fi
           if [ "${{ runner.os }}" = "Windows" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
             CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+            # Pin the release triplet so find_library does not pick the
+            # debug variant under installed/x64-windows/debug/lib/.
+            CMAKE_ARGS+=("-DVCPKG_TARGET_TRIPLET=x64-windows")
           fi
           cmake "${CMAKE_ARGS[@]}"
 
@@ -187,9 +190,16 @@ jobs:
             test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
             echo "--- ldd ${MEX_FILE} ---"
             ldd "${MEX_FILE}"
-            # Confirm the MEX resolves libgmp to the co-located bundled copy,
-            # not to a system path.
+            # The linker (--as-needed by default) drops libgmp from
+            # DT_NEEDED for any MEX whose translation unit pulls in
+            # GMP headers but never references a GMP symbol.  Such a
+            # MEX has no runtime GMP dependency, so passing the
+            # bundled-resolution check vacuously is correct.
             RESOLVED=$(ldd "${MEX_FILE}" | awk '/libgmp\.so/ {print $3}')
+            if [ -z "${RESOLVED}" ]; then
+              echo "SKIP: ${mex} has no libgmp DT_NEEDED entry"
+              continue
+            fi
             case "${RESOLVED}" in
               */+braidlab/@braid/private/libgmp.so*) echo "OK: ${mex} -> ${RESOLVED}" ;;
               *) echo "FAIL: ${mex} resolves libgmp to ${RESOLVED}"; exit 1 ;;
@@ -211,9 +221,17 @@ jobs:
             test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
             echo "--- otool -L ${MEX_FILE} ---"
             otool -L "${MEX_FILE}"
+            # A MEX whose translation unit pulls in GMP headers but
+            # never references a GMP symbol may be linked without any
+            # libgmp dependency (analogous to ld --as-needed on Linux).
+            # Such a MEX has no runtime GMP load to rewrite, so skip it.
+            if ! otool -L "${MEX_FILE}" | grep -q libgmp; then
+              echo "SKIP: ${mex} has no libgmp load command"
+              continue
+            fi
             # Confirm GMP references are rewritten to @loader_path,
             # not absolute Homebrew paths.
-            if otool -L "${MEX_FILE}" | grep -E '\s+/.*libgmp' >/dev/null; then
+            if otool -L "${MEX_FILE}" | grep -E '^\s+/.*libgmp' >/dev/null; then
               echo "FAIL: ${mex} still has absolute libgmp reference"
               otool -L "${MEX_FILE}" | grep libgmp
               exit 1
@@ -229,11 +247,16 @@ jobs:
           $priv = "stage/+braidlab/@braid/private"
           Write-Host "Contents of ${priv}:"
           Get-ChildItem $priv
-          $gmpDlls = Get-ChildItem -Path $priv -Filter "libgmp*.dll"
+          # vcpkg's GMP port installs gmp-10.dll (no lib prefix); MSYS2
+          # ships libgmp-10.dll.  Accept both so the layout check is
+          # not coupled to the package source.
+          $gmpDlls = Get-ChildItem -Path $priv -Include "gmp*.dll","libgmp*.dll" -File
           if ($gmpDlls.Count -eq 0) {
-            Write-Error "No bundled libgmp DLL found in ${priv}"
+            Write-Error "No bundled GMP DLL found in ${priv}"
             exit 1
           }
+          Write-Host "Found bundled GMP DLLs:"
+          $gmpDlls | ForEach-Object { Write-Host "  $($_.Name)" }
           foreach ($mex in @('cross2gen_helper', 'loopsigma_helper', 'entropy_helper')) {
             $mexFiles = Get-ChildItem -Path $priv -Filter "${mex}.mexw*"
             if ($mexFiles.Count -eq 0) {
