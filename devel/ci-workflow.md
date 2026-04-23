@@ -109,7 +109,7 @@ Use this shape once workflow validation on the issue branch is complete:
 on:
   push:
     branches:
-      - main
+      - master
       # - develop   # optional
     tags:
       - "release-*"

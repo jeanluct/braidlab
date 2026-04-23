@@ -34,6 +34,12 @@ For values that support overrides, resolution is:
 - Repository variable (optional): `BRAIDLAB_LATEX_PACKAGES`.
 - Workflow default: `texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make`.
 
+`BRAIDLAB_BUILD_PARALLEL`
+
+- Purpose: `-j` parallelism used by CMake build steps in release and compat lanes.
+- Repository variable (optional): `BRAIDLAB_BUILD_PARALLEL`.
+- Workflow default: `4`.
+
 ## Recommended maintenance cadence
 
 - MATLAB pin: bump intentionally when validating a new release cycle.
