@@ -237,6 +237,9 @@ Recommended merge order:
 
 - Windows GMP source: **vcpkg** vs **MSYS2 mingw64**?  Decision affects
   toolchain compatibility with MATLAB MEX on `windows-latest`.
+  Working assumption: start with **vcpkg** (`vcpkg install
+  gmp:x64-windows`) and adjust empirically if MEX load fails on
+  Windows.
 - `BRAIDLAB_GMP_LINKAGE` value names: `system|bundled|static|off` vs
   `dynamic|bundled|static|off`.  Current plan uses `system|bundled|...`
   because `system` more clearly contrasts with `bundled` along the
@@ -244,6 +247,27 @@ Recommended merge order:
 - Linux baseline upgrade: keep `ubuntu-22.04` until end of support, or
   proactively introduce a second `ubuntu-24.04` baseline lane?  Default
   plan: stay on 22.04 for now; revisit when 22.04 nears EOL.
+
+## Implementation sequencing
+
+This plan is gated on the prior CI work landing first.  Recommended
+order of operations:
+
+1. Finish and merge `iss163-continuous-integration-github` into
+   `develop`.
+2. Rebase `iss165-GMP-portability` onto the new `develop` tip.
+3. Implement in two phases on the rebased branch:
+   - **Phase A — CMake only.**  Locally testable, no CI dependency.
+     Adds `BRAIDLAB_GMP_LINKAGE`, the `BRAIDLAB_USE_GMP` alias, the
+     GMP-not-found `FATAL_ERROR` diagnostic, and the `bundled`-mode
+     install rules (rpath/install-name handling per OS).  Validate
+     locally with `-DBRAIDLAB_GMP_LINKAGE=bundled` and `ldd`.
+   - **Phase B — Workflow.**  Requires the iss163 workflow file to be
+     present on the integration target.  Adds the per-OS GMP install
+     steps, the flavor matrix, archive-naming changes, manifest
+     `gmp_linkage` field, and the smoke-test dependency checks.
+     Discover Windows GMP issues empirically here rather than via a
+     pre-implementation spike.
 
 ## Acceptance criteria
 
