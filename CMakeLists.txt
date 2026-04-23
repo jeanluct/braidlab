@@ -211,6 +211,41 @@ if(BRAIDLAB_GMP_LINKAGE STREQUAL "system" OR BRAIDLAB_GMP_LINKAGE STREQUAL "bund
         "${BRAIDLAB_GMP_LIBRARY}" REALPATH)
       get_filename_component(BRAIDLAB_GMPXX_LIBRARY_REAL
         "${BRAIDLAB_GMPXX_LIBRARY}" REALPATH)
+
+      if(WIN32)
+        # find_library on Windows returns the .lib import library
+        # (e.g. C:/vcpkg/installed/x64-windows/lib/gmp.lib), but the
+        # runtime artefact we need to bundle is the matching .dll
+        # (e.g. .../bin/gmp-10.dll).  Locate it by walking up to the
+        # vcpkg installation prefix and globbing the bin/ directory
+        # for a DLL whose basename starts with the import library's
+        # basename.
+        function(_braidlab_resolve_runtime_dll lib_path out_var)
+          get_filename_component(_lib_dir "${lib_path}" DIRECTORY)
+          get_filename_component(_prefix  "${_lib_dir}" DIRECTORY)
+          get_filename_component(_lib_stem "${lib_path}" NAME_WE)
+          file(GLOB _candidates
+            "${_prefix}/bin/${_lib_stem}.dll"
+            "${_prefix}/bin/${_lib_stem}-*.dll"
+            "${_prefix}/bin/lib${_lib_stem}.dll"
+            "${_prefix}/bin/lib${_lib_stem}-*.dll")
+          list(LENGTH _candidates _n)
+          if(_n EQUAL 0)
+            message(FATAL_ERROR
+              "BRAIDLAB_GMP_LINKAGE=bundled on Windows: could not find "
+              "runtime DLL for ${lib_path} in ${_prefix}/bin/.  "
+              "Check that the vcpkg port installs gmp:x64-windows "
+              "(release variant), not just the debug variant.")
+          endif()
+          list(GET _candidates 0 _dll)
+          set(${out_var} "${_dll}" PARENT_SCOPE)
+        endfunction()
+        _braidlab_resolve_runtime_dll(
+          "${BRAIDLAB_GMP_LIBRARY_REAL}"   BRAIDLAB_GMP_LIBRARY_REAL)
+        _braidlab_resolve_runtime_dll(
+          "${BRAIDLAB_GMPXX_LIBRARY_REAL}" BRAIDLAB_GMPXX_LIBRARY_REAL)
+      endif()
+
       list(APPEND BRAIDLAB_GMP_BUNDLE_FILES
         "${BRAIDLAB_GMP_LIBRARY_REAL}" "${BRAIDLAB_GMPXX_LIBRARY_REAL}")
 
@@ -389,6 +424,14 @@ if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
   # time because the MEX files were linked against absolute Homebrew
   # paths and need to be patched in the staged tree, not the build
   # tree.
+  #
+  # The MEX records the path Homebrew advertised at link time
+  # (typically /opt/homebrew/opt/gmp/lib/libgmp.10.dylib, the
+  # versionless symlink), which differs from the realpath we used
+  # for install(FILES) (/opt/homebrew/Cellar/gmp/<version>/...).
+  # `install_name_tool -change` requires an exact match of the OLD
+  # string, so we discover the actual recorded reference at install
+  # time with otool and use that.
   if(APPLE)
     install(CODE "
       set(_gmp_dir \"\${CMAKE_INSTALL_PREFIX}/${BRAIDLAB_DIR_BRAID_PRIVATE}\")
@@ -397,15 +440,35 @@ if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
       foreach(_mex ${BRAIDLAB_GMP_MEX_TARGETS})
         file(GLOB _mex_files \"\${_gmp_dir}/\${_mex}.mex*\")
         foreach(_mex_file \${_mex_files})
-          execute_process(COMMAND install_name_tool
-            -change \"${BRAIDLAB_GMP_LIBRARY_REAL}\"   \"@loader_path/\${_gmp_name}\"
-            -change \"${BRAIDLAB_GMPXX_LIBRARY_REAL}\" \"@loader_path/\${_gmpxx_name}\"
-            \"\${_mex_file}\")
+          execute_process(COMMAND otool -L \"\${_mex_file}\"
+            OUTPUT_VARIABLE _otool_out OUTPUT_STRIP_TRAILING_WHITESPACE)
+          string(REGEX MATCHALL \"[^\\n\\t ]*libgmp[^\\n\\t ]*\\\\.dylib\"
+            _gmp_refs \"\${_otool_out}\")
+          foreach(_gmp_ref \${_gmp_refs})
+            if(_gmp_ref MATCHES \"libgmpxx\")
+              execute_process(COMMAND install_name_tool
+                -change \"\${_gmp_ref}\" \"@loader_path/\${_gmpxx_name}\"
+                \"\${_mex_file}\")
+            else()
+              execute_process(COMMAND install_name_tool
+                -change \"\${_gmp_ref}\" \"@loader_path/\${_gmp_name}\"
+                \"\${_mex_file}\")
+            endif()
+          endforeach()
         endforeach()
       endforeach()
-      execute_process(COMMAND install_name_tool
-        -change \"${BRAIDLAB_GMP_LIBRARY_REAL}\" \"@loader_path/\${_gmp_name}\"
-        \"\${_gmp_dir}/\${_gmpxx_name}\")
+      # libgmpxx itself depends on libgmp; rewrite that reference too.
+      execute_process(COMMAND otool -L \"\${_gmp_dir}/\${_gmpxx_name}\"
+        OUTPUT_VARIABLE _otool_out OUTPUT_STRIP_TRAILING_WHITESPACE)
+      string(REGEX MATCHALL \"[^\\n\\t ]*libgmp[^\\n\\t ]*\\\\.dylib\"
+        _gmp_refs \"\${_otool_out}\")
+      foreach(_gmp_ref \${_gmp_refs})
+        if(NOT _gmp_ref MATCHES \"libgmpxx\")
+          execute_process(COMMAND install_name_tool
+            -change \"\${_gmp_ref}\" \"@loader_path/\${_gmp_name}\"
+            \"\${_gmp_dir}/\${_gmpxx_name}\")
+        endif()
+      endforeach()
       execute_process(COMMAND install_name_tool -id \"@loader_path/\${_gmp_name}\"
         \"\${_gmp_dir}/\${_gmp_name}\")
       execute_process(COMMAND install_name_tool -id \"@loader_path/\${_gmpxx_name}\"
