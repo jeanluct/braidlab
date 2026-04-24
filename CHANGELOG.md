@@ -3,6 +3,8 @@
 
 ## [Unreleased][unreleased]
 
+* Move `doc/examples/` to top-level `examples/`.
+
 * Bugfix: `cross2gen_helper.hpp` used `reserve` rather than `resize`.
 
 ## [3.3] - 2026-03-22

@@ -27,7 +27,7 @@ classdef taffyTest < matlab.unittest.TestCase
   methods (TestClassSetup)
     function addExampleFolderToPath(testCase)
       % The taffy routine is in the examples folder.
-      testCase.addTeardown(@path, addpath(fullfile(pwd, '../../doc/examples')));
+      testCase.addTeardown(@path, addpath(fullfile(pwd, '../../examples')));
     end
   end
 

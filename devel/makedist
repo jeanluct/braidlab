@@ -54,7 +54,7 @@ ${TARCMD} cvzf ${BLNAME}.tar.gz "${TARFLAGS[@]}" \
     extern/README \
     extern/VariablePrecisionIntegers \
     doc/braidlab_guide.pdf \
-    doc/examples
+    examples
 
 # Also make a zip.
 mkdir tmp-zip

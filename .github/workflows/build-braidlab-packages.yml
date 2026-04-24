@@ -175,6 +175,12 @@ jobs:
           test -f stage/extern/VariablePrecisionIntegers/@vpi/vpi.m \
             || { echo "VPI not staged"; ls -R stage/extern || true; exit 1; }
 
+      - name: Verify examples bundled in stage
+        shell: bash
+        run: |
+          test -f stage/examples/taffy.m || { echo "taffy.m not staged"; ls stage/examples || true; exit 1; }
+          test -f stage/examples/arrow.m || { echo "arrow.m not staged"; ls stage/examples || true; exit 1; }
+
       - name: Download guide PDF
         uses: actions/download-artifact@v8
         with:
@@ -370,7 +376,7 @@ jobs:
           # Include distribution metadata and tests in package output.
           cp README.md LICENSE COPYING CHANGELOG.md stage/
           cp -a testsuite stage/
-          PACKAGE_PATHS="+braidlab extern doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
+          PACKAGE_PATHS="+braidlab extern examples doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
 
           {
             echo "commit=${GITHUB_SHA}"

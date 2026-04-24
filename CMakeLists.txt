@@ -198,6 +198,14 @@ install(
   PATTERN "*.asv" EXCLUDE
 )
 
+# Bundle runnable user-facing examples.  The taffy testcase depends on
+# examples/taffy.m (which itself uses examples/arrow.m).
+install(
+  DIRECTORY "${CMAKE_SOURCE_DIR}/examples"
+  DESTINATION "."
+  FILES_MATCHING PATTERN "*.m"
+)
+
 set(CBRAID_SOURCES
   extern/cbraid/lib/cbraid.cpp
   extern/cbraid/lib/braiding.cpp
