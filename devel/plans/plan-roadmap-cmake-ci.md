@@ -11,9 +11,12 @@ This roadmap is split into issue-driven plans to keep scope controlled and to su
 - `iss161-ci-matlab-probe`
 - `iss162-cmake-conversion`
 - `iss163-continuous-integration-github`
-- `iss165-static-gmp-linking`
+- `iss165-GMP-portability`
 
-Issue #165 was added later to track optional static GMP linkage investigation.
+Issue #165 was added later to track GMP runtime portability for
+distributed binary archives (originally scoped to a static-linking
+investigation; the implemented solution bundles GMP shared libraries
+inside the archive instead).
 
 ## Stacking Strategy
 
@@ -32,6 +35,10 @@ Rationale:
 - `iss161` goals were completed and fed into `iss162`/`iss163`.
 - `iss162` established CMake-based MEX build/install flow.
 - `iss163` established package workflow, smoke tests, and artifact assembly.
+- `iss165` shipped GMP runtime portability via bundling (default
+  flavor co-locates GMP shared libraries with the GMP-using MEX
+  files; an opt-in `no-gmp` flavor is also produced per OS).
+  Validated on Linux/macOS/Windows in CI; ready to merge to develop.
 - Cross-branch backports already applied:
   - `0eecd36` (cross2gen vector init bug fix) was cherry-picked to `develop`.
   - `e8a8750` and `258e438` were cherry-picked to `iss162`.
@@ -114,4 +121,3 @@ Status: In progress (docs mostly in place, trigger policy still pending).
 
 - Final `push` branch trigger set (`master` only vs `master` + `develop`).
 - Whether to add full MATLAB testsuite via CTest lane in CI (beyond smoke tests).
-- Whether to implement optional static GMP linkage mode (tracked in issue #165).
