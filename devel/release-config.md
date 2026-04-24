@@ -57,8 +57,12 @@ variable:
   GMP-using MEX files in `+braidlab/@braid/private/`.  Built on every
   push to `develop`/`master`, on PRs, and on release tags.
 - `no-gmp` flavor: `BRAIDLAB_GMP_LINKAGE=off`.  GMP-using code paths
-  are compiled out.  Built only on `refs/tags/release-*` to keep CI
-  minutes contained.
+  are compiled out.  Built on every push (not gated on release tags)
+  so GMP-free build regressions surface immediately; the no-gmp jobs
+  are cheap because they skip the GMP install and bundled-layout
+  verification steps.  (An earlier plan gated this on
+  `refs/tags/release-*`, but `matrix` context is not allowed in
+  job-level `if` conditions, so the gate was dropped.)
 
 These values are intentionally not exposed as repository variables;
 they describe the shipped artifacts and changing them per build would

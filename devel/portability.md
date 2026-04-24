@@ -49,6 +49,18 @@ braidlab-<version>_<platform>-<arch>_matlab-<release>.<ext>
 Each archive ships with `BUILD-MANIFEST.txt` recording commit, MATLAB
 release, runner OS/arch, and timestamp.
 
+Archives also bundle the supporting MATLAB code that braidlab needs at
+runtime, so that a fresh extraction is self-contained:
+
+- `extern/VariablePrecisionIntegers/` — John D'Errico's VPI toolbox,
+  required by braidlab's arbitrary-precision MATLAB code paths.
+- `examples/` — top-level example scripts referenced by the guide and
+  testsuite (moved from `doc/examples/` in this release cycle).
+
+For the default flavor, GMP runtime libraries are co-located with the
+GMP-using MEX files in `+braidlab/@braid/private/`; see "Dimension 2:
+GMP" below.
+
 ## Dimension 1: MATLAB version compatibility
 
 `CMakeLists.txt` uses:

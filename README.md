@@ -4,15 +4,20 @@
 
 ### installation
 
-The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file.
+The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file and add the resulting folder to your Matlab path.  The archive is self-contained: it bundles the documentation PDF, testsuite, examples, and the [Variable Precision Integers][11] toolbox.
 
-To compile from source, you can still use the Makefile build (`make`) or the CMake build:
+Two binary flavors are produced for each platform:
+
+- **default** — GMP runtime libraries (arbitrary precision arithmetic) are bundled inside the archive.  No GMP install is required on your system.
+- **`_no-gmp`** — GMP is compiled out, for environments where GMP cannot be used.  Other functionality is unaffected.
+
+To compile from source, you can use either the legacy Makefile build (`make`) or the CMake build:
 ```
 cmake -S . -B build
 cmake --build build -j
 cmake --install build --prefix .
 ```
-In many setups CMake auto-detects the Matlab installation (including MEX toolchain/libraries).  If it does not, pass `-DMatlab_ROOT_DIR=/path/to/MATLAB/R20XXx` to the `cmake -S` command above.
+In many setups CMake auto-detects the Matlab installation (including MEX toolchain/libraries).  If it does not, pass `-DMatlab_ROOT_DIR=/path/to/MATLAB/R20XXx` to the `cmake -S` command above.  For a GMP-free local build, add `-DBRAIDLAB_GMP_LINKAGE=off`.
 
 ### example and documentation
 
@@ -39,7 +44,7 @@ The train track map associated with the braid's mapping class is
 ```
 where numbers denote peripheral edges, and letters main edges.
 
-*braidlab* can do much more; see the [*braidlab* user's guide][5] in the `doc` folder for many examples.  The guide is also posted on [arXiv][6].  For detailed installation instructions from source files, see the Appendix in the guide.
+*braidlab* can do much more; see the [*braidlab* user's guide][5] in the `doc` folder for many examples, and the standalone scripts in the `examples` folder.  The guide is also posted on [arXiv][6].  For detailed installation instructions from source files, see the Appendix in the guide.
 
 ### citing *braidlab*
 

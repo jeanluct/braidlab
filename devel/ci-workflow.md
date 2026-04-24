@@ -17,7 +17,12 @@ At a high level, CI does three things:
 
 The release/package jobs produce archives that include:
 
-- `+braidlab/`
+- `+braidlab/` (with bundled GMP runtime libraries co-located in
+  `+braidlab/@braid/private/` for the default flavor)
+- `extern/VariablePrecisionIntegers/` (John D'Errico's VPI toolbox,
+  required by braidlab's arbitrary-precision MATLAB code paths)
+- `examples/` (top-level example scripts referenced by the guide and
+  testsuite)
 - `doc/braidlab_guide.pdf`
 - `testsuite/` (copied as-is)
 - `README.md`, `LICENSE`, `COPYING`, `CHANGELOG.md`
@@ -188,7 +193,8 @@ Key implementation details:
 - Runs a MATLAB smoke test against the staged install; the smoke test
   exercises a GMP-backed code path (`braidlab.braid.entropy`) on every
   flavor where GMP is enabled.
-- Copies metadata + `testsuite/` into `stage/`.
+- Copies metadata + `testsuite/` + `examples/` +
+  `extern/VariablePrecisionIntegers/` into `stage/`.
 - Writes `BUILD-MANIFEST.txt` with commit/release/platform/flavor
   metadata, including the `flavor` and `gmp_linkage` fields.
 - Archives selected directories/files from `stage/`.

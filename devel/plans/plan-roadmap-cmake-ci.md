@@ -11,9 +11,12 @@ This roadmap is split into issue-driven plans to keep scope controlled and to su
 - `iss161-ci-matlab-probe`
 - `iss162-cmake-conversion`
 - `iss163-continuous-integration-github`
-- `iss165-static-gmp-linking`
+- `iss165-GMP-portability`
 
-Issue #165 was added later to track optional static GMP linkage investigation.
+Issue #165 was added later to track GMP runtime portability for
+distributed binary archives (originally scoped to a static-linking
+investigation; the implemented solution bundles GMP shared libraries
+inside the archive instead).
 
 ## Stacking Strategy
 

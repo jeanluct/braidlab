@@ -3,7 +3,29 @@
 
 ## [Unreleased][unreleased]
 
-* Move `doc/examples/` to top-level `examples/`.
+* Build system: add a CMake build alongside the legacy Makefiles
+  (issue #162).  `cmake -S . -B build && cmake --build build -j &&
+  cmake --install build --prefix .` reproduces the in-place install
+  that `make` produced.
+
+* Continuous integration: GitHub Actions workflow builds packaged binary
+  archives for Linux, macOS, and Windows on every push and PR (issue #163).
+  Verify the bundled-binary layout run quick MATLAB tests to check GMP code
+  path on every flavor.
+
+* GMP portability: distributable archives now ship in two flavors
+  (issue #165):
+  - `default`: GMP runtime libraries bundled inside the archive,
+    co-located with the GMP-using MEX files in
+    `+braidlab/@braid/private/`.  Users do not need GMP installed.
+  - `no-gmp`: GMP-using code paths compiled out, for environments
+    where GMP cannot be used.
+  CMake controls this via `BRAIDLAB_GMP_LINKAGE=system|bundled|off`;
+  the legacy `BRAIDLAB_USE_GMP=ON|OFF` continues to work as an alias
+  for local builds.
+
+* Move `doc/examples/` to top-level `examples/`, and bundle it inside
+  distributable archives.
 
 * Bugfix: `cross2gen_helper.hpp` used `reserve` rather than `resize`.
 
@@ -435,7 +457,7 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...develop
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.3...develop
 [3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
 [3.2.5]: https://github.com/jeanluct/braidlab/compare/release-3.2.4...release-3.2.5

@@ -331,3 +331,20 @@ order of operations:
   (b) `matrix` context is not allowed in job-level `if` — dropped the
   tag-gate and now run the `no-gmp` flavor on every push (cheap and
   catches GMP-free regressions early).
+- 2026-04-24: stabilization pass after observing CI on all three OSes.
+  Workflow fixes: macOS uses `/opt/homebrew/opt/gmp` symlink (stable
+  across Homebrew GMP version bumps); Windows DLL discovery handles
+  vcpkg's tools/ layout and pins the vcpkg triplet; PowerShell
+  `Get-ChildItem -Include` bug worked around with `-Filter` for the
+  bundled-layout audit; action major versions bumped for Node 24
+  compatibility (`actions/checkout@v5`, `actions/upload-artifact@v5`,
+  `actions/cache@v4`).  Linux MEX linkage switched to
+  `-Wl,--no-as-needed -l:libmex.so -l:libmx.so` so DT_NEEDED records
+  bare basenames instead of absolute `/opt/hostedtoolcache/...` paths
+  (which made the binaries non-portable across MATLAB install
+  locations); regression check added to CI.  Distribution now also
+  bundles the VPI toolbox under `extern/VariablePrecisionIntegers/`
+  and the top-level `examples/` directory (moved from `doc/examples/`),
+  so testsuite runs cleanly on a fresh extraction with no extra
+  downloads.  Smoke test extended with `checkvpi()` to fail fast if
+  the VPI bundle is missing.
