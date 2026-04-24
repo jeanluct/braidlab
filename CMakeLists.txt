@@ -111,7 +111,41 @@ function(braidlab_add_mex target source install_dir)
     NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
   )
 
-  target_link_libraries(${target} Matlab::mex Matlab::mx)
+  # Link to MATLAB's MEX runtime libraries.  On Linux we cannot use
+  # the imported targets Matlab::mex / Matlab::mx directly: their
+  # IMPORTED_LOCATION is an absolute path (e.g.
+  # /opt/hostedtoolcache/MATLAB/<ver>/x64/bin/glnxa64/libmex.so) and
+  # libmex.so / libmx.so do not declare a SONAME, so the linker
+  # records the full absolute path verbatim in DT_NEEDED.  That path
+  # is then baked into every shipped MEX file and only resolves on
+  # the exact machine that built it; users hit
+  #   "Invalid MEX-file '...': /opt/.../libmex.so: cannot open shared
+  #    object file: No such file or directory"
+  # The pre-CMake build used the mex script, which links via
+  # -L<dir> -lmex -lmx and records bare basenames in DT_NEEDED;
+  # MATLAB's loader then injects matlabroot/bin/glnxa64 into the
+  # search path at MEX-load time and the basenames resolve correctly.
+  # We reproduce that behaviour with -l:libmex.so / -l:libmx.so
+  # (GNU ld syntax that forces an exact-name lookup and records the
+  # file's name, not its path, in DT_NEEDED).
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    get_target_property(_braidlab_libmex_path Matlab::mex IMPORTED_LOCATION)
+    get_filename_component(_braidlab_matlab_libdir "${_braidlab_libmex_path}" DIRECTORY)
+    # -Wl,--no-as-needed forces DT_NEEDED entries to be retained even
+    # when the linker thinks the library is unused (mexFunction is
+    # called from MATLAB via dlsym, so the linker cannot see the
+    # API references).  -l:libNAME.so records the bare basename in
+    # DT_NEEDED instead of the absolute path that find_library
+    # returned.
+    target_link_options(${target} PRIVATE
+      "-L${_braidlab_matlab_libdir}"
+      "-Wl,--no-as-needed"
+      "-l:libmex.so"
+      "-l:libmx.so"
+      "-Wl,--as-needed")
+  else()
+    target_link_libraries(${target} Matlab::mex Matlab::mx)
+  endif()
 
   if(BLM_INCLUDE_DIRS)
     target_include_directories(${target} PRIVATE ${BLM_INCLUDE_DIRS})
