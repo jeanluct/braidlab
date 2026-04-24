@@ -13,8 +13,6 @@ on:
     branches:
       - develop
       - master
-      # TODO: remove before merging iss165 to develop.
-      - iss165-GMP-portability
     tags:
       - "release-*"
   pull_request:
