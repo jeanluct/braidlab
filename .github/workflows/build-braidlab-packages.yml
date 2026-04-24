@@ -169,6 +169,12 @@ jobs:
         # Assemble the final package layout in an isolated staging folder.
         run: cmake --install build --prefix stage --config Release
 
+      - name: Verify VPI bundled in stage
+        shell: bash
+        run: |
+          test -f stage/extern/VariablePrecisionIntegers/@vpi/vpi.m \
+            || { echo "VPI not staged"; ls -R stage/extern || true; exit 1; }
+
       - name: Download guide PDF
         uses: actions/download-artifact@v8
         with:
@@ -322,6 +328,10 @@ jobs:
             assert(~isempty(c));
             assert(isfield(t,'tntype'));
             disp(t.tntype);
+            % Confirm the bundled Variable Precision Integers library is
+            % discoverable via the documented helper.
+            braidlab.util.checkvpi();
+            assert(exist('vpi','file') > 0, 'vpi class not on path after checkvpi');
             % Exercise a GMP-using code path when GMP is enabled.
             % entropy() uses the GMP-backed loopsigma_helper on long words.
             gmpFlavor = '${{ matrix.gmp_linkage }}';
@@ -360,7 +370,7 @@ jobs:
           # Include distribution metadata and tests in package output.
           cp README.md LICENSE COPYING CHANGELOG.md stage/
           cp -a testsuite stage/
-          PACKAGE_PATHS="+braidlab doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
+          PACKAGE_PATHS="+braidlab extern doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
 
           {
             echo "commit=${GITHUB_SHA}"

@@ -187,6 +187,17 @@ install(
     PATTERN "*.mat"
 )
 
+# Bundle the Variable Precision Integers (VPI) library so that
+# braidlab.util.checkvpi can locate it at runtime in the binary
+# distribution.  VPI is pure MATLAB code (John D'Errico, FEX 22725)
+# used as the .m-layer arbitrary-precision integer type for loop
+# coordinates (see loop.loop, braid.loopcoords).
+install(
+  DIRECTORY "${CMAKE_SOURCE_DIR}/extern/VariablePrecisionIntegers"
+  DESTINATION "extern"
+  PATTERN "*.asv" EXCLUDE
+)
+
 set(CBRAID_SOURCES
   extern/cbraid/lib/cbraid.cpp
   extern/cbraid/lib/braiding.cpp
