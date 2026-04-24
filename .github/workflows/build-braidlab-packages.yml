@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install LaTeX tools
         run: |
@@ -64,7 +64,7 @@ jobs:
         run: make -C doc braidlab_guide.pdf
 
       - name: Upload guide PDF artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs-pdf
           path: doc/braidlab_guide.pdf
@@ -116,10 +116,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup MATLAB (release-pinned)
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
         with:
           release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
 
@@ -170,7 +170,7 @@ jobs:
         run: cmake --install build --prefix stage --config Release
 
       - name: Download guide PDF
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docs-pdf
           path: stage/doc
@@ -271,7 +271,7 @@ jobs:
           }
 
       - name: MATLAB smoke test
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: |
             % Keep CI lightweight here: sanity-check package load and key MEX calls.
@@ -359,7 +359,7 @@ jobs:
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
 
       - name: Upload packaged artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARCHIVE_NAME }}
           path: ${{ env.ARCHIVE_NAME }}
@@ -372,10 +372,10 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup MATLAB (latest available)
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
 
       - name: Install GCC toolchain
         shell: bash
@@ -394,7 +394,7 @@ jobs:
         run: cmake --build build-compat --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
 
       - name: MATLAB smoke test
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: |
             root = getenv('MW_ORIG_WORKING_FOLDER');
