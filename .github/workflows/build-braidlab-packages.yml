@@ -249,8 +249,12 @@ jobs:
           Get-ChildItem $priv
           # vcpkg's GMP port installs gmp-10.dll (no lib prefix); MSYS2
           # ships libgmp-10.dll.  Accept both so the layout check is
-          # not coupled to the package source.
-          $gmpDlls = Get-ChildItem -Path $priv -Include "gmp*.dll","libgmp*.dll" -File
+          # not coupled to the package source.  Note: Get-ChildItem's
+          # -Include filter is a silent no-op unless the -Path argument
+          # contains a wildcard (or -Recurse is set), so append \* to
+          # the directory path rather than using -Filter (which takes
+          # only a single pattern).
+          $gmpDlls = Get-ChildItem -Path "$priv\*" -Include "gmp*.dll","libgmp*.dll" -File
           if ($gmpDlls.Count -eq 0) {
             Write-Error "No bundled GMP DLL found in ${priv}"
             exit 1
