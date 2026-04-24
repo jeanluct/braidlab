@@ -242,20 +242,20 @@ Recommended merge order:
 2. Rebase iss165 onto the new tip.
 3. iss165 → master (or develop).
 
-## Open questions
+## Open questions (resolved)
 
-- Windows GMP source: **vcpkg** vs **MSYS2 mingw64**?  Decision affects
-  toolchain compatibility with MATLAB MEX on `windows-latest`.
-  Working assumption: start with **vcpkg** (`vcpkg install
-  gmp:x64-windows`) and adjust empirically if MEX load fails on
-  Windows.
+- Windows GMP source: **vcpkg** vs **MSYS2 mingw64**?  Resolved:
+  shipped with **vcpkg** (`vcpkg install gmp:x64-windows`), with the
+  vcpkg release triplet pinned in CI for reproducibility.  MEX load
+  on `windows-latest` works against the bundled `libgmp-*.dll` /
+  `libgmpxx-*.dll` co-located in `+braidlab/@braid/private/`.
 - `BRAIDLAB_GMP_LINKAGE` value names: `system|bundled|static|off` vs
-  `dynamic|bundled|static|off`.  Current plan uses `system|bundled|...`
-  because `system` more clearly contrasts with `bundled` along the
-  end-user-relevant axis.
+  `dynamic|bundled|static|off`.  Resolved: shipped as
+  `system|bundled|off` (with `static` reserved as an unimplemented
+  opt-in that CMake rejects at configure time).
 - Linux baseline upgrade: keep `ubuntu-22.04` until end of support, or
-  proactively introduce a second `ubuntu-24.04` baseline lane?  Default
-  plan: stay on 22.04 for now; revisit when 22.04 nears EOL.
+  proactively introduce a second `ubuntu-24.04` baseline lane?
+  Deferred: staying on 22.04 for now; revisit when 22.04 nears EOL.
 
 ## Implementation sequencing
 
