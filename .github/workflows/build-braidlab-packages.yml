@@ -175,6 +175,31 @@ jobs:
           name: docs-pdf
           path: stage/doc
 
+      - name: Verify MATLAB library references (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          # Regression check: every MEX must record libmex.so and
+          # libmx.so as bare basenames in DT_NEEDED, never as absolute
+          # paths.  An absolute path such as
+          #   /opt/hostedtoolcache/MATLAB/.../libmex.so
+          # is portable only on the build machine; users on different
+          # MATLAB installs see "Invalid MEX-file: ... cannot open
+          # shared object file: No such file or directory".
+          PRIV="stage/+braidlab/@braid/private"
+          fail=0
+          for mex_file in "${PRIV}"/*.mexa64; do
+            echo "--- ${mex_file} ---"
+            readelf -d "${mex_file}" | grep '(NEEDED)' || true
+            for lib in libmex.so libmx.so; do
+              if readelf -d "${mex_file}" | grep -E "\(NEEDED\).*\[/.*${lib}\]" >/dev/null; then
+                echo "FAIL: ${mex_file} records absolute path to ${lib}"
+                fail=1
+              fi
+            done
+          done
+          test "${fail}" -eq 0 || exit 1
+
       - name: Verify bundled GMP layout (Linux)
         if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
         shell: bash
