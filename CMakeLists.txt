@@ -177,34 +177,9 @@ function(braidlab_add_mex_rel target relative_source install_dir)
   braidlab_add_mex(${target} "${CMAKE_SOURCE_DIR}/${relative_source}" "${install_dir}" ${ARGN})
 endfunction()
 
-# Install MATLAB source files so staged artifacts are directly usable after
-# adding the staging root to MATLAB path.
-install(
-  DIRECTORY "${CMAKE_SOURCE_DIR}/+braidlab/"
-  DESTINATION "+braidlab"
-  FILES_MATCHING
-    PATTERN "*.m"
-    PATTERN "*.mat"
-)
-
-# Bundle the Variable Precision Integers (VPI) library so that
-# braidlab.util.checkvpi can locate it at runtime in the binary
-# distribution.  VPI is pure MATLAB code (John D'Errico, FEX 22725)
-# used as the .m-layer arbitrary-precision integer type for loop
-# coordinates (see loop.loop, braid.loopcoords).
-install(
-  DIRECTORY "${CMAKE_SOURCE_DIR}/extern/VariablePrecisionIntegers"
-  DESTINATION "extern"
-  PATTERN "*.asv" EXCLUDE
-)
-
-# Bundle runnable user-facing examples.  The taffy testcase depends on
-# examples/taffy.m (which itself uses examples/arrow.m).
-install(
-  DIRECTORY "${CMAKE_SOURCE_DIR}/examples"
-  DESTINATION "."
-  FILES_MATCHING PATTERN "*.m"
-)
+# Packaging install rules for non-MEX assets (.m sources, VPI, examples).
+# See cmake/BraidlabPackage.cmake for the rationale.
+include(cmake/BraidlabPackage.cmake)
 
 set(CBRAID_SOURCES
   extern/cbraid/lib/cbraid.cpp
