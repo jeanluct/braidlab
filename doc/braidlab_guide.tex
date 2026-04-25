@@ -2501,22 +2501,10 @@ to use it.  If you're lucky, this could be as easy as typing
   language=bash,backgroundcolor=\color{white}]
 $ mex -setup cpp
 \end{lstlisting}
-but typically this will just lead to Matlab using the wrong compiler anyways.
-In that case you can try and download
-\href{https://github.com/jeanluct/braidlab/raw/develop/devel/gcc-alternatives}{this
-  script}, then run it:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ bash ./gcc-alternatives
-\end{lstlisting}
-You will be prompted for your password (assuming you have administrator
-privileges), and then asked to select a compiler version.  You should then be
-able to compile \braidlab.  You can later switch back to your original
-compiler with the command
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo update-alternatives --config gcc
-\end{lstlisting}
+For most systems this is enough.  If Matlab still chooses the wrong compiler,
+open Matlab and run \texttt{mex -setup cpp} again to choose a supported
+compiler explicitly.  See also the MathWorks compiler support page for your
+Matlab release.
 
 \index{GCC compiler|)}%
 \index{Linux|)}%
