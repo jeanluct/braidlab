@@ -17,4 +17,4 @@ Methods and features not yet covered in the guide:
 - `@cfbraid` class
 - loop pre-allocation (see `devel/test/loop_speedtest`)
 - `format loose/compact`
-- several options of `braid.entropy`
+- several options of `braid.entropy`, including optional return value
