@@ -5,7 +5,7 @@ practice for day-to-day development and release packaging.
 
 Workflow file: `.github/workflows/build-braidlab-packages.yml`
 
-Config knobs reference: `devel/release-config.md`
+Config knobs reference: `devel/RELEASE-CONFIG.md`
 
 ## What the CI pipeline does
 
@@ -42,7 +42,7 @@ Manual runs can override the pinned MATLAB release via input
 `matlab_release` (default `R2024b`).
 
 All pinned/overridable workflow values are documented in
-`devel/release-config.md`.
+`devel/RELEASE-CONFIG.md`.
 
 ## Manual runs and overrides
 
@@ -319,7 +319,7 @@ If local MATLAB tests do not find braidlab:
 
 ## Where to change pinned values
 
-For maintainers, use `devel/release-config.md` as the source of truth for:
+For maintainers, use `devel/RELEASE-CONFIG.md` as the source of truth for:
 
 - what values are pinned,
 - which repository variables can override them, and
@@ -328,7 +328,7 @@ For maintainers, use `devel/release-config.md` as the source of truth for:
 When changing CI defaults, update both:
 
 1. `.github/workflows/build-braidlab-packages.yml`
-2. `devel/release-config.md`
+2. `devel/RELEASE-CONFIG.md`
 
 ---
 
@@ -383,7 +383,7 @@ If you want, this file can be split into:
   - Dynamic values remain runtime-derived (tag version, commit SHA, arch).
   - Maintainer overrides are available via workflow input and repository
     variables.
-  - `devel/release-config.md` documents what to bump and where.
+  - `devel/RELEASE-CONFIG.md` documents what to bump and where.
 
 - Q: Is there a way to run the testsuite through `ctest`?
   A: Yes. The clean approach is to add a CTest test that shells out to MATLAB

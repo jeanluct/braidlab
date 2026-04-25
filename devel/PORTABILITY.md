@@ -8,8 +8,8 @@ run them.  It covers MATLAB version compatibility, native dependencies
 
 Companion documents:
 
-- `devel/ci-workflow.md` — operational use of the workflow.
-- `devel/release-config.md` — what is pinned and how to override it.
+- `devel/CI-WORKFLOW.md` — operational use of the workflow.
+- `devel/RELEASE-CONFIG.md` — what is pinned and how to override it.
 
 ## Summary recommendation
 
@@ -284,7 +284,7 @@ repository for bundling:
 | Install rules (loader-name renames, post-install rewrites) | ~25 | Co-locate libs and patch install names |
 | MATLAB smoke tests                | ~10           | Confirm bundled MEX loads inside MATLAB             |
 | Archive naming and metadata       | ~10           | `-bundled` / `-system` suffixes, manifest fields    |
-| `devel/portability.md` and plans  | ~80           | Documentation of the design and its caveats         |
+| `devel/PORTABILITY.md` and plans  | ~80           | Documentation of the design and its caveats         |
 
 ### Conceptual costs
 

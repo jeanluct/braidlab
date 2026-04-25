@@ -8,10 +8,10 @@ requiring the user to install GMP themselves.
 
 Companion documents:
 
-- `devel/portability.md` — analysis of CI portability and recommended
+- `devel/PORTABILITY.md` — analysis of CI portability and recommended
   policy.
-- `devel/ci-workflow.md` — operational use of the CI workflow.
-- `devel/release-config.md` — pinned values and override knobs.
+- `devel/CI-WORKFLOW.md` — operational use of the CI workflow.
+- `devel/RELEASE-CONFIG.md` — pinned values and override knobs.
 - `devel/plans/plan-iss163-continuous-integration-github.md` — CI work
   this branch builds on.
 - `devel/plans/plan-iss162-cmake-conversion.md` — CMake migration work.
@@ -27,7 +27,7 @@ The GMP-using MEX targets are:
 - `+braidlab/@braid/private/loopsigma_helper`
 - `+braidlab/@braid/private/entropy_helper`
 
-Per `devel/portability.md`, GMP is the only realistic portability hazard
+Per `devel/PORTABILITY.md`, GMP is the only realistic portability hazard
 for distributed archives:
 
 - Linux: GMP is widely available (`libgmp10`, `libgmpxx4ldbl`) on
@@ -56,7 +56,7 @@ non-deterministic with respect to feature set.
   dependency or who use a stripped environment.
 - Static GMP linking remains a **deferred optional**: kept as a
   documented build-system option, not the default, for the reasons in
-  `devel/portability.md` (LGPL relink obligations, larger binaries,
+  `devel/PORTABILITY.md` (LGPL relink obligations, larger binaries,
   per-platform maintenance overhead).
 - Make the GMP policy a **first-class build flavor** rather than an
   environment-detected fallback, so artifacts are deterministic for a
@@ -292,7 +292,7 @@ order of operations:
   one GMP-using code path on every flavor.
 - README updated with runtime requirements per flavor and per OS, plus
   install hints mirroring the CMake diagnostic.
-- `devel/ci-workflow.md` and `devel/release-config.md` updated with the
+- `devel/CI-WORKFLOW.md` and `devel/RELEASE-CONFIG.md` updated with the
   new flavor knobs.
 - Local developer build behavior (default `system` linkage) confirmed
   unchanged from today.

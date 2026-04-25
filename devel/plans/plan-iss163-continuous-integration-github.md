@@ -17,8 +17,8 @@ Current workflow file:
 
 Operational docs:
 
-- `devel/ci-workflow.md`
-- `devel/release-config.md`
+- `devel/CI-WORKFLOW.md`
+- `devel/RELEASE-CONFIG.md`
 
 ## Scope
 

@@ -92,15 +92,15 @@ Status: In progress (docs mostly in place, trigger policy still pending).
 2. Top-level CMake build merged with full MEX target coverage.
 3. Matrix artifact workflow merged and tested on tagged or manually triggered runs.
 4. Runtime bug fix (`cross2gen_helper.hpp` reserve/resize) backported to `develop`.
-5. CI config centralization documented (`devel/release-config.md`) and linked from CI workflow guide.
+5. CI config centralization documented (`devel/RELEASE-CONFIG.md`) and linked from CI workflow guide.
 
 ## Supporting Plan Files
 
 - `devel/plans/plan-iss161-ci-matlab-probe.md`
 - `devel/plans/plan-iss162-cmake-conversion.md`
 - `devel/plans/plan-iss163-continuous-integration-github.md`
-- `devel/ci-workflow.md`
-- `devel/release-config.md`
+- `devel/CI-WORKFLOW.md`
+- `devel/RELEASE-CONFIG.md`
 
 ## Compatibility Policy (Working Assumption)
 
