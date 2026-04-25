@@ -358,11 +358,11 @@ If you want, this file can be split into:
 
 - Q: Can we make the Makefile system a wrapper for CMake? It would be nice if
   `make clean; make` still worked.
-  A: Yes. That is a good migration path and keeps developer muscle memory.
-  Recommended behavior for top-level `Makefile` wrapper targets:
+  A: Yes. This is now implemented to keep developer muscle memory.
+  Current behavior for top-level `Makefile` wrapper targets:
   - `make` / `make all` -> `cmake -S . -B build` then `cmake --build build -j`
-  - `make install` -> `cmake --install build --prefix .`
-  - `make clean` -> `cmake --build build --target clean`
+  - `make install` -> configure/build if needed, then `cmake --install build --prefix .`
+  - `make clean` -> `cmake --build build --target clean` (if `build/` exists)
   - `make distclean` -> remove `build/` and generated doc artifacts
   This lets legacy commands work while the actual build logic lives in CMake.
 
