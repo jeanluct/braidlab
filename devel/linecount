@@ -33,6 +33,15 @@ for i in $REVLIST; do
     if [ -e 'doc' ]; then
 	CODEFOLDERS="$CODEFOLDERS doc"
     fi
+    if [ -e 'examples' ]; then
+	CODEFOLDERS="$CODEFOLDERS examples"
+    fi
+    if [ -e '.github' ]; then
+	CODEFOLDERS="$CODEFOLDERS .github"
+    fi
+    if [ -e 'cmake' ]; then
+	CODEFOLDERS="$CODEFOLDERS cmake"
+    fi
     LINES=`find $CODEFOLDERS \
 	-name '*.[cm]' -o -name '*.?pp' -o -name '*.tex' -o -name '*.bib' \
 	| xargs wc -l | tail -1 | sed 's/ total$//g'`
@@ -41,14 +50,23 @@ for i in $REVLIST; do
     if [ -e '+braidlab/private/assignmentoptimal.c' ]; then
 	LINES=$(($LINES-441))
     fi
+    # assignmentoptimal.m is part of +braidlab/+util, but is extern.
+    # subtract its linecount (235) if the file is present.
+    if [ -e '+braidlab/+util/assignmentoptimal.m' ]; then
+	LINES=$(($LINES-235))
+    fi
     # arrow.m is included as part of examples, but is extern.
-    if [ -e 'examples/arrow.m' ]; then
+    # subtract its linecount (1410) if the file is present.
+    if [ -e 'examples/arrow.m' ] || [ -e 'doc/examples/arrow.m' ]; then
 	LINES=$(($LINES-1410))
     fi
     # The date is in UTC seconds.
     DATE=`git log -1 --format=%ct $i`
     SHORTHASH=`git log -1 --format=%h $i`
-    echo $SHORTHASH '\t' $DATE '\t' $LINES >> $LINECOUNTFILE
+    # There are a lot of 0 results.  Investigate at some point.
+    if [ "$LINES" -gt 0 ]; then
+	echo $SHORTHASH '\t' $DATE '\t' $LINES >> $LINECOUNTFILE
+    fi
 done
 
 cd /tmp
