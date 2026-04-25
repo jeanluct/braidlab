@@ -263,3 +263,74 @@ The three-job design itself is appropriate; redesign is not warranted.
   GMP on macOS/Windows plus a `no-gmp` flavor.
 - Workflow weight: appropriate.  Optimization leverage is in caching
   and scheduling, not in restructuring the workflow.
+
+## Complexity cost of GMP bundling
+
+The bundled-GMP approach delivered by issue #165 solves a real user
+problem (no system GMP required on macOS or Windows), but it is worth
+recording honestly how much project complexity it added so future
+maintainers can weigh the trade-off.
+
+### Where the complexity lives
+
+Roughly 420 lines of supporting infrastructure were added across the
+repository for bundling:
+
+| Area                              | Approx. lines | Purpose                                              |
+| --------------------------------- | ------------- | ---------------------------------------------------- |
+| `CMakeLists.txt`                  | ~150          | GMP discovery, runtime resolution, install/rpath    |
+| CI verify steps (per OS)          | ~120          | Inspect packaged MEX files for correct linkage      |
+| CI matrix expansion               | ~25 YAML      | Doubled job count from 3 → 6 (system + bundled)     |
+| Install rules (loader-name renames, post-install rewrites) | ~25 | Co-locate libs and patch install names |
+| MATLAB smoke tests                | ~10           | Confirm bundled MEX loads inside MATLAB             |
+| Archive naming and metadata       | ~10           | `-bundled` / `-system` suffixes, manifest fields    |
+| `devel/portability.md` and plans  | ~80           | Documentation of the design and its caveats         |
+
+### Conceptual costs
+
+Three orthogonal bundling mechanisms must be maintained in parallel,
+one per platform:
+
+- Linux: `$ORIGIN` rpath on each MEX file.
+- macOS: `@loader_path` rpath plus `install_name_tool` rewriting of
+  the bundled `libgmp.10.dylib` install name during the install step.
+- Windows: DLL co-location next to the MEX file, with vcpkg-resolved
+  runtime DLLs copied into the install tree.
+
+Several non-obvious interactions complicate the picture:
+
+- The linker's `--as-needed` behavior drops `DT_NEEDED libgmp` for
+  translation units that include GMP headers but never call any GMP
+  symbol.  CI verify steps must therefore branch on "skip if no
+  `DT_NEEDED` entry" rather than asserting the bundled library is
+  always referenced.
+- On Linux, MATLAB pre-loads `libgnutls.so.30`, which transitively
+  pulls in the system `libgmp.so.10` before any braidlab MEX is
+  loaded.  The bundled `libgmp` is therefore shadowed by the system
+  one inside MATLAB on Linux.  Linux bundling is defense-in-depth
+  only; the practical benefit is on macOS and Windows.
+- The vcpkg triplet (`x64-windows`) is hard-coded in CI.  Adding
+  ARM64 Windows support later will require revisiting the bundling
+  pipeline, not just the build matrix.
+- GMP is LGPL-3+, not GPL.  Dynamic linking with a co-located shared
+  library is the comfortable path; static linking would impose
+  redistribution obligations (object files or relinking ability for
+  end users), which is why `BRAIDLAB_GMP_LINKAGE=static` is reserved
+  but unimplemented.
+
+### What dropping bundling would save
+
+If a future maintainer decides the trade-off no longer pays off, the
+mechanically removable scope is roughly:
+
+- The `bundled` branch of `BRAIDLAB_GMP_LINKAGE` and all install /
+  rpath / `install_name_tool` logic gated by it.
+- The bundled lanes of the CI matrix and their verify steps.
+- The `-bundled` archive flavor and manifest fields.
+
+What would remain: a single `system`-mode build that requires users
+on macOS and Windows to install GMP themselves (Homebrew, vcpkg, or
+manual), as was the case before issue #165.  The bundling code is
+written so this rollback is a contained excision rather than a
+rewrite — see the separation of bundling logic into its own CMake
+module.
