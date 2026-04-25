@@ -31,33 +31,33 @@ CMAKE ?= cmake
 BUILD_DIR ?= build
 PREFIX ?= .
 
-# Best-effort parallelism for wrapper builds.
+# Best-effort parallelism for CMake-backed builds.
 NPROC := $(shell command -v nproc >/dev/null 2>&1 && nproc || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
 
 .PHONY: all configure install clean distclean doc
 
 all: configure
-	$(CMAKE) --build $(BUILD_DIR) -j $(NPROC)
+	MAKEFLAGS= $(CMAKE) --build $(BUILD_DIR) --parallel $(NPROC)
 
 configure:
 	$(CMAKE) -S . -B $(BUILD_DIR)
 
 install: configure
-	$(CMAKE) --build $(BUILD_DIR) -j $(NPROC)
+	MAKEFLAGS= $(CMAKE) --build $(BUILD_DIR) --parallel $(NPROC)
 	$(CMAKE) --install $(BUILD_DIR) --prefix $(PREFIX)
 
 clean:
-	@if [ -d "$(BUILD_DIR)" ]; then \
-	  $(CMAKE) --build $(BUILD_DIR) --target clean; \
-	fi
-	$(MAKE) -C doc clean
+ifneq ("$(wildcard $(BUILD_DIR))","")
+	MAKEFLAGS= $(CMAKE) --build $(BUILD_DIR) --target clean
+endif
+	+$(MAKE) -C doc clean
 
 distclean:
 	# This removes build trees and generated doc output, but does not
 	# remove binaries previously installed via `make install -- PREFIX=...`.
 	# A fresh CMake configure/build still starts from scratch after distclean.
 	rm -rf $(BUILD_DIR) CMakeCache.txt CMakeFiles
-	$(MAKE) -C doc distclean
+	+$(MAKE) -C doc distclean
 
 doc:
-	$(MAKE) -C doc
+	+$(MAKE) -C doc
