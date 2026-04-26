@@ -11,7 +11,8 @@ function b = knot2braid(K)
 %
 %   The braid representatives were originally obtained from
 %     http://homepages.warwick.ac.uk/~maaac/images/knot_braid_rep.jpg
-%   which is now a broken link, so may differ.
+%   which is now a broken link.  A local verions is here:
+%     https://github.com/jeanluct/braidlab/raw/develop/devel/resources/knot_braid_rep.jpg
 %
 %   See also ALEXPOLY, BRAID.
 

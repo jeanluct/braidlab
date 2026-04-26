@@ -5,11 +5,12 @@ subfolder.  Credits and licenses are in each library's subfolder.
 
 ### assignmentoptimal
 
-`assignmentoptimal` is obtained from http://www.mathworks.com/matlabcentral/fileexchange/6543.  The compiled mex file is copied to the folder `+braidlab/private`. (Version 2011-07-05)
+`assignmentoptimal` is obtained from https://www.mathworks.com/matlabcentral/fileexchange/6543.  The compiled mex file is copied to the folder `+braidlab/private`. (Version 2011-07-05)
 
 ### VPI
 
-`VariablePrecisionIntegers` is obtained from http://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic. The functions not used by braidlab are not included. (Version 31 Jul 2013)
+`VariablePrecisionIntegers` is obtained from
+https://www.mathworks.com/matlabcentral/fileexchange/22725-variable-precision-integer-arithmetic. The functions not used by braidlab are not included. (Version 31 Jul 2013)
 
 ### CBraid
 
@@ -17,12 +18,12 @@ subfolder.  Credits and licenses are in each library's subfolder.
 ```sh
   git checkout cbraid-branch; git pull # pull changes from remote cbraid-remote
   git checkout develop
-  git merge --squash -s recursive -Xsubtree=extern/cbraid --no-commit --allow-unrelated-histories cbraid-branch
+  # first time only (if histories are still unrelated):
+  git merge -s recursive -Xsubtree=extern/cbraid --allow-unrelated-histories cbraid-branch
+  # subsequent updates:
+  git merge -s recursive -Xsubtree=extern/cbraid cbraid-branch
 ```
-See [Subtree Merging](http://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).
-
-This seems a bit broken now: I had to add --allow-unrelated-histories,
-but Git seems to create a squash commit of everything each time.
+See [Subtree Merging](https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).
 
 ### Trains
 
@@ -31,9 +32,9 @@ in a separate branch [`trains-branch`](https://github.com/jeanluct/braidlab/tree
 ```sh
   git checkout trains-branch; git pull # pull changes from remote trains-remote
   git checkout develop
-  git merge --squash -s recursive -Xsubtree=extern/trains --no-commit --allow-unrelated-histories trains-branch
+  # first time only (if histories are still unrelated):
+  git merge -s recursive -Xsubtree=extern/trains --allow-unrelated-histories trains-branch
+  # subsequent updates:
+  git merge -s recursive -Xsubtree=extern/trains trains-branch
 ```
-See [Subtree Merging](http://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).
-
-This seems a bit broken now: I had to add --allow-unrelated-histories,
-but Git seems to create a squash commit of everything each time.
+See [Subtree Merging](https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging).

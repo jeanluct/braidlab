@@ -195,9 +195,9 @@ void BallotSequence(sint16 n, cln::cl_I k, sint8* s)
     s[1] = 1;
     s[2*i] = -1;
     if (i > 1)
-        BallotSequence(i-1, d.quotient, s+1);
+        BallotSequence(i-1, d.quotient+1, s+1);
     if (i < n)
-        BallotSequence(n-i, d.remainder, s+2*i);
+        BallotSequence(n-i, d.remainder+1, s+2*i);
 }
 
 

@@ -1,17 +1,17 @@
 OBJSOURCES = \
-    Batch.cpp \
-    braid.cpp \
-    edgevert.cpp \
-    embedding.cpp \
-    General.cpp \
-    Graphalg.cpp \
-    graph.cpp \
-    Graphset.cpp \
-    Graputil.cpp \
-    help.cpp \
-    hshoe.cpp \
-    Matrix.cpp \
-    ttt.cpp
+	Batch.cpp \
+	braid.cpp \
+	edgevert.cpp \
+	embedding.cpp \
+	General.cpp \
+	Graphalg.cpp \
+	graph.cpp \
+	Graphset.cpp \
+	Graputil.cpp \
+	help.cpp \
+	hshoe.cpp \
+	Matrix.cpp \
+	ttt.cpp
 
 SRCDIR = .
 
