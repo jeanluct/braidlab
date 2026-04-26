@@ -2315,7 +2315,7 @@ $ tar xvzf braidlab-<version>.tar.gz
 A binary might still work even if the operating system and Matlab versions
 don't match exactly.
 
-For Mac OS~X, there is a version compiled without
+For macOS there is a version compiled without
 \href{https://gmplib.org/}{GMP} (the GNU MultiPrecision library) %
 \index{GMP}%
 since it is a bit tricky to install (see Section~\ref{sec:gmp}).
@@ -2328,11 +2328,11 @@ $ sudo apt-get install libgmp-dev
 After you install the binaries you must set the Matlab path as described in
 Section~\ref{sec:path}.
 
-\index{OS X|(}%
-Mac OS~X does not have access to \lstinline{apt} or
+\index{macOS|(}%
+MacOS does not have access to \lstinline{apt} or
 \lstinline{aptitude}. Their functionality is in part reproduced by the %
-\index{Homebrew|see{OS X}}%
-\index{OS X!Homebrew}%
+\index{Homebrew|see{macOS}}%
+\index{macOS!Homebrew}%
 \href{https://brew.sh/}{Homebrew project}. If you install Homebrew, you can
 easily obtain GMP by running
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
@@ -2345,7 +2345,7 @@ sources into system directories, you will likely need to set
 the location of the local Homebrew library storage (see Homebrew
 documentation for further instructions).
 
-\index{OS X|)}%
+\index{macOS|)}%
 
 
 \subsection{Cloning the repository}
@@ -2364,8 +2364,10 @@ assuming Git is installed on your system.  After the cloning finishes type
   language=bash,backgroundcolor=\color{white}]
 $ cd braidlab; make
 \end{lstlisting}
-to compile the MEX files.  (If for some reasone you need to recompile, run
-\lstinline{make clean} first.)  Note that you can still use \braidlab\ even if
+to compile the MEX files.  The \lstinline{make} command is a
+compatibility wrapper around CMake.  (If for some reason you need to
+recompile, run \lstinline{make clean} first.)  Note that you can still use
+\braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly. %
 \index{Matlab!MEX files|)}
@@ -2391,7 +2393,10 @@ MultiPrecision library) is not installed on your system, instead of the above
 use
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ cd braidlab; make BRAIDLAB_USE_GMP=0
+$ cd braidlab
+$ cmake -S . -B build -DBRAIDLAB_GMP_LINKAGE=off
+$ cmake --build build -j
+$ cmake --install build --prefix .
 \end{lstlisting}
 This will slow down some functions, in particular testing for equality of
 large braids.  If you want to install GMP first, see Section~\ref{sec:gmp}.
@@ -2453,12 +2458,11 @@ braidlab.
 If you get a Matlab error about the wrong version of libraries:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-Invalid MEX-file '/home/jeanluc/Projects/articles/braidlab/+braidlab/@braid/private/train_helper.mexa64':
-    /usr/local/MATLAB/R2025a/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
-    (required by /home/jeanluc/Projects/articles/braidlab/+braidlab/@braid/private/train_helper.mexa64)
+Invalid MEX-file '.../+braidlab/@braid/private/train_helper.mexa64':
+    /usr/local/MATLAB/R20XXx/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
 \end{lstlisting}
-then run Matlab from the command-line by specifying the system library
-location:
+then run Matlab from the command-line (\lstinline{bash} shell) by specifying
+the system library location:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab
@@ -2468,43 +2472,20 @@ You may need to adjust the path above for your local configuration.
 \subsubsection{Unsupported compiler}
 
 \index{Linux|(}%
-Linux distributions often use very recent C/C++ compilers that are not yet
-supported by Matlab.  If you get such an error from MEX, %
+Linux distributions often use C/C++ compilers that may not match the one
+supported by your Matlab release.  If you get such an error from MEX, %
 \index{Matlab!MEX files}%
-it will tell you which version of %
+check the MathWorks supported compiler list for your Matlab release and
+install one of them.  Then run %
 \index{GCC compiler|(}%
-GCC it wants.  For example, if it claims it needs GCC 4.7 or earlier, you can
-try
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ which gcc-4.7
-\end{lstlisting}
-to see if a path to the command exists.  If it does, you have an earlier
-compiler installed and you can skip to the next paragraph.  If the
-\lstinline{which} command above didn't return anything, you can try to install
-an older version of GCC:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get install gcc-4.7 g++-4.7
-\end{lstlisting}
-This last line is for Ubuntu and Debian Linux distributions.  Note that this
-will \emph{not} overwrite the default compiler.  If your Linux distribution
-doesn't allow you to easily install the required compiler, you could always
-\href{https://gcc.gnu.org/releases.html}{compile and install it from scratch!}
-That's fairly tedious, though.
-
-Assuming that you now have a Matlab-supported compiler installed, you need to
-tell MEX %
-\index{Matlab!MEX files}%
-to use it.  If you're lucky, this could be as easy as typing
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 $ mex -setup cpp
 \end{lstlisting}
+inside Matlab to choose the compiler explicitly.
 For most systems this is enough.  If Matlab still chooses the wrong compiler,
-open Matlab and run \texttt{mex -setup cpp} again to choose a supported
-compiler explicitly.  See also the MathWorks compiler support page for your
-Matlab release.
+set it again from within Matlab and verify that \lstinline{mex -setup cpp}
+reports a supported compiler.
 
 \index{GCC compiler|)}%
 \index{Linux|)}%
@@ -2523,29 +2504,33 @@ is much slower.
 If you wish to compile \braidlab\ from source using GMP, you first need to
 install GMP (see \ref{sec:precompiled}), and then make the GMP headers
 \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++ compiler that
-Matlab is using. Both the %
+Matlab is using.  In most Linux installations this is automatic once the
+development package is installed.  On macOS with Homebrew, pass
+\lstinline{CMAKE_PREFIX_PATH} so CMake can locate GMP.
+For example: %
+\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
+  language=bash,backgroundcolor=\color{white}]
+$ brew install gmp
+$ cmake -S . -B build -DCMAKE_PREFIX_PATH="$(brew --prefix gmp)"
+$ cmake --build build -j
+$ cmake --install build --prefix .
+\end{lstlisting}
+On Windows, use the vcpkg toolchain (for example
+\lstinline{vcpkg install gmp:x64-windows}) and configure CMake with
+\lstinline{CMAKE_TOOLCHAIN_FILE}.
+
+Both the %
 \index{GCC compiler}%
 GCC compiler (more common on Linux %
 \index{Linux}%
 systems) and %
-\index{Clang compiler|see{OS X}}%
-\index{OS X!Clang compiler}%
-Clang compiler (more common on Mac OS~X systems) %
-\index{OS X}%
-use the environment variable \lstinline{CPLUS_INCLUDE_PATH} to specify path to
-include files. For example, if both header files reside in
-\lstinline{/usr/local/include} on your Linux or Mac OS~X system, you would
-issue (in \lstinline{bash} shell):
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/usr/local/include
-\end{lstlisting}
-or in \lstinline{tcsh} shell (now the default on Mac OS~X):
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=csh,backgroundcolor=\color{white}]
-$ setenv CPLUS_INCLUDE_PATH $CPLUS_INCLUDE_PATH:/usr/local/include
-\end{lstlisting}
-before issuing the \lstinline{make} command to build \lstinline{braidlab}.
+\index{Clang compiler|see{macOS}}%
+\index{macOS!Clang compiler}%
+Clang compiler (more common on macOS systems) %
+\index{macOS}%
+can also be pointed to non-standard include paths with the environment variable
+\lstinline{CPLUS_INCLUDE_PATH} if needed, but this is usually unnecessary when
+GMP is installed through standard package-manager locations.
 
 \index{GMP|)}%
 
@@ -2577,17 +2562,17 @@ manually rename the Polish \lstinline{mex} command to something like
 path.
 
 Another solution is to make sure that the Matlab executable directory appears
-early in bash's path variable. For Matlab R2014b on Mac OS~X %
-\index{OS X}%
+early in your shell path.  For example on macOS: %
+\index{macOS}%
 and under \lstinline{bash} shell this reads
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ export PATH=/Applications/MATLAB_R2014b.app/bin:$PATH
+$ export PATH=/Applications/MATLAB_R20XXx.app/bin:$PATH
 \end{lstlisting}
-or under \lstinline{tcsh} shell (now the default in Mac OS~X)
+or under \lstinline{tcsh} shell
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ setenv PATH /Applications/MATLAB_R2014b.app/bin:$PATH
+$ setenv PATH /Applications/MATLAB_R20XXx.app/bin:$PATH
 \end{lstlisting}
 
 \index{Linux|)}%
