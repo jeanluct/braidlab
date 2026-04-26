@@ -85,7 +85,7 @@ The development of *braidlab* was supported by the [US National Science Foundati
 [4]: https://github.com/jeanluct/braidlab/releases
 [5]: https://github.com/jeanluct/braidlab/blob/master/doc/braidlab_guide.tex
 [6]: https://arxiv.org/abs/1410.0849
-[7]: https://coe.northeastern.edu/people/allshouse-michael/
+[7]: https://www.linkedin.com/in/michael-allshouse-38a1125b/
 [8]: https://github.com/jeanluct/trains
 [9]: https://github.com/jeanluct/cbraid
 [10]: https://personal.us.es/meneses/software.php
