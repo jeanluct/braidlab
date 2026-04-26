@@ -3,10 +3,11 @@
 
 ## [Unreleased][unreleased]
 
-* Build system: add a CMake build alongside the legacy Makefiles
-  (issue #162).  `cmake -S . -B build && cmake --build build -j &&
-  cmake --install build --prefix .` reproduces the in-place install
-  that `make` produced.
+* Build system: top-level `make` is now a compatibility wrapper around
+  CMake (issue #162), preserving familiar commands like `make`,
+  `make install`, `make clean`, and `make distclean` while delegating
+  build logic to CMake.  Legacy recursive Makefiles under `+braidlab`
+  were removed.
 
 * Continuous integration: GitHub Actions workflow builds packaged binary
   archives for Linux, macOS, and Windows on every push and PR (issue #163).
@@ -27,7 +28,11 @@
 * Move `doc/examples/` to top-level `examples/`, and bundle it inside
   distributable archives.
 
+* Refresh Appendix A (installation and troubleshooting) in
+  `doc/braidlab_guide.tex` for the current CMake/GMP/compiler workflow.
+
 * Bugfix: `cross2gen_helper.hpp` used `reserve` rather than `resize`.
+
 
 ## [3.3] - 2026-03-22
 
