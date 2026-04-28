@@ -1,9 +1,6 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
-
-
 ## [3.4] - 2026-04-27
 
 * Build system: top-level `make` is now a compatibility wrapper around
