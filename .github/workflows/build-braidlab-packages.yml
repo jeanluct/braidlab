@@ -1,0 +1,456 @@
+name: Build Braidlab Packages
+
+permissions:
+  contents: read
+
+concurrency:
+  # Avoid burning runner minutes on superseded commits for the same ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    tags:
+      - "release-*"
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      matlab_release:
+        description: MATLAB release for the release-pinned lane
+        required: true
+        # Keep in sync with the inline default in BRAIDLAB_RELEASE_MATLAB below.
+        default: R2024b
+        type: string
+
+env:
+  # Centralized workflow defaults.  Repository variables can override selected
+  # values without editing this file.
+  #
+  # GitHub does not allow self-references inside an env: block, so the
+  # default values are inlined directly in each fallback expression
+  # rather than defined as separate _DEFAULT entries.
+
+  # Release lanes use a pinned MATLAB version for reproducible archives.
+  # Resolution order:
+  # 1) workflow_dispatch input, 2) repository variable, 3) inline default.
+  BRAIDLAB_RELEASE_MATLAB: ${{ github.event.inputs.matlab_release || vars.BRAIDLAB_RELEASE_MATLAB || 'R2024b' }}
+  # Compat lane toolchain pin.  Can be moved forward via repo variable.
+  BRAIDLAB_COMPAT_GCC_MAJOR: ${{ vars.BRAIDLAB_COMPAT_GCC_MAJOR || '12' }}
+  # Docs toolchain packages.
+  BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || 'texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make' }}
+  # Build parallelism for CMake builds.
+  BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || '4' }}
+
+jobs:
+  docs_pdf:
+    # Build docs once and reuse in all platform package jobs.
+    name: Build Braidlab Guide PDF
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install LaTeX tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${BRAIDLAB_LATEX_PACKAGES}
+
+      - name: Build guide PDF
+        run: make -C doc braidlab_guide.pdf
+
+      - name: Upload guide PDF artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-pdf
+          path: doc/braidlab_guide.pdf
+          if-no-files-found: error
+
+  release_pinned:
+    name: Build Package (${{ matrix.os }}, ${{ matrix.flavor }})
+    runs-on: ${{ matrix.os }}
+    needs: docs_pdf
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Default flavor: GMP bundled into the archive.
+          # Linux token includes distro baseline per artifact naming policy.
+          - os: ubuntu-22.04
+            platform_token: linux-ubuntu-22.04
+            archive_ext: tar.gz
+            flavor: default
+            gmp_linkage: bundled
+          - os: macos-latest
+            platform_token: macos
+            archive_ext: zip
+            flavor: default
+            gmp_linkage: bundled
+          - os: windows-latest
+            platform_token: windows
+            archive_ext: zip
+            flavor: default
+            gmp_linkage: bundled
+          # no-gmp flavor: built on every push to catch GMP-free
+          # build regressions early.  Cheap because no GMP install
+          # and no bundled-layout verification.
+          - os: ubuntu-22.04
+            platform_token: linux-ubuntu-22.04
+            archive_ext: tar.gz
+            flavor: no-gmp
+            gmp_linkage: 'off'
+          - os: macos-latest
+            platform_token: macos
+            archive_ext: zip
+            flavor: no-gmp
+            gmp_linkage: 'off'
+          - os: windows-latest
+            platform_token: windows
+            archive_ext: zip
+            flavor: no-gmp
+            gmp_linkage: 'off'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup MATLAB (release-pinned)
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
+
+      - name: Install GMP (Linux, bundled flavor)
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10
+
+      - name: Install GMP (macOS, bundled flavor)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: brew install gmp
+
+      - name: Install GMP (Windows, bundled flavor)
+        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          # vcpkg ships preinstalled on windows-latest runners.
+          vcpkg install gmp:x64-windows
+          # Expose vcpkg toolchain location for the configure step.
+          echo "VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
+
+      - name: Configure CMake
+        shell: bash
+        run: |
+          CMAKE_ARGS=(-S . -B build "-DBRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }}")
+          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
+            GMP_PREFIX="$(brew --prefix gmp)"
+            CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=${GMP_PREFIX}")
+          fi
+          if [ "${{ runner.os }}" = "Windows" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
+            CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+            # Pin the release triplet so find_library does not pick the
+            # debug variant under installed/x64-windows/debug/lib/.
+            CMAKE_ARGS+=("-DVCPKG_TARGET_TRIPLET=x64-windows")
+          fi
+          cmake "${CMAKE_ARGS[@]}"
+
+      - name: Build CMake targets
+        shell: bash
+        run: cmake --build build --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
+
+      - name: Install staged package
+        shell: bash
+        # Assemble the final package layout in an isolated staging folder.
+        run: cmake --install build --prefix stage --config Release
+
+      - name: Verify VPI bundled in stage
+        shell: bash
+        run: |
+          test -f stage/extern/VariablePrecisionIntegers/@vpi/vpi.m \
+            || { echo "VPI not staged"; ls -R stage/extern || true; exit 1; }
+
+      - name: Verify examples bundled in stage
+        shell: bash
+        run: |
+          test -f stage/examples/taffy.m || { echo "taffy.m not staged"; ls stage/examples || true; exit 1; }
+          test -f stage/examples/arrow.m || { echo "arrow.m not staged"; ls stage/examples || true; exit 1; }
+
+      - name: Download guide PDF
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-pdf
+          path: stage/doc
+
+      - name: Verify MATLAB library references (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          # Regression check: every MEX must record libmex.so and
+          # libmx.so as bare basenames in DT_NEEDED, never as absolute
+          # paths.  An absolute path such as
+          #   /opt/hostedtoolcache/MATLAB/.../libmex.so
+          # is portable only on the build machine; users on different
+          # MATLAB installs see "Invalid MEX-file: ... cannot open
+          # shared object file: No such file or directory".
+          PRIV="stage/+braidlab/@braid/private"
+          fail=0
+          for mex_file in "${PRIV}"/*.mexa64; do
+            echo "--- ${mex_file} ---"
+            readelf -d "${mex_file}" | grep '(NEEDED)' || true
+            for lib in libmex.so libmx.so; do
+              if readelf -d "${mex_file}" | grep -E "\(NEEDED\).*\[/.*${lib}\]" >/dev/null; then
+                echo "FAIL: ${mex_file} records absolute path to ${lib}"
+                fail=1
+              fi
+            done
+          done
+          test "${fail}" -eq 0 || exit 1
+
+      - name: Verify bundled GMP layout (Linux)
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          PRIV="stage/+braidlab/@braid/private"
+          echo "Contents of ${PRIV}:"
+          ls -la "${PRIV}"
+          for lib in libgmp.so.10 libgmpxx.so.4; do
+            test -f "${PRIV}/${lib}" || { echo "Missing bundled lib: ${lib}"; exit 1; }
+          done
+          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
+            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
+            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
+            echo "--- ldd ${MEX_FILE} ---"
+            ldd "${MEX_FILE}"
+            # The linker (--as-needed by default) drops libgmp from
+            # DT_NEEDED for any MEX whose translation unit pulls in
+            # GMP headers but never references a GMP symbol.  Such a
+            # MEX has no runtime GMP dependency, so passing the
+            # bundled-resolution check vacuously is correct.
+            RESOLVED=$(ldd "${MEX_FILE}" | awk '/libgmp\.so/ {print $3}')
+            if [ -z "${RESOLVED}" ]; then
+              echo "SKIP: ${mex} has no libgmp DT_NEEDED entry"
+              continue
+            fi
+            case "${RESOLVED}" in
+              */+braidlab/@braid/private/libgmp.so*) echo "OK: ${mex} -> ${RESOLVED}" ;;
+              *) echo "FAIL: ${mex} resolves libgmp to ${RESOLVED}"; exit 1 ;;
+            esac
+          done
+
+      - name: Verify bundled GMP layout (macOS)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
+        shell: bash
+        run: |
+          PRIV="stage/+braidlab/@braid/private"
+          echo "Contents of ${PRIV}:"
+          ls -la "${PRIV}"
+          # Bundled SONAMEs on macOS look like libgmp.10.dylib / libgmpxx.4.dylib.
+          ls "${PRIV}"/libgmp*.dylib >/dev/null || { echo "Missing bundled libgmp dylib"; exit 1; }
+          ls "${PRIV}"/libgmpxx*.dylib >/dev/null || { echo "Missing bundled libgmpxx dylib"; exit 1; }
+          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
+            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
+            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
+            echo "--- otool -L ${MEX_FILE} ---"
+            otool -L "${MEX_FILE}"
+            # A MEX whose translation unit pulls in GMP headers but
+            # never references a GMP symbol may be linked without any
+            # libgmp dependency (analogous to ld --as-needed on Linux).
+            # Such a MEX has no runtime GMP load to rewrite, so skip it.
+            if ! otool -L "${MEX_FILE}" | grep -q libgmp; then
+              echo "SKIP: ${mex} has no libgmp load command"
+              continue
+            fi
+            # Confirm GMP references are rewritten to @loader_path,
+            # not absolute Homebrew paths.
+            if otool -L "${MEX_FILE}" | grep -E '^\s+/.*libgmp' >/dev/null; then
+              echo "FAIL: ${mex} still has absolute libgmp reference"
+              otool -L "${MEX_FILE}" | grep libgmp
+              exit 1
+            fi
+            otool -L "${MEX_FILE}" | grep -q '@loader_path/libgmp' || {
+              echo "FAIL: ${mex} missing @loader_path/libgmp reference"; exit 1; }
+          done
+
+      - name: Verify bundled GMP layout (Windows)
+        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+        shell: pwsh
+        run: |
+          $priv = "stage/+braidlab/@braid/private"
+          Write-Host "Contents of ${priv}:"
+          Get-ChildItem $priv
+          # vcpkg's GMP port installs gmp-10.dll (no lib prefix); MSYS2
+          # ships libgmp-10.dll.  Accept both so the layout check is
+          # not coupled to the package source.  Note: Get-ChildItem's
+          # -Include filter is a silent no-op unless the -Path argument
+          # contains a wildcard (or -Recurse is set), so append \* to
+          # the directory path rather than using -Filter (which takes
+          # only a single pattern).
+          $gmpDlls = Get-ChildItem -Path "$priv\*" -Include "gmp*.dll","libgmp*.dll" -File
+          if ($gmpDlls.Count -eq 0) {
+            Write-Error "No bundled GMP DLL found in ${priv}"
+            exit 1
+          }
+          Write-Host "Found bundled GMP DLLs:"
+          $gmpDlls | ForEach-Object { Write-Host "  $($_.Name)" }
+          foreach ($mex in @('cross2gen_helper', 'loopsigma_helper', 'entropy_helper')) {
+            $mexFiles = Get-ChildItem -Path $priv -Filter "${mex}.mexw*"
+            if ($mexFiles.Count -eq 0) {
+              Write-Error "Missing MEX: ${mex}"
+              exit 1
+            }
+            Write-Host "Found ${mex}: $($mexFiles[0].Name)"
+          }
+
+      - name: MATLAB smoke test
+        uses: matlab-actions/run-command@v3
+        with:
+          command: |
+            % Keep CI lightweight here: sanity-check package load and key MEX calls.
+            root = getenv('MW_ORIG_WORKING_FOLDER');
+            stageRoot = fullfile(root,'stage');
+            if ismac
+              engineLibDir = fullfile(matlabroot,'extern','bin',computer('arch'));
+              if isfolder(engineLibDir)
+                prev = getenv('DYLD_LIBRARY_PATH');
+                if isempty(prev)
+                  setenv('DYLD_LIBRARY_PATH',engineLibDir);
+                else
+                  setenv('DYLD_LIBRARY_PATH',[engineLibDir pathsep prev]);
+                end
+              end
+            end
+            cd(stageRoot);
+            addpath(stageRoot,'-begin');
+            import braidlab.*;
+            b = braid([1 2 -3]);
+            c = b.compact;
+            t = b.train;
+            assert(~isempty(c));
+            assert(isfield(t,'tntype'));
+            disp(t.tntype);
+            % Confirm the bundled Variable Precision Integers library is
+            % discoverable via the documented helper.
+            braidlab.util.checkvpi();
+            assert(exist('vpi','file') > 0, 'vpi class not on path after checkvpi');
+            % Exercise a GMP-using code path when GMP is enabled.
+            % entropy() uses the GMP-backed loopsigma_helper on long words.
+            gmpFlavor = '${{ matrix.gmp_linkage }}';
+            if ~strcmp(gmpFlavor, 'off')
+              bLong = braid([1 2 -3 1 -2 3 1 2 -3]);
+              e = bLong.entropy;
+              assert(isfinite(e) && e > 0, 'entropy must be a finite positive number');
+              fprintf('entropy = %g (gmp_linkage=%s)\n', e, gmpFlavor);
+            else
+              fprintf('Skipping GMP-dependent entropy check (gmp_linkage=off)\n');
+            end
+
+      - name: Build package archive
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/release-* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/release-}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+
+          case "${RUNNER_ARCH}" in
+            X64) ARCH_TOKEN="x86_64" ;;
+            ARM64) ARCH_TOKEN="arm64" ;;
+            *) ARCH_TOKEN="$(printf '%s' "${RUNNER_ARCH}" | tr '[:upper:]' '[:lower:]')" ;;
+          esac
+
+          MATLAB_TOKEN="matlab-${BRAIDLAB_RELEASE_MATLAB}"
+          # Archive naming standard:
+          # braidlab-<version>_<platform>-<arch>_matlab-<release>[_no-gmp]
+          BASE_NAME="braidlab-${VERSION}_${{ matrix.platform_token }}-${ARCH_TOKEN}_${MATLAB_TOKEN}"
+          if [ "${{ matrix.flavor }}" = "no-gmp" ]; then
+            BASE_NAME="${BASE_NAME}_no-gmp"
+          fi
+
+          # Include distribution metadata and tests in package output.
+          cp README.md LICENSE COPYING CHANGELOG.md stage/
+          cp -a testsuite stage/
+          PACKAGE_PATHS="+braidlab extern examples doc testsuite BUILD-MANIFEST.txt README.md LICENSE COPYING CHANGELOG.md"
+
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "matlab_release=${BRAIDLAB_RELEASE_MATLAB}"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_arch=${RUNNER_ARCH}"
+            echo "platform_token=${{ matrix.platform_token }}"
+            echo "flavor=${{ matrix.flavor }}"
+            echo "gmp_linkage=${{ matrix.gmp_linkage }}"
+            echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > stage/BUILD-MANIFEST.txt
+
+          if [ "${{ matrix.archive_ext }}" = "tar.gz" ]; then
+            ARCHIVE_NAME="${BASE_NAME}.tar.gz"
+            tar -C stage -czf "${ARCHIVE_NAME}" ${PACKAGE_PATHS}
+          else
+            ARCHIVE_NAME="${BASE_NAME}.zip"
+            cmake -E chdir stage cmake -E tar cfv "../${ARCHIVE_NAME}" --format=zip ${PACKAGE_PATHS}
+          fi
+
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload packaged artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.ARCHIVE_NAME }}
+          path: ${{ env.ARCHIVE_NAME }}
+          if-no-files-found: error
+
+  compat_latest:
+    name: Compatibility Check (ubuntu)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/release-') }}
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup MATLAB (latest available)
+        uses: matlab-actions/setup-matlab@v3
+
+      - name: Install GCC toolchain
+        shell: bash
+        run: |
+          # Keep compat lane ABI aligned with MATLAB runtime libraries.
+          sudo apt-get update
+          sudo apt-get install -y gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
+
+      - name: Configure CMake
+        shell: bash
+        # Force pinned GCC major to avoid GLIBCXX mismatches on latest MATLAB lane.
+        run: cmake -S . -B build-compat -DBRAIDLAB_USE_GMP=ON -DCMAKE_C_COMPILER=gcc-${BRAIDLAB_COMPAT_GCC_MAJOR} -DCMAKE_CXX_COMPILER=g++-${BRAIDLAB_COMPAT_GCC_MAJOR}
+
+      - name: Build CMake targets
+        shell: bash
+        run: cmake --build build-compat --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
+
+      - name: MATLAB smoke test
+        uses: matlab-actions/run-command@v3
+        with:
+          command: |
+            root = getenv('MW_ORIG_WORKING_FOLDER');
+            buildRoot = fullfile(root,'build-compat');
+            stageCompat = fullfile(root,'stage-compat');
+            if ~isfolder(stageCompat)
+              mkdir(stageCompat);
+            end
+            [status, cmdout] = system(sprintf('cmake --install "%s" --prefix "%s" --config Release', buildRoot, stageCompat));
+            assert(status == 0, cmdout);
+            if isunix && ~ismac
+              % Prefer runner libstdc++ over MATLAB-bundled one for newest GCC ABI.
+              setenv('LD_PRELOAD','/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
+            end
+            cd(buildRoot);
+            addpath(stageCompat,'-begin');
+            import braidlab.*;
+            b = braid([1 2 -3]);
+            c = b.compact;
+            assert(~isempty(c));

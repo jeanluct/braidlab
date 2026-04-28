@@ -23,6 +23,3 @@ tar cvzf braidlab_guide.tar.gz \
     braidlab_guide.tex braidlab_guide.bbl braidlab_guide.toc \
     braidlab_guide.ind \
     getrelease.tex figs figs_lo
-
-# Restore getrelease.tex
-git checkout getrelease.tex

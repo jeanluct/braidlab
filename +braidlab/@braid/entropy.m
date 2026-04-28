@@ -320,6 +320,7 @@ end
 varargout{1} = entr;
 
 if nargout > 1
+  % Undocumented: return projectivized loop coordinates.
   u.coords = u.coords/currentLoopLength;
   varargout{2} = u;
 end
