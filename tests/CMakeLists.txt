@@ -90,6 +90,21 @@ set_tests_properties(test_train_reducible PROPERTIES
     LABELS "integration;train"
     PASS_REGULAR_EXPRESSION "Thurston type = Reducible")
 
+# Golden regression: exact output of a braid/horseshoe corpus (type, growth,
+# singularities, transition matrices, graph dumps). The expected file was
+# generated from master before the strict-warning cleanup. Regenerate it
+# only for intended behavior changes, and explain the diff in the commit.
+add_test(
+    NAME test_golden_batch
+    COMMAND ${CMAKE_COMMAND}
+        -DFRONTEND=$<TARGET_FILE:frontend>
+        -DGOLDEN_DIR=${CMAKE_CURRENT_SOURCE_DIR}/golden
+        -DACTUAL=${CMAKE_CURRENT_BINARY_DIR}/golden_batch.actual
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/golden/run_golden.cmake
+)
+set_tests_properties(test_golden_batch PROPERTIES
+    LABELS "integration;golden;regression")
+
 # Tokens longer than 20 characters used to overflow frontend's parse buffers
 # (heap overflow in Parse, then strcpy into Filename[20]). Only a sanitizer
 # build reliably detects a regression here.

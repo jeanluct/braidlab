@@ -87,10 +87,22 @@ Interpretation:
 - It may be a conservative analyzer path rather than a concrete runtime fault.
 - It still touches core assignment flow, so it remains open until verified.
 
+Sanitizer evidence (2026-09-26):
+
+- The flagged statement is `CurrentPreP = NextPreP` (`src/Graphalg.cpp`),
+  a plain `std::vector<long>` copy inside `MakeIrreducible()`.
+  `FindTrainTrack()` calls `MakeIrreducible()` on every run.
+- The full CTest suite, including the golden corpus of 53 braids and
+  horseshoe orbits, runs clean under `-DTRAINS_SANITIZE=ON`
+  (ASan + UBSan). There are no reports on this path.
+- This strongly suggests a GCC `-O3` false positive. The two UBSan/ASan
+  findings from that run were real bugs elsewhere, and both are fixed
+  (see below).
+
 ## What Remains
 
 1. Build a minimal reproducer for the `MyArray` assignment path used in `MakeIrreducible()`.
-2. Run targeted tests under `ASan` and `UBSan` for that path.
+2. ~~Run targeted tests under `ASan` and `UBSan` for that path.~~ Done: clean.
 3. Audit `MyArray<T>::operator=` invariants (self-assignment, empty state, allocation/copy preconditions).
 4. Close with one of:
    - code fix + test + warning gone, or
@@ -104,4 +116,43 @@ Run after each warning-reduction batch:
 - `ctest --test-dir build --output-on-failure`
 - strict clean rebuild with log capture
 
-Current test status: `ctest` passes (`8/8`).
+- `test_golden_batch` must pass: exact output must match `master`
+  from before the cleanup.
+- periodically, a sanitizer build:
+  `cmake -S . -B build-asan -DTRAINS_SANITIZE=ON -DTRAINS_FAST_MATH=OFF`
+  then `cmake --build build-asan` and `ctest --test-dir build-asan`
+
+Current test status: `ctest` passes (`13/13`), both normally and under
+ASan + UBSan.
+
+## Behavior Equivalence With `master`
+
+The golden corpus (`tests/golden/braids.txt`) was run on the pre-cleanup
+code (`master`) and on this branch:
+
+- At 6 digits, the committed test output (853 lines) is byte-identical.
+- At 12 digits, with a full graph dump for every entry (4855 lines), it is
+  also byte-identical under the default `-O3 -ffast-math`.
+
+So the cast and type-boundary cleanup did not change results. Without
+fast-math, one entry's graph dump starts a vertex's cyclic edge order and
+its gate list at a different point. The structure is equivalent; this is
+floating-point tie-breaking, not a regression.
+
+## Bugs Found Along the Way
+
+- `src/train.cpp` has printed `Thurston type = Unknown` for every braid
+  since e1f1467 (2014). That commit commented out the side-effecting call
+  `FindTrainTrack()` along with an unused variable. Fixed on `master`
+  (ffd000b, tests in c51da7c).
+- `edge` and `vertex` (`trains/edgevert.h`) left their scalar members
+  uninitialized. `edgelist`/`vertexlist` allocate them with `new T[n]` and
+  copy them while shifting in `_Remove`. UBSan reported loading garbage into
+  `bool Flag`. Fixed with default member initializers; the output is
+  unchanged.
+- `src/frontend.cpp`: an off-by-one heap overflow in `Parse` (a 20-byte
+  token buffer allowed 20 characters plus the NUL), a `strcpy` overflow
+  into `Filename[20]`, and an unbounded `cin >> Filename`. Any filename of
+  20 or more characters corrupted memory. Fixed by sizing the buffers to
+  the 200-character input line and bounding the reads with `setw`.
+  Regression test: `test_frontend_long_token` (only meaningful under ASan).

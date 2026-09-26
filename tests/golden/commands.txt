@@ -1,0 +1,2 @@
+run braids.txt
+quit

@@ -6,6 +6,19 @@ include(CTest)
 
 option(TRAINS_FAST_MATH "Enable -ffast-math" ON)
 option(TRAINS_STRICT_WARNINGS "Enable extra warning checks" OFF)
+option(TRAINS_SANITIZE "Build with AddressSanitizer and UBSan" OFF)
+
+if(TRAINS_SANITIZE)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        # Directory-wide so that the library, executables and tests all get
+        # it; must come before any target is defined.
+        add_compile_options(-fsanitize=address,undefined
+            -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g)
+        add_link_options(-fsanitize=address,undefined)
+    else()
+        message(WARNING "TRAINS_SANITIZE is only supported with GCC/Clang")
+    endif()
+endif()
 
 set(TRAINS_LIBRARY_SOURCES
     src/Batch.cpp

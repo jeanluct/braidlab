@@ -6,7 +6,10 @@ keeping behavior unchanged unless explicitly intended.
 
 ## Quick assessment from cleanup
 
-- No obvious, concrete runtime bug was found during warning cleanup passes.
+- No concrete runtime bug was found by the warning cleanup itself. The
+  follow-up sanitizer and golden-corpus work found three (a dead `train`
+  executable, uninitialized `edge`/`vertex` members, and buffer overflows in
+  `frontend`); see `STRICT_WARNINGS_STATUS.md`.
 - Most changes were explicit cast/type-boundary normalization.
 - The codebase still has mixed integer conventions (`int`, `long`, `uint`, STL
   size types), which increases future bug risk and maintenance cost.
@@ -72,6 +75,9 @@ Because the remaining warning touches `MyArray` assignment:
 
 ## Priority 5: Add sanitizer CI lane
 
+Status: `TRAINS_SANITIZE` CMake option added and the full suite is clean
+under it. There is no CI yet.
+
 Add one CI job for Linux/clang or gcc with:
 
 - `-fsanitize=address,undefined`
@@ -81,6 +87,9 @@ Add one CI job for Linux/clang or gcc with:
 This catches latent memory/UB issues not visible through warning cleanup alone.
 
 ## Priority 6: Improve algorithm regression confidence
+
+Status: `test_golden_batch` added, with a 53-entry corpus in `tests/golden/`
+and expected output from pre-cleanup `master`.
 
 Current tests are good smoke/invariant coverage but not exhaustive for algorithm
 semantics.
