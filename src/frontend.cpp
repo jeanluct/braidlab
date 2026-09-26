@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <fstream>
+#include <iomanip>
 #include <string>
 #include "trains/newarray.h"
 #include "trains/Matrix.h"
@@ -31,7 +32,7 @@ const uint NumberOfCommands = 45;
 
 char InputLine[200]; //Input line
 char* Input[10]; //Parsed input line
-char Filename[20];
+char Filename[200];
 char Comment[200];
 decimal g; //Growth rate
 ofstream File;
@@ -53,7 +54,7 @@ uint Parse(char* In) //Returns number of parameters passed
 		if (c != 32)
 		{
 			char Temp[2]; Temp[0] = c; Temp[1] = 0;
-			if (strlen(Input[i])<20) strcat(Input[i], Temp);
+			if (strlen(Input[i])<199) strcat(Input[i], Temp);
 			HadSpace = false;
 		}
 		else if (!HadSpace)
@@ -77,7 +78,7 @@ int main(int argc, char* argv[])
 
 	set_new_handler(Memory);
         uint CommandNumber;
-	uint i; for (i=0; i<=9; i++) Input[i] = new char[20];
+	uint i; for (i=0; i<=9; i++) Input[i] = new char[200];
 	bool Finished = false;
 	bool Assigned = false; //Has graph been assigned yet?
 	bool FirstTime = true;
@@ -116,7 +117,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << "Enter filename: ";
-					cin >> Filename;
+					cin >> setw(sizeof(Filename)) >> Filename;
 				}
 				G.Load(Filename);
 				cout << Filename << " loaded\n";
@@ -134,7 +135,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << "Enter filename: ";
-					cin >> Filename;
+					cin >> setw(sizeof(Filename)) >> Filename;
 				}
 				G.Save(Filename);
 				cout << "Saved as " << Filename << '\n';
@@ -274,7 +275,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << "Enter filename: ";
-					cin >> Filename;
+					cin >> setw(sizeof(Filename)) >> Filename;
 				}
 				File.open(Filename);
 				G.Print(File);
@@ -356,7 +357,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << "Enter filename: ";
-					cin >> Filename;
+					cin >> setw(sizeof(Filename)) >> Filename;
 				}
 				if (BatchProcess(Filename, Precision)) cout << "\nRun was successful\n";
 				Assigned = false;
@@ -424,7 +425,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					cout << "Enter filename: ";
-					cin >> Filename;
+					cin >> setw(sizeof(Filename)) >> Filename;
 				}
 				File.open(Filename);
 				G.Print(File,false);

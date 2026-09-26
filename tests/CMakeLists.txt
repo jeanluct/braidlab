@@ -89,3 +89,14 @@ add_test(NAME test_train_reducible COMMAND train 4 1 3)
 set_tests_properties(test_train_reducible PROPERTIES
     LABELS "integration;train"
     PASS_REGULAR_EXPRESSION "Thurston type = Reducible")
+
+# Tokens longer than 20 characters used to overflow frontend's parse buffers
+# (heap overflow in Parse, then strcpy into Filename[20]). Only a sanitizer
+# build reliably detects a regression here.
+add_test(
+    NAME test_frontend_long_token
+    COMMAND /bin/sh -c "printf 'run a_batch_file_name_well_over_twenty_characters.txt\nquit\n' | $<TARGET_FILE:frontend>"
+)
+set_tests_properties(test_frontend_long_token PROPERTIES
+    LABELS "integration;frontend"
+    PASS_REGULAR_EXPRESSION "Cannot find batch file")
