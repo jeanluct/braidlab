@@ -74,3 +74,18 @@ add_test(
     COMMAND /bin/sh -c "printf 'horseshoe\n1\n10010\ntrain\nttt\nquit\n' | $<TARGET_FILE:frontend>"
 )
 set_tests_properties(test_frontend_horseshoe_ttt PROPERTIES LABELS "integration;frontend;ttt")
+
+add_test(NAME test_train_pseudo_anosov COMMAND train 3 1 -2)
+set_tests_properties(test_train_pseudo_anosov PROPERTIES
+    LABELS "integration;train"
+    PASS_REGULAR_EXPRESSION "Thurston type = Pseudo-Anosov")
+
+add_test(NAME test_train_finite_order COMMAND train 3 1 2)
+set_tests_properties(test_train_finite_order PROPERTIES
+    LABELS "integration;train"
+    PASS_REGULAR_EXPRESSION "Thurston type = Finite Order")
+
+add_test(NAME test_train_reducible COMMAND train 4 1 3)
+set_tests_properties(test_train_reducible PROPERTIES
+    LABELS "integration;train"
+    PASS_REGULAR_EXPRESSION "Thurston type = Reducible")
