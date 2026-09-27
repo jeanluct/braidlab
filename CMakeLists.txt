@@ -24,6 +24,18 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+# Oldest macOS the MEX files will load on.  Without this, the compiler
+# targets the build machine's own macOS version, so packages built on a
+# new runner would not load on older (but MATLAB-supported) macOS.  13.0
+# covers every macOS that MATLAB R2024b supports (13.7, 14, 15).  Must be
+# set before project(); an explicit -DCMAKE_OSX_DEPLOYMENT_TARGET or the
+# MACOSX_DEPLOYMENT_TARGET environment variable takes precedence.
+if(CMAKE_HOST_APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET
+    AND NOT DEFINED ENV{MACOSX_DEPLOYMENT_TARGET})
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING
+    "Minimum macOS version for the MEX files")
+endif()
+
 project(braidlab LANGUAGES C CXX)
 
 # Match the Makefile workflow's optimized default build behavior.
@@ -110,6 +122,19 @@ function(braidlab_add_mex target source install_dir)
     R2017b
     NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
   )
+
+  # On macOS, export exactly the two symbols a C-API MEX file defines.
+  # matlab_add_mex exports MATLAB's C++ MEX API entry points too
+  # (_mexCreateMexFunction etc., via cppMexFunction.map) even for C-API
+  # MEX files, and relies on -Wl,-U to excuse their absence.  The Xcode 26
+  # linker rejects that ("Undefined symbols ... <initial-undefines>"), and
+  # older linkers left dangling re-exports in the binaries.  Replacing the
+  # link flags wholesale is safe: on Apple, matlab_add_mex puts nothing
+  # else in LINK_FLAGS.
+  if(APPLE)
+    set_property(TARGET ${target} PROPERTY LINK_FLAGS
+      "-Wl,-exported_symbols_list,${CMAKE_SOURCE_DIR}/cmake/mex-exports-macos.txt")
+  endif()
 
   # Link to MATLAB's MEX runtime libraries.  On Linux we cannot use
   # the imported targets Matlab::mex / Matlab::mx directly: their

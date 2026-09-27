@@ -43,6 +43,14 @@ env:
   BRAIDLAB_LATEX_PACKAGES: ${{ vars.BRAIDLAB_LATEX_PACKAGES || 'texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra make' }}
   # Build parallelism for CMake builds.
   BRAIDLAB_BUILD_PARALLEL: ${{ vars.BRAIDLAB_BUILD_PARALLEL || '4' }}
+  # Toolchain pins for the release lanes.  These follow the compilers
+  # MathWorks supports for BRAIDLAB_RELEASE_MATLAB (R2024b: Xcode 15-16,
+  # MSVC 2017-2022, GCC 8-13) and must be bumped together with it; see
+  # devel/RELEASE-CONFIG.md.  The runner images themselves are pinned in
+  # the release_pinned matrix below.
+  BRAIDLAB_XCODE_VERSION: ${{ vars.BRAIDLAB_XCODE_VERSION || '16.4' }}
+  BRAIDLAB_VS_GENERATOR: ${{ vars.BRAIDLAB_VS_GENERATOR || 'Visual Studio 17 2022' }}
+  BRAIDLAB_CMAKE_VERSION: ${{ vars.BRAIDLAB_CMAKE_VERSION || '3.31.6' }}
 
 jobs:
   docs_pdf:
@@ -83,12 +91,17 @@ jobs:
             archive_ext: tar.gz
             flavor: default
             gmp_linkage: bundled
-          - os: macos-latest
+          - os: macos-15
             platform_token: macos
             archive_ext: zip
             flavor: default
             gmp_linkage: bundled
-          - os: windows-latest
+          - os: macos-15-intel
+            platform_token: macos
+            archive_ext: zip
+            flavor: default
+            gmp_linkage: bundled
+          - os: windows-2025
             platform_token: windows
             archive_ext: zip
             flavor: default
@@ -101,12 +114,17 @@ jobs:
             archive_ext: tar.gz
             flavor: no-gmp
             gmp_linkage: 'off'
-          - os: macos-latest
+          - os: macos-15
             platform_token: macos
             archive_ext: zip
             flavor: no-gmp
             gmp_linkage: 'off'
-          - os: windows-latest
+          - os: macos-15-intel
+            platform_token: macos
+            archive_ext: zip
+            flavor: no-gmp
+            gmp_linkage: 'off'
+          - os: windows-2025
             platform_token: windows
             archive_ext: zip
             flavor: no-gmp
@@ -120,6 +138,35 @@ jobs:
         uses: matlab-actions/setup-matlab@v3
         with:
           release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
+
+      - name: Setup CMake (pinned)
+        uses: lukka/get-cmake@v4.4.2
+        with:
+          cmakeVersion: ${{ env.BRAIDLAB_CMAKE_VERSION }}
+
+      - name: Select Xcode (macOS, pinned)
+        if: ${{ runner.os == 'macOS' }}
+        shell: bash
+        run: |
+          # Use an explicit Xcode rather than the image default, which
+          # changes over time.  DEVELOPER_DIR applies to later steps.
+          XCODE_APP="/Applications/Xcode_${BRAIDLAB_XCODE_VERSION}.app"
+          test -d "${XCODE_APP}" || {
+            echo "Pinned Xcode ${BRAIDLAB_XCODE_VERSION} not on this image:"
+            ls -d /Applications/Xcode*.app
+            exit 1
+          }
+          echo "DEVELOPER_DIR=${XCODE_APP}/Contents/Developer" >> "$GITHUB_ENV"
+
+      - name: Show toolchain versions
+        shell: bash
+        run: |
+          cmake --version | head -1
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            xcodebuild -version
+            clang --version | head -1
+            sw_vers
+          fi
 
       - name: Install GMP (Linux, bundled flavor)
         if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
@@ -146,6 +193,11 @@ jobs:
         shell: bash
         run: |
           CMAKE_ARGS=(-S . -B build "-DBRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }}")
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            # Pin the Visual Studio version rather than taking the newest
+            # one installed on the image.
+            CMAKE_ARGS+=(-G "${BRAIDLAB_VS_GENERATOR}" -A x64)
+          fi
           if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
             GMP_PREFIX="$(brew --prefix gmp)"
             CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=${GMP_PREFIX}")
