@@ -67,7 +67,7 @@ Outcome:
 
 - Removed all `-Wconversion` and `-Wsign-conversion` warnings.
 
-## Remaining Issue
+## Accepted Warning
 
 ### `-Wnull-dereference` (single diagnostic)
 
@@ -86,7 +86,8 @@ Interpretation:
 
 - This is emitted from inlined STL internals after optimization.
 - It may be a conservative analyzer path rather than a concrete runtime fault.
-- It still touches core assignment flow, so it remains open until verified.
+- It touches core assignment flow, so it was investigated before being
+  accepted.
 
 Sanitizer evidence (2026-09-26):
 
@@ -99,15 +100,20 @@ Sanitizer evidence (2026-09-26):
 - This strongly suggests a GCC `-O3` false positive. The two UBSan/ASan
   findings from that run were real bugs elsewhere, and both are fixed
   (see below).
+- Clang 18's strict build does not report it (see "Clang").
+- `MyArray::operator=` is two member copies (`std::vector` plus the
+  origin), and `tests/test_myarray.cpp` covers its edge cases.
+
+Decision (2026-09-27): **accepted as a GCC false positive and not
+suppressed.** A strict GCC build is therefore expected to show exactly one
+warning, and anything more is new. Revisit if the code around
+`CurrentPreP = NextPreP` changes, or if a newer GCC reports it differently.
 
 ## What Remains
 
-1. Build a minimal reproducer for the `MyArray` assignment path used in `MakeIrreducible()`.
-2. ~~Run targeted tests under `ASan` and `UBSan` for that path.~~ Done: clean.
-3. Audit `MyArray<T>::operator=` invariants (self-assignment, empty state, allocation/copy preconditions).
-4. Close with one of:
-   - code fix + test + warning gone, or
-   - narrow documented toolchain-specific suppression with evidence.
+Nothing: the strict-warning work is closed. The remaining diagnostic is
+accepted (above). The sanitizer runs and `test_myarray` replaced the
+planned reproducer and the `operator=` audit.
 
 ## Validation Gates Used
 

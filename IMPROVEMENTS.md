@@ -14,7 +14,8 @@ keeping behavior unchanged unless explicitly intended.
 - The codebase still has mixed integer conventions (`int`, `long`, `uint`, STL
   size types), which increases future bug risk and maintenance cost.
 - One strict warning remains (`-Wnull-dereference`) in an STL-inlined path tied
-  to `MyArray` assignment; this needs targeted investigation.
+  to `MyArray` assignment. It was investigated and accepted as a GCC false
+  positive (see `STRICT_WARNINGS_STATUS.md`).
 
 ## Priority 1: Define integer/type policy
 
@@ -144,8 +145,9 @@ This prevents style drift and preserves cleanup gains.
 
 Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
 
-1. **Close out and merge the branch** (small effort, high value). This
-   unblocks the bug fixes, which are only on `address-warnings`.
+1. **Close out and merge the branch** (small effort, high value). Done:
+   the warning was accepted, the docs and `.gitignore` were updated, and
+   the branch was merged into `master` (not yet pushed).
    - Settle the `-Wnull-dereference` at `Graphalg.cpp:681` (likely a GCC
      false positive, since ASan and UBSan are clean on that path). Either
      suppress it narrowly with `#pragma GCC diagnostic` and a comment, or
@@ -157,11 +159,11 @@ Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
 2. **Give each build directory its own outputs** (small). Done: the
    `TRAINS_IN_TREE_OUTPUTS` option is on only for `build/` (and always set
    by the Makefile), and there are new `make test`, `make strict` and
-   `make asan` targets. At present
-   `build`, `build-strict` and `build-asan` all write the same in-tree
+   `make asan` targets. Previously
+   `build`, `build-strict` and `build-asan` all wrote the same in-tree
    `src/frontend`, `src/train` and `lib/libtrains.a`. This once made a
-   normal build link against the sanitizer library. `make` should keep
-   putting copies in the old places for anything that expects them (such as
+   normal build link against the sanitizer library. `make` keeps putting
+   copies in the old places for anything that expects them (such as
    the MATLAB `train.m` wrapper).
 3. **Remove old-build leftovers** (trivial). Done: the logs, `warnings`
    and `src/*.o` were deleted and `src/Makefile` removed. Was: `src/Makefile`, `src/*.o`, and
@@ -206,7 +208,8 @@ Superseded by "Remaining work (ranked)" above.
 ## Definition of done for this roadmap
 
 - Remaining `-Wnull-dereference` is either fixed with evidence or narrowly
-  suppressed with documented rationale and reproducer notes.
+  suppressed with documented rationale and reproducer notes. (Met instead
+  by documented acceptance; see `STRICT_WARNINGS_STATUS.md`.)
 - Type policy is documented and followed in all new patches.
 - The suite passes under `TRAINS_SANITIZE` (ASan + UBSan).
 - Algorithm regression coverage is expanded with stable fixtures.

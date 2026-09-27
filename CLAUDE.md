@@ -53,8 +53,10 @@ under the strict profile. GCC-only warning flags are added only for GCC.
 ## Warning-cleanup status
 
 `STRICT_WARNINGS_STATUS.md` is the single source of truth. The count went
-from 369 to 1. The remaining one is a `-Wnull-dereference` in an STL-inlined
-path through `MyArray::operator=`. `IMPROVEMENTS.md` has the prioritized
+from 369 to 1. The remaining one, a `-Wnull-dereference` in an STL-inlined
+path through `MyArray::operator=`, is accepted as a GCC false positive (not
+suppressed). A strict GCC build should show exactly that one warning, and a
+strict Clang build none. `IMPROVEMENTS.md` has the prioritized
 roadmap: integer/type policy, domain type aliases, checked conversions,
 `MyArray` edge-case tests, a sanitizer lane, and golden algorithm regressions.
 `todo.md` is the user's top-level checklist. Keep these documents up to date
