@@ -59,6 +59,11 @@ env:
   # (.github/scripts/build-gmp-static.sh).  The checksum is of
   # gmp-<version>.tar.xz and must be updated with the version.
   BRAIDLAB_GMP_VERSION: '6.3.0'
+  # Linux packages are built in this manylinux image (AlmaLinux 8, glibc
+  # 2.28, the oldest glibc R2024b supports), pinned to a dated tag, with
+  # a gcc-toolset in R2024b's supported GCC range.
+  BRAIDLAB_MANYLINUX_IMAGE: 'quay.io/pypa/manylinux_2_28_x86_64:2026.09.23-1'
+  BRAIDLAB_GCC_TOOLSET: '13'
   BRAIDLAB_GMP_SHA256: 'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898'
 
 jobs:
@@ -93,13 +98,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Default flavor: GMP bundled into the archive.
-          # Linux token includes distro baseline per artifact naming policy.
+          # Default flavor: GMP linked statically into the MEX files.
+          # The Linux token records the glibc baseline the package needs
+          # (it is built in a manylinux_2_28 container on this host).
           - os: ubuntu-22.04
-            platform_token: linux-ubuntu-22.04
+            platform_token: linux-glibc2.28
             archive_ext: tar.gz
             flavor: default
-            gmp_linkage: bundled
+            gmp_linkage: static
           - os: macos-15
             platform_token: macos
             archive_ext: zip
@@ -116,10 +122,9 @@ jobs:
             flavor: default
             gmp_linkage: static
           # no-gmp flavor: built on every push to catch GMP-free
-          # build regressions early.  Cheap because no GMP install
-          # and no bundled-layout verification.
+          # build regressions early.  Cheap because no GMP is built.
           - os: ubuntu-22.04
-            platform_token: linux-ubuntu-22.04
+            platform_token: linux-glibc2.28
             archive_ext: tar.gz
             flavor: no-gmp
             gmp_linkage: 'off'
@@ -144,6 +149,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup MATLAB (release-pinned)
+        id: setup-matlab
         uses: matlab-actions/setup-matlab@v3
         with:
           release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
@@ -177,12 +183,36 @@ jobs:
             sw_vers
           fi
 
-      - name: Install GMP (Linux, bundled flavor)
-        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+      - name: Cache static GMP (Linux)
+        id: gmp-cache-linux
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'static' }}
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/gmp-static
+          key: gmp-${{ env.BRAIDLAB_GMP_VERSION }}-${{ env.BRAIDLAB_MANYLINUX_IMAGE }}-gcc${{ env.BRAIDLAB_GCC_TOOLSET }}-${{ hashFiles('.github/scripts/build-gmp-static.sh') }}
+
+      - name: Build and stage in manylinux container (Linux)
+        if: ${{ runner.os == 'Linux' }}
         shell: bash
+        env:
+          MATLAB_ROOT: ${{ steps.setup-matlab.outputs.matlabroot }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10
+          mkdir -p "${RUNNER_TEMP}/gmp-static"
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" -w "${GITHUB_WORKSPACE}" \
+            -v "${MATLAB_ROOT}:${MATLAB_ROOT}:ro" \
+            -v "${RUNNER_TEMP}/gmp-static:/opt/gmp-static" \
+            -e MATLAB_ROOT \
+            -e BRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }} \
+            -e CMAKE_VERSION="${BRAIDLAB_CMAKE_VERSION}" \
+            -e GCC_TOOLSET="${BRAIDLAB_GCC_TOOLSET}" \
+            -e GMP_PREFIX=/opt/gmp-static \
+            -e GMP_VERSION="${BRAIDLAB_GMP_VERSION}" \
+            -e GMP_SHA256="${BRAIDLAB_GMP_SHA256}" \
+            -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" \
+            -e BUILD_PARALLEL="${BRAIDLAB_BUILD_PARALLEL}" \
+            "${BRAIDLAB_MANYLINUX_IMAGE}" \
+            .github/scripts/build-linux-manylinux.sh
 
       - name: Cache static GMP (macOS)
         id: gmp-cache
@@ -213,6 +243,7 @@ jobs:
           echo "VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
 
       - name: Configure CMake
+        if: ${{ runner.os != 'Linux' }}
         shell: bash
         run: |
           CMAKE_ARGS=(-S . -B build "-DBRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }}")
@@ -236,10 +267,12 @@ jobs:
           cmake "${CMAKE_ARGS[@]}"
 
       - name: Build CMake targets
+        if: ${{ runner.os != 'Linux' }}
         shell: bash
         run: cmake --build build --config Release -j "${BRAIDLAB_BUILD_PARALLEL}"
 
       - name: Install staged package
+        if: ${{ runner.os != 'Linux' }}
         shell: bash
         # Assemble the final package layout in an isolated staging folder.
         run: cmake --install build --prefix stage --config Release
@@ -287,36 +320,23 @@ jobs:
           done
           test "${fail}" -eq 0 || exit 1
 
-      - name: Verify bundled GMP layout (Linux)
-        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'bundled' }}
+      - name: Verify static GMP (Linux)
+        if: ${{ runner.os == 'Linux' && matrix.gmp_linkage == 'static' }}
         shell: bash
         run: |
-          PRIV="stage/+braidlab/@braid/private"
-          echo "Contents of ${PRIV}:"
-          ls -la "${PRIV}"
-          for lib in libgmp.so.10 libgmpxx.so.4; do
-            test -f "${PRIV}/${lib}" || { echo "Missing bundled lib: ${lib}"; exit 1; }
-          done
-          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
-            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
-            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
-            echo "--- ldd ${MEX_FILE} ---"
-            ldd "${MEX_FILE}"
-            # The linker (--as-needed by default) drops libgmp from
-            # DT_NEEDED for any MEX whose translation unit pulls in
-            # GMP headers but never references a GMP symbol.  Such a
-            # MEX has no runtime GMP dependency, so passing the
-            # bundled-resolution check vacuously is correct.
-            RESOLVED=$(ldd "${MEX_FILE}" | awk '/libgmp\.so/ {print $3}')
-            if [ -z "${RESOLVED}" ]; then
-              echo "SKIP: ${mex} has no libgmp DT_NEEDED entry"
-              continue
+          # With static GMP, no MEX may depend on libgmp, and no shared
+          # libraries may be shipped.
+          fail=0
+          if find stage -name '*.so*' | grep .; then
+            echo "FAIL: shared libraries shipped in the package"; fail=1
+          fi
+          for mex_file in $(find stage -name '*.mexa64'); do
+            if readelf -d "${mex_file}" | grep -E '\(NEEDED\).*gmp'; then
+              echo "FAIL: ${mex_file} depends on libgmp"; fail=1
             fi
-            case "${RESOLVED}" in
-              */+braidlab/@braid/private/libgmp.so*) echo "OK: ${mex} -> ${RESOLVED}" ;;
-              *) echo "FAIL: ${mex} resolves libgmp to ${RESOLVED}"; exit 1 ;;
-            esac
           done
+          test -f stage/extern/gmp/README.md || { echo "FAIL: GMP README not staged"; fail=1; }
+          test "${fail}" -eq 0
 
       - name: Verify static GMP (macOS)
         if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'static' }}
