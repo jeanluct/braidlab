@@ -154,7 +154,10 @@ Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
      `operator=` audit is now covered by `test_myarray`.
    - Add `build-*/` and `strict-warnings*.log` to `.gitignore`.
    - Merge into `master`, then push (confirm before pushing).
-2. **Give each build directory its own outputs** (small). At present
+2. **Give each build directory its own outputs** (small). Done: the
+   `TRAINS_IN_TREE_OUTPUTS` option is on only for `build/` (and always set
+   by the Makefile), and there are new `make test`, `make strict` and
+   `make asan` targets. At present
    `build`, `build-strict` and `build-asan` all write the same in-tree
    `src/frontend`, `src/train` and `lib/libtrains.a`. This once made a
    normal build link against the sanitizer library. `make` should keep

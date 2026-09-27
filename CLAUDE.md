@@ -21,10 +21,16 @@ CMake is canonical. The top-level `Makefile` is a thin wrapper
     ctest --test-dir build -R test_graph_io --output-on-failure   # one test
     ctest --test-dir build -L graph                               # by label
 
-Outputs go into the source tree, not `build/`: `lib/libtrains.a`,
-`src/frontend` (the interactive program), and `src/train` (a non-interactive
-`train <strings> <generators...>`). `src/Makefile` and the `src/*.o` files are
-leftovers from the old build.
+The main build directory `build/` writes into the source tree:
+`lib/libtrains.a`, `src/frontend` (the interactive program), and `src/train`
+(non-interactive: `train <strings> <generators...>`). Any other build
+directory keeps its outputs inside itself (`TRAINS_IN_TREE_OUTPUTS`, which
+defaults to on only for `build/`, and the Makefile always sets it). Tests
+locate binaries by `$<TARGET_FILE:...>`, so each build directory tests its
+own. `src/Makefile` and the `src/*.o` files are leftovers from the old build.
+
+Makefile shortcuts: `make test`, `make strict` (logs to
+`strict-warnings-latest.log`), `make asan`.
 
 Strict-warning profile (separate build dir by convention):
 
@@ -38,10 +44,7 @@ Sanitizer build (ASan + UBSan; run it after any nontrivial change):
     cmake --build build-asan && ctest --test-dir build-asan
 
 `TRAINS_FAST_MATH` (default ON) adds `-ffast-math`. The library is built with
-`-O3`. **Every build directory writes the same in-tree `src/frontend`,
-`src/train` and `lib/libtrains.a`**, so building `build-asan` or
-`build-strict` overwrites the normal binaries. Rebuild the directory whose
-binaries you want to run or test last.
+`-O3`.
 
 ## Warning-cleanup status
 

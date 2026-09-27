@@ -8,6 +8,20 @@ option(TRAINS_FAST_MATH "Enable -ffast-math" ON)
 option(TRAINS_STRICT_WARNINGS "Enable extra warning checks" OFF)
 option(TRAINS_SANITIZE "Build with AddressSanitizer and UBSan" OFF)
 
+# Legacy layout: lib/libtrains.a, src/frontend and src/train, as the old
+# Makefiles produced. On by default only for the main build directory
+# (build/, which the top-level Makefile uses), so that extra build
+# directories such as build-strict or build-asan keep their outputs to
+# themselves instead of overwriting the main build's.
+if(CMAKE_BINARY_DIR STREQUAL "${CMAKE_SOURCE_DIR}/build")
+    set(TRAINS_IN_TREE_DEFAULT ON)
+else()
+    set(TRAINS_IN_TREE_DEFAULT OFF)
+endif()
+option(TRAINS_IN_TREE_OUTPUTS
+    "Put libtrains.a in lib/ and executables in src/ (legacy layout)"
+    ${TRAINS_IN_TREE_DEFAULT})
+
 if(TRAINS_SANITIZE)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         # Directory-wide so that the library, executables and tests all get
@@ -49,21 +63,20 @@ if(TRAINS_FAST_MATH)
     target_compile_options(trains PRIVATE -ffast-math)
 endif()
 
-set_target_properties(trains PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
-)
-
 add_executable(frontend src/frontend.cpp)
 target_link_libraries(frontend PRIVATE trains)
-set_target_properties(frontend PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
-)
 
 add_executable(train src/train.cpp)
 target_link_libraries(train PRIVATE trains)
-set_target_properties(train PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
-)
+
+if(TRAINS_IN_TREE_OUTPUTS)
+    set_target_properties(trains PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+    )
+    set_target_properties(frontend train PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    )
+endif()
 
 if(BUILD_TESTING)
     add_subdirectory(tests)
