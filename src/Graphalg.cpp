@@ -328,9 +328,9 @@ bool graph::AbsorbIntoP()
 			//Find some vertex on this loop
 			uint j=1;
 			while (OnP(Vertices[j].Label) != i) j++;
-			uint VertexIndex = j;
+			uint VIndex = j;
 			do { //while not back to j again
-				intarray& Round = Vertices[VertexIndex].Edges;
+				intarray& Round = Vertices[VIndex].Edges;
 				//Start with edge first after peripheral in
 				uint k = 1; while (!IsPeripheralLabel(Round[k]) || Round[k]>0) k++;
 				k= (long(k)==Round.TopIndex()) ? 1 : k+1;
@@ -341,8 +341,8 @@ bool graph::AbsorbIntoP()
 					k = (long(k)==Round.TopIndex()) ? 1 : k+1;
 				}
 				Separators[static_cast<uint>(Separators.TopIndex())] = 1;
-				VertexIndex = FindVertex(To(Round[k]));
-			} while (VertexIndex != j);
+				VIndex = FindVertex(To(Round[k]));
+			} while (VIndex != j);
 			if (EdgesOut.TopIndex() == 1) continue; //No action when only one edge from loop
 			//Now determine equivalence classes in EdgesOut INEFFICIENT
 			intarray Class; //Will hold AltDeriv(corresponding edge, 2*number edges) which determines class

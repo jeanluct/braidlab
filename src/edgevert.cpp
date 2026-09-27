@@ -403,7 +403,7 @@ void vertexiterator::Reset()
 
 static const char* EdgeType[] = {"Main", "Peripheral", "Pre-peripheral"};
 
-void edge::Set(long label, edgetype type, uint start, uint end, intarray& image, uint puncture)
+void edge::Set(EdgeLabel label, edgetype type, VertexLabel start, VertexLabel end, intarray& image, PunctureIndex puncture)
 {
 	Label = label;
 	Type = type;
@@ -447,7 +447,7 @@ ostream& operator<<(ostream& Out, edge E)
 
 
 //Vertex Class
-void vertex::Set(uint label, intarray& edges, uint image)
+void vertex::Set(VertexLabel label, intarray& edges, VertexLabel image)
 {
 	Label = label;
 	Image = image;

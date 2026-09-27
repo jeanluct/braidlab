@@ -574,7 +574,7 @@ void graph::IdentityGraph(uint n)
 	}
 }
 
-void graph::ActOn(long Gen)
+void graph::ActOn(BraidGenerator Gen)
 {
 	intarray Temp;
 	long n = long(Punctures);
@@ -650,7 +650,7 @@ void graph::ActOn(long Gen)
 	}
 }
 
-void graph::VertexImageSwap(uint i, uint j)
+void graph::VertexImageSwap(VertexLabel i, VertexLabel j)
 {
 	uint k;
 	for (k=1; k<=Punctures; k++)

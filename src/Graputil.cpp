@@ -23,20 +23,20 @@ namespace trains {
 using namespace std;
 
 
-uint graph::FindEdge(long Label)
+EdgeIndex graph::FindEdge(EdgeLabel Label)
 {
 	for (uint i=1; long(i)<=Edges.TopIndex(); i++)
 		if (Edges[i].Label == Label || Edges[i].Label == -Label) return i;
 	return 0;
 }
 
-uint graph::FindVertex(uint Label)
+VertexIndex graph::FindVertex(VertexLabel Label)
 {
 	for (uint i=1; long(i)<=Vertices.TopIndex(); i++) if (Vertices[i].Label == Label) return i;
 	return 0;
 }
 
-long graph::Derivative(long Label)
+EdgeLabel graph::Derivative(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	if (!Edges[Index].Image.TopIndex()) return 0;
@@ -44,7 +44,7 @@ long graph::Derivative(long Label)
 	return (-Edges[Index].Image[static_cast<uint>(Edges[Index].Image.TopIndex())]);
 }
 
-long graph::Derivative(long Label, uint n)
+EdgeLabel graph::Derivative(EdgeLabel Label, uint n)
 {
 	for (uint i=1; i<=n; i++)
 	{
@@ -54,7 +54,7 @@ long graph::Derivative(long Label, uint n)
 	return Label;
 }
 
-long graph::AltDerivative(long Label, uint n)
+EdgeLabel graph::AltDerivative(EdgeLabel Label, uint n)
 {
 	for (uint i=1; i<=n; i++)
 	{
@@ -69,7 +69,7 @@ long graph::AltDerivative(long Label, uint n)
 	return Label;
 }
 
-void graph::Replace(long Label, intarray& L)
+void graph::Replace(EdgeLabel Label, intarray& L)
 {
 	edgeiterator I(Edges);
 	do
@@ -78,7 +78,7 @@ void graph::Replace(long Label, intarray& L)
 	} while (!I.AtOrigin());
 }
 
-void graph::LoopReplace(long label, intarray& L)
+void graph::LoopReplace(EdgeLabel label, intarray& L)
 {
 	for (vector<int>::size_type i=0; i < loops.size(); ++i)
 	{
@@ -86,7 +86,7 @@ void graph::LoopReplace(long label, intarray& L)
 	}    
 }    
 
-void graph::RemoveAll(long Label)
+void graph::RemoveAll(EdgeLabel Label)
 {
 	edgeiterator I(Edges);
 	do
@@ -95,7 +95,7 @@ void graph::RemoveAll(long Label)
 	} while (!I.AtOrigin());
 }
 
-void graph::LoopRemoveAll(long Label)
+void graph::LoopRemoveAll(EdgeLabel Label)
 {
 	for (vector<int>::size_type i=0; i<loops.size(); ++i)
 	{
@@ -372,7 +372,7 @@ std::string graph::CharacteristicPolynomial(bool factorise, bool includeNonMain)
 }   
 #endif 
 
-bool graph::IntersectsPLabel(long Label)
+bool graph::IntersectsPLabel(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	edge& Now = Edges[Index];
@@ -380,7 +380,7 @@ bool graph::IntersectsPLabel(long Label)
 	return (OnP(Now.Start) || OnP(Now.End));
 }
 
-uint graph::OnPInd(uint Index)
+PunctureIndex graph::OnPInd(VertexIndex Index)
 {
 	intiterator I(Vertices[Index].Edges);
 	do
@@ -391,7 +391,7 @@ uint graph::OnPInd(uint Index)
 	return 0;
 }
 
-uint graph::OnP(uint Label)
+PunctureIndex graph::OnP(VertexLabel Label)
 {
 	uint Index = FindVertex(Label);
 	intiterator I(Vertices[Index].Edges);
@@ -403,7 +403,7 @@ uint graph::OnP(uint Label)
 	return 0;
 }
 
-bool graph::IsPeripheralLabel(long Label)
+bool graph::IsPeripheralLabel(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	return (Edges[Index].Type == Peripheral);
@@ -455,7 +455,7 @@ void graph::FindTypes()
 	}
 }
 
-uint graph::From(long Label)
+VertexLabel graph::From(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	return ( (Label>0) ? Edges[Index].Start : Edges[Index].End );
@@ -1103,7 +1103,7 @@ void graph::TampDown()
 	}
 }
 
-bool graph::SingleVertexEmbeddingTighten(uint Index)
+bool graph::SingleVertexEmbeddingTighten(VertexIndex Index)
 {
 	vertex& Now = Vertices[Index];
 	if (Now.Edges.TopIndex()<=1) return false;

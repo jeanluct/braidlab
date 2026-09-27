@@ -177,7 +177,7 @@ uint turnlist::AgreesTo(turnlist& A)
 }
 
 
-void graph::Split(long Label)
+void graph::Split(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	if (!Index) THROW("Trying to split non-existent edge",1);
@@ -237,7 +237,7 @@ void graph::Split(long Label)
 	}
 }
 
-void graph::Collapse(long Label)
+void graph::Collapse(EdgeLabel Label)
 {
 	if (Label<0) Label = -Label;
 	uint Index = FindEdge(Label);
@@ -362,30 +362,30 @@ void graph::Collapse(long Label)
 	if (Embedding) TightenAllVertexEmbeddings();
 }
 
-void graph::Push(long Label, uint i)
+void graph::Push(EdgeLabel Label, uint i)
 {
 	uint Index = FindEdge(Label);
 	edge& E = Edges[Index];
-	uint VertexLabel;
+	uint VLabel;
 	if (E.Image.TopIndex() < long(i)) THROW("Trying to push more symbols than there are",1);
 	if (i==0) return;
 	intarray Pushed(i,1,1);
 	if (Label > 0)
 	{
-		VertexLabel = E.Start;
+		VLabel = E.Start;
 		for (uint j=1; j<=i; j++) Pushed[j] = E.Image[j];
 		E.Image.Remove(1,i-1);
 	}
 	else
 	{
-		VertexLabel = E.End;
+		VLabel = E.End;
 		uint k=static_cast<uint>(E.Image.TopIndex());
 		for (uint j=1; j<=i; j++) Pushed[j] = -E.Image[k--];
 		E.Image.Remove(k+1,i-1);
 	}
 	intarray PushedInverse = Pushed;
 	PushedInverse.Invert();
-	uint VIndex = FindVertex(VertexLabel);
+	uint VIndex = FindVertex(VLabel);
 	vertex& V = Vertices[VIndex];
 	intiterator I(V.Edges);
 	do
@@ -400,13 +400,13 @@ void graph::Push(long Label, uint i)
 	Vertices[VIndex].Image = From(PushedInverse[1]);
 }
 
-void graph::Subdivide(long Label, uint i)
+void graph::Subdivide(EdgeLabel Label, uint i)
 {
 	Split(Label);
 	Push(Label, i);
 }
 
-void graph::SubdivideAllBut(long Label, uint i)
+void graph::SubdivideAllBut(EdgeLabel Label, uint i)
 {
 	Split (Label);
 	uint ImageSize = static_cast<uint>(Edges[FindEdge(Label)].Image.TopIndex());
@@ -414,7 +414,7 @@ void graph::SubdivideAllBut(long Label, uint i)
 	Push(Label, ImageSize-i);
 }
 
-void graph::SubdivideHere(long Label, uint i)
+void graph::SubdivideHere(EdgeLabel Label, uint i)
 {
 	uint k=0;
 	uint Index = FindEdge(Label);
@@ -469,7 +469,7 @@ bool graph::PullTight()
 	return Result;
 }
 
-void graph::ValenceTwoIsotopyEdge(long Label)
+void graph::ValenceTwoIsotopyEdge(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	uint VLabel = (Label>0) ? Edges[Index].Start : Edges[Index].End;
@@ -480,7 +480,7 @@ void graph::ValenceTwoIsotopyEdge(long Label)
 	Collapse(Label);
 }
 
-void graph::ValenceTwoIsotopyVertex(uint Label)
+void graph::ValenceTwoIsotopyVertex(VertexLabel Label)
 {
 	uint Index = FindVertex(Label);
 	if (!(Vertices[Index].Valence() == 2))
@@ -514,7 +514,7 @@ void graph::ValenceTwoIsotopyVertex(uint Label)
 	else ValenceTwoIsotopyEdge(Label2);
 }
 
-void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
+void graph::FoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2, bool Care)
 {
 	if (Care)
 	{
@@ -562,9 +562,9 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 		uint i;
 		for (i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint EdgeIndex = FindEdge(Vertex.Edges[i]);
+			uint EIndex = FindEdge(Vertex.Edges[i]);
 			uint EndVertIndex = FindVertex(To(Vertex.Edges[i]));
-			if (Edges[EdgeIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
+			if (Edges[EIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
 			{
 				Bad = true;
 				break;
@@ -697,7 +697,7 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 
 
 
-void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
+void graph::CarefulFoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2)
 {
 	if (Label1 == Label2) THROW("Trying to fold edge with itself",1);
 	if (!(From(Label1) == From(Label2))) THROW("Trying to fold edges at different vertices",1);
@@ -739,9 +739,9 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 		uint i;
 		for (i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint EdgeIndex = FindEdge(Vertex.Edges[i]);
+			uint EIndex = FindEdge(Vertex.Edges[i]);
 			uint EndVertIndex = FindVertex(To(Vertex.Edges[i]));
-			if (Edges[EdgeIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
+			if (Edges[EIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
 			{
 				Bad = true;
 				break;
