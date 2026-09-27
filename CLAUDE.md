@@ -84,11 +84,32 @@ Everything is in `namespace trains`. Headers are in `trains/`, sources in
   binary that links `libtrains` must define them.
 - Errors: the `THROW(msg, n)` macro in `trains/General.h` throws
   `trains::Error`. `TRY`/`CATCH` are macro aliases. `uint` is
-  `unsigned int`. There are mixed `int`/`long`/`uint`/`size_t` conventions
-  (see `IMPROVEMENTS.md`).
+  `unsigned int`.
 - Platform macros (`VS2005`, `__WINDOWSVERSION`, `__UNIXVERSION`) and
   `__CHARPOLY` (undefined in `General.h`) gate legacy code paths. Only the
   Unix path is built here.
+
+## Integer types
+
+`trains/types.h` names the integer kinds: `EdgeLabel` (signed `long`; `-L`
+is edge `L` reversed), `EdgeIndex`/`VertexIndex` (1-based positions in
+`graph::Edges`/`Vertices`), `VertexLabel`, `PunctureIndex` (0 means none),
+and `BraidGenerator`. They are plain typedefs, so they document intent
+without enforcing it. The rules:
+
+- Use the aliases in new or changed signatures and data members. Counts
+  stay `uint`, and `size_t` is used only when iterating STL containers
+  directly.
+- Never overload a function on two integer types (for example `long` versus
+  `uint`): the argument's type silently chooses the function. Use distinct
+  names instead (`IsPeripheralLabel` versus `IsPeripheralIndex`).
+- Convert once at a boundary with `static_cast`, not repeatedly inside
+  expressions.
+- Don't name a local variable after an alias. `-Wshadow` flags it in the
+  strict build, and the code already uses `EIndex`, `VIndex` and `VLabel`
+  for such locals.
+- For a purely type-level change, check that
+  `objdump -d --no-show-raw-insn lib/libtrains.a` is unchanged.
 
 ## Tests
 

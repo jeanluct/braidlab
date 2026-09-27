@@ -18,6 +18,11 @@ keeping behavior unchanged unless explicitly intended.
 
 ## Priority 1: Define integer/type policy
 
+Status: done. The policy lives in `CLAUDE.md` ("Integer types"). It
+differs from the suggestion below in one way: counts stay `uint`, and
+`size_t` is limited to direct STL iteration, rather than migrating container
+sizes wholesale.
+
 Create a short project-wide policy and enforce it in new/changed code.
 
 Suggested policy:
@@ -31,6 +36,16 @@ Suggested policy:
 
 ## Priority 2: Introduce domain type aliases
 
+Status: done for `graph.h`, `edgevert.h` and `braid.h` signatures and data
+members (`trains/types.h`). The aliases are `EdgeLabel`, `EdgeIndex`,
+`VertexLabel`, `VertexIndex`, `PunctureIndex` and `BraidGenerator`. The
+single `Label` below was split in two because edge labels are signed and
+vertex labels are not. `Count` was dropped because it is a common local
+name and would trip `-Wshadow`. The three overload pairs that differed only
+by `long` versus `uint` (`IsPeripheral`, `IntersectsP`,
+`ValenceTwoIsotopy`) were renamed. Local variables inside function bodies
+were not migrated. Wrapper types are deferred.
+
 To improve readability and reduce accidental mixing:
 
 - Add aliases in a common header (example names):
@@ -43,6 +58,8 @@ To improve readability and reduce accidental mixing:
 - Optionally move to strong typedef wrappers later if needed.
 
 ## Priority 3: Harden conversion boundaries
+
+Status: not started (deferred).
 
 Add small helper functions/macros for common checked conversions, for example:
 
