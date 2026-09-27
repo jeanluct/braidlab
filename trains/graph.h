@@ -152,12 +152,12 @@ public:
 	long Derivative(long Label); // Returns Dg(Label). Returns 0 if edge has null image
 	long Derivative(long Label, uint n); // Returns Dg^n(Label). Returns 0 if some edge has null image
 	long AltDerivative(long Label, uint n=1); // Returns first of Labels image which is not peripheral, repeats n times
-	bool IntersectsP(long Label); //Does edge intersect peripheral subgraph
-	bool IntersectsP(uint Index) {return (IntersectsP(Edges[Index].Label));} //INEFFICIENT
+	bool IntersectsPLabel(long Label); //Does edge intersect peripheral subgraph
+	bool IntersectsPIndex(uint Index) {return (IntersectsPLabel(Edges[Index].Label));} //INEFFICIENT
 	uint OnP(uint Label); //Returns appropriate puncture if Vertex is on Peripheral subgraph, 0 otherwise
 	uint OnPInd(uint Index); //Same as OnP, but for index not label
-	bool IsPeripheral(long Label); //Is edge peripheral
-	bool IsPeripheral(uint Index) {return (Edges[Index].Type == Peripheral);}
+	bool IsPeripheralLabel(long Label); //Is edge peripheral
+	bool IsPeripheralIndex(uint Index) {return (Edges[Index].Type == Peripheral);}
 	uint FromP(long Label) {return OnP(From(Label));}
 	void FindTypes(); //Determines edge types
 	uint NumberEdges() {return static_cast<uint>(Edges.TopIndex());}
@@ -183,8 +183,8 @@ public:
 	void Subdivide(long Label, uint i); // Subdivides edge Label after i symbols
 	void SubdivideHere(long Label, uint i); //Ensures new vertex is at position i in ORIGINAL edge image
 	void SubdivideAllBut(long Label, uint i); //Leaves i edge images after subdivision
-	void ValenceTwoIsotopy(long Label); //Across given edge (which is collapsed)
-	void ValenceTwoIsotopy(uint Label); //At given vertex - chooses correct edge
+	void ValenceTwoIsotopyEdge(long Label); //Across given edge (which is collapsed)
+	void ValenceTwoIsotopyVertex(uint Label); //At given vertex - chooses correct edge
 	void FoldAsMuchAsPossible(long Label1, long Label2, bool Care = true);// Folds 2 edges and any between as much as possible, avoiding fold up to flagged vertex
 	void CarefulFoldAsMuchAsPossible(long Label1, long Label2); //Avoids problem of eventually only folding preperipheral edges
 	//Graph Setting

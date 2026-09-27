@@ -39,7 +39,7 @@ TTT::TTT(graph& G)
 		u = uint(F.Find(CurrentEdge));
 		do {
 			u++; if (long(u)>F.TopIndex()) u=1;
-		} while (G.IsPeripheral(F[u]));
+		} while (G.IsPeripheralLabel(F[u]));
 		CurrentEdge = F[u];
 		if (i!=2) // start new edge
 		{

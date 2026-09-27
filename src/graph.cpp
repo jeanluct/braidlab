@@ -469,7 +469,7 @@ bool graph::PullTight()
 	return Result;
 }
 
-void graph::ValenceTwoIsotopy(long Label)
+void graph::ValenceTwoIsotopyEdge(long Label)
 {
 	uint Index = FindEdge(Label);
 	uint VLabel = (Label>0) ? Edges[Index].Start : Edges[Index].End;
@@ -480,7 +480,7 @@ void graph::ValenceTwoIsotopy(long Label)
 	Collapse(Label);
 }
 
-void graph::ValenceTwoIsotopy(uint Label)
+void graph::ValenceTwoIsotopyVertex(uint Label)
 {
 	uint Index = FindVertex(Label);
 	if (!(Vertices[Index].Valence() == 2))
@@ -491,12 +491,12 @@ void graph::ValenceTwoIsotopy(uint Label)
 	FindTypes();
 	if (Edges[Index1].Type == Preperipheral)
 	{
-		ValenceTwoIsotopy(Label1);
+		ValenceTwoIsotopyEdge(Label1);
 		return;
 	}
 	if (Edges[Index2].Type == Preperipheral)
 	{
-		ValenceTwoIsotopy(Label2);
+		ValenceTwoIsotopyEdge(Label2);
 		return;
 	}
 	//Determine which edge has greater eigenvector entry
@@ -510,8 +510,8 @@ void graph::ValenceTwoIsotopy(uint Label)
 		if (i==Index2) i2 = Count;
 		Count++;
 	}
-	if (M.IsBigger(i1, i2)) ValenceTwoIsotopy(Label1);
-	else ValenceTwoIsotopy(Label2);
+	if (M.IsBigger(i1, i2)) ValenceTwoIsotopyEdge(Label1);
+	else ValenceTwoIsotopyEdge(Label2);
 }
 
 void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)

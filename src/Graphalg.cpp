@@ -29,7 +29,7 @@ bool graph::CollapseInvariantForest()
 	for (i=1; i<=n; i++) Labels[i] = Edges[i].Label;
 	for (i=1; i<=n; i++) //Is Edges[i] in invariant forest
 	{
-		if (IntersectsP(Labels[i])) continue; //Certainly no good
+		if (IntersectsPLabel(Labels[i])) continue; //Certainly no good
 		for (uint j=1; j<=n; j++) Inset[j] = Changed[j] = NewChanged[j] = false;
 		Inset[i] = Changed[i] = true;
 		bool SomeChanged = true, Bad = false;
@@ -40,7 +40,7 @@ bool graph::CollapseInvariantForest()
 				intarray& Im = Edges[j].Image;
 				for (uint k=1; long(k)<=Im.TopIndex(); k++)
 				{
-					if (IntersectsP(Im[k]))
+					if (IntersectsPLabel(Im[k]))
 					{
 						Bad = true;
 						break;
@@ -104,7 +104,7 @@ bool graph::PerformValenceTwoIsotopies()
 		{
 			if (Vertices[i].Valence() == 2)
 			{
-				ValenceTwoIsotopy(Vertices[i].Label);
+				ValenceTwoIsotopyVertex(Vertices[i].Label);
 				PullTight();
 				while (CollapseInvariantForest());
 				ValenceTwoFound = Result = true;
@@ -255,13 +255,13 @@ bool graph::AbsorbIntoP()
 		long* Labels = new long[n+1];
 		for (uint i=1; i<=n; i++) Labels[i] = Edges[i].Label;
 		Found = false;
-		for (uint i=1; i<=n; i++) if (IntersectsP(i) && !IsPeripheral(i))
+		for (uint i=1; i<=n; i++) if (IntersectsPIndex(i) && !IsPeripheralIndex(i))
 			//Does edges[i], which emanates from P, lie in an invariant subgraph which drs onto P?
 		{
 			for (uint j=1; j<=n; j++)
 			{
 				Inset[j] = Changed[j] = NewChanged[j] = false;
-				if (IsPeripheral(j)) Inset[j] = true;
+				if (IsPeripheralIndex(j)) Inset[j] = true;
 			}
 			Inset[i] = Changed[i] = true;
 			bool SomeChanged = true, Bad = false;
@@ -273,7 +273,7 @@ bool graph::AbsorbIntoP()
 					for (uint k=1; long(k)<=Im.TopIndex(); k++)
 					{
 						uint Index = FindEdge(Im[k]);
-						if (Index < i && IntersectsP(Index) && !IsPeripheral(Index)) //CHANGED
+						if (Index < i && IntersectsPIndex(Index) && !IsPeripheralIndex(Index)) //CHANGED
 						{
 							Bad = true;
 							break;
@@ -300,7 +300,7 @@ bool graph::AbsorbIntoP()
 				Found = true;
 				Result = true;
 				//Collapse edges in Inset, pushing images anywhere but into P
-				for (uint j=1; j<=n; j++) if (Inset[j] && !IsPeripheral(Labels[j]))
+				for (uint j=1; j<=n; j++) if (Inset[j] && !IsPeripheralLabel(Labels[j]))
 				{
 					uint Index = FindEdge(Labels[j]);
 					if (OnP(Edges[Index].Start)) Push(-Labels[j], static_cast<uint>(Edges[Index].Image.TopIndex()));
@@ -332,9 +332,9 @@ bool graph::AbsorbIntoP()
 			do { //while not back to j again
 				intarray& Round = Vertices[VertexIndex].Edges;
 				//Start with edge first after peripheral in
-				uint k = 1; while (!IsPeripheral(Round[k]) || Round[k]>0) k++;
+				uint k = 1; while (!IsPeripheralLabel(Round[k]) || Round[k]>0) k++;
 				k= (long(k)==Round.TopIndex()) ? 1 : k+1;
-				while (!IsPeripheral(Round[k]))
+				while (!IsPeripheralLabel(Round[k]))
 				{
 					EdgesOut.Add(Round[k]);
 					Separators[static_cast<uint>(Separators.TopIndex()+1)] = 0;
@@ -396,7 +396,7 @@ bool graph::AbsorbIntoP()
 							NewVertex.Edges.Add(Now);
 							if (Now>0) Edges[FindEdge(Now)].Start = NewVertexLabel;
 							else Edges[FindEdge(Now)].End = NewVertexLabel;
-							if (IsPeripheral(Now)) break;
+							if (IsPeripheralLabel(Now)) break;
 							l++;
 							if (long(l)>OldEdgesRound.TopIndex()) l=1;
 						}
@@ -459,7 +459,7 @@ bool graph::AbsorbIntoP()
 						//Find peripheral edge going from j vertex to k vertex
 						intarray& EdgesRoundj = Vertices[FindVertex(From(EdgesOut[j]))].Edges;
 						uint l=1;
-						while (EdgesRoundj[l]<0 || !IsPeripheral(EdgesRoundj[l])) l++;
+						while (EdgesRoundj[l]<0 || !IsPeripheralLabel(EdgesRoundj[l])) l++;
 						//Push all at k vertex, and collapse
 						long SeparatingEdgeLabel = EdgesRoundj[l];
 						Push(-SeparatingEdgeLabel, static_cast<uint>(Edges[FindEdge(SeparatingEdgeLabel)].Image.TopIndex()));
@@ -486,7 +486,7 @@ bool graph::AbsorbIntoP()
 					intarray& EdgesAtj = Vertices[FindVertex(From(EdgesOut[j]))].Edges;
 					uint m = uint(EdgesAtj.Find(EdgesOut[j]));
 					uint Next = (long(m) == EdgesAtj.TopIndex()) ? 1 : m+1;
-					if (!IsPeripheral(EdgesAtj[Next])) L[2] = EdgesOut[k];
+					if (!IsPeripheralLabel(EdgesAtj[Next])) L[2] = EdgesOut[k];
 					else
 					{
 						//Include peripheral edge joining j to k
@@ -533,7 +533,7 @@ bool graph::AbsorbIntoP()
 						NewVertex.Edges.Add(Now);
 						if (Now>0) Edges[FindEdge(Now)].Start = NewVertexLabel;
 						else Edges[FindEdge(Now)].End = NewVertexLabel;
-						if (IsPeripheral(Now)) break;
+						if (IsPeripheralLabel(Now)) break;
 						l++;
 						if (long(l)>OldEdgesRound.TopIndex()) l=1;
 					}
@@ -591,7 +591,7 @@ bool graph::AbsorbIntoP()
 				{
 					//Find Peripheral edge emanating from same vertex as k
 					intarray& EdgesRoundk = Vertices[FindVertex(From(EdgesOut[k]))].Edges;
-					uint l=1; while (!IsPeripheral(EdgesRoundk[l]) || EdgesRoundk[l]<0) l++;
+					uint l=1; while (!IsPeripheralLabel(EdgesRoundk[l]) || EdgesRoundk[l]<0) l++;
 					//Push and collapse it
 					Push(EdgesRoundk[l], static_cast<uint>(Edges[FindEdge(EdgesRoundk[l])].Image.TopIndex()));
 					Collapse(EdgesRoundk[l]);
@@ -603,9 +603,9 @@ bool graph::AbsorbIntoP()
 		{
 			if (Edges[i].Type == Peripheral) continue;
 			if (OnP(Edges[i].Start))
-				while (IsPeripheral(Edges[i].Image[1])) Edges[i].Image.Remove(1);
+				while (IsPeripheralLabel(Edges[i].Image[1])) Edges[i].Image.Remove(1);
 			if (OnP(Edges[i].End))
-				while (IsPeripheral(Edges[i].Image[static_cast<uint>(Edges[i].Image.TopIndex())]))
+				while (IsPeripheralLabel(Edges[i].Image[static_cast<uint>(Edges[i].Image.TopIndex())]))
 					Edges[i].Image.Remove(static_cast<uint>(Edges[i].Image.TopIndex()));
 		}
 		// Correct images of peripheral edges and vertices
@@ -613,12 +613,12 @@ bool graph::AbsorbIntoP()
 		{
 			if (Edges[i].Type != Peripheral) continue;
 			vertex& Start = Vertices[FindVertex(Edges[i].Start)];
-			uint j=1; while (IsPeripheral(Start.Edges[j])) j++;
+			uint j=1; while (IsPeripheralLabel(Start.Edges[j])) j++;
 			uint ImVertexLabel = From(Derivative(Start.Edges[j]));
 			Start.Image = ImVertexLabel;
 			//Find peripheral edge starting at ImVertexLabel
 			intarray& EdgesAtImage = Vertices[FindVertex(ImVertexLabel)].Edges;
-			j=1; while (!IsPeripheral(EdgesAtImage[j]) || EdgesAtImage[j] < 0) j++;
+			j=1; while (!IsPeripheralLabel(EdgesAtImage[j]) || EdgesAtImage[j] < 0) j++;
 			Edges[i].Image.Flush();
 			Edges[i].Image[1] = EdgesAtImage[j];
 		}

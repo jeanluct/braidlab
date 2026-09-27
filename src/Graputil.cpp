@@ -62,7 +62,7 @@ long graph::AltDerivative(long Label, uint n)
 		intarray Image = Edges[Index].Image;
 		if (Label<0) Image.Invert();
 		uint j=1;
-		while (long(j)<=Image.TopIndex() && IsPeripheral(Image[j])) j++;
+		while (long(j)<=Image.TopIndex() && IsPeripheralLabel(Image[j])) j++;
 		if (long(j)>Image.TopIndex()) return 0;
 		Label = Image[j];
 	}
@@ -372,7 +372,7 @@ std::string graph::CharacteristicPolynomial(bool factorise, bool includeNonMain)
 }   
 #endif 
 
-bool graph::IntersectsP(long Label)
+bool graph::IntersectsPLabel(long Label)
 {
 	uint Index = FindEdge(Label);
 	edge& Now = Edges[Index];
@@ -403,7 +403,7 @@ uint graph::OnP(uint Label)
 	return 0;
 }
 
-bool graph::IsPeripheral(long Label)
+bool graph::IsPeripheralLabel(long Label)
 {
 	uint Index = FindEdge(Label);
 	return (Edges[Index].Type == Peripheral);
@@ -651,14 +651,14 @@ bool graph::RetractsOntoP(bool* Inset, uint n)
 	bool *PunctureDone = new bool[Punctures+1];
 	uint i;
 	for (i=1; i<=Punctures; i++) PunctureDone[i] = false;
-	for (i=1; i<=n; i++) if (IsPeripheral(i) && !PunctureDone[Edges[i].Puncture])
+	for (i=1; i<=n; i++) if (IsPeripheralIndex(i) && !PunctureDone[Edges[i].Puncture])
 	{
 		Inset[i] = false;
 		PunctureDone[Edges[i].Puncture] = true;
 	}
 	delete[] PunctureDone;
 	if (!IsProperSubForest(Inset, n)) return false;
-	for (i=1; i<=n; i++) if (IsPeripheral(i)) Inset[i] = true; //Restore peripheral subgraph
+	for (i=1; i<=n; i++) if (IsPeripheralIndex(i)) Inset[i] = true; //Restore peripheral subgraph
 	uint m = NumberVertices();
 	bool *VertSet = new bool[m+1], *Changed = new bool[m+1], *NewChanged = new bool[m+1], Result = true;
 	for (i=1; i<=m; i++) if (OnP(Vertices[i].Label))
@@ -713,8 +713,8 @@ bool graph::NeedToAbsorb()
 	{
 		edge& Now = I++;
 		if (Now.Type == Peripheral) continue;
-		if (OnP(Now.Start) && IsPeripheral(Now.Image[1])) return true;
-		if (OnP(Now.End) && IsPeripheral(Now.Image[static_cast<uint>(Now.Image.TopIndex())])) return true;
+		if (OnP(Now.Start) && IsPeripheralLabel(Now.Image[1])) return true;
+		if (OnP(Now.End) && IsPeripheralLabel(Now.Image[static_cast<uint>(Now.Image.TopIndex())])) return true;
 	} while (!I.AtOrigin());
 	return false;
 }
@@ -727,7 +727,7 @@ bool graph::Collapses(intarray& L)
 		M.Flush();
 		intarray Image = Edges[FindEdge(L[1])].Image;
 		if (L[1]<0) Image.Invert();
-		uint j = static_cast<uint>(Image.TopIndex()); while (IsPeripheral(Image[j])) j--;
+		uint j = static_cast<uint>(Image.TopIndex()); while (IsPeripheralLabel(Image[j])) j--;
 		while (long(j)<=Image.TopIndex()) M[static_cast<uint>(M.TopIndex()+1)] = Image[j++];
 		for (j=2; long(j)<L.TopIndex(); j++) //Peripheral edges
 		{
@@ -737,7 +737,7 @@ bool graph::Collapses(intarray& L)
 		}
 		Image = Edges[FindEdge(L[static_cast<uint>(L.TopIndex())])].Image;
 		if (L[static_cast<uint>(L.TopIndex())]<0) Image.Invert();
-		j=1; while (IsPeripheral(Image[j])) j++;
+		j=1; while (IsPeripheralLabel(Image[j])) j++;
 		for (uint k=1; k<=j; k++) M[static_cast<uint>(M.TopIndex()+1)] = Image[k];
 		M.Tighten();
 		if (!M.TopIndex()) return true; 

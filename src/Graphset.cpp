@@ -1204,10 +1204,10 @@ void graph::OrientPeripheralEdges()
 		//Consider peripheral edges at Now
 		for (uint j=1, k=2; long(j)<=Now.Edges.TopIndex(); j++, k++)
 		{
-			if (!IsPeripheral(Now.Edges[j])) continue;
+			if (!IsPeripheralLabel(Now.Edges[j])) continue;
 			if (long(j)==Now.Edges.TopIndex()) k=1;
-			if ((Now.Edges[j]>0 && !IsPeripheral(Now.Edges[k])) ||
-				(Now.Edges[j]<0 && IsPeripheral(Now.Edges[k])))
+			if ((Now.Edges[j]>0 && !IsPeripheralLabel(Now.Edges[k])) ||
+				(Now.Edges[j]<0 && IsPeripheralLabel(Now.Edges[k])))
 			{
 				//Alter orientation of peripheral edge
 				long Label = (Now.Edges[j]>0) ? Now.Edges[j] : -Now.Edges[j];
