@@ -179,39 +179,40 @@ void graph::BoundaryPeripheralSet(braid& B)
 	Embedding = DesireEmbedding;
 	Flush();
 	//First calculate action of braid on n-1 loops from boundary around first n-1 braid string punctures
-	int n = B.Size();
-	vector<list<int> >  Images(n-1);
-	for (int i=0; i<n-1; ++i) Images[i].assign(1, i+1);
-	for (int i=1; i<=static_cast<int>(B.Length()); ++i)
+	const int n = static_cast<int>(B.Size());
+	vector<list<int> > Images(static_cast<vector<list<int> >::size_type>(n - 1));
+	for (int i=0; i<n-1; ++i) Images[static_cast<vector<list<int> >::size_type>(i)].assign(1, i+1);
+	for (uint braidIdx = 1; braidIdx <= B.Length(); ++braidIdx)
 	{
+		const int gen = static_cast<int>(B[braidIdx]);
 		for (vector<list<int> >::iterator I = Images.begin(); I != Images.end(); ++I)
 		{
-			if (B[i] > 0)
+			if (gen > 0)
 			{
-				//replace each B[i] with B[i] B[i]+1 -B[i], and each B[i]+1 with B[i]
+				//replace each gen with gen gen+1 -gen, and each gen+1 with gen
 				for (list<int>::iterator J = I->begin(); J != I->end(); ++J)
 				{
-					if (*J == B[i]+1) *J = B[i];
-					else if (*J == B[i])
+					if (*J == gen+1) *J = gen;
+					else if (*J == gen)
 					{
 						++J;
-						J = I->insert(J, B[i]+1);
+						J = I->insert(J, gen+1);
 						++J;
-						J = I->insert(J, -B[i]);
+						J = I->insert(J, -gen);
 					}
-					else if (*J == -(B[i]+1)) *J = -B[i];
-					else if (*J == -B[i])
+					else if (*J == -(gen+1)) *J = -gen;
+					else if (*J == -gen)
 					{
-						J = I->insert(J, -(B[i]+1));
-						J = I->insert(J, B[i]);
+						J = I->insert(J, -(gen+1));
+						J = I->insert(J, gen);
 						++J; ++J;
 					}
 				}
 			}
-			else //B[i] < 0
+			else //gen < 0
 			{
-				//replace each B[i] with B[i]+1 and each B[i]+1 with -(B[i]+1) B[i] B[i}+1
-				int absgen = -B[i];
+				//replace each gen with gen+1 and each gen+1 with -(gen+1) gen gen+1
+				int absgen = -gen;
 				for (list<int>::iterator J = I->begin(); J != I->end(); ++J)
 				{
 					if (*J == absgen)
@@ -244,26 +245,28 @@ void graph::BoundaryPeripheralSet(braid& B)
 		}
 	}
 	//Determine which punctures have peripheral loops around them
-	vector<uint> punctureImages(n+1); //punctureImages[0] is not used
-	for (int i=1; i<=n; ++i) punctureImages[i] = B.Permute(i);
-	vector<bool> nonPeripheral(n+1, false); //nonPeripheral[0] is not used
+	vector<uint> punctureImages(static_cast<vector<uint>::size_type>(n + 1)); //punctureImages[0] is not used
+	for (int i=1; i<=n; ++i) punctureImages[static_cast<vector<uint>::size_type>(i)] = B.Permute(static_cast<uint>(i));
+	vector<bool> nonPeripheral(static_cast<vector<bool>::size_type>(n + 1), false); //nonPeripheral[0] is not used
 	int numberNonPeripheral = 0;
-	int i=n;
+	int nonPeripheralCycleIdx = n;
 	do
 	{
 		++numberNonPeripheral;
-		nonPeripheral[i] = true;
-		i = punctureImages[i];
-	} while (i != n);
-	vector<int> vertexNumbers(n, 0); //For peripheral values, gives number of vertex on that loop
+		nonPeripheral[static_cast<vector<bool>::size_type>(nonPeripheralCycleIdx)] = true;
+		nonPeripheralCycleIdx = static_cast<int>(punctureImages[static_cast<vector<uint>::size_type>(nonPeripheralCycleIdx)]);
+	} while (nonPeripheralCycleIdx != n);
+	vector<int> vertexNumbers(static_cast<vector<int>::size_type>(n), 0); //For peripheral values, gives number of vertex on that loop
 	int nextVertexNumber = 2;
-	for (int i=1; i<n; ++i) if (!nonPeripheral[i]) vertexNumbers[i] = nextVertexNumber++;
+	for (int i=1; i<n; ++i)
+		if (!nonPeripheral[static_cast<vector<bool>::size_type>(i)])
+			vertexNumbers[static_cast<vector<int>::size_type>(i)] = nextVertexNumber++;
 
 	//Set up graph 
 	Flush();
-	Punctures = n + 1 - numberNonPeripheral;
+	Punctures = static_cast<uint>(n + 1 - numberNonPeripheral);
 	NextEdgeLabel = 2*n + 1 - numberNonPeripheral;
-	NextVertexLabel = n + 2 - numberNonPeripheral;
+	NextVertexLabel = static_cast<uint>(n + 2 - numberNonPeripheral);
 	Type = Unknown;
 	//Vertices
 	int boundayVertexRegion = n/2;
@@ -277,58 +280,62 @@ void graph::BoundaryPeripheralSet(braid& B)
 	for (int i=1; i<n; ++i)
 	{
 		Now.Edges.SureAdd(i);
-		if (nonPeripheral[i]) Now.Edges.SureAdd(-i);
+		if (nonPeripheral[static_cast<vector<bool>::size_type>(i)]) Now.Edges.SureAdd(-i);
 	}
 	Now.Edges.SureAdd(n);
 	//Other vertices are on peripheral loops about braid strings
-	for (int i=1; i<n; ++i) if (!nonPeripheral[i])
+	for (int i=1; i<n; ++i) if (!nonPeripheral[static_cast<vector<bool>::size_type>(i)])
 	{
-		vertex& Now = Vertices[vertexNumbers[i]];
-		Now.Edges.Flush();
-		Now.Label = vertexNumbers[i];
-		Now.Image = vertexNumbers[punctureImages[i]];
-		Now.Region = (i <= boundayVertexRegion) ? i : i-1;
-		Now.Edges.SureAdd(-i);
-		Now.Edges.SureAdd(vertexNumbers[i] + n - 1);
-		Now.Edges.SureAdd(1 - n - vertexNumbers[i]);
+		const int vertexNumber = vertexNumbers[static_cast<vector<int>::size_type>(i)];
+		vertex& peripheralVertex = Vertices[static_cast<uint>(vertexNumber)];
+		peripheralVertex.Edges.Flush();
+		peripheralVertex.Label = static_cast<uint>(vertexNumber);
+		peripheralVertex.Image = static_cast<uint>(vertexNumbers[static_cast<vector<int>::size_type>(
+			punctureImages[static_cast<vector<uint>::size_type>(i)])]);
+		peripheralVertex.Region = (i <= boundayVertexRegion) ? i : i-1;
+		peripheralVertex.Edges.SureAdd(-i);
+		peripheralVertex.Edges.SureAdd(vertexNumber + n - 1);
+		peripheralVertex.Edges.SureAdd(1 - n - vertexNumber);
 	}
 	//Next set up peripheral edges INCLUDING IMAGES
 	for (int i=n; i<=2*n-numberNonPeripheral; ++i)
 	{
-		edge& Now = Edges[i];
-		Now.Image.Flush();
-		Now.Label = i;
-		Now.Type = Peripheral;
-		Now.Puncture = i + 1 - n;
-		Now.Start = i + 1 - n;
-		Now.End = i + 1 - n;
-		if (i == n) Now.Image[1] = i;
+		edge& peripheralEdge = Edges[static_cast<uint>(i)];
+		peripheralEdge.Image.Flush();
+		peripheralEdge.Label = i;
+		peripheralEdge.Type = Peripheral;
+		peripheralEdge.Puncture = static_cast<uint>(i + 1 - n);
+		peripheralEdge.Start = static_cast<uint>(i + 1 - n);
+		peripheralEdge.End = static_cast<uint>(i + 1 - n);
+		if (i == n) peripheralEdge.Image[1] = i;
 		else 
 		{
-			int stringNumber = -Vertices[i + 1 - n].Edges[1];
-			int imageStringNumber = punctureImages[stringNumber];
-			Now.Image[1] = vertexNumbers[imageStringNumber] + n - 1;
+			const long stringNumberLong = -Vertices[static_cast<uint>(i + 1 - n)].Edges[1];
+			const int stringNumber = static_cast<int>(stringNumberLong);
+			const int imageStringNumber = static_cast<int>(punctureImages[static_cast<vector<uint>::size_type>(stringNumber)]);
+			peripheralEdge.Image[1] = vertexNumbers[static_cast<vector<int>::size_type>(imageStringNumber)] + n - 1;
 		}
 		if (Embedding)
 		{
-			Now.EI.Path.clear();
-			Now.EI.Start = Now.EI.End = Vertices[i + 1 - n].Region;
+			peripheralEdge.EI.Path.clear();
+			peripheralEdge.EI.Start = peripheralEdge.EI.End = Vertices[static_cast<uint>(i + 1 - n)].Region;
 			if (i == n)
 			{
-				for (int j = boundayVertexRegion + 1; j <= n; ++j) Now.EI.append(j);
-				for (int j = -n; j <= -1; ++j) Now.EI.append(j);
-				for (int j = 1; j <= boundayVertexRegion; ++j) Now.EI.append(j);
+				for (int j = boundayVertexRegion + 1; j <= n; ++j) peripheralEdge.EI.append(j);
+				for (int j = -n; j <= -1; ++j) peripheralEdge.EI.append(j);
+				for (int j = 1; j <= boundayVertexRegion; ++j) peripheralEdge.EI.append(j);
 			}
 			else
 			{
-				int stringNumber = -Vertices[i + 1 - n].Edges[1];
+				const long stringNumberLong = -Vertices[static_cast<uint>(i + 1 - n)].Edges[1];
+				const int stringNumber = static_cast<int>(stringNumberLong);
 				if (stringNumber <= boundayVertexRegion)
 				{
-					Now.EI.append(stringNumber); Now.EI.append(-stringNumber);
+					peripheralEdge.EI.append(stringNumber); peripheralEdge.EI.append(-stringNumber);
 				}
 				else
 				{
-					Now.EI.append(-stringNumber); Now.EI.append(stringNumber);
+					peripheralEdge.EI.append(-stringNumber); peripheralEdge.EI.append(stringNumber);
 				}
 			}
 
@@ -337,38 +344,42 @@ void graph::BoundaryPeripheralSet(braid& B)
 	//Next set up main edges OMITTING IMAGES
 	for (int i = 1; i < n; ++i)
 	{
-		edge& Now = Edges[i];
-		Now.Image.Flush();
-		Now.Label = i;
-		Now.Type = Main;
-		Now.Start = 1;
-		Now.End = (nonPeripheral[i]) ? 1 : vertexNumbers[i];
+		edge& mainEdge = Edges[static_cast<uint>(i)];
+		mainEdge.Image.Flush();
+		mainEdge.Label = i;
+		mainEdge.Type = Main;
+		mainEdge.Start = 1;
+		mainEdge.End = (nonPeripheral[static_cast<vector<bool>::size_type>(i)])
+			? static_cast<uint>(1)
+			: static_cast<uint>(vertexNumbers[static_cast<vector<int>::size_type>(i)]);
 		if (Embedding)
 		{
-			Now.EI.Path.clear();
-			Now.EI.Start = boundayVertexRegion;
-			Now.EI.End = (nonPeripheral[i]) ? boundayVertexRegion : Vertices[vertexNumbers[i]].Region;
-			if (nonPeripheral[i])
+			mainEdge.EI.Path.clear();
+			mainEdge.EI.Start = boundayVertexRegion;
+			mainEdge.EI.End = (nonPeripheral[static_cast<vector<bool>::size_type>(i)])
+				? boundayVertexRegion
+				: Vertices[static_cast<uint>(vertexNumbers[static_cast<vector<int>::size_type>(i)])].Region;
+			if (nonPeripheral[static_cast<vector<bool>::size_type>(i)])
 			{
 				if (i <= boundayVertexRegion)
 				{
-					for (int j = boundayVertexRegion; j >= i; --j) Now.EI.append(j);
-					Now.EI.append(-i);
-					for (int j = i+1; j<=boundayVertexRegion; ++j) Now.EI.append(j);
+					for (int j = boundayVertexRegion; j >= i; --j) mainEdge.EI.append(j);
+					mainEdge.EI.append(-i);
+					for (int j = i+1; j<=boundayVertexRegion; ++j) mainEdge.EI.append(j);
 				}
 				else
 				{
-					for (int j = boundayVertexRegion+1; j < i; ++j) Now.EI.append(j);
-					Now.EI.append(-i);
-					for (int j = i; j > boundayVertexRegion; --j) Now.EI.append(j);
+					for (int j = boundayVertexRegion+1; j < i; ++j) mainEdge.EI.append(j);
+					mainEdge.EI.append(-i);
+					for (int j = i; j > boundayVertexRegion; --j) mainEdge.EI.append(j);
 				}
 			}
 			else
 			{
 				if (i <= boundayVertexRegion)
-					for (int j = boundayVertexRegion; j > i; --j) Now.EI.append(j);
+					for (int j = boundayVertexRegion; j > i; --j) mainEdge.EI.append(j);
 				else
-					for (int j = boundayVertexRegion+1; j < i; ++j) Now.EI.append(j);
+					for (int j = boundayVertexRegion+1; j < i; ++j) mainEdge.EI.append(j);
 			}
 		}
 	}
@@ -376,7 +387,7 @@ void graph::BoundaryPeripheralSet(braid& B)
 	map<int, vector<long> > replacements;
 	for (int i = 1; i < n; ++i)
 	{
-		if (nonPeripheral[i])
+		if (nonPeripheral[static_cast<vector<bool>::size_type>(i)])
 		{
 			replacements[i] = vector<long>(1, i);
 			replacements[-i] = vector<long>(1, -i);
@@ -384,9 +395,10 @@ void graph::BoundaryPeripheralSet(braid& B)
 		else
 		{
 			vector<long> v;
-			v.push_back(i); v.push_back(n - 1 + vertexNumbers[i]); v.push_back(-i);
+			const int vertexNumber = vertexNumbers[static_cast<vector<int>::size_type>(i)];
+			v.push_back(i); v.push_back(n - 1 + vertexNumber); v.push_back(-i);
 			replacements[i] = v;
-			v[1] = 1 - n - vertexNumbers[i];
+			v[1] = 1 - n - vertexNumber;
 			replacements[-i] = v;
 		}
 	}
@@ -400,12 +412,16 @@ void graph::BoundaryPeripheralSet(braid& B)
 
 	for (int i = 1; i < n; ++i)
 	{
-		vector<long>& CurrentImage = Edges[i].Image.p;
-		for (list<int>::iterator I = Images[i-1].begin(); I != Images[i-1].end(); ++I) CurrentImage.insert(CurrentImage.end(), replacements[*I].begin(), replacements[*I].end());
+		vector<long>& CurrentImage = Edges[static_cast<uint>(i)].Image.p;
+		for (list<int>::iterator I = Images[static_cast<vector<list<int> >::size_type>(i - 1)].begin();
+			I != Images[static_cast<vector<list<int> >::size_type>(i - 1)].end(); ++I)
+			CurrentImage.insert(CurrentImage.end(), replacements[*I].begin(), replacements[*I].end());
 		tighten(CurrentImage);
-		if (!nonPeripheral[i]) //cut off half way down
+		if (!nonPeripheral[static_cast<vector<bool>::size_type>(i)]) //cut off half way down
 		{
-			CurrentImage.erase(CurrentImage.begin() + CurrentImage.size()/2, CurrentImage.end());
+			const vector<long>::difference_type halfSize =
+				static_cast<vector<long>::difference_type>(CurrentImage.size()/2);
+			CurrentImage.erase(CurrentImage.begin() + halfSize, CurrentImage.end());
 		}
 	}
 
@@ -483,7 +499,7 @@ void graph::IdentityGraph(uint n)
 		Now.Edges.Flush();
 		Now.Label = i;
 		Now.Image = i;
-		Now.Region = i-1;
+		Now.Region = static_cast<int>(i)-1;
 		if (i==1)
 		{
 			Now.Edges[1] = 1;
@@ -518,7 +534,7 @@ void graph::IdentityGraph(uint n)
 		if (Embedding)
 		{
 			Now.EI.Path.clear();
-			Now.EI.Start = Now.EI.End = ((i==1) ? 1 : i-1);
+			Now.EI.Start = Now.EI.End = ((i==1) ? 1 : static_cast<int>(i)-1);
 			Now.EI.append((i==1) ? 1 : -static_cast<int>(i));
 			Now.EI.append((i==1) ? -1 : static_cast<int>(i));
 		}
@@ -536,9 +552,9 @@ void graph::IdentityGraph(uint n)
 		if (Embedding)
 		{
 			Now.EI.Path.clear();
-			Now.EI.Start = ((i==n+1) ? 1 : i-n-1);
-			Now.EI.End = i-n;
-			if (i>n+1) Now.EI.append(i-n);
+			Now.EI.Start = ((i==n+1) ? 1 : static_cast<int>(i)-static_cast<int>(n)-1);
+			Now.EI.End = static_cast<int>(i)-static_cast<int>(n);
+			if (i>n+1) Now.EI.append(static_cast<int>(i)-static_cast<int>(n));
 		}
 	}
 	// Set up loops
@@ -558,12 +574,12 @@ void graph::IdentityGraph(uint n)
 	}
 }
 
-void graph::ActOn(long Gen)
+void graph::ActOn(BraidGenerator Gen)
 {
 	intarray Temp;
 	long n = long(Punctures);
 	long i = (Gen>0) ? Gen : -Gen;
-	VertexImageSwap(i, i+1);
+	VertexImageSwap(static_cast<uint>(i), static_cast<uint>(i+1));
 	if (Gen == 1)
 	{
 		Temp[1] = -(n+1);
@@ -634,7 +650,7 @@ void graph::ActOn(long Gen)
 	}
 }
 
-void graph::VertexImageSwap(uint i, uint j)
+void graph::VertexImageSwap(VertexLabel i, VertexLabel j)
 {
 	uint k;
 	for (k=1; k<=Punctures; k++)
@@ -684,7 +700,7 @@ void graph::PrintSingularities(ostream& Out, bool Abbreviated)
 	int currentProngs = 0;
 	// JLT: Initialised total to remove a compiler complaint.
 	// In theory the loop could fail to assign any value to it.
-	int total = 0;
+	vector<singularity>::size_type total = 0;
 	for (vector<singularityOrbit>::iterator I = singularities.begin(); I != singularities.end(); ++I)
 	{
 		if (I->singularities.front().prongs != currentProngs)
@@ -832,8 +848,9 @@ void graph::ReLabel()
 	edgelist Copy = Edges;
 	for (i=1; i<=ENo; i++)
 	{
-		uint j=1; while (Copy[j].Label != long(i)) j++;
-		Edges[i] = Copy[j];
+		uint copyPos=1;
+		while (Copy[copyPos].Label != long(i)) copyPos++;
+		Edges[i] = Copy[copyPos];
 	}
 
 	//Relabel Vertices
@@ -982,7 +999,7 @@ void graph::Load(istream& In)
 			In >> Image;
 			while (Image != 0)
 			{
-				if (DesireEmbedding) Now.EI.Path.push_back(Image);
+				if (DesireEmbedding) Now.EI.Path.push_back(static_cast<int>(Image));
 				In >> Image;
 			}
 		}
@@ -1002,17 +1019,17 @@ void graph::Load(istream& In)
 	int NumberOfLoops; In >> NumberOfLoops;
 	for (int i=0; i<NumberOfLoops; ++i)
 	{
-		string c;
+		string loopLabel;
 		In.ignore(200,'\n');
-		getline(In,c);
-		looplabels.push_back(c);
+		getline(In,loopLabel);
+		looplabels.push_back(loopLabel);
 		loops.push_back(intarray());
 		long LoopEntry;
 		uint j=1;
 		In >> LoopEntry;
 		while (LoopEntry != 0)
 		{
-			loops[i][j++] = LoopEntry;
+			loops[static_cast<vector<intarray>::size_type>(i)][j++] = LoopEntry;
 			In >> LoopEntry;
 		}
 	}
@@ -1187,10 +1204,10 @@ void graph::OrientPeripheralEdges()
 		//Consider peripheral edges at Now
 		for (uint j=1, k=2; long(j)<=Now.Edges.TopIndex(); j++, k++)
 		{
-			if (!IsPeripheral(Now.Edges[j])) continue;
+			if (!IsPeripheralLabel(Now.Edges[j])) continue;
 			if (long(j)==Now.Edges.TopIndex()) k=1;
-			if ((Now.Edges[j]>0 && !IsPeripheral(Now.Edges[k])) ||
-				(Now.Edges[j]<0 && IsPeripheral(Now.Edges[k])))
+			if ((Now.Edges[j]>0 && !IsPeripheralLabel(Now.Edges[k])) ||
+				(Now.Edges[j]<0 && IsPeripheralLabel(Now.Edges[k])))
 			{
 				//Alter orientation of peripheral edge
 				long Label = (Now.Edges[j]>0) ? Now.Edges[j] : -Now.Edges[j];

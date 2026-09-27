@@ -65,8 +65,8 @@ template<typename T> class MyArray {
 	void _Remove(uint i, uint d=0) {p.erase(p.begin()+i, p.begin()+i+d+1);} /* Removes elements in Positions i to i+d (origin 0) and shifts down.*/
 	void _Split(uint i, MyArray<T>& A) {A.p.assign(p.begin()+i+1, p.end()); p.erase(p.begin()+i+1, p.end());} /*Splits after position i (origin 0) and places tail in A*/
 public:
-	MyArray(uint /*legacy*/ = 1, uint /*legacy*/=1, uint o=1) :  origin(o) {};
-	MyArray(const MyArray& A) : p(A.p), origin(A.origin) {};
+	MyArray(uint /*legacy*/ = 1, uint /*legacy*/=1, uint o=1) :  origin(o) {}
+	MyArray(const MyArray& A) : p(A.p), origin(A.origin) {}
 	MyArray& operator=(const MyArray&A) {origin = A.origin; p = A.p; return *this;}
 	//	~intarray();
 	//	intarray& operator=(intarray& A);
@@ -82,18 +82,31 @@ public:
 	void Append(const MyArray<T>& A) {p.insert(p.end(), A.p.begin(), A.p.end());} /* Appends A*/
 	void Prepend(const MyArray<T>& A) {p.insert(p.begin(), A.p.begin(), A.p.end());}
 	void Insert(uint i, const T& Value) {p.insert(p.begin()+i-origin,Value);} /*Array[i] = value, all others shifted up*/
-	void Invert() {for (int i=0, j=static_cast<int>(p.size())-1; i<static_cast<int>(p.size())/2; ++i, --j)
-	{
-		T temp = p[i];
-		p[i] = -p[j];
-		p[j] = -temp;
-	} 
-	if (p.size()%2) p[(p.size()-1)/2]=-p[(p.size()-1)/2]; }/*Reverses order of elements and replaces each with negative (requires unary - on T)*/
+	void Invert() {
+		if (p.empty()) return;
+		std::size_t i = 0;
+		std::size_t j = p.size() - 1;
+		while (i < j)
+		{
+			T temp = p[i];
+			p[i] = -p[j];
+			p[j] = -temp;
+			++i;
+			--j;
+		}
+		if (i == j) p[i] = -p[i];
+	}/*Reverses order of elements and replaces each with negative (requires unary - on T)*/
 	void Split(uint i, MyArray<T>& A) {_Split(i-origin,A);}/*Splits after position i and places tail in A*/
 	void Print(std::ostream& Out = std::cout) const {std::copy(p.begin(), p.end(), std::ostream_iterator<T>(Out, " ")); 
 	Out << std::endl;}
 	void RemoveAll(const T& Value) {p.erase(std::remove(p.begin(), p.end(), Value),p.end()); p.erase(std::remove(p.begin(), p.end(), -Value),p.end());}/* Removes all occurences of Value and -Value */
-	void Rotate(long Angle=1) {while (Angle>=static_cast<long>(p.size())) Angle-=static_cast<long>(p.size()); std::rotate(p.begin(), p.begin()+Angle, p.end());} /*NewArray[i] = Array[i+Angle] (mod MaxAssigned+1)*/
+	void Rotate(long Angle=1) {
+		if (p.empty()) return;
+		const long n = static_cast<long>(p.size());
+		Angle %= n;
+		if (Angle < 0) Angle += n;
+		std::rotate(p.begin(), p.begin()+Angle, p.end());
+	} /*NewArray[i] = Array[i+Angle] (mod MaxAssigned+1)*/
 	void Replace(const T& Value, const MyArray<T>& A) {if (A.p.size()<1) {RemoveAll(Value); return;}
 	//std::vector<T> temp = p; p.clear();
 	std::vector<T> temp; p.swap(temp);
@@ -140,7 +153,7 @@ template<typename T> class arrayiterator {
 	uint Index;                                   
 	MyArray<T>*  Array;                                   
 public:                                            
-	arrayiterator(MyArray<T>& A) : Index(0), Array(&A) {};
+	arrayiterator(MyArray<T>& A) : Index(0), Array(&A) {}
 	T& Now() {return Array->p[Index];}
 	T& operator++(int) {if (Index<Array->p.size()-1) return Array->p[Index++]; Index=0; return Array->p[Array->p.size()-1];}  /*Post Increment*/              
 	T& operator++() {Index = (Index==Array->p.size()-1) ? 0 : Index+1; return Array->p[Index];}  /* Pre Increment */ 

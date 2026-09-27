@@ -5,6 +5,7 @@
 
 #include "newarray.h"
 #include "embedding.h"
+#include "types.h"
 
 namespace trains {
 
@@ -17,24 +18,24 @@ class graph;
 class edge {
 	friend class graph;
 	friend class matrix;
-	long Label; //Unique positive integer identifying edge. Inverse denoted -Label
-	edgetype Type;
-	uint Puncture; //For peripheral edge, identifies puncture it surrounds
-	uint Start; //Label of initial vertex
-	uint End; //Label of final vertex
+	EdgeLabel Label = 0; //Unique positive integer identifying edge. Inverse denoted -Label
+	edgetype Type = Main;
+	PunctureIndex Puncture = 0; //For peripheral edge, identifies puncture it surrounds
+	VertexLabel Start = 0; //Label of initial vertex
+	VertexLabel End = 0; //Label of final vertex
 	EmbeddingInformation EI;
 public:
 	intarray Image; // Integer list giving image of edge
-	bool Flag; //Utility Flag
-	void Set(long label, edgetype type, uint start, uint end, intarray& image, uint puncture=0);
+	bool Flag = false; //Utility Flag
+	void Set(EdgeLabel label, edgetype type, VertexLabel start, VertexLabel end, intarray& image, PunctureIndex puncture=0);
 	void Print(std::ostream& Out = std::cout, bool showimages = true, bool showembedding = false); // Displays edge data
 	edgetype GetType() {return Type;}
-	long GetLabel() {return Label;}
+	EdgeLabel GetLabel() {return Label;}
 	intarray GetImage() {return Image;}
 	edge operator-() {THROW("Calling dummy operator -",4); return(*this);}
-	bool operator==(edge& E) {THROW("Calling dummy operator =",4); return false;}
+	bool operator==(edge& /*unused*/) {THROW("Calling dummy operator =",4); return false;}
 	friend std::ostream& operator<<(std::ostream& Out, edge E);
-	int Key; //Used for TTT
+	int Key = 0; //Used for TTT
 };
 
 class edgelist {
@@ -91,20 +92,20 @@ public:
 class vertex {
 	friend class graph;
 	friend class TTT;
-	uint Label; //Unique positive integer identifier
+	VertexLabel Label = 0; //Unique positive integer identifier
 	intarray Edges; //Labels of edges at vertex, in cyclic order
-	uint Image; //Label of image vertex
-	int Region; //For embedding information
-	bool Flag; //Utility Flag
+	VertexLabel Image = 0; //Label of image vertex
+	int Region = 0; //For embedding information
+	bool Flag = false; //Utility Flag
 public:
-	void Set(uint label, intarray& edges, uint image);
+	void Set(VertexLabel label, intarray& edges, VertexLabel image);
 	void Print(std::ostream& Out = std::cout, bool showembedding = false); // Displays vertex data
-	uint Valence() {return (Edges.TopIndex());}
-	uint GetLabel() {return Label;}
-	uint GetImage() {return Image;}
+	uint Valence() {return static_cast<uint>(Edges.TopIndex());}
+	VertexLabel GetLabel() {return Label;}
+	VertexLabel GetImage() {return Image;}
 	intarray GetEdges() {return Edges;}
 	vertex operator-() {THROW("Calling dummy operator -",4); return(*this);}
-	bool operator==(vertex& V) {THROW("Calling dummy operator =",4); return false;}
+	bool operator==(vertex& /*unused*/) {THROW("Calling dummy operator =",4); return false;}
 	friend std::ostream& operator<<(std::ostream& Out, vertex V);
 };
 

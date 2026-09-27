@@ -9,7 +9,7 @@ namespace trains {
 
 class EmbeddingInformation {
 public:
-	EmbeddingInformation() : Start(-1), End(-1) {};
+	EmbeddingInformation() : Start(-1), End(-1) {}
 	int Start;
 	int End; //Regions of start and end of edge. Redundant information, but convenient?
 	std::list<int> Path; //List of boundaries crossed by edge.
