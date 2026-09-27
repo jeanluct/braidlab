@@ -43,6 +43,10 @@ Sanitizer build (ASan + UBSan; run it after any nontrivial change):
     cmake -S . -B build-asan -DTRAINS_SANITIZE=ON -DTRAINS_FAST_MATH=OFF
     cmake --build build-asan && ctest --test-dir build-asan
 
+Clang builds work too (for example
+`cmake -S . -B build-clang -DCMAKE_CXX_COMPILER=clang++`) and are clean
+under the strict profile. GCC-only warning flags are added only for GCC.
+
 `TRAINS_FAST_MATH` (default ON) adds `-ffast-math`. The library is built with
 `-O3`.
 

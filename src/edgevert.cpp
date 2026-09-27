@@ -9,7 +9,7 @@ namespace trains {
 
 using namespace std;
 
-edgelist::edgelist(uint s, uint d, uint o) : p(new edge[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+edgelist::edgelist(uint s, uint d, uint o) : p(new edge[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 edgelist::~edgelist() {if (next) next->edgelist::~edgelist(); delete [] p;}
@@ -176,7 +176,7 @@ uint edgelist::AgreesTo(edgelist& A)
 }
 
 
-edgeiterator::edgeiterator(edgelist& A) : Index(0), Array(&A) {};
+edgeiterator::edgeiterator(edgelist& A) : Index(0), Array(&A) {}
 
 edge& edgeiterator::Now() {return Array->Element(Index);}
 
@@ -205,7 +205,7 @@ void edgeiterator::Reset()
 }
 
 
-vertexlist::vertexlist(uint s, uint d, uint o) : p(new vertex[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+vertexlist::vertexlist(uint s, uint d, uint o) : p(new vertex[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 vertexlist::~vertexlist() {if (next) next->vertexlist::~vertexlist(); delete [] p;}
@@ -370,7 +370,7 @@ uint vertexlist::AgreesTo(vertexlist& A)
 }
 
 
-vertexiterator::vertexiterator(vertexlist& A) : Index(0), Array(&A) {};
+vertexiterator::vertexiterator(vertexlist& A) : Index(0), Array(&A) {}
 
 vertex& vertexiterator::Now() {return Array->Element(Index);}
 

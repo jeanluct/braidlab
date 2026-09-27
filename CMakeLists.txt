@@ -99,10 +99,6 @@ if(TRAINS_STRICT_WARNINGS)
             -Woverloaded-virtual
             -Wnon-virtual-dtor
             -Wold-style-cast
-            -Wduplicated-cond
-            -Wduplicated-branches
-            -Wlogical-op
-            -Wuseless-cast
             -Wmisleading-indentation
             -Wundef
             -Wredundant-decls
@@ -110,6 +106,15 @@ if(TRAINS_STRICT_WARNINGS)
             -Wextra-semi
             -Wzero-as-null-pointer-constant
         )
+        # GCC-only warnings; Clang rejects them as unknown options.
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            list(APPEND TRAINS_STRICT_WARNING_FLAGS
+                -Wduplicated-cond
+                -Wduplicated-branches
+                -Wlogical-op
+                -Wuseless-cast
+            )
+        endif()
         target_compile_options(trains PRIVATE ${TRAINS_STRICT_WARNING_FLAGS})
         target_compile_options(frontend PRIVATE ${TRAINS_STRICT_WARNING_FLAGS})
         target_compile_options(train PRIVATE ${TRAINS_STRICT_WARNING_FLAGS})

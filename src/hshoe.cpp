@@ -11,7 +11,7 @@ namespace trains {
 using namespace std;
 
 
-codelist::codelist(uint s, uint d, uint o) : p(new code[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+codelist::codelist(uint s, uint d, uint o) : p(new code[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 codelist::~codelist() {if (next) next->codelist::~codelist(); delete [] p;}

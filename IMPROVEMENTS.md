@@ -167,7 +167,8 @@ Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
    the stray `warnings` file. The `strict-warnings*.log` files are
    superseded by `STRICT_WARNINGS_STATUS.md`; delete them or keep them as
    history.
-4. **Try a Clang build** (small to medium). Only GCC has been used so far.
+4. **Try a Clang build** (small to medium). Done: see
+   `STRICT_WARNINGS_STATUS.md` ("Clang"). Only GCC has been used so far.
    The history has Mac compiler fixes, and Clang's warnings differ.
 5. **README contributor section** (small; Priority 7). Most of the content
    already exists in `CLAUDE.md` ("Integer types", the build and test

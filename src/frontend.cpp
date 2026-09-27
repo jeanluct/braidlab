@@ -236,9 +236,9 @@ int main(int argc, char* argv[])
 						continue;
 					}
 					g = G.Growth();
-					if (g-1.0<TOL)
+					if (g-1.0L<TOL)
 					{
-						g = 1.0;
+						g = 1.0L;
 						G.SetType(fo);
 					}
 					cout << "Now have an efficient fibred surface: Growth " << g << ", Entropy " << log(g) << '\n';
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 				else
 				{
 					g = G.Growth();
-					if (g-1.0 < TOL) g = 1.0;
+					if (g-1.0L < TOL) g = 1.0L;
 					cout << "Growth: " << g << "    Entropy: " << log(g) << '\n';
 				}
 				break;

@@ -12,7 +12,7 @@ namespace trains {
 
 using namespace std;
 
-turnlist::turnlist(uint s, uint d, uint o) : p(new turn[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+turnlist::turnlist(uint s, uint d, uint o) : p(new turn[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 turnlist::~turnlist() {if (next) next->turnlist::~turnlist(); delete [] p;}

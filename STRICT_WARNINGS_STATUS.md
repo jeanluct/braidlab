@@ -139,6 +139,29 @@ fast-math, one entry's graph dump starts a vertex's cyclic edge order and
 its gate list at a different point. The structure is equivalent; this is
 floating-point tie-breaking, not a regression.
 
+## Clang
+
+Checked with Clang 18.1 (2026-09-27), in the default, strict and sanitizer
+configurations. All 14 tests pass in each, including the byte-identical
+golden test.
+
+- Default flags: no warnings.
+- Strict profile: 72 warnings at first. 60 of them were four GCC-only
+  flags (`-Wduplicated-cond`, `-Wduplicated-branches`, `-Wlogical-op`,
+  `-Wuseless-cast`) being passed to Clang; `CMakeLists.txt` now adds them
+  for GCC only. 16 were `-Wdouble-promotion` on `double` literals used as
+  `decimal` (Clang also flags constants, which GCC does not); these now have
+  an `L` suffix, and the inexact tolerance literals (`STARTTOL`, and
+  `train.cpp`'s `TOL`) have an explicit `static_cast<decimal>` so they keep
+  their exact value. 6 were `;` after namespace-scope function bodies
+  (Clang's `-Wextra-semi` covers these), now removed. Now: 0 warnings.
+- These fixes leave the generated code unchanged: `objdump -d` is identical
+  for GCC's `libtrains.a`, `frontend` and `train`, and for Clang's
+  `libtrains.a`.
+- ASan + UBSan: clean.
+- Clang does not report the `-Wnull-dereference` that GCC does, which
+  further supports the false-positive reading.
+
 ## Bugs Found Along the Way
 
 - `src/train.cpp` has printed `Thurston type = Unknown` for every braid

@@ -119,7 +119,7 @@ bool graph::PerformValenceTwoIsotopies()
 bool graph::FoldToDecreaseLambda()
 {
 	decimal OldGrowth = Growth();
-	if (OldGrowth-1.0 < TOL)
+	if (OldGrowth-1.0L < TOL)
 	{
 		Type = fo;
 		return false;
@@ -216,7 +216,7 @@ decimal graph::FindTrainTrack()
 			Type = Reducible1;
 			FindReduction();
 			ReLabel();
-			return 1.0;
+			return 1.0L;
 		}
 		if (PerformValenceTwoIsotopies()) continue;
 #ifdef VS2005
@@ -232,10 +232,10 @@ decimal graph::FindTrainTrack()
 	}
 	ReLabel();
 	decimal Result = Growth();
-	if (Result-1.0<TOL)
+	if (Result-1.0L<TOL)
 	{
 		Type = fo;
-		return 1.0;
+		return 1.0L;
 	}
 	Type = pA_or_red;
 	return Result;
