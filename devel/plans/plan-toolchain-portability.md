@@ -4,7 +4,8 @@ Branch: `toolchain-portability` (from `develop` at `879e033`).
 
 Status: plan only; nothing implemented yet.  Revised after discussion:
 the strategy is to remove the sources of drift rather than to keep
-patching them.
+patching them.  Target release: **3.4.2**, with rebuilt packages for all
+platforms, including Intel macOS.
 
 Companion documents: `devel/PORTABILITY.md` (earlier analysis; parts of it
 are corrected below), `devel/RELEASE-CONFIG.md`, `devel/CI-WORKFLOW.md`,
@@ -84,9 +85,15 @@ distributions.
 `macos-latest` and `windows-latest` change without notice, which is how
 F1 appeared.  Rebuilding the same commit can give different binaries.
 
-### F6. Minor: release assets are zipped twice
+### F6. Minor: macOS and Windows release assets are zipped twice
 
-Each release asset is a zip containing the actual archive.
+Every GitHub Actions artifact is stored as a zip, whatever it contains.
+The release procedure (`devel/CI-WORKFLOW.md`, step 4: attach the
+generated archives by hand) attached each artifact's wrapper rather than
+its contents.  The Linux `.tar.gz` assets were unwrapped correctly.  The
+four `.zip` assets (macOS and Windows, both flavors) are the wrapper: a
+valid zip, named correctly, whose only entry is the real zip.  Users who
+unzip them get a second zip rather than `+braidlab/`.
 
 ## Diagnosis: one root cause, one fragile component
 
@@ -146,8 +153,14 @@ MATLAB loads the system `libgmp` first (via gnutls).
   the pins are updated from MathWorks' supported-compilers list for that
   release), or when GitHub retires a pinned image.  That is announced
   months ahead and happens roughly yearly.
-- Optional: Intel macOS packages on `macos-15-intel` (R2024b supports
-  Intel Macs).
+- **Intel macOS packages** (decided): two more matrix entries (default
+  and no-gmp) on `macos-15-intel`.  They use Intel MATLAB R2024b from
+  `setup-matlab`, Xcode 16, the same 13.0 deployment target, and a GMP
+  static library configured `--enable-fat`, so it does not tune to the
+  runner's CPU.  The archive name picks up `x86_64` from `RUNNER_ARCH`
+  automatically.  Intel support has a natural end: GitHub is phasing out
+  Intel macOS images, and Apple and MathWorks are ending Intel support.
+  When `macos-15-intel` is retired, these entries are simply dropped.
 
 ### B. Link GMP statically; remove bundling
 
@@ -179,6 +192,16 @@ MATLAB loads the system `libgmp` first (via gnutls).
   libraries and the OS runtime.  F3 and the dylib half of F2 disappear by
   construction.
 
+### D. Publish release assets from CI (fixes F6)
+
+A `publish_release` job runs only on `release-*` tags, after every
+package job succeeds.  `actions/download-artifact` unwraps the
+artifacts, so it gets the real archives.  It uploads them with
+`gh release upload` to a **draft** GitHub release for the maintainer to
+review and publish, together with a `SHA256SUMS` file.  Only this job gets
+`permissions: contents: write`.  This replaces the manual step 4 in
+`devel/CI-WORKFLOW.md`.
+
 ### C. Self-checking builds (deferred)
 
 On the back burner until A and B are done; then decide whether it is
@@ -203,7 +226,9 @@ done for 3.4.  `develop` is not touched until everything is green.
 2. **Static GMP on macOS and Windows** (B).  Remove bundling there.
 3. **Linux in manylinux_2_28 with static GMP** (A + B).  Remove the
    remaining bundling code.
-4. **Documentation.**
+4. **Release publishing job** (D), tested on a throwaway tag such as
+   `release-0.0.0-test` against a draft release that is then deleted.
+5. **Documentation.**
    - `devel/PORTABILITY.md`: the licensing correction, a minimum-platform
      table, and corrections to Dimension 1 ("MSVC runtime ... largely a
      non-issue") and Dimension 3 ("C++ runtime ... in good shape").
@@ -215,9 +240,10 @@ For each step, a manual check of the archives confirms that it did what
 it claims: minimum OS, glibc/GLIBCXX, exports, imports, and no bundled
 libraries.
 
-## Open questions
+## Decisions
 
-1. Build Intel macOS packages?
-2. Given F2–F4, publish a 3.4.1 with rebuilt packages once this lands?
-3. F6: fix the double-zipped release assets (for example, attach the
-   inner archives with `gh release upload`)?
+- Build release floor: R2024b.
+- Ship Intel macOS packages.
+- Publish the result as braidlab 3.4.2.
+- Fix F6 by publishing release assets from CI (D).
+- Self-checking builds (C): deferred until the rest is done.
