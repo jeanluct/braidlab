@@ -15,38 +15,16 @@ The project builds with CMake. The top-level `Makefile` is a backwards-compatibl
   - `make` (build library + executables)
   - `make lib` (build static library only)
   - `make test` (build, then run the test suite)
-  - `make strict` (clean rebuild with strict warnings, see below)
-  - `make asan` (build and test with sanitizers, see below)
+  - `make strict` (clean rebuild with strict warnings)
+  - `make asan` (build and test with sanitizers)
   - `make clean`
   - `make distclean` (also removes the other `build-*` directories)
 
-The main build directory `build/` (the one `make` uses) keeps the traditional
-layout: `lib/libtrains.a`, `src/frontend` and `src/train`. Any other build
-directory keeps its outputs inside itself (for example `build-asan/frontend`),
-so extra configurations never overwrite the main build. This is controlled by
-the CMake option `TRAINS_IN_TREE_OUTPUTS`, which is on by default only for
-`build/`.
+`make` leaves the library in `lib/libtrains.a` and the executables in
+`src/frontend` and `src/train`.
 
-### Optional strict warnings profile
-
-Enable additional compile-time checks without changing default behavior:
-
-- `make strict`, or equivalently:
-  - `cmake -S . -B build-strict -DTRAINS_STRICT_WARNINGS=ON`
-  - `cmake --build build-strict`
-
-This adds an extended warning set for GNU/Clang (`-Wextra`, `-Wpedantic`,
-`-Wconversion`, `-Wsign-conversion`, etc.) and `/W4` on MSVC.
-
-### Optional sanitizer build
-
-Build and run the tests with AddressSanitizer and UndefinedBehaviorSanitizer
-(GNU/Clang):
-
-- `make asan`, or equivalently:
-  - `cmake -S . -B build-asan -DTRAINS_SANITIZE=ON -DTRAINS_FAST_MATH=OFF`
-  - `cmake --build build-asan`
-  - `ctest --test-dir build-asan --output-on-failure`
+The optional development builds (strict warnings, sanitizers, Clang) are
+described in [`devel/BUILDING.md`](devel/BUILDING.md).
 
 ### Running tests (CTest)
 

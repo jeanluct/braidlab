@@ -30,7 +30,8 @@ locate binaries by `$<TARGET_FILE:...>`, so each build directory tests its
 own.
 
 Makefile shortcuts: `make test`, `make strict` (logs to
-`strict-warnings-latest.log`), `make asan`.
+`strict-warnings-latest.log`), `make asan`. The optional build modes are
+documented for humans in `devel/BUILDING.md`.
 
 Strict-warning profile (separate build dir by convention):
 
