@@ -100,7 +100,13 @@ public:
 	void Print(std::ostream& Out = std::cout) const {std::copy(p.begin(), p.end(), std::ostream_iterator<T>(Out, " ")); 
 	Out << std::endl;}
 	void RemoveAll(const T& Value) {p.erase(std::remove(p.begin(), p.end(), Value),p.end()); p.erase(std::remove(p.begin(), p.end(), -Value),p.end());}/* Removes all occurences of Value and -Value */
-	void Rotate(long Angle=1) {while (Angle>=static_cast<long>(p.size())) Angle-=static_cast<long>(p.size()); std::rotate(p.begin(), p.begin()+Angle, p.end());} /*NewArray[i] = Array[i+Angle] (mod MaxAssigned+1)*/
+	void Rotate(long Angle=1) {
+		if (p.empty()) return;
+		const long n = static_cast<long>(p.size());
+		Angle %= n;
+		if (Angle < 0) Angle += n;
+		std::rotate(p.begin(), p.begin()+Angle, p.end());
+	} /*NewArray[i] = Array[i+Angle] (mod MaxAssigned+1)*/
 	void Replace(const T& Value, const MyArray<T>& A) {if (A.p.size()<1) {RemoveAll(Value); return;}
 	//std::vector<T> temp = p; p.clear();
 	std::vector<T> temp; p.swap(temp);

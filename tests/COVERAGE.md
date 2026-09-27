@@ -110,6 +110,30 @@ train -> TTT flow runs end-to-end. This gives integration coverage around:
 - train-track computation invocation from frontend
 - TTT output path (`src/ttt.cpp`)
 
+## `test_myarray`
+
+Edge cases of `MyArray<T>` (`trains/newarray.h`):
+
+- assignment: empty/non-empty in each direction, self-assignment, deep copy,
+  repeated assignment under mutation (the `MakeIrreducible` pattern)
+- 1-based indexing, zero-filled auto-growth on read and write, `Find`,
+  `Add` vs `SureAdd`
+- `Rotate`: wrap-around, negative angles, empty and single-element arrays,
+  and the rotate-then-remove idiom in `graph::Collapse`
+- `Remove`, `Insert`, `Split`, `Append`/`Prepend`, `RemoveAll`, `Replace`
+  with an empty array, `Invert` edge cases
+- `Tighten`/`CyclicTighten` nesting and full cancellation
+- `Agrees`/`AgreesTo` with prefixes and empty arrays
+- `arrayiterator` cyclic wrap for pre- and post-increment
+
+## Other integration tests
+
+- `test_train_*`: one braid per Thurston type through `train`.
+- `test_frontend_long_token`: tokens over 20 characters (a past buffer
+  overflow; only meaningful under `TRAINS_SANITIZE`).
+- `test_golden_batch`: exact output of the corpus in `tests/golden/`
+  against pre-cleanup `master`. See `CLAUDE.md`.
+
 ## Notes on boundaries
 
 - The suite aims for broad behavioral coverage of major library modules, not

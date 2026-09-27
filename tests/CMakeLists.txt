@@ -15,6 +15,15 @@ target_link_libraries(test_newarray_embedding PRIVATE ${TRAINS_TEST_COMMON_LIBS}
 add_test(NAME test_newarray_embedding COMMAND test_newarray_embedding)
 set_tests_properties(test_newarray_embedding PROPERTIES LABELS "library;array;embedding")
 
+add_executable(test_myarray
+    test_myarray.cpp
+    ${TRAINS_TEST_COMMON_SOURCES}
+)
+target_include_directories(test_myarray PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(test_myarray PRIVATE ${TRAINS_TEST_COMMON_LIBS})
+add_test(NAME test_myarray COMMAND test_myarray)
+set_tests_properties(test_myarray PROPERTIES LABELS "library;array" TIMEOUT 30)
+
 add_executable(test_braid_horseshoe_batch
     test_braid_horseshoe_batch.cpp
     ${TRAINS_TEST_COMMON_SOURCES}

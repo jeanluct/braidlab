@@ -58,6 +58,15 @@ Guidelines:
 
 ## Priority 4: Strengthen `MyArray` safety guarantees
 
+Status: done except copy-and-swap. `operator=` is two member copies
+(`std::vector` plus origin), which is already self-assignment safe and
+strongly exception safe, so copy-and-swap would add nothing. Covered by
+`tests/test_myarray.cpp`. `Rotate` was hardened: it used to loop forever on
+an empty array and was undefined for negative angles. No caller hit either
+case. Remaining latent hazards, all unreachable from current callers:
+`operator[]` below the origin (a `uint` underflow leading to a huge resize),
+`arrayiterator` on an empty array, and `Remove`/`Split` past the end.
+
 Because the remaining warning touches `MyArray` assignment:
 
 1. Audit `MyArray<T>::operator=` invariants:
