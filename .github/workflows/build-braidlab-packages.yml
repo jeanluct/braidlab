@@ -47,10 +47,19 @@ env:
   # MathWorks supports for BRAIDLAB_RELEASE_MATLAB (R2024b: Xcode 15-16,
   # MSVC 2017-2022, GCC 8-13) and must be bumped together with it; see
   # devel/RELEASE-CONFIG.md.  The runner images themselves are pinned in
-  # the release_pinned matrix below.
+  # the release_pinned matrix below.  (Windows uses windows-2022: since
+  # September 2026 the windows-2025 label serves an image with only
+  # Visual Studio 2026, which R2024b does not support.)
   BRAIDLAB_XCODE_VERSION: ${{ vars.BRAIDLAB_XCODE_VERSION || '16.4' }}
   BRAIDLAB_VS_GENERATOR: ${{ vars.BRAIDLAB_VS_GENERATOR || 'Visual Studio 17 2022' }}
   BRAIDLAB_CMAKE_VERSION: ${{ vars.BRAIDLAB_CMAKE_VERSION || '3.31.6' }}
+  # Oldest macOS the packages support (R2024b: 13.7 and newer).
+  BRAIDLAB_MACOS_DEPLOYMENT_TARGET: ${{ vars.BRAIDLAB_MACOS_DEPLOYMENT_TARGET || '13.0' }}
+  # GMP linked statically into the release packages
+  # (.github/scripts/build-gmp-static.sh).  The checksum is of
+  # gmp-<version>.tar.xz and must be updated with the version.
+  BRAIDLAB_GMP_VERSION: '6.3.0'
+  BRAIDLAB_GMP_SHA256: 'a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898'
 
 jobs:
   docs_pdf:
@@ -95,17 +104,17 @@ jobs:
             platform_token: macos
             archive_ext: zip
             flavor: default
-            gmp_linkage: bundled
+            gmp_linkage: static
           - os: macos-15-intel
             platform_token: macos
             archive_ext: zip
             flavor: default
-            gmp_linkage: bundled
-          - os: windows-2025
+            gmp_linkage: static
+          - os: windows-2022
             platform_token: windows
             archive_ext: zip
             flavor: default
-            gmp_linkage: bundled
+            gmp_linkage: static
           # no-gmp flavor: built on every push to catch GMP-free
           # build regressions early.  Cheap because no GMP install
           # and no bundled-layout verification.
@@ -124,7 +133,7 @@ jobs:
             archive_ext: zip
             flavor: no-gmp
             gmp_linkage: 'off'
-          - os: windows-2025
+          - os: windows-2022
             platform_token: windows
             archive_ext: zip
             flavor: no-gmp
@@ -175,17 +184,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10
 
-      - name: Install GMP (macOS, bundled flavor)
-        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
-        shell: bash
-        run: brew install gmp
+      - name: Cache static GMP (macOS)
+        id: gmp-cache
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'static' }}
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/gmp-static
+          key: gmp-${{ env.BRAIDLAB_GMP_VERSION }}-${{ matrix.os }}-${{ runner.arch }}-macos${{ env.BRAIDLAB_MACOS_DEPLOYMENT_TARGET }}-xcode${{ env.BRAIDLAB_XCODE_VERSION }}-${{ hashFiles('.github/scripts/build-gmp-static.sh') }}
 
-      - name: Install GMP (Windows, bundled flavor)
-        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+      - name: Build static GMP (macOS)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'static' && steps.gmp-cache.outputs.cache-hit != 'true' }}
+        shell: bash
+        env:
+          GMP_VERSION: ${{ env.BRAIDLAB_GMP_VERSION }}
+          GMP_SHA256: ${{ env.BRAIDLAB_GMP_SHA256 }}
+          MACOSX_DEPLOYMENT_TARGET: ${{ env.BRAIDLAB_MACOS_DEPLOYMENT_TARGET }}
+        run: .github/scripts/build-gmp-static.sh "${RUNNER_TEMP}/gmp-static"
+
+      - name: Install static GMP (Windows)
+        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'static' }}
         shell: bash
         run: |
-          # vcpkg ships preinstalled on windows-latest runners.
-          vcpkg install gmp:x64-windows
+          # Static GMP built against the release DLL C runtime (/MD), which
+          # is what MATLAB and our MEX files use.  vcpkg ships preinstalled
+          # on the Windows runners.
+          vcpkg install gmp:x64-windows-static-md
           # Expose vcpkg toolchain location for the configure step.
           echo "VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
 
@@ -195,18 +218,20 @@ jobs:
           CMAKE_ARGS=(-S . -B build "-DBRAIDLAB_GMP_LINKAGE=${{ matrix.gmp_linkage }}")
           if [ "${{ runner.os }}" = "Windows" ]; then
             # Pin the Visual Studio version rather than taking the newest
-            # one installed on the image.
-            CMAKE_ARGS+=(-G "${BRAIDLAB_VS_GENERATOR}" -A x64)
+            # one installed on the image.  CMAKE_BUILD_TYPE matters even
+            # with this multi-config generator: without it, vcpkg's
+            # toolchain prefers its debug libraries.
+            CMAKE_ARGS+=(-G "${BRAIDLAB_VS_GENERATOR}" -A x64 -DCMAKE_BUILD_TYPE=Release)
           fi
-          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
-            GMP_PREFIX="$(brew --prefix gmp)"
-            CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=${GMP_PREFIX}")
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            CMAKE_ARGS+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=${BRAIDLAB_MACOS_DEPLOYMENT_TARGET}")
           fi
-          if [ "${{ runner.os }}" = "Windows" ] && [ "${{ matrix.gmp_linkage }}" = "bundled" ]; then
+          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.gmp_linkage }}" = "static" ]; then
+            CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=${RUNNER_TEMP}/gmp-static")
+          fi
+          if [ "${{ runner.os }}" = "Windows" ] && [ "${{ matrix.gmp_linkage }}" = "static" ]; then
             CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-            # Pin the release triplet so find_library does not pick the
-            # debug variant under installed/x64-windows/debug/lib/.
-            CMAKE_ARGS+=("-DVCPKG_TARGET_TRIPLET=x64-windows")
+            CMAKE_ARGS+=("-DVCPKG_TARGET_TRIPLET=x64-windows-static-md")
           fi
           cmake "${CMAKE_ARGS[@]}"
 
@@ -293,69 +318,53 @@ jobs:
             esac
           done
 
-      - name: Verify bundled GMP layout (macOS)
-        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'bundled' }}
+      - name: Verify static GMP (macOS)
+        if: ${{ runner.os == 'macOS' && matrix.gmp_linkage == 'static' }}
         shell: bash
         run: |
-          PRIV="stage/+braidlab/@braid/private"
-          echo "Contents of ${PRIV}:"
-          ls -la "${PRIV}"
-          # Bundled SONAMEs on macOS look like libgmp.10.dylib / libgmpxx.4.dylib.
-          ls "${PRIV}"/libgmp*.dylib >/dev/null || { echo "Missing bundled libgmp dylib"; exit 1; }
-          ls "${PRIV}"/libgmpxx*.dylib >/dev/null || { echo "Missing bundled libgmpxx dylib"; exit 1; }
-          for mex in cross2gen_helper loopsigma_helper entropy_helper; do
-            MEX_FILE=$(ls "${PRIV}/${mex}".mex* 2>/dev/null | head -1)
-            test -n "${MEX_FILE}" || { echo "Missing MEX: ${mex}"; exit 1; }
-            echo "--- otool -L ${MEX_FILE} ---"
-            otool -L "${MEX_FILE}"
-            # A MEX whose translation unit pulls in GMP headers but
-            # never references a GMP symbol may be linked without any
-            # libgmp dependency (analogous to ld --as-needed on Linux).
-            # Such a MEX has no runtime GMP load to rewrite, so skip it.
-            if ! otool -L "${MEX_FILE}" | grep -q libgmp; then
-              echo "SKIP: ${mex} has no libgmp load command"
-              continue
+          # With static GMP, no MEX may load a GMP dylib, and none may be
+          # shipped.
+          fail=0
+          if find stage -name '*.dylib' | grep .; then
+            echo "FAIL: dynamic libraries shipped in the package"; fail=1
+          fi
+          for mex_file in $(find stage -name '*.mexmac*'); do
+            if otool -L "${mex_file}" | grep -i gmp; then
+              echo "FAIL: ${mex_file} depends on a GMP dylib"; fail=1
             fi
-            # Confirm GMP references are rewritten to @loader_path,
-            # not absolute Homebrew paths.
-            if otool -L "${MEX_FILE}" | grep -E '^\s+/.*libgmp' >/dev/null; then
-              echo "FAIL: ${mex} still has absolute libgmp reference"
-              otool -L "${MEX_FILE}" | grep libgmp
-              exit 1
-            fi
-            otool -L "${MEX_FILE}" | grep -q '@loader_path/libgmp' || {
-              echo "FAIL: ${mex} missing @loader_path/libgmp reference"; exit 1; }
           done
+          test -f stage/extern/gmp/README.md || { echo "FAIL: GMP README not staged"; fail=1; }
+          test "${fail}" -eq 0
 
-      - name: Verify bundled GMP layout (Windows)
-        if: ${{ runner.os == 'Windows' && matrix.gmp_linkage == 'bundled' }}
+      - name: Verify static GMP and release runtime (Windows)
+        if: ${{ runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          $priv = "stage/+braidlab/@braid/private"
-          Write-Host "Contents of ${priv}:"
-          Get-ChildItem $priv
-          # vcpkg's GMP port installs gmp-10.dll (no lib prefix); MSYS2
-          # ships libgmp-10.dll.  Accept both so the layout check is
-          # not coupled to the package source.  Note: Get-ChildItem's
-          # -Include filter is a silent no-op unless the -Path argument
-          # contains a wildcard (or -Recurse is set), so append \* to
-          # the directory path rather than using -Filter (which takes
-          # only a single pattern).
-          $gmpDlls = Get-ChildItem -Path "$priv\*" -Include "gmp*.dll","libgmp*.dll" -File
-          if ($gmpDlls.Count -eq 0) {
-            Write-Error "No bundled GMP DLL found in ${priv}"
-            exit 1
-          }
-          Write-Host "Found bundled GMP DLLs:"
-          $gmpDlls | ForEach-Object { Write-Host "  $($_.Name)" }
-          foreach ($mex in @('cross2gen_helper', 'loopsigma_helper', 'entropy_helper')) {
-            $mexFiles = Get-ChildItem -Path $priv -Filter "${mex}.mexw*"
-            if ($mexFiles.Count -eq 0) {
-              Write-Error "Missing MEX: ${mex}"
-              exit 1
+          # No MEX may import a GMP DLL (GMP is static) or Microsoft's
+          # debug C runtime (present only where Visual Studio is
+          # installed), and no DLLs may be shipped.
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $dumpbin = Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Select-Object -First 1
+          $fail = $false
+          $dlls = Get-ChildItem -Path stage -Recurse -Filter *.dll
+          if ($dlls) { Write-Host "FAIL: DLLs shipped: $($dlls.Name)"; $fail = $true }
+          foreach ($mex in Get-ChildItem -Path stage -Recurse -Filter *.mexw64) {
+            $imports = & $dumpbin.FullName /dependents $mex.FullName |
+              Where-Object { $_ -match '^\s+\S+\.dll\s*$' } | ForEach-Object { $_.Trim() }
+            Write-Host "$($mex.Name): $($imports -join ' ')"
+            foreach ($imp in $imports) {
+              if ($imp -match '^(lib)?gmp') {
+                Write-Host "FAIL: $($mex.Name) imports $imp"; $fail = $true
+              }
+              if ($imp -match '^(msvcp|vcruntime)\d+d(_\d+)?\.dll$' -or $imp -match '^ucrtbased\.dll$') {
+                Write-Host "FAIL: $($mex.Name) imports debug runtime $imp"; $fail = $true
+              }
             }
-            Write-Host "Found ${mex}: $($mexFiles[0].Name)"
           }
+          if ('${{ matrix.gmp_linkage }}' -eq 'static' -and -not (Test-Path stage/extern/gmp/README.md)) {
+            Write-Host "FAIL: GMP README not staged"; $fail = $true
+          }
+          if ($fail) { exit 1 }
 
       - name: MATLAB smoke test
         uses: matlab-actions/run-command@v3
@@ -436,6 +445,9 @@ jobs:
             echo "platform_token=${{ matrix.platform_token }}"
             echo "flavor=${{ matrix.flavor }}"
             echo "gmp_linkage=${{ matrix.gmp_linkage }}"
+            if [ "${{ matrix.gmp_linkage }}" = "static" ]; then
+              echo "gmp_version=${BRAIDLAB_GMP_VERSION}"
+            fi
             echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           } > stage/BUILD-MANIFEST.txt
 
