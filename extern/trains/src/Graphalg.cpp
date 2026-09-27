@@ -29,7 +29,7 @@ bool graph::CollapseInvariantForest()
 	for (i=1; i<=n; i++) Labels[i] = Edges[i].Label;
 	for (i=1; i<=n; i++) //Is Edges[i] in invariant forest
 	{
-		if (IntersectsP(Labels[i])) continue; //Certainly no good
+		if (IntersectsPLabel(Labels[i])) continue; //Certainly no good
 		for (uint j=1; j<=n; j++) Inset[j] = Changed[j] = NewChanged[j] = false;
 		Inset[i] = Changed[i] = true;
 		bool SomeChanged = true, Bad = false;
@@ -40,7 +40,7 @@ bool graph::CollapseInvariantForest()
 				intarray& Im = Edges[j].Image;
 				for (uint k=1; long(k)<=Im.TopIndex(); k++)
 				{
-					if (IntersectsP(Im[k]))
+					if (IntersectsPLabel(Im[k]))
 					{
 						Bad = true;
 						break;
@@ -81,7 +81,7 @@ bool graph::CollapseInvariantForest()
 	{
 		for (i=1; i<=n; i++) if (Inset[i])
 		{
-			Push(Labels[i], Edges[FindEdge(Labels[i])].Image.TopIndex());
+			Push(Labels[i], static_cast<uint>(Edges[FindEdge(Labels[i])].Image.TopIndex()));
 			Collapse(Labels[i]);
 		}
 		PullTight();
@@ -104,7 +104,7 @@ bool graph::PerformValenceTwoIsotopies()
 		{
 			if (Vertices[i].Valence() == 2)
 			{
-				ValenceTwoIsotopy(Vertices[i].Label);
+				ValenceTwoIsotopyVertex(Vertices[i].Label);
 				PullTight();
 				while (CollapseInvariantForest());
 				ValenceTwoFound = Result = true;
@@ -119,7 +119,7 @@ bool graph::PerformValenceTwoIsotopies()
 bool graph::FoldToDecreaseLambda()
 {
 	decimal OldGrowth = Growth();
-	if (OldGrowth-1.0 < TOL)
+	if (OldGrowth-1.0L < TOL)
 	{
 		Type = fo;
 		return false;
@@ -216,7 +216,7 @@ decimal graph::FindTrainTrack()
 			Type = Reducible1;
 			FindReduction();
 			ReLabel();
-			return 1.0;
+			return 1.0L;
 		}
 		if (PerformValenceTwoIsotopies()) continue;
 #ifdef VS2005
@@ -232,10 +232,10 @@ decimal graph::FindTrainTrack()
 	}
 	ReLabel();
 	decimal Result = Growth();
-	if (Result-1.0<TOL)
+	if (Result-1.0L<TOL)
 	{
 		Type = fo;
-		return 1.0;
+		return 1.0L;
 	}
 	Type = pA_or_red;
 	return Result;
@@ -255,13 +255,13 @@ bool graph::AbsorbIntoP()
 		long* Labels = new long[n+1];
 		for (uint i=1; i<=n; i++) Labels[i] = Edges[i].Label;
 		Found = false;
-		for (uint i=1; i<=n; i++) if (IntersectsP(i) && !IsPeripheral(i))
+		for (uint i=1; i<=n; i++) if (IntersectsPIndex(i) && !IsPeripheralIndex(i))
 			//Does edges[i], which emanates from P, lie in an invariant subgraph which drs onto P?
 		{
 			for (uint j=1; j<=n; j++)
 			{
 				Inset[j] = Changed[j] = NewChanged[j] = false;
-				if (IsPeripheral(j)) Inset[j] = true;
+				if (IsPeripheralIndex(j)) Inset[j] = true;
 			}
 			Inset[i] = Changed[i] = true;
 			bool SomeChanged = true, Bad = false;
@@ -273,7 +273,7 @@ bool graph::AbsorbIntoP()
 					for (uint k=1; long(k)<=Im.TopIndex(); k++)
 					{
 						uint Index = FindEdge(Im[k]);
-						if (Index < i && IntersectsP(Index) && !IsPeripheral(Index)) //CHANGED
+						if (Index < i && IntersectsPIndex(Index) && !IsPeripheralIndex(Index)) //CHANGED
 						{
 							Bad = true;
 							break;
@@ -300,11 +300,11 @@ bool graph::AbsorbIntoP()
 				Found = true;
 				Result = true;
 				//Collapse edges in Inset, pushing images anywhere but into P
-				for (uint j=1; j<=n; j++) if (Inset[j] && !IsPeripheral(Labels[j]))
+				for (uint j=1; j<=n; j++) if (Inset[j] && !IsPeripheralLabel(Labels[j]))
 				{
 					uint Index = FindEdge(Labels[j]);
-					if (OnP(Edges[Index].Start)) Push(-Labels[j], Edges[Index].Image.TopIndex());
-					else Push(Labels[j], Edges[Index].Image.TopIndex());
+					if (OnP(Edges[Index].Start)) Push(-Labels[j], static_cast<uint>(Edges[Index].Image.TopIndex()));
+					else Push(Labels[j], static_cast<uint>(Edges[Index].Image.TopIndex()));
 					Collapse(Labels[j]);
 				}
 				PullTight();
@@ -328,21 +328,21 @@ bool graph::AbsorbIntoP()
 			//Find some vertex on this loop
 			uint j=1;
 			while (OnP(Vertices[j].Label) != i) j++;
-			uint VertexIndex = j;
+			uint VIndex = j;
 			do { //while not back to j again
-				intarray& Round = Vertices[VertexIndex].Edges;
+				intarray& Round = Vertices[VIndex].Edges;
 				//Start with edge first after peripheral in
-				uint k = 1; while (!IsPeripheral(Round[k]) || Round[k]>0) k++;
+				uint k = 1; while (!IsPeripheralLabel(Round[k]) || Round[k]>0) k++;
 				k= (long(k)==Round.TopIndex()) ? 1 : k+1;
-				while (!IsPeripheral(Round[k]))
+				while (!IsPeripheralLabel(Round[k]))
 				{
 					EdgesOut.Add(Round[k]);
-					Separators[Separators.TopIndex()+1] = 0;
+					Separators[static_cast<uint>(Separators.TopIndex()+1)] = 0;
 					k = (long(k)==Round.TopIndex()) ? 1 : k+1;
 				}
-				Separators[Separators.TopIndex()] = 1;
-				VertexIndex = FindVertex(To(Round[k]));
-			} while (VertexIndex != j);
+				Separators[static_cast<uint>(Separators.TopIndex())] = 1;
+				VIndex = FindVertex(To(Round[k]));
+			} while (VIndex != j);
 			if (EdgesOut.TopIndex() == 1) continue; //No action when only one edge from loop
 			//Now determine equivalence classes in EdgesOut INEFFICIENT
 			intarray Class; //Will hold AltDeriv(corresponding edge, 2*number edges) which determines class
@@ -354,7 +354,7 @@ bool graph::AbsorbIntoP()
 			}
 			intarray ClassLabels; //Will hold possible labels for equivalence classes
 			for (j=1; long(j)<=Class.TopIndex(); j++)
-				if (ClassLabels.Find(Class[j]) == -1) ClassLabels[ClassLabels.TopIndex()+1] = Class[j];
+				if (ClassLabels.Find(Class[j]) == -1) ClassLabels[static_cast<uint>(ClassLabels.TopIndex()+1)] = Class[j];
 			//If at least 2 classes, insert zero-image edges to separate classes, and push from edges within classes
 			if (ClassLabels.TopIndex() > 1)
 			{
@@ -366,8 +366,8 @@ bool graph::AbsorbIntoP()
 						//First change graph
 						long NewEdgeLabel = NextEdgeLabel++;
 						uint NewVertexLabel = NextVertexLabel++;
-						edge& NewEdge = Edges[Edges.TopIndex()+1];
-						vertex& NewVertex = Vertices[Vertices.TopIndex()+1];
+						edge& NewEdge = Edges[static_cast<uint>(Edges.TopIndex()+1)];
+						vertex& NewVertex = Vertices[static_cast<uint>(Vertices.TopIndex()+1)];
 						uint OldVertexLabel = From(EdgesOut[j]);
 						vertex& OldVertex = Vertices[FindVertex(OldVertexLabel)];
 						//Set up new edge
@@ -396,7 +396,7 @@ bool graph::AbsorbIntoP()
 							NewVertex.Edges.Add(Now);
 							if (Now>0) Edges[FindEdge(Now)].Start = NewVertexLabel;
 							else Edges[FindEdge(Now)].End = NewVertexLabel;
-							if (IsPeripheral(Now)) break;
+							if (IsPeripheralLabel(Now)) break;
 							l++;
 							if (long(l)>OldEdgesRound.TopIndex()) l=1;
 						}
@@ -425,7 +425,7 @@ bool graph::AbsorbIntoP()
 									NowImage.Insert(++m, Temp2);
 							}
 							if (!NowImage.TopIndex()) continue;
-							long Temp=-NewEdgeLabel, Temp2=-NowImage[NowImage.TopIndex()];
+							long Temp=-NewEdgeLabel, Temp2=-NowImage[static_cast<uint>(NowImage.TopIndex())];
 							if (OldEdgesRound.Find(NowImage[1])!=-1) NowImage.Insert(1, Temp);
 							if (OldEdgesRound.Find(Temp2)!=-1) NowImage.SureAdd(NewEdgeLabel);
 						}
@@ -444,7 +444,7 @@ bool graph::AbsorbIntoP()
 									NowImage.Insert(++m, Temp2);
 							}
 							if (!NowImage.TopIndex()) continue;
-							long Temp=-NewEdgeLabel, Temp2=-NowImage[NowImage.TopIndex()];
+							long Temp=-NewEdgeLabel, Temp2=-NowImage[static_cast<uint>(NowImage.TopIndex())];
 							if (OldEdgesRound.Find(NowImage[1])!=-1) NowImage.Insert(1, Temp);
 							if (OldEdgesRound.Find(Temp2)!=-1) NowImage.SureAdd(NewEdgeLabel);
 						}
@@ -459,10 +459,10 @@ bool graph::AbsorbIntoP()
 						//Find peripheral edge going from j vertex to k vertex
 						intarray& EdgesRoundj = Vertices[FindVertex(From(EdgesOut[j]))].Edges;
 						uint l=1;
-						while (EdgesRoundj[l]<0 || !IsPeripheral(EdgesRoundj[l])) l++;
+						while (EdgesRoundj[l]<0 || !IsPeripheralLabel(EdgesRoundj[l])) l++;
 						//Push all at k vertex, and collapse
 						long SeparatingEdgeLabel = EdgesRoundj[l];
-						Push(-SeparatingEdgeLabel, Edges[FindEdge(SeparatingEdgeLabel)].Image.TopIndex());
+						Push(-SeparatingEdgeLabel, static_cast<uint>(Edges[FindEdge(SeparatingEdgeLabel)].Image.TopIndex()));
 						Collapse(SeparatingEdgeLabel);
 					}
 				}
@@ -486,7 +486,7 @@ bool graph::AbsorbIntoP()
 					intarray& EdgesAtj = Vertices[FindVertex(From(EdgesOut[j]))].Edges;
 					uint m = uint(EdgesAtj.Find(EdgesOut[j]));
 					uint Next = (long(m) == EdgesAtj.TopIndex()) ? 1 : m+1;
-					if (!IsPeripheral(EdgesAtj[Next])) L[2] = EdgesOut[k];
+					if (!IsPeripheralLabel(EdgesAtj[Next])) L[2] = EdgesOut[k];
 					else
 					{
 						//Include peripheral edge joining j to k
@@ -503,8 +503,8 @@ bool graph::AbsorbIntoP()
 					//First change graph
 					long NewEdgeLabel = NextEdgeLabel++;
 					uint NewVertexLabel = NextVertexLabel++;
-					edge& NewEdge = Edges[Edges.TopIndex()+1];
-					vertex& NewVertex = Vertices[Vertices.TopIndex()+1];
+					edge& NewEdge = Edges[static_cast<uint>(Edges.TopIndex()+1)];
+					vertex& NewVertex = Vertices[static_cast<uint>(Vertices.TopIndex()+1)];
 					uint OldVertexLabel = From(EdgesOut[j]);
 					vertex& OldVertex = Vertices[FindVertex(OldVertexLabel)];
 					//Set up new edge
@@ -533,7 +533,7 @@ bool graph::AbsorbIntoP()
 						NewVertex.Edges.Add(Now);
 						if (Now>0) Edges[FindEdge(Now)].Start = NewVertexLabel;
 						else Edges[FindEdge(Now)].End = NewVertexLabel;
-						if (IsPeripheral(Now)) break;
+						if (IsPeripheralLabel(Now)) break;
 						l++;
 						if (long(l)>OldEdgesRound.TopIndex()) l=1;
 					}
@@ -562,7 +562,7 @@ bool graph::AbsorbIntoP()
 								NowImage.Insert(++m, Temp2);
 						}
 						if (!NowImage.TopIndex()) continue;
-						long Temp=-NewEdgeLabel, Temp2= -NowImage[NowImage.TopIndex()];
+						long Temp=-NewEdgeLabel, Temp2= -NowImage[static_cast<uint>(NowImage.TopIndex())];
 						if (OldEdgesRound.Find(NowImage[1])!=-1) NowImage.Insert(1, Temp);
 						if (OldEdgesRound.Find(Temp2)!=-1) NowImage.SureAdd(NewEdgeLabel);
 					}
@@ -581,7 +581,7 @@ bool graph::AbsorbIntoP()
 								NowImage.Insert(++m, Temp2);
 						}
 						if (!NowImage.TopIndex()) continue;
-						long Temp=-NewEdgeLabel, Temp2= -NowImage[NowImage.TopIndex()];
+						long Temp=-NewEdgeLabel, Temp2= -NowImage[static_cast<uint>(NowImage.TopIndex())];
 						if (OldEdgesRound.Find(NowImage[1])!=-1) NowImage.Insert(1, Temp);
 						if (OldEdgesRound.Find(Temp2)!=-1) NowImage.SureAdd(NewEdgeLabel);
 					}
@@ -591,9 +591,9 @@ bool graph::AbsorbIntoP()
 				{
 					//Find Peripheral edge emanating from same vertex as k
 					intarray& EdgesRoundk = Vertices[FindVertex(From(EdgesOut[k]))].Edges;
-					uint l=1; while (!IsPeripheral(EdgesRoundk[l]) || EdgesRoundk[l]<0) l++;
+					uint l=1; while (!IsPeripheralLabel(EdgesRoundk[l]) || EdgesRoundk[l]<0) l++;
 					//Push and collapse it
-					Push(EdgesRoundk[l], Edges[FindEdge(EdgesRoundk[l])].Image.TopIndex());
+					Push(EdgesRoundk[l], static_cast<uint>(Edges[FindEdge(EdgesRoundk[l])].Image.TopIndex()));
 					Collapse(EdgesRoundk[l]);
 				}
 			}//End of one equivalence class case
@@ -603,22 +603,22 @@ bool graph::AbsorbIntoP()
 		{
 			if (Edges[i].Type == Peripheral) continue;
 			if (OnP(Edges[i].Start))
-				while (IsPeripheral(Edges[i].Image[1])) Edges[i].Image.Remove(1);
+				while (IsPeripheralLabel(Edges[i].Image[1])) Edges[i].Image.Remove(1);
 			if (OnP(Edges[i].End))
-				while (IsPeripheral(Edges[i].Image[Edges[i].Image.TopIndex()]))
-					Edges[i].Image.Remove(Edges[i].Image.TopIndex());
+				while (IsPeripheralLabel(Edges[i].Image[static_cast<uint>(Edges[i].Image.TopIndex())]))
+					Edges[i].Image.Remove(static_cast<uint>(Edges[i].Image.TopIndex()));
 		}
 		// Correct images of peripheral edges and vertices
 		for (uint i=1; i<=NumberEdges(); i++)
 		{
 			if (Edges[i].Type != Peripheral) continue;
 			vertex& Start = Vertices[FindVertex(Edges[i].Start)];
-			uint j=1; while (IsPeripheral(Start.Edges[j])) j++;
+			uint j=1; while (IsPeripheralLabel(Start.Edges[j])) j++;
 			uint ImVertexLabel = From(Derivative(Start.Edges[j]));
 			Start.Image = ImVertexLabel;
 			//Find peripheral edge starting at ImVertexLabel
 			intarray& EdgesAtImage = Vertices[FindVertex(ImVertexLabel)].Edges;
-			j=1; while (!IsPeripheral(EdgesAtImage[j]) || EdgesAtImage[j] < 0) j++;
+			j=1; while (!IsPeripheralLabel(EdgesAtImage[j]) || EdgesAtImage[j] < 0) j++;
 			Edges[i].Image.Flush();
 			Edges[i].Image[1] = EdgesAtImage[j];
 		}

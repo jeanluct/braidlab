@@ -23,28 +23,28 @@ namespace trains {
 using namespace std;
 
 
-uint graph::FindEdge(long Label)
+EdgeIndex graph::FindEdge(EdgeLabel Label)
 {
 	for (uint i=1; long(i)<=Edges.TopIndex(); i++)
 		if (Edges[i].Label == Label || Edges[i].Label == -Label) return i;
 	return 0;
 }
 
-uint graph::FindVertex(uint Label)
+VertexIndex graph::FindVertex(VertexLabel Label)
 {
 	for (uint i=1; long(i)<=Vertices.TopIndex(); i++) if (Vertices[i].Label == Label) return i;
 	return 0;
 }
 
-long graph::Derivative(long Label)
+EdgeLabel graph::Derivative(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	if (!Edges[Index].Image.TopIndex()) return 0;
 	if (Label>0) return (Edges[Index].Image[1]);
-	return (-Edges[Index].Image[Edges[Index].Image.TopIndex()]);
+	return (-Edges[Index].Image[static_cast<uint>(Edges[Index].Image.TopIndex())]);
 }
 
-long graph::Derivative(long Label, uint n)
+EdgeLabel graph::Derivative(EdgeLabel Label, uint n)
 {
 	for (uint i=1; i<=n; i++)
 	{
@@ -54,7 +54,7 @@ long graph::Derivative(long Label, uint n)
 	return Label;
 }
 
-long graph::AltDerivative(long Label, uint n)
+EdgeLabel graph::AltDerivative(EdgeLabel Label, uint n)
 {
 	for (uint i=1; i<=n; i++)
 	{
@@ -62,14 +62,14 @@ long graph::AltDerivative(long Label, uint n)
 		intarray Image = Edges[Index].Image;
 		if (Label<0) Image.Invert();
 		uint j=1;
-		while (long(j)<=Image.TopIndex() && IsPeripheral(Image[j])) j++;
+		while (long(j)<=Image.TopIndex() && IsPeripheralLabel(Image[j])) j++;
 		if (long(j)>Image.TopIndex()) return 0;
 		Label = Image[j];
 	}
 	return Label;
 }
 
-void graph::Replace(long Label, intarray& L)
+void graph::Replace(EdgeLabel Label, intarray& L)
 {
 	edgeiterator I(Edges);
 	do
@@ -78,7 +78,7 @@ void graph::Replace(long Label, intarray& L)
 	} while (!I.AtOrigin());
 }
 
-void graph::LoopReplace(long label, intarray& L)
+void graph::LoopReplace(EdgeLabel label, intarray& L)
 {
 	for (vector<int>::size_type i=0; i < loops.size(); ++i)
 	{
@@ -86,7 +86,7 @@ void graph::LoopReplace(long label, intarray& L)
 	}    
 }    
 
-void graph::RemoveAll(long Label)
+void graph::RemoveAll(EdgeLabel Label)
 {
 	edgeiterator I(Edges);
 	do
@@ -95,7 +95,7 @@ void graph::RemoveAll(long Label)
 	} while (!I.AtOrigin());
 }
 
-void graph::LoopRemoveAll(long Label)
+void graph::LoopRemoveAll(EdgeLabel Label)
 {
 	for (vector<int>::size_type i=0; i<loops.size(); ++i)
 	{
@@ -372,7 +372,7 @@ std::string graph::CharacteristicPolynomial(bool factorise, bool includeNonMain)
 }   
 #endif 
 
-bool graph::IntersectsP(long Label)
+bool graph::IntersectsPLabel(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	edge& Now = Edges[Index];
@@ -380,7 +380,7 @@ bool graph::IntersectsP(long Label)
 	return (OnP(Now.Start) || OnP(Now.End));
 }
 
-uint graph::OnPInd(uint Index)
+PunctureIndex graph::OnPInd(VertexIndex Index)
 {
 	intiterator I(Vertices[Index].Edges);
 	do
@@ -391,7 +391,7 @@ uint graph::OnPInd(uint Index)
 	return 0;
 }
 
-uint graph::OnP(uint Label)
+PunctureIndex graph::OnP(VertexLabel Label)
 {
 	uint Index = FindVertex(Label);
 	intiterator I(Vertices[Index].Edges);
@@ -403,7 +403,7 @@ uint graph::OnP(uint Label)
 	return 0;
 }
 
-bool graph::IsPeripheral(long Label)
+bool graph::IsPeripheralLabel(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	return (Edges[Index].Type == Peripheral);
@@ -455,7 +455,7 @@ void graph::FindTypes()
 	}
 }
 
-uint graph::From(long Label)
+VertexLabel graph::From(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	return ( (Label>0) ? Edges[Index].Start : Edges[Index].End );
@@ -561,7 +561,7 @@ turn graph::FindTurns()
 			long Found;
 			if ((Found = Turns.Find(Current)) != -1)
 			{
-				Current.Level = Turns[Found].Level;
+				Current.Level = Turns[static_cast<uint>(Found)].Level;
 				if (Current.Level && (!Result.Level || Current.Level<Result.Level)) Result = Current;
 				continue;
 			}
@@ -575,9 +575,9 @@ turn graph::FindTurns()
 				if (Found != -1)
 				{
 					Finished = true;
-					uint FoundLevel = Turns[Found].Level;
+					uint FoundLevel = Turns[static_cast<uint>(Found)].Level;
 					if (!FoundLevel) for (uint l=1; long(l)<=T.TopIndex(); l++) T[l].Level = 0;
-					else for (uint l=1; long(l)<=T.TopIndex(); l++) T[l].Level = FoundLevel+T.TopIndex()+1-l;
+					else for (uint l=1; long(l)<=T.TopIndex(); l++) T[l].Level = static_cast<uint>(FoundLevel+T.TopIndex()+1-l);
 				}
 				else
 				{
@@ -591,7 +591,7 @@ turn graph::FindTurns()
 						if (Current.IsDegenerate())
 						{
 							Finished = true;
-							for (uint l=1; long(l)<=T.TopIndex(); l++) T[l].Level = T.TopIndex()+1-l;
+							for (uint l=1; long(l)<=T.TopIndex(); l++) T[l].Level = static_cast<uint>(T.TopIndex()+1-l);
 						}
 						else T.Add(Current);
 					}
@@ -651,14 +651,14 @@ bool graph::RetractsOntoP(bool* Inset, uint n)
 	bool *PunctureDone = new bool[Punctures+1];
 	uint i;
 	for (i=1; i<=Punctures; i++) PunctureDone[i] = false;
-	for (i=1; i<=n; i++) if (IsPeripheral(i) && !PunctureDone[Edges[i].Puncture])
+	for (i=1; i<=n; i++) if (IsPeripheralIndex(i) && !PunctureDone[Edges[i].Puncture])
 	{
 		Inset[i] = false;
 		PunctureDone[Edges[i].Puncture] = true;
 	}
 	delete[] PunctureDone;
 	if (!IsProperSubForest(Inset, n)) return false;
-	for (i=1; i<=n; i++) if (IsPeripheral(i)) Inset[i] = true; //Restore peripheral subgraph
+	for (i=1; i<=n; i++) if (IsPeripheralIndex(i)) Inset[i] = true; //Restore peripheral subgraph
 	uint m = NumberVertices();
 	bool *VertSet = new bool[m+1], *Changed = new bool[m+1], *NewChanged = new bool[m+1], Result = true;
 	for (i=1; i<=m; i++) if (OnP(Vertices[i].Label))
@@ -713,8 +713,8 @@ bool graph::NeedToAbsorb()
 	{
 		edge& Now = I++;
 		if (Now.Type == Peripheral) continue;
-		if (OnP(Now.Start) && IsPeripheral(Now.Image[1])) return true;
-		if (OnP(Now.End) && IsPeripheral(Now.Image[Now.Image.TopIndex()])) return true;
+		if (OnP(Now.Start) && IsPeripheralLabel(Now.Image[1])) return true;
+		if (OnP(Now.End) && IsPeripheralLabel(Now.Image[static_cast<uint>(Now.Image.TopIndex())])) return true;
 	} while (!I.AtOrigin());
 	return false;
 }
@@ -727,18 +727,18 @@ bool graph::Collapses(intarray& L)
 		M.Flush();
 		intarray Image = Edges[FindEdge(L[1])].Image;
 		if (L[1]<0) Image.Invert();
-		uint j = Image.TopIndex(); while (IsPeripheral(Image[j])) j--;
-		while (long(j)<=Image.TopIndex()) M[M.TopIndex()+1] = Image[j++];
+		uint j = static_cast<uint>(Image.TopIndex()); while (IsPeripheralLabel(Image[j])) j--;
+		while (long(j)<=Image.TopIndex()) M[static_cast<uint>(M.TopIndex()+1)] = Image[j++];
 		for (j=2; long(j)<L.TopIndex(); j++) //Peripheral edges
 		{
 			Image = Edges[FindEdge(L[j])].Image;
 			if (L[j]<0) Image.Invert();
 			M.Append(Image);
 		}
-		Image = Edges[FindEdge(L[L.TopIndex()])].Image;
-		if (L[L.TopIndex()]<0) Image.Invert();
-		j=1; while (IsPeripheral(Image[j])) j++;
-		for (uint k=1; k<=j; k++) M[M.TopIndex()+1] = Image[k];
+		Image = Edges[FindEdge(L[static_cast<uint>(L.TopIndex())])].Image;
+		if (L[static_cast<uint>(L.TopIndex())]<0) Image.Invert();
+		j=1; while (IsPeripheralLabel(Image[j])) j++;
+		for (uint k=1; k<=j; k++) M[static_cast<uint>(M.TopIndex()+1)] = Image[k];
 		M.Tighten();
 		if (!M.TopIndex()) return true; 
 		L = M;
@@ -767,7 +767,7 @@ void graph::FindSingularities()
 	//I believe that we must already have found gates to reach this stage. Also must have relabelled.
 	//Make a nicer list of gates and infinitesimal edges
 	//First the gates
-	std::vector<vertexGateInformation> v(Vertices.TopIndex()+1);
+	std::vector<vertexGateInformation> v(static_cast<std::vector<vertexGateInformation>::size_type>(Vertices.TopIndex()+1));
 	uint j=3; //index into Reduction
 	for (uint i=1; static_cast<long>(i)<=Vertices.TopIndex(); ++i)
 	{
@@ -832,11 +832,15 @@ void graph::FindSingularities()
 			int first = *I; ++I; int second = *I;
 			if (first == 0 && second != 1)
 			{
-				cusps[-v[i].gates[second][v[i].gates[second].size()-1]].cusps = v[i].gates.size()-2;
+				cusps[-v[i].gates[static_cast<vector<vector<long> >::size_type>(second)]
+					[v[i].gates[static_cast<vector<vector<long> >::size_type>(second)].size()-1]].cusps =
+					static_cast<int>(v[i].gates.size()-2);
 			}
 			else
 			{
-				cusps[-v[i].gates[first][v[i].gates[first].size()-1]].cusps = v[i].gates.size()-2;
+				cusps[-v[i].gates[static_cast<vector<vector<long> >::size_type>(first)]
+					[v[i].gates[static_cast<vector<vector<long> >::size_type>(first)].size()-1]].cusps =
+					static_cast<int>(v[i].gates.size()-2);
 			}
 		}
 	}
@@ -898,7 +902,7 @@ void graph::FindSingularities()
 				else
 				{
 					intarray& A = Edges[FindEdge(-(*I))].Image;
-					for (uint i=A.TopIndex(); i>=1; --i) image.push_back(-A[i]);
+					for (long i=A.TopIndex(); i>=1; --i) image.push_back(-A[static_cast<uint>(i)]);
 				}
 			}
 			//tighten. First remove interior cancellations
@@ -1099,7 +1103,7 @@ void graph::TampDown()
 	}
 }
 
-bool graph::SingleVertexEmbeddingTighten(uint Index)
+bool graph::SingleVertexEmbeddingTighten(VertexIndex Index)
 {
 	vertex& Now = Vertices[Index];
 	if (Now.Edges.TopIndex()<=1) return false;
@@ -1114,31 +1118,31 @@ bool graph::SingleVertexEmbeddingTighten(uint Index)
 		if (Crossing == -(Now.Region+1)) ++BR;
 	}
 	int Majority = 0;
-	if (static_cast<double>(TL)> Now.Edges.TopIndex()/2.0) {Majority = Now.Region; --Now.Region;}
-	if (static_cast<double>(BL)> Now.Edges.TopIndex()/2.0) {Majority = -Now.Region; --Now.Region;}
-	if (static_cast<double>(TR)> Now.Edges.TopIndex()/2.0) {Majority = Now.Region+1; ++Now.Region;}
-	if (static_cast<double>(BR)> Now.Edges.TopIndex()/2.0) {Majority = -(Now.Region+1); ++Now.Region;}
+	if (static_cast<double>(TL)> static_cast<double>(Now.Edges.TopIndex())/2.0) {Majority = Now.Region; --Now.Region;}
+	if (static_cast<double>(BL)> static_cast<double>(Now.Edges.TopIndex())/2.0) {Majority = -Now.Region; --Now.Region;}
+	if (static_cast<double>(TR)> static_cast<double>(Now.Edges.TopIndex())/2.0) {Majority = Now.Region+1; ++Now.Region;}
+	if (static_cast<double>(BR)> static_cast<double>(Now.Edges.TopIndex())/2.0) {Majority = -(Now.Region+1); ++Now.Region;}
 
 	if (Majority==0) return false;
 	for (uint i=1; static_cast<long>(i)<=Now.Edges.TopIndex(); ++i)
 	{
-		uint Index = FindEdge(Now.Edges[i]);
+		uint edgeIndex = FindEdge(Now.Edges[i]);
 		if (Now.Edges[i]>0)
 		{
-			if (!Edges[Index].EI.Path.empty() && Edges[Index].EI.Path.front() == Majority) Edges[Index].EI.Path.erase(Edges[Index].EI.Path.begin());
-			else Edges[Index].EI.Path.insert(Edges[Index].EI.Path.begin(), Majority);
-			Edges[Index].EI.Start = Now.Region;
+			if (!Edges[edgeIndex].EI.Path.empty() && Edges[edgeIndex].EI.Path.front() == Majority) Edges[edgeIndex].EI.Path.erase(Edges[edgeIndex].EI.Path.begin());
+			else Edges[edgeIndex].EI.Path.insert(Edges[edgeIndex].EI.Path.begin(), Majority);
+			Edges[edgeIndex].EI.Start = Now.Region;
 		}
 		else
 		{
 
-			if (!Edges[Index].EI.Path.empty() && Edges[Index].EI.Path.back() == Majority) 
+			if (!Edges[edgeIndex].EI.Path.empty() && Edges[edgeIndex].EI.Path.back() == Majority) 
 			{
-				std::list<int>::iterator I = Edges[Index].EI.Path.end();
-				Edges[Index].EI.Path.erase(--I);
+				std::list<int>::iterator I = Edges[edgeIndex].EI.Path.end();
+				Edges[edgeIndex].EI.Path.erase(--I);
 			}
-			else Edges[Index].EI.Path.push_back(Majority);
-			Edges[Index].EI.End = Now.Region;
+			else Edges[edgeIndex].EI.Path.push_back(Majority);
+			Edges[edgeIndex].EI.End = Now.Region;
 		}
 	}
 	return true;

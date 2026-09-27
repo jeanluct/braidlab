@@ -1,4 +1,9 @@
 src/*.o
 src/frontend
 src/train
-.sconsign.dblite
+build/
+build-*/
+strict-warnings*.log
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake

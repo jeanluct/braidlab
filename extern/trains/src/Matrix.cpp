@@ -17,7 +17,7 @@ matrix::matrix(graph& G, bool includeNonMain) : GrowthDone(false), IrredDone(fal
 {
 	if (includeNonMain)
 	{
-		n = G.Edges.TopIndex();
+		n = static_cast<uint>(G.Edges.TopIndex());
 		Evec = new decimal[n];
 		p = new long*[n];
 		for (uint i = 0; i<n; ++i) p[i] = new long[n];
@@ -40,7 +40,7 @@ matrix::matrix(graph& G, bool includeNonMain) : GrowthDone(false), IrredDone(fal
 		uint i;
 		//Identify main edges
 		G.FindTypes();
-		uint GEdges = G.Edges.TopIndex(); //Total number of edges in G
+		uint GEdges = static_cast<uint>(G.Edges.TopIndex()); //Total number of edges in G
 		n = 0;
 		uint* MainEdges = new uint[GEdges]; //Will Store Indices of main edges
 		for (i=1; i<=GEdges; i++)
@@ -84,15 +84,15 @@ void matrix::GrowthCalc()
 	for (i=0; i<n; i++) p[i][i]+=1;
 	GrowthDone = true;
 	decimal* Temp = new decimal[n];
-	for (i=0; i<n; i++) Temp[i] = 1.0/SQRT(static_cast<long double>(n));
-	decimal Eval = 1.0;
+	for (i=0; i<n; i++) Temp[i] = 1.0L/SQRT(static_cast<long double>(n));
+	decimal Eval = 1.0L;
 	bool Finished = false;
 	while (!Finished)
 	{
 		Growth = Eval;
 		for (i=0; i<n; i++)
 		{
-			Evec[i] = 0.0;
+			Evec[i] = 0.0L;
 			for (uint j=0; j<n; j++) Evec[i] += decimal(p[i][j])*Temp[j];
 		}
 		Eval = EvecModulus();
@@ -100,19 +100,19 @@ void matrix::GrowthCalc()
 		for (i=0; i<n; i++)
 		{
 			decimal Test = Evec[i]/Eval;
-			if (FABS(Test-Temp[i])>TOL/10.0) Finished = false;
+			if (FABS(Test-Temp[i])>TOL/10.0L) Finished = false;
 			Temp[i] = Test;
 		}
 	}
 	for (i=0; i<n; i++) Evec[i] = Temp[i];
-	Growth = Eval-1.0; //Compensate for added identity
+	Growth = Eval-1.0L; //Compensate for added identity
 	for (i=0; i<n; i++)  p[i][i]-=1;
 	delete [] Temp;
 }
 
 decimal matrix::EvecModulus()
 {
-	decimal Sum = 0.0;
+	decimal Sum = 0.0L;
 	for (uint i=0; i<n; i++) Sum += (Evec[i]*Evec[i]);
 	return SQRT(Sum);
 }

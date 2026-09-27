@@ -5,12 +5,12 @@
 #include <cmath>
 #ifdef __WINDOWSVERSION
 #ifndef VS2005
-#define STARTTOL 0.000001
+#define STARTTOL (static_cast< ::trains::decimal>(0.000001))
 #else
-#define STARTTOL 0.00000000001
+#define STARTTOL (static_cast< ::trains::decimal>(0.00000000001))
 #endif
 #else
-#define STARTTOL 0.000000001
+#define STARTTOL (static_cast< ::trains::decimal>(0.000000001))
 #endif
 #define SQRT sqrt
 #define FABS fabs

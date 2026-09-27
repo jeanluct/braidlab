@@ -1,0 +1,853 @@
+=== 3 strings
+Braid: 1 -2
+Pseudo-Anosov Growth: 2.618034
+
+4 1-pronged singularities
+Fixed:   [-5 2 -4 1 4 5 3]
+Period 3 orbit:   [-3] -> [-2] -> [-1]
+
+1 1
+1 2
+
+
+Braid: 1 2
+Finite Order Growth: 1.000000
+
+0 1 0
+0 0 1
+1 0 0
+
+
+Braid: 1 1
+Reducible 
+
+1 2
+0 1
+
+
+Braid: 1 1 -2
+Pseudo-Anosov Growth: 3.732051
+
+4 1-pronged singularities
+Fixed:   [-5 2 -4 1 4 5 3]
+Fixed:   [-1]
+Period 2 orbit:   [-3] -> [-2]
+
+1 2
+1 3
+
+
+Braid: 1 -2 1 -2
+Pseudo-Anosov Growth: 6.854102
+
+4 1-pronged singularities
+Fixed:   [-5 2 -4 1 4 5 3]
+Period 3 orbit:   [-3] -> [-1] -> [-2]
+
+2 3
+3 5
+
+
+Braid: 1 1 1 -2 -2
+Pseudo-Anosov Growth: 7.872983
+
+4 1-pronged singularities
+Fixed:   [-5 2 -4 1 4 5 3]
+Fixed:   [-3]
+Period 2 orbit:   [-2] -> [-1]
+
+1 3
+2 7
+
+
+Braid: -1 2 2 2
+Pseudo-Anosov Growth: 4.791288
+
+4 1-pronged singularities
+Fixed:   [-5 -4 1 4 2 5 3]
+Period 3 orbit:   [-3] -> [-2] -> [-1]
+
+1 1
+3 4
+
+
+Braid: 1 2 1
+Finite Order Growth: 1.000000
+
+0 1
+1 0
+
+
+Braid: 1 2 1 2 1 2
+Reducible 
+
+1 0
+0 1
+
+
+=== 4 strings
+Braid: 1 2 3
+Finite Order Growth: 1.000000
+
+0 0 1 0
+0 0 0 1
+0 1 0 0
+1 0 0 0
+
+
+Braid: 1 -2 3
+Pseudo-Anosov Growth: 3.732051
+
+1 2-pronged singularity
+[-7 -6 2 -5 1 5 6 3 7 4]
+
+4 1-pronged singularities
+Period 4 orbit:   [-4] -> [-3] -> [-2] -> [-1]
+
+1 1 0
+1 2 1
+1 2 2
+
+
+Braid: 1 3
+Reducible 
+
+1 1 0
+0 1 0
+0 1 1
+
+
+Braid: 1 2 -3
+Pseudo-Anosov Growth: 2.296630
+
+1 3-pronged singularity
+(5)
+
+5 1-pronged singularities
+Fixed:   [-8 2 8 -7 1 7 5 6 4 -6 3 -5]
+Period 4 orbit:   [-4] -> [-3] -> [-2] -> [-1]
+
+0 1 1 0
+0 2 1 0
+0 0 0 1
+1 1 0 0
+
+
+Braid: 1 -2 -3 2
+Reducible 
+
+1 1 0
+1 2 1
+0 0 1
+
+
+Braid: 1 1 2 -3
+Pseudo-Anosov Growth: 2.618034
+
+1 2-pronged singularity
+[-2 -1]
+
+4 1-pronged singularities
+Fixed:   [-8 3 8 1 6 7 5 -7 4 -6 2]
+Period 3 orbit:   [-5] -> [-4] -> [-3]
+
+0 1 1
+0 2 1
+1 1 0
+
+
+Braid: 3 -2 1 -2 -3
+Reducible 
+
+2 1 1
+3 2 3
+0 0 1
+
+
+Braid: 1 2 3 1 2 3 1 2 3 1 2 3
+Reducible 
+
+1 0 0
+0 1 0
+0 0 1
+
+
+=== 5 strings
+Braid: 1 -2 3 -4
+Pseudo-Anosov Growth: 4.390257
+
+1 3-pronged singularity
+[-9 4 -8 -7 2 -6 1 6 7 3 8 9 5]
+
+5 1-pronged singularities
+Period 5 orbit:   [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+1 1 0 0
+1 2 1 0
+1 2 2 1
+1 2 2 2
+
+
+Braid: 1 2 3 4
+Finite Order Growth: 1.000000
+
+0 0 0 1 0
+0 0 1 0 0
+0 0 0 0 1
+0 1 0 0 0
+1 0 0 0 0
+
+
+Braid: 1 2 -3 -4
+Pseudo-Anosov Growth: 2.015357
+
+2 3-pronged singularities
+Fixed:   (6)
+Fixed:   (7)
+
+6 1-pronged singularities
+Fixed:   [-11 5 11 -7 3 -6 -9 2 9 -8 1 8 6 7 -10 4 10]
+Period 5 orbit:   [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+0 1 1 0 0 0
+0 1 1 0 1 0
+0 0 0 1 0 0
+1 1 0 0 0 0
+0 0 0 0 0 1
+0 2 1 0 0 0
+
+
+Braid: 1 -2 1 -2 4 4
+Reducible 
+
+2 3 1 0
+3 5 3 0
+0 0 1 0
+0 0 2 1
+
+
+Braid: 1 3 -2 -4 1 3 -2 -4
+Pseudo-Anosov Growth: 19.274356
+
+1 3-pronged singularity
+[-9 4 -8 -7 2 -6 1 6 7 3 8 9 5]
+
+5 1-pronged singularities
+Period 5 orbit:   [-5] -> [-2] -> [-3] -> [-4] -> [-1]
+
+2  4 1 1
+4 12 5 6
+1  5 3 4
+1  6 4 6
+
+
+Braid: 2 -1 3 -4 3
+Pseudo-Anosov Growth: 3.732051
+
+2 2-pronged singularities
+Fixed:   [-10 3 10 5 -8 -7 1 7 2 8 9 6 -9 4]
+Fixed:   [-5 -4]
+
+4 1-pronged singularities
+Period 4 orbit:   [-6] -> [-3] -> [-1] -> [-2]
+
+2 0 0 1
+1 0 0 1
+1 1 2 0
+2 2 3 0
+
+
+Braid: 1 2 1 3
+Finite Order Growth: 1.000000
+
+0 1 0
+0 0 1
+1 0 0
+
+
+=== 6-8 strings
+Braid: 1 -2 3 -4 5
+Pseudo-Anosov Growth: 4.791288
+
+1 4-pronged singularity
+[-11 -10 4 -9 -8 2 -7 1 7 8 3 9 10 5 11 6]
+
+6 1-pronged singularities
+Period 6 orbit:   [-6] -> [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+1 1 0 0 0
+1 2 1 0 0
+1 2 2 1 0
+1 2 2 2 1
+1 2 2 2 2
+
+
+Braid: 1 2 3 4 5
+Finite Order Growth: 1.000000
+
+0 0 0 0 1 0
+0 0 1 0 0 0
+0 0 0 1 0 0
+0 0 0 0 0 1
+0 1 0 0 0 0
+1 0 0 0 0 0
+
+
+Braid: 1 -2 3 -4 5 -6
+Pseudo-Anosov Growth: 5.048917
+
+1 5-pronged singularity
+[-13 6 -12 -11 4 -10 -9 2 -8 1 8 9 3 10 11 5 12 13 7]
+
+7 1-pronged singularities
+Period 7 orbit:   [-7] -> [-6] -> [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+1 1 0 0 0 0
+1 2 1 0 0 0
+1 2 2 1 0 0
+1 2 2 2 1 0
+1 2 2 2 2 1
+1 2 2 2 2 2
+
+
+Braid: 1 2 3 -4 -5 -6
+Pseudo-Anosov Growth: 1.754878
+
+2 4-pronged singularities
+Fixed:   (8)
+Fixed:   (9)
+
+8 1-pronged singularities
+Fixed:   [-15 7 15 -9 4 -8 -13 3 13 -10 2 10 -12 1 12 8 9 -14 5 14 -11 6 11]
+Period 7 orbit:   [-7] -> [-6] -> [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+0 1 0 0 1 0 0 0
+0 1 0 0 1 0 1 0
+0 0 0 0 0 1 0 0
+0 0 0 0 0 0 0 1
+0 0 1 0 0 0 0 0
+1 1 0 0 0 0 0 0
+0 0 0 1 0 0 0 0
+0 2 0 0 1 0 0 0
+
+
+Braid: 1 -2 3 -4 5 -6 7
+Pseudo-Anosov Growth: 5.222743
+
+1 6-pronged singularity
+[-15 -14 6 -13 -12 4 -11 -10 2 -9 1 9 10 3 11 12 5 13 14 7 15 8]
+
+8 1-pronged singularities
+Period 8 orbit:   [-8] -> [-7] -> [-6] -> [-5] -> [-4] -> [-3] -> [-2] -> [-1]
+
+1 1 0 0 0 0 0
+1 2 1 0 0 0 0
+1 2 2 1 0 0 0
+1 2 2 2 1 0 0
+1 2 2 2 2 1 0
+1 2 2 2 2 2 1
+1 2 2 2 2 2 2
+
+
+Braid: 1 3 5 -2 -4 -6
+Pseudo-Anosov Growth: 5.048917
+
+1 5-pronged singularity
+[-13 6 -12 -11 4 -10 -9 2 -8 1 8 9 3 10 11 5 12 13 7]
+
+7 1-pronged singularities
+Period 7 orbit:   [-7] -> [-6] -> [-4] -> [-2] -> [-1] -> [-3] -> [-5]
+
+1 1 0 0 0 0
+1 3 1 1 0 0
+0 1 1 1 0 0
+0 1 1 3 1 1
+0 0 0 1 1 1
+0 0 0 1 1 2
+
+
+Braid: 1 2 -3 1 -2 4 -5 3
+Pseudo-Anosov Growth: 3.090658
+
+1 4-pronged singularity
+(7)
+
+1 2-pronged singularity
+[-12 4 12 8 9 6 -9 5 -8 -11 3 11 -10 2 -7 1 7 10]
+
+6 1-pronged singularities
+Period 2 orbit:   [-4] -> [-2]
+Period 4 orbit:   [-6] -> [-5] -> [-3] -> [-1]
+
+0 0 0 0 1 0
+1 0 1 0 0 2
+1 0 2 0 0 2
+0 0 0 0 1 1
+0 1 1 0 0 0
+1 0 0 1 0 2
+
+
+=== boundary peripheral
+Braid: 1 -2
+Pseudo-Anosov Growth: 2.618034
+
+4 1-pronged singularities
+Fixed:   [-1]
+Period 3 orbit:   [-3] -> [3 1 -2] -> [2]
+
+2 1
+1 1
+
+
+Braid: 1 2 3
+Finite Order Growth: 1.000000
+
+0 0 1 0
+0 0 0 1
+0 1 0 0
+1 0 0 0
+
+
+Braid: 1 -2 3 -4
+Pseudo-Anosov Growth: 4.390257
+
+1 3-pronged singularity
+[-2 -1]
+
+5 1-pronged singularities
+Period 5 orbit:   [-6 -5 3 1] -> [-4] -> [4 2 5] -> [6] -> [-3]
+
+1 0 2 1
+0 1 1 0
+1 1 3 0
+1 0 3 2
+
+
+Braid: 1 3
+Reducible 
+
+2 1 2
+1 0 2
+0 0 1
+
+
+=== horseshoe orbits
+Orbit: 100
+Finite Order Growth: 1.000000
+
+0 1 0
+0 0 1
+1 0 0
+
+
+Orbit: 1001
+Finite Order Growth: 1.000000
+
+0 1 0 0
+0 0 1 0
+0 0 0 1
+1 0 0 0
+
+
+Orbit: 10010
+Pseudo-Anosov Growth: 1.722084
+
+1 3-pronged singularity
+[-9 4 -8 -7 2 -6 1 6 7 3 8 9 5]
+
+5 1-pronged singularities
+Period 5 orbit:   [-5] -> [-1] -> [-2] -> [-4] -> [-3]
+
+0 0 0 1
+1 0 0 1
+1 0 1 0
+0 1 1 0
+
+
+Orbit: 10011
+Pseudo-Anosov Growth: 1.722084
+
+1 3-pronged singularity
+[-9 4 -8 -7 2 -6 1 6 7 3 8 9 5]
+
+5 1-pronged singularities
+Period 5 orbit:   [-5] -> [-1] -> [-2] -> [-4] -> [-3]
+
+0 0 0 1
+1 0 0 1
+1 0 1 0
+0 1 1 0
+
+
+Orbit: 100110
+Reducible 
+
+0 1 0 0 0 0
+0 0 1 0 0 0
+1 0 0 1 0 0
+0 0 0 0 1 0
+0 0 0 0 0 1
+0 0 0 1 0 0
+
+
+Orbit: 100111
+Reducible 
+
+0 1 0 0 0 0
+0 0 1 0 0 0
+1 0 0 1 0 0
+0 0 0 0 1 0
+0 0 0 0 0 1
+0 0 0 1 0 0
+
+
+Orbit: 1001110
+Pseudo-Anosov Growth: 1.610942
+
+3 3-pronged singularities
+Fixed:   [-15 6 15 -11 5 -10 -9 -13 2 -8 1 8 13 -14 3 14 9 4 10 11 12 7 -12]
+Period 2 orbit:   (8) -> (9)
+
+7 1-pronged singularities
+Period 7 orbit:   [-7] -> [-1] -> [-2] -> [-5] -> [-4] -> [-6] -> [-3]
+
+0 0 0 0 1 0 0 0
+1 0 0 1 0 0 0 0
+1 0 1 0 0 0 0 0
+0 0 1 0 0 1 0 0
+0 0 0 0 0 0 1 0
+1 0 0 0 1 0 0 0
+2 0 0 0 0 0 0 1
+0 1 1 0 0 0 0 0
+
+
+Orbit: 10010110
+Pseudo-Anosov Growth: 1.413447
+
+1 5-pronged singularity
+(9)
+
+1 3-pronged singularity
+[-16 -12 4 12 3 16 -14 5 14 10 11 8 -11 7 -10 -13 6 13 -15 -9 1 9 2 15]
+
+8 1-pronged singularities
+Period 8 orbit:   [-8] -> [-1] -> [-3] -> [-7] -> [-2] -> [-5] -> [-6] -> [-4]
+
+0 0 1 0 0 0 0 0
+0 0 0 0 0 0 0 1
+0 0 0 1 0 0 0 0
+2 0 0 0 1 0 0 0
+0 0 0 0 0 1 0 0
+1 0 0 0 0 0 1 0
+0 1 0 0 0 0 0 0
+1 0 0 0 1 0 0 0
+
+
+Orbit: 1011
+Reducible 
+
+0 0 1
+0 1 0
+1 1 0
+
+
+Orbit: 10110
+Finite Order Growth: 1.000000
+
+0 0 1 0 0
+1 0 0 0 0
+0 0 0 1 0
+0 0 0 0 1
+0 1 0 0 0
+
+
+Orbit: 10111
+Finite Order Growth: 1.000000
+
+0 0 1 0 0
+1 0 0 0 0
+0 0 0 1 0
+0 0 0 0 1
+0 1 0 0 0
+
+
+Orbit: 100101
+Reducible 
+
+0 0 0 0 1
+0 0 0 1 0
+1 0 0 1 0
+0 1 0 1 0
+0 0 1 1 0
+
+
+Orbit: 1001011
+Pseudo-Anosov Growth: 1.610942
+
+3 3-pronged singularities
+Fixed:   [-15 3 15 -11 4 11 9 -14 6 14 10 7 -10 -12 5 12 -9 -13 2 13 -8 1 8]
+Period 2 orbit:   (8) -> (9)
+
+7 1-pronged singularities
+Period 7 orbit:   [-7] -> [-1] -> [-3] -> [-6] -> [-2] -> [-5] -> [-4]
+
+0 0 1 0 0 0 0 0
+1 1 0 0 0 0 0 0
+0 0 0 1 0 0 0 0
+2 0 0 0 1 0 0 0
+0 2 0 0 0 1 0 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0
+
+
+Orbit: 1011011
+Pseudo-Anosov Growth: 1.556030
+
+1 5-pronged singularity
+[-13 -12 5 -11 4 -10 -9 2 -8 1 8 9 3 10 11 12 6 13 7]
+
+7 1-pronged singularities
+Period 7 orbit:   [-7] -> [-1] -> [-4] -> [-6] -> [-2] -> [-5] -> [-3]
+
+0 0 0 0 0 1
+0 0 0 0 1 0
+0 0 0 1 0 0
+1 0 0 1 0 0
+0 1 0 1 0 0
+0 1 1 0 0 0
+
+
+Orbit: 10011101
+Pseudo-Anosov Growth: 1.645585
+
+4 3-pronged singularities
+Fixed:   [-18 5 11 12 15 8 -15 -17 7 17 -12 6 -11 18 -10 3 -9 -14 1 14 -16 2 16 9 10 -13 4 13]
+Period 3 orbit:   (9) -> (10) -> (11)
+
+8 1-pronged singularities
+Period 8 orbit:   [-8] -> [-1] -> [-3] -> [-6] -> [-5] -> [-7] -> [-2] -> [-4]
+
+0 0 0 1 0 0 0 0 0 0
+0 0 0 1 0 1 0 0 0 0
+1 0 1 0 0 0 0 0 0 0
+0 1 1 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 0 0
+0 0 0 0 0 0 1 0 0 0
+0 0 0 0 1 0 0 0 0 0
+0 0 0 0 0 0 0 0 1 0
+0 0 1 0 0 0 0 0 0 1
+1 0 0 1 0 0 0 0 0 0
+
+
+=== long singularity format and graph dump
+Braid: 1 -2
+Pseudo-Anosov Growth: 2.618034
+
+4 1-pronged singularities
+Fixed:   [-5 2 -4 1 4 5 3]
+Period 3 orbit:   [-3] -> [-2] -> [-1]
+
+Graph on surface with 3 peripheral loops:
+Vertex number 1 with image vertex 2:
+Edges at vertex are: 1 -1 4 
+Region 1
+
+Vertex number 2 with image vertex 3:
+Edges at vertex are: 3 -3 -5 
+Region 2
+
+Vertex number 3 with image vertex 1:
+Edges at vertex are: -2 -4 5 2 
+Region 1
+
+Edge number 1 from vertex 1 to vertex 1:
+Type: Peripheral about puncture number 1
+Image is: 3 
+Path (1 -> 1):  1 -1 
+
+Edge number 2 from vertex 3 to vertex 3:
+Type: Peripheral about puncture number 2
+Image is: 1 
+Path (1 -> 1):  -2 2 
+
+Edge number 3 from vertex 2 to vertex 2:
+Type: Peripheral about puncture number 3
+Image is: 2 
+Path (2 -> 2):  -3 3 
+
+Edge number 4 from vertex 1 to vertex 3:
+Type: Main
+Image is: -5 2 -4 
+Path (1 -> 1):  
+
+Edge number 5 from vertex 3 to vertex 2:
+Type: Main
+Image is: 4 -2 5 -3 -5 
+Path (1 -> 2):  -2 
+
+Pseudo-Anosov Isotopy class
+Vertex 1:
+Gates are: {-1}, {4}, {1}
+Infinitesimal edges join 1 to 4, -1 to 4
+Vertex 2:
+Gates are: {-3}, {-5}, {3}
+Infinitesimal edges join -5 to 3, -5 to -3
+Vertex 3:
+Gates are: {-4, 5}, {2}, {-2}
+Infinitesimal edges join -4 to 2, -4 to -2
+
+
+Braid: 1 -2 -3 2
+Reducible 
+
+Graph on surface with 4 peripheral loops:
+Vertex number 1 with image vertex 4:
+Edges at vertex are: 1 -1 5 
+Region 1
+
+Vertex number 2 with image vertex 2:
+Edges at vertex are: 3 -3 7 
+Region 3
+
+Vertex number 3 with image vertex 1:
+Edges at vertex are: -2 -5 6 2 
+Region 1
+
+Vertex number 4 with image vertex 3:
+Edges at vertex are: -4 -7 -6 4 
+Region 3
+
+Edge number 1 from vertex 1 to vertex 1:
+Type: Peripheral about puncture number 1
+Image is: 4 
+Path (1 -> 1):  1 -1 
+
+Edge number 2 from vertex 3 to vertex 3:
+Type: Peripheral about puncture number 2
+Image is: 1 
+Path (1 -> 1):  -2 2 
+
+Edge number 3 from vertex 2 to vertex 2:
+Type: Peripheral about puncture number 3
+Image is: 3 
+Path (3 -> 3):  3 -3 
+
+Edge number 4 from vertex 4 to vertex 4:
+Type: Peripheral about puncture number 4
+Image is: 2 
+Path (3 -> 3):  -4 4 
+
+Edge number 5 from vertex 1 to vertex 3:
+Type: Main
+Image is: -6 2 -5 
+Path (1 -> 1):  
+
+Edge number 6 from vertex 3 to vertex 4:
+Type: Main
+Image is: 5 -2 6 -4 -6 
+Path (1 -> 3):  -2 3 4 -4 
+
+Edge number 7 from vertex 2 to vertex 4:
+Type: Main
+Image is: 7 -4 -6 
+Path (3 -> 3):  
+
+Reducible Isotopy class
+The following main edges and their images constitute an invariant subgraph:
+5 6 
+
+
+Orbit: 10010
+Pseudo-Anosov Growth: 1.722084
+
+1 3-pronged singularity
+[-9 4 -8 -7 2 -6 1 6 7 3 8 9 5]
+
+5 1-pronged singularities
+Period 5 orbit:   [-5] -> [-1] -> [-2] -> [-4] -> [-3]
+
+Graph on surface with 5 peripheral loops:
+Vertex number 1 with image vertex 4:
+Edges at vertex are: 1 -1 6 
+Region 1
+
+Vertex number 2 with image vertex 3:
+Edges at vertex are: 3 -3 8 -7 
+Region 2
+
+Vertex number 3 with image vertex 1:
+Edges at vertex are: 5 -5 -9 
+Region 4
+
+Vertex number 4 with image vertex 5:
+Edges at vertex are: -2 -6 7 2 
+Region 1
+
+Vertex number 5 with image vertex 2:
+Edges at vertex are: -4 -8 9 4 
+Region 3
+
+Edge number 1 from vertex 1 to vertex 1:
+Type: Peripheral about puncture number 1
+Image is: 2 
+Path (1 -> 1):  1 -1 
+
+Edge number 2 from vertex 4 to vertex 4:
+Type: Peripheral about puncture number 2
+Image is: 4 
+Path (1 -> 1):  -2 2 
+
+Edge number 3 from vertex 2 to vertex 2:
+Type: Peripheral about puncture number 3
+Image is: 5 
+Path (2 -> 2):  -3 3 
+
+Edge number 4 from vertex 5 to vertex 5:
+Type: Peripheral about puncture number 4
+Image is: 3 
+Path (3 -> 3):  -4 4 
+
+Edge number 5 from vertex 3 to vertex 3:
+Type: Peripheral about puncture number 5
+Image is: 1 
+Path (4 -> 4):  -5 5 
+
+Edge number 6 from vertex 1 to vertex 4:
+Type: Main
+Image is: 7 3 8 
+Path (1 -> 1):  
+
+Edge number 7 from vertex 4 to vertex 2:
+Type: Main
+Image is: 9 
+Path (1 -> 2):  -2 
+
+Edge number 8 from vertex 2 to vertex 5:
+Type: Main
+Image is: -9 4 -8 
+Path (2 -> 3):  3 
+
+Edge number 9 from vertex 5 to vertex 3:
+Type: Main
+Image is: -7 2 -6 
+Path (3 -> 4):  -4 
+
+Pseudo-Anosov Isotopy class
+Vertex 1:
+Gates are: {-1}, {6}, {1}
+Infinitesimal edges join 1 to 6, -1 to 6
+Vertex 2:
+Gates are: {-3}, {8, -7}, {3}
+Infinitesimal edges join 3 to 8, -3 to 8
+Vertex 3:
+Gates are: {-5}, {-9}, {5}
+Infinitesimal edges join -9 to 5, -9 to -5
+Vertex 4:
+Gates are: {-6, 7}, {2}, {-2}
+Infinitesimal edges join -6 to 2, -6 to -2
+Vertex 5:
+Gates are: {-8, 9}, {4}, {-4}
+Infinitesimal edges join -8 to 4, -8 to -4
+
+

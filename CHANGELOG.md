@@ -3,6 +3,14 @@
 
 ## [Unreleased][unreleased]
 
+* Update the bundled `trains` library (`extern/trains`) to upstream
+  `b51ff82`.  This fixes undefined behavior from uninitialized edge and
+  vertex data inside the train-track code used by `train` and
+  `entropy(...,'Method','train')`.  Results are unchanged: `train` gives
+  identical output (type, entropy, transition matrix, train track map)
+  before and after on a corpus of 216 braids.  The upstream build is now
+  CMake-based; braidlab still compiles the library sources directly.
+
 
 ## [3.4] - 2026-04-27
 
