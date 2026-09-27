@@ -102,7 +102,8 @@ Because the remaining warning touches `MyArray` assignment:
 ## Priority 5: Add sanitizer CI lane
 
 Status: `TRAINS_SANITIZE` CMake option added and the full suite is clean
-under it. There is no CI yet.
+under it. CI is not being pursued (decided 2026-09-27): run the sanitizer
+build locally instead.
 
 Add one CI job for Linux/clang or gcc with:
 
@@ -139,7 +140,57 @@ Add a short contributor section in `README.md` covering:
 
 This prevents style drift and preserves cleanup gains.
 
+## Remaining work (ranked)
+
+Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
+
+1. **Close out and merge the branch** (small effort, high value). This
+   unblocks the bug fixes, which are only on `address-warnings`.
+   - Settle the `-Wnull-dereference` at `Graphalg.cpp:681` (likely a GCC
+     false positive, since ASan and UBSan are clean on that path). Either
+     suppress it narrowly with `#pragma GCC diagnostic` and a comment, or
+     formally accept it.
+   - Refresh "What Remains" in `STRICT_WARNINGS_STATUS.md`; the
+     `operator=` audit is now covered by `test_myarray`.
+   - Add `build-*/` and `strict-warnings*.log` to `.gitignore`.
+   - Merge into `master`, then push (confirm before pushing).
+2. **Give each build directory its own outputs** (small). At present
+   `build`, `build-strict` and `build-asan` all write the same in-tree
+   `src/frontend`, `src/train` and `lib/libtrains.a`. This once made a
+   normal build link against the sanitizer library. `make` should keep
+   putting copies in the old places for anything that expects them (such as
+   the MATLAB `train.m` wrapper).
+3. **Remove old-build leftovers** (trivial): `src/Makefile`, `src/*.o`, and
+   the stray `warnings` file. The `strict-warnings*.log` files are
+   superseded by `STRICT_WARNINGS_STATUS.md`; delete them or keep them as
+   history.
+4. **Try a Clang build** (small to medium). Only GCC has been used so far.
+   The history has Mac compiler fixes, and Clang's warnings differ.
+5. **README contributor section** (small; Priority 7). Most of the content
+   already exists in `CLAUDE.md` ("Integer types", the build and test
+   sections); the README needs a version for human contributors.
+6. **Modernize `frontend` input** (medium, low value). It still parses
+   into fixed `char` buffers with `strcpy`, and more than 10 words on a
+   line throws. The overflow is fixed, but `std::string` would remove the
+   whole class of problem.
+7. **Checked conversions** (medium, low value; Priority 3). The golden
+   test and the sanitizers already cover most of what they would catch.
+8. **Latent `MyArray` hazards** (low; see Priority 4). None is reachable
+   from current callers.
+
+Decided against:
+
+- **Strong index types.** An experiment turning the `types.h` aliases into
+  wrapper classes needed 272 or more lines of explicit wraps in the library
+  alone. That was mostly edge labels taken from `intarray`s, plus 75 `uint`
+  loop counters. Typing the edge arrays made it worse (323 lines). It found
+  no case of one kind being passed as another. The overload renames already
+  removed the concrete hazard.
+- **CI.** Not wanted; see Priority 5.
+
 ## Suggested phased execution
+
+Superseded by "Remaining work (ranked)" above.
 
 1. Land type policy + helper conversion utilities.
 2. Add `MyArray` edge-case tests and investigate remaining null-deref warning.
@@ -152,5 +203,5 @@ This prevents style drift and preserves cleanup gains.
 - Remaining `-Wnull-dereference` is either fixed with evidence or narrowly
   suppressed with documented rationale and reproducer notes.
 - Type policy is documented and followed in all new patches.
-- Sanitizer CI lane is green.
+- The suite passes under `TRAINS_SANITIZE` (ASan + UBSan).
 - Algorithm regression coverage is expanded with stable fixtures.
