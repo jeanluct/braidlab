@@ -38,8 +38,10 @@ asan:
 # Clean up build artifacts but keep the CMake build tree.
 clean:
 	+cmake --build $(BUILD_DIR) --target clean
+	rm -f $(STRICT_LOG)
 
-# Clean up everything, including build directories and generated outputs.
+# Clean up everything, including all build directories (build, build-*) and
+# generated outputs.
 distclean:
-	rm -rf $(BUILD_DIR) $(STRICT_DIR) $(ASAN_DIR) CMakeFiles CMakeCache.txt cmake_install.cmake
-	rm -f src/frontend src/train lib/libtrains.a src/*.o
+	rm -rf $(BUILD_DIR) $(STRICT_DIR) $(ASAN_DIR) build-* CMakeFiles CMakeCache.txt cmake_install.cmake
+	rm -f src/frontend src/train lib/libtrains.a src/*.o $(STRICT_LOG)

@@ -163,7 +163,8 @@ Recorded 2026-09-27. Ranked by value for effort; to be discussed one by one.
    normal build link against the sanitizer library. `make` should keep
    putting copies in the old places for anything that expects them (such as
    the MATLAB `train.m` wrapper).
-3. **Remove old-build leftovers** (trivial): `src/Makefile`, `src/*.o`, and
+3. **Remove old-build leftovers** (trivial). Done: the logs, `warnings`
+   and `src/*.o` were deleted and `src/Makefile` removed. Was: `src/Makefile`, `src/*.o`, and
    the stray `warnings` file. The `strict-warnings*.log` files are
    superseded by `STRICT_WARNINGS_STATUS.md`; delete them or keep them as
    history.

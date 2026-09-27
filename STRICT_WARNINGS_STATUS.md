@@ -8,11 +8,12 @@ Build profile:
 
 - `cmake -S . -B build-strict -DTRAINS_STRICT_WARNINGS=ON`
 - `cmake --build build-strict --target clean`
-- `cmake --build build-strict 2>&1 | tee strict-warnings-phase2j.log`
+- `cmake --build build-strict 2>&1 | tee strict-warnings-latest.log`
+  (or simply `make strict`)
 
 Warning counts:
 
-| Warning Type | Baseline (`strict-warnings.log`) | Current (`strict-warnings-phase2j.log`) | Delta |
+| Warning Type | Baseline | After phase 2 | Delta |
 | --- | ---: | ---: | ---: |
 | `-Wconversion` | 134 | 0 | -134 |
 | `-Wsign-conversion` | 124 | 0 | -124 |
@@ -54,13 +55,13 @@ Main touched areas:
 
 Trend snapshots:
 
-- `strict-warnings-phase2d.log`: 126 total
-- `strict-warnings-phase2e.log`: 67 total
-- `strict-warnings-phase2f.log`: 34 total
-- `strict-warnings-phase2g.log`: 24 total
-- `strict-warnings-phase2h.log`: 15 total
-- `strict-warnings-phase2i.log`: 8 total
-- `strict-warnings-phase2j.log`: 1 total
+- phase 2d: 126 total
+- phase 2e: 67 total
+- phase 2f: 34 total
+- phase 2g: 24 total
+- phase 2h: 15 total
+- phase 2i: 8 total
+- phase 2j: 1 total
 
 Outcome:
 

@@ -27,7 +27,7 @@ The main build directory `build/` writes into the source tree:
 directory keeps its outputs inside itself (`TRAINS_IN_TREE_OUTPUTS`, which
 defaults to on only for `build/`, and the Makefile always sets it). Tests
 locate binaries by `$<TARGET_FILE:...>`, so each build directory tests its
-own. `src/Makefile` and the `src/*.o` files are leftovers from the old build.
+own.
 
 Makefile shortcuts: `make test`, `make strict` (logs to
 `strict-warnings-latest.log`), `make asan`.
@@ -36,7 +36,7 @@ Strict-warning profile (separate build dir by convention):
 
     cmake -S . -B build-strict -DTRAINS_STRICT_WARNINGS=ON
     cmake --build build-strict --target clean
-    cmake --build build-strict 2>&1 | tee strict-warnings-phaseN.log
+    cmake --build build-strict 2>&1 | tee strict-warnings-latest.log
 
 Sanitizer build (ASan + UBSan; run it after any nontrivial change):
 

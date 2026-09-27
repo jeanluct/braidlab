@@ -18,7 +18,7 @@ The project builds with CMake. The top-level `Makefile` is a backwards-compatibl
   - `make strict` (clean rebuild with strict warnings, see below)
   - `make asan` (build and test with sanitizers, see below)
   - `make clean`
-  - `make distclean` (also removes `build-strict/` and `build-asan/`)
+  - `make distclean` (also removes the other `build-*` directories)
 
 The main build directory `build/` (the one `make` uses) keeps the traditional
 layout: `lib/libtrains.a`, `src/frontend` and `src/train`. Any other build
