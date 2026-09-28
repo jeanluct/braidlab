@@ -11,6 +11,41 @@ Companion documents:
 - `devel/CI-WORKFLOW.md` — operational use of the workflow.
 - `devel/RELEASE-CONFIG.md` — what is pinned and how to override it.
 
+## Update (3.4.2): current policy and corrections
+
+This document was written for 3.4, when the packages bundled GMP shared
+libraries.  Inspecting the shipped 3.4 binaries later showed that several
+of its conclusions did not hold.  Details and evidence are in
+`devel/plans/plan-toolchain-portability.md`.  Current state:
+
+| Platform | Packages load on | Enforced by |
+| --- | --- | --- |
+| Linux x86-64 | glibc 2.28+ (RHEL 8, Debian 11, Ubuntu 20.04, ...) | build in `manylinux_2_28`; max symbol version measured `GLIBC_2.14` / `GLIBCXX_3.4.22` |
+| macOS arm64, x86-64 | macOS 13+ | `CMAKE_OSX_DEPLOYMENT_TARGET=13.0`, also used for the static GMP |
+| Windows x64 | Windows 10/11, no Visual Studio needed | release C runtime only; CI rejects debug-runtime imports |
+| MATLAB | the build release (R2024b) and later | C-API (`R2017b`) MEX files are forward compatible |
+
+- **GMP** is linked statically (`BRAIDLAB_GMP_LINKAGE=static`); the
+  `bundled` mode is gone.  GMP is dual-licensed, LGPLv3 or GPLv2, each with
+  the option of later versions.  braidlab is GPLv3+, so it uses GMP under
+  the GPLv3, and static linking only requires that the source be
+  available.  The LGPL static-linking concern in "Dimension 2" below
+  applies to proprietary programs.  GMP's license texts ship in
+  `extern/gmp/`.
+- **Toolchain.**  It is pinned to the compilers MathWorks supports for
+  the build release (runner images, Xcode, Visual Studio, CMake, the
+  manylinux image and gcc-toolset).  So the build only changes when it is
+  bumped deliberately; see `devel/RELEASE-CONFIG.md`.
+- **Corrections to the analysis below.**
+  - Dimension 1: "Windows MSVC runtime ... largely a non-issue" held for
+    braidlab's MEX files.  But the bundled vcpkg GMP DLLs were debug
+    builds that needed Visual Studio's debug runtime.
+  - Dimension 3: "C++ runtime ... in good shape" held on the build
+    runners only.  The 3.4 packages needed glibc 2.35 and GCC 12's
+    libstdc++ on Linux, and macOS 15.
+  - The minimum operating system of the shipped binaries was not
+    considered at all.  It is now part of the pinned toolchain.
+
 ## Summary recommendation
 
 - **MATLAB version**: not a major concern.  One pinned-release archive

@@ -2306,47 +2306,29 @@ compiler.  \index{Matlab!MEX files|)}
 \subsection{Precompiled packages}
 \label{sec:precompiled}
 
-Some tar files of the precompiled latest released version are
-available at \url{https://github.com/jeanluct/braidlab/releases}.  If one of
-those suits your system, then download and untar:
+Precompiled packages of the latest released version are available at
+\url{https://github.com/jeanluct/braidlab/releases}, for Linux (x86-64),
+macOS (Apple silicon and Intel), and Windows (x86-64).  Download the one for
+your system and unpack it; for example, on Linux
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ tar xvzf braidlab-<version>.tar.gz
+$ tar xvzf braidlab-<version>_linux-glibc2.28-x86_64_matlab-R2024b.tar.gz
 \end{lstlisting}
-A binary might still work even if the operating system and Matlab versions
-don't match exactly.
+(the macOS and Windows packages are zip files).  The name of a package gives
+the Matlab release it was built with; it works with that release and all
+later ones.  The packages run on the operating systems which that release
+supports: Linux with glibc~2.28 or newer (for example Red Hat Enterprise
+Linux~8, Debian~11, Ubuntu~20.04, or later), macOS~13 or later, and
+Windows~10 or~11.
 
-For macOS there is a version compiled without
-\href{https://gmplib.org/}{GMP} (the GNU MultiPrecision library) %
 \index{GMP}%
-since it is a bit tricky to install (see Section~\ref{sec:gmp}).
+The default packages have the \href{https://gmplib.org/}{GMP} library (the
+GNU MultiPrecision library, see Section~\ref{sec:gmp}) built into the MEX
+files that use it, so nothing else needs to be installed.  Packages whose name
+ends in \lstinline{_no-gmp} are built without GMP.
 
-On Ubuntu or Debian Linux, you can install the GMP source and binaries with
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get install libgmp-dev
-\end{lstlisting}
-After you install the binaries you must set the Matlab path as described in
+After you unpack a package you must set the Matlab path as described in
 Section~\ref{sec:path}.
-
-\index{macOS|(}%
-MacOS does not have access to \lstinline{apt} or
-\lstinline{aptitude}. Their functionality is in part reproduced by the %
-\index{Homebrew|see{macOS}}%
-\index{macOS!Homebrew}%
-\href{https://brew.sh/}{Homebrew project}. If you install Homebrew, you can
-easily obtain GMP by running
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ brew install gmp
-\end{lstlisting}
-Since \lstinline{brew} is conservative about installing libraries and
-sources into system directories, you will likely need to set
-\lstinline{LD_LIBRARY_PATH}, and \lstinline{PATH} variables to include
-the location of the local Homebrew library storage (see Homebrew
-documentation for further instructions).
-
-\index{macOS|)}%
 
 
 \subsection{Cloning the repository}
@@ -2503,7 +2485,8 @@ on the VPI library \citep{vpi}, which is written natively in Matlab and hence
 is much slower.
 
 If you wish to compile \braidlab\ from source using GMP, you first need to
-install GMP (see \ref{sec:precompiled}), and then make the GMP headers
+install GMP (on Ubuntu or Debian Linux, for example, with
+\lstinline{sudo apt-get install libgmp-dev}), and then make the GMP headers
 \lstinline{gmp.h} and \lstinline{gmpxx.h} available to the C++ compiler that
 Matlab is using.  In most Linux installations this is automatic once the
 development package is installed.  On macOS with Homebrew, pass
@@ -2518,7 +2501,9 @@ $ cmake --install build --prefix .
 \end{lstlisting}
 On Windows, use the vcpkg toolchain (for example
 \lstinline{vcpkg install gmp:x64-windows}) and configure CMake with
-\lstinline{CMAKE_TOOLCHAIN_FILE}.
+\lstinline{CMAKE_TOOLCHAIN_FILE} and \lstinline{-DCMAKE_BUILD_TYPE=Release}
+(otherwise vcpkg may select its debug build of GMP, which only runs where
+Visual Studio is installed).
 
 Both the %
 \index{GCC compiler}%

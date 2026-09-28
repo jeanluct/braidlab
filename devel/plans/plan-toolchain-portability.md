@@ -2,10 +2,30 @@
 
 Branch: `toolchain-portability` (from `develop` at `879e033`).
 
-Status: plan only; nothing implemented yet.  Revised after discussion:
-the strategy is to remove the sources of drift rather than to keep
-patching them.  Target release: **3.4.2**, with rebuilt packages for all
-platforms, including Intel macOS.
+Status: steps 1–3 and 5 are implemented, and every package job passes
+on the branch (run 36439748460).  Step 4 (release publishing) is
+implemented but still needs a test tag.  Target release: **3.4.2**, with
+rebuilt packages for all platforms, including Intel macOS.
+
+## Results (measured on the branch's packages)
+
+| Package | Needs | GMP | Shared libs shipped |
+| --- | --- | --- | --- |
+| Linux x86-64 | `GLIBC_2.14`, `GLIBCXX_3.4.22` (was 2.35 / 3.4.30) | static | none |
+| macOS arm64 | macOS 13.0 (was 15.0) | static | none (were Homebrew dylibs) |
+| macOS x86-64 | macOS 13.0 (new) | static | none |
+| Windows x64 | release C runtime only (was debug, for GMP) | static | none (were debug DLLs) |
+
+On macOS every MEX file exports exactly `_mexFunction` and
+`_mexfilerequiredapiversion`.  The MATLAB smoke test, including a GMP
+code path, passes on all eight package jobs.  The full testsuite (442
+tests) passes locally against a static-GMP Linux build.
+
+Deviations from the plan, found along the way:
+- Windows: pinned `windows-2022`, not `windows-2025`, because that label
+  now serves an image with only Visual Studio 2026 (unsupported by
+  R2024b).
+- The `bundled` linkage was removed outright rather than kept.
 
 Companion documents: `devel/PORTABILITY.md` (earlier analysis; parts of it
 are corrected below), `devel/RELEASE-CONFIG.md`, `devel/CI-WORKFLOW.md`,

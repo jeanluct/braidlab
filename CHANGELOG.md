@@ -11,6 +11,36 @@
   before and after on a corpus of 216 braids.  The upstream build is now
   CMake-based; braidlab still compiles the library sources directly.
 
+* Binary packages: fix several portability problems in the 3.4 packages,
+  found by inspecting what the shipped binaries require (see
+  `devel/plans/plan-toolchain-portability.md`):
+  - Windows: the bundled GMP DLLs were debug builds that need Visual
+    Studio's debug C runtime, so the GMP-backed functions
+    (`cross2gen_helper`, `loopsigma_helper`, `entropy_helper`) most likely
+    failed to load on machines without Visual Studio.
+  - macOS: the packages required macOS 15; they now run on macOS 13 and
+    later, as MATLAB R2024b does.  Intel Macs now have packages too.
+  - Linux: the packages required glibc 2.35; they are now built in a
+    `manylinux_2_28` container and run on any glibc 2.28 or newer distribution
+    (RHEL 8, Debian 11, Ubuntu 20.04, ...).  The archive name changes from
+    `linux-ubuntu-22.04` to `linux-glibc2.28`.
+  - macOS and Windows release assets are no longer zipped twice.
+
+* Build system: GMP is now linked statically into the MEX files
+  (`BRAIDLAB_GMP_LINKAGE=static`, GMP used under the GPLv3 option of its
+  dual license, with its license texts in `extern/gmp/`).  The `bundled`
+  mode, which shipped GMP shared libraries, is removed.  On macOS the MEX
+  files export only `mexFunction` and `mexfilerequiredapiversion`, which
+  fixes linking with Xcode 26.  `CMAKE_OSX_DEPLOYMENT_TARGET` defaults to
+  13.0.
+
+* Continuous integration: the toolchain is pinned to the compilers
+  MathWorks supports for the build release, R2024b.  That means explicit
+  runner images (`macos-15`, `macos-15-intel`, `windows-2022`), Xcode 16.4,
+  Visual Studio 2022, CMake 3.31.6, and a dated manylinux image with
+  gcc-toolset-13.  Release tags now publish their packages, with a
+  `SHA256SUMS` file, to a draft GitHub release.
+
 
 ## [3.4] - 2026-04-27
 
