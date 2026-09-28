@@ -41,6 +41,20 @@
   gcc-toolset-13.  Release tags now publish their packages, with a
   `SHA256SUMS` file, to a draft GitHub release.
 
+* Guide (Appendices A and B) and README: update the installation and
+  troubleshooting instructions for the CMake build.
+  - Compiling from source needs `make install`: a plain `make` only
+    compiles the MEX files into `build/`, so braidlab could not find them.
+  - The `GLIBCXX ... not found` and "unsupported compiler" advice is
+    merged into one section, whose fix is to build with a GCC that your
+    Matlab release supports (`mex -setup` has no effect on a CMake build).
+  - Removed the sections on the Polish LaTeX `mex` command and the
+    `-largeArrayDims` warning, which no longer apply.
+  - For GMP in a non-standard place, use `CMAKE_PREFIX_PATH` rather than
+    `CPLUS_INCLUDE_PATH`.
+  - Bug reports should include the output of `ver` and, for precompiled
+    packages, `BUILD-MANIFEST.txt`.
+
 
 ## [3.4] - 2026-04-27
 

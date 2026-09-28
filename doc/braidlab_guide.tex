@@ -2300,8 +2300,9 @@ V\'{a}clav Zeman's \emph{ThreadPool} \citep{ThreadPool}.
 and C++ auxiliary files, so-called MEX files.  The MEX files are used to
 greatly speed up calculations.  Many commands will work even if the MEX files
 are unavailable, but much more slowly.  (A few commands won't work at all.)
-However, MEX files need to be first compiled with Matlab's \lstinline{mex}
-compiler.  \index{Matlab!MEX files|)}
+The precompiled packages (Section~\ref{sec:precompiled}) include the MEX
+files; from source they are compiled with CMake
+(Section~\ref{sec:cloning}).  \index{Matlab!MEX files|)}
 
 \subsection{Precompiled packages}
 \label{sec:precompiled}
@@ -2342,14 +2343,17 @@ source repository with the terminal command
   language=bash,backgroundcolor=\color{white}]
 $ git clone https://github.com/jeanluct/braidlab.git
 \end{lstlisting}
-assuming Git is installed on your system.  After the cloning finishes type
+assuming Git is installed on your system.  Compiling needs
+\href{https://cmake.org/}{CMake} 3.20 or newer and a C/C++ compiler that
+MathWorks supports for your Matlab release.  After the cloning finishes type
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ cd braidlab; make
+$ cd braidlab; make install
 \end{lstlisting}
-to compile the MEX files.  The \lstinline{make} command is a
-compatibility wrapper around CMake.  (If for some reason you need to
-recompile, run \lstinline{make clean} first.)  Note that you can still use
+to compile the MEX files and put them into the \lstinline{+braidlab} folder,
+where Matlab looks for them.  (A plain \lstinline{make} only compiles them
+into the \lstinline{build} folder.)  The \lstinline{make} command is a
+compatibility wrapper around CMake.  Note that you can still use
 \braidlab\ even if
 you're unable to compile the MEX files, but some commands will be unavailable
 or run (much) more slowly. %
@@ -2425,7 +2429,6 @@ Matlab, change to the \lstinline{testsuite} folder, and run
 >> test_braidlab
 \end{lstbraidlab}
 making sure the path is set properly (Section~\ref{sec:path}).
-Note that running the testsuite requires Matlab version 2013a or later.
 
 
 \subsection{Troubleshooting the installation process}
@@ -2436,40 +2439,32 @@ Note that running the testsuite requires Matlab version 2013a or later.
 Here are some common problems that can occur when installing or compiling
 braidlab.
 
-\subsubsection{Invalid MEX-file: Wrong version of libraries}
+\subsubsection{Invalid MEX-file: \texorpdfstring{\lstinline{GLIBCXX}}{GLIBCXX} not found}
 
-If you get a Matlab error about the wrong version of libraries:
+\index{Linux|(}%
+If you compiled \braidlab\ yourself on Linux and Matlab reports an error like
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
 Invalid MEX-file '.../+braidlab/@braid/private/train_helper.mexa64':
     /usr/local/MATLAB/R20XXx/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found
 \end{lstlisting}
-then run Matlab from the command-line (\lstinline{bash} shell) by specifying
-the system library location:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab
-\end{lstlisting}
-You may need to adjust the path above for your local configuration.
-
-\subsubsection{Unsupported compiler}
-
-\index{Linux|(}%
-Linux distributions often use C/C++ compilers that may not match the one
-supported by your Matlab release.  If you get such an error from MEX, %
-\index{Matlab!MEX files}%
-check the MathWorks supported compiler list for your Matlab release and
-install one of them.  Then run %
+then the MEX files were compiled with a newer %
 \index{GCC compiler|(}%
+GCC than the one your Matlab release supports: each release comes with its
+own copy of the C++ runtime library \lstinline{libstdc++}, and it is older
+than the one a newer compiler expects.  (Linux distributions often ship such a
+newer compiler.)  Install a GCC version from MathWorks' list of supported
+compilers for your Matlab release, and compile with it in a fresh build folder;
+for example, for GCC~12:
 \begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
   language=bash,backgroundcolor=\color{white}]
-$ mex -setup cpp
+$ cmake -S . -B build-gcc12 -DCMAKE_C_COMPILER=gcc-12 \
+    -DCMAKE_CXX_COMPILER=g++-12
+$ cmake --build build-gcc12 -j
+$ cmake --install build-gcc12 --prefix .
 \end{lstlisting}
-inside Matlab to choose the compiler explicitly.
-For most systems this is enough.  If Matlab still chooses the wrong compiler,
-set it again from within Matlab and verify that \lstinline{mex -setup cpp}
-reports a supported compiler.
-
+The precompiled packages (Section~\ref{sec:precompiled}) do not have this
+problem.
 \index{GCC compiler|)}%
 \index{Linux|)}%
 
@@ -2505,74 +2500,12 @@ On Windows, use the vcpkg toolchain (for example
 (otherwise vcpkg may select its debug build of GMP, which only runs where
 Visual Studio is installed).
 
-Both the %
-\index{GCC compiler}%
-GCC compiler (more common on Linux %
-\index{Linux}%
-systems) and %
-\index{Clang compiler|see{macOS}}%
-\index{macOS!Clang compiler}%
-Clang compiler (more common on macOS systems) %
-\index{macOS}%
-can also be pointed to non-standard include paths with the environment variable
-\lstinline{CPLUS_INCLUDE_PATH} if needed, but this is usually unnecessary when
-GMP is installed through standard package-manager locations.
+If GMP is installed in a non-standard location, pass its installation
+prefix to CMake with \lstinline{-DCMAKE_PREFIX_PATH=<prefix>}, as in the
+macOS example above.
 
 \index{GMP|)}%
 
-
-\subsubsection{Polish \LaTeX\ gets in the way}
-
-\index{Linux|(}%
-This is a strange one.  If on compilation you see an error like this:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-mex: unrecognized option `-largeArrayDims'
-mex: unrecognized option `-O'
-mex: unrecognized option `-DBRAIDLAB_USE_GMP'
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013)
- restricted \write18 enabled.
-entering extended mode
-! I can't find file `"CFLAGS=-O -DMATLAB_MEX_FILE"'.
-\end{lstlisting}
-This is due to the command \lstinline{mex} --- part of the Polish \LaTeX\
-package --- shadowing Matlab's \lstinline{mex} compiler.  A simple solution,
-if you don't use the Polish language often, is to simply remove the package:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ sudo apt-get remove texlive-lang-polish
-\end{lstlisting}
-This last line is for Ubuntu and Debian Linux distributions.  You can also
-manually rename the Polish \lstinline{mex} command to something like
-\lstinline{mex.polish}, and then make sure Matlab's \lstinline{mex} is in your
-path.
-
-Another solution is to make sure that the Matlab executable directory appears
-early in your shell path.  For example on macOS: %
-\index{macOS}%
-and under \lstinline{bash} shell this reads
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ export PATH=/Applications/MATLAB_R20XXx.app/bin:$PATH
-\end{lstlisting}
-or under \lstinline{tcsh} shell
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-$ setenv PATH /Applications/MATLAB_R20XXx.app/bin:$PATH
-\end{lstlisting}
-
-\index{Linux|)}%
-
-\subsubsection{\texorpdfstring{\lstinline{largeArraydims}}{largeArraydims} warning}
-
-You might get this warning:
-\begin{lstlisting}[frame=single,framerule=0pt,escapechar=*,%
-  language=bash,backgroundcolor=\color{white}]
-Warning: Legacy MEX infrastructure is provided for compatibility; it will be removed in a future version of MATLAB.
-\end{lstlisting}
-This can be safely ignored.  Matlab is transitioning from a shorter to a
-longer type of internal array indexing.  Eventually the
-\lstinline{-largeArraydims} flag will be removed from \braidlab.
 
 \index{installing \braidlab!troubleshooting|)}
 \index{troubleshooting!installation|)}
@@ -2590,7 +2523,7 @@ and alert the developers if an issue exists.
 \label{sec:global-flags}
 
 \index{global flags|(}%
-There are several flags that you can use to help the identify the root of the
+There are several flags that you can use to help identify the root of the
 problem:
 \begin{itemize}
 \item \lstinline{BRAIDLAB_braid_nomex}%
@@ -2618,7 +2551,7 @@ problem:
   result in an overwhelming amount of output lines.
 \end{itemize}
 
-All the flags are set through MATLAB's \lstinline{global} variables as follows.
+All the flags are set through Matlab's \lstinline{global} variables as follows.
 To set the global value of the flag \lstinline{BRAIDLAB_<flagname>} to \lstinline{true}, issue the following set of commands \emph{before} you run your code.
 \begin{lstbraidlab}
 >> global BRAIDLAB_<flagname>
@@ -2655,7 +2588,10 @@ include:
   \lstinline{git}, please copy-paste the output of \lstinline{git log -1} run
   in your \braidlab{} folder. If you have downloaded a compiled version of
   \braidlab{}, please let us know the version number on this guide's front
-  page.
+  page, and include the file \lstinline{BUILD-MANIFEST.txt} from the package,
+  which records exactly what it was built from.
+\item The output of the Matlab command \lstinline{ver}, which gives your
+  Matlab release and operating system.
 \item A minimal example re-creating the problem. You can also attach any data
   files to the GitHub issue that would help us recreate the problem.
 \item Output of the Matlab command window during the behavior of the

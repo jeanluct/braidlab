@@ -13,7 +13,7 @@ Two binary flavors are produced for each platform:
 
 Packages are built for Linux (x86-64), macOS (Apple silicon and Intel), and Windows (x86-64).  Each package works with the Matlab release in its name and all later releases, on the operating systems that release supports: Linux with glibc 2.28 or newer (for example RHEL 8, Debian 11, Ubuntu 20.04, or later), macOS 13 or later, and Windows 10 or 11.
 
-To compile from source, you can use either the legacy Makefile build (`make`) or the CMake build:
+To compile from source, you can use either the legacy Makefile build (`make install`, which compiles the MEX files and puts them into `+braidlab`; a plain `make` only compiles them into `build/`) or the CMake build:
 ```
 cmake -S . -B build
 cmake --build build -j
