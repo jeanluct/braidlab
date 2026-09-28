@@ -488,6 +488,50 @@ jobs:
           path: ${{ env.ARCHIVE_NAME }}
           if-no-files-found: error
 
+  publish_release:
+    # On release tags only: attach the package archives to a draft GitHub
+    # release, for the maintainer to review and publish.  Downloading
+    # through actions/download-artifact unwraps each artifact's zip, so
+    # the release gets the real archives (3.4's macOS/Windows assets were
+    # accidentally the artifact wrappers: a zip inside a zip).
+    name: Publish Release Assets (draft)
+    needs: release_pinned
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/release-') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download package archives
+        uses: actions/download-artifact@v8
+        with:
+          pattern: braidlab-*
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        shell: bash
+        run: |
+          cd dist
+          ls -l
+          sha256sum braidlab-* > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Create or update draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            # Release already exists (for example created by hand):
+            # replace its assets with the CI-built ones.
+            gh release upload "${TAG}" dist/* --repo "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${TAG}" dist/* --repo "${GITHUB_REPOSITORY}" \
+              --draft --verify-tag --title "braidlab ${TAG#release-}" \
+              --notes "Draft created by CI from ${GITHUB_SHA::7}.  Add release notes from CHANGELOG.md, check the assets, then publish."
+          fi
+
   compat_latest:
     name: Compatibility Check (ubuntu)
     runs-on: ubuntu-latest
