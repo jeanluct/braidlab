@@ -11,7 +11,7 @@ Companion documents:
 - `devel/CI-WORKFLOW.md` — operational use of the workflow.
 - `devel/RELEASE-CONFIG.md` — what is pinned and how to override it.
 
-## Update (3.4.2): current policy and corrections
+## Update (3.4.1): current policy and corrections
 
 This document was written for 3.4, when the packages bundled GMP shared
 libraries.  Inspecting the shipped 3.4 binaries later showed that several

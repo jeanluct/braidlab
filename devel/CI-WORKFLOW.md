@@ -208,7 +208,7 @@ Archive naming format:
 
 Examples:
 
-- `braidlab-3.4.2_linux-glibc2.28-x86_64_matlab-R2024b.tar.gz`
+- `braidlab-3.4.1_linux-glibc2.28-x86_64_matlab-R2024b.tar.gz`
 - `braidlab-dev-a1b2c3d_macos-arm64_matlab-R2024b.zip`
 - `braidlab-dev-a1b2c3d_macos-x86_64_matlab-R2024b.zip`
 
@@ -362,7 +362,7 @@ If you want, this file can be split into:
 - Q: How do I know users can use the build? Will it fail if GMP is not
   installed on the user's system?
   A: The package jobs intentionally run a MATLAB smoke test after install,
-  so each artifact is at least load-tested before upload.  Since 3.4.2 the
+  so each artifact is at least load-tested before upload.  Since 3.4.1 the
   MEX files link GMP statically, so users never need GMP installed, and no
   GMP library ships in the package.  CI checks that no MEX depends on GMP
   and that no shared libraries are shipped.  (Issue #165 originally
@@ -412,7 +412,7 @@ If you want, this file can be split into:
 
 - Q: Follow-up to GMP question above: can we statically-link GMP so the user
   doesn't have to have it installed on their system?
-  A: Yes, and since 3.4.2 that is what the packages do
+  A: Yes, and since 3.4.1 that is what the packages do
   (`-DBRAIDLAB_GMP_LINKAGE=static`).  Issue #165 first chose bundling,
   partly because of LGPLv3 relinking obligations.  But GMP is dual-licensed,
   LGPLv3 or GPLv2, each with the option of later versions.  braidlab is

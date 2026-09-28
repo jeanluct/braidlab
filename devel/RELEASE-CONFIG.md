@@ -132,7 +132,7 @@ These values describe the shipped artifacts and are deliberately not
 repository variables.  To change them, edit the matrix in
 `.github/workflows/build-braidlab-packages.yml`.
 
-Until 3.4.2 there was also a `no-gmp` package flavor
+Until 3.4.1 there was also a `no-gmp` package flavor
 (`BRAIDLAB_GMP_LINKAGE=off`), for users who could not install GMP.
 Static GMP made it pointless, so it is no longer shipped.  The GMP-off
 build, which developers without GMP use, is still checked by the
@@ -140,7 +140,7 @@ non-publishing `nogmp_check` job, which builds it and smoke-tests the
 MATLAB fallback.
 
 The former `bundled` linkage (GMP shared libraries shipped next to the
-MEX files) was removed in 3.4.2.  `system` remains for local builds.
+MEX files) was removed in 3.4.1.  `system` remains for local builds.
 
 ## Notes
 

@@ -17,7 +17,7 @@ Related: `devel/release-prep.py` (the text edits),
 
 ## Inputs
 
-- `X.Y.Z`: the new version, for example `3.4.2` (or `X.Y`, as in `3.4`).
+- `X.Y.Z`: the new version, for example `3.4.1` (or `X.Y`, as in `3.4`).
 - The release date, `YYYY-MM-DD`; default today.
 
 Below, `X.Y.Z` stands for the version.  Run all commands from the

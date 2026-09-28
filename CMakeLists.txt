@@ -66,7 +66,7 @@ option(BRAIDLAB_BUILD_DOCS "Enable braidlab-doc target" OFF)
 #             license, and its license texts are installed alongside.
 #   off     - build without GMP support (equivalent to BRAIDLAB_USE_GMP=OFF).
 # (A former 'bundled' mode, which shipped GMP shared libraries next to the
-# MEX files, was removed in 3.4.2 in favor of 'static'.)
+# MEX files, was removed in 3.4.1 in favor of 'static'.)
 # BRAIDLAB_USE_GMP is retained as a backward-compatible alias: when
 # BRAIDLAB_GMP_LINKAGE is left at its default and BRAIDLAB_USE_GMP=OFF
 # is passed, BRAIDLAB_GMP_LINKAGE is forced to off.
@@ -82,7 +82,7 @@ endif()
 
 if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
   message(FATAL_ERROR
-    "BRAIDLAB_GMP_LINKAGE=bundled was removed in braidlab 3.4.2.  "
+    "BRAIDLAB_GMP_LINKAGE=bundled was removed in braidlab 3.4.1.  "
     "Use 'static' for self-contained packages (see "
     ".github/scripts/build-gmp-static.sh), or 'system'.")
 endif()
