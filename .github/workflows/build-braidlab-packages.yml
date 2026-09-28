@@ -176,10 +176,10 @@ jobs:
       - name: Show toolchain versions
         shell: bash
         run: |
-          cmake --version | head -1
+          cmake --version | sed -n 1p
           if [ "${{ runner.os }}" = "macOS" ]; then
             xcodebuild -version
-            clang --version | head -1
+            clang --version | sed -n 1p
             sw_vers
           fi
 

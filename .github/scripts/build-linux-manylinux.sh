@@ -27,14 +27,14 @@ parallel="${BUILD_PARALLEL:-4}"
 dnf install -y -q "gcc-toolset-${GCC_TOOLSET}-gcc-c++" m4 xz
 # shellcheck disable=SC1090
 source "/opt/rh/gcc-toolset-${GCC_TOOLSET}/enable"
-gcc --version | head -1
-ldd --version | head -1
+gcc --version | sed -n 1p
+ldd --version | sed -n 1p
 
 # Pinned CMake, independent of the image's.
 /opt/python/cp312-cp312/bin/python3 -m venv /tmp/cmake-venv
 /tmp/cmake-venv/bin/pip install -q "cmake==${CMAKE_VERSION}"
 export PATH="/tmp/cmake-venv/bin:${PATH}"
-cmake --version | head -1
+cmake --version | sed -n 1p
 
 cmake_args=(-S . -B build
   "-DMatlab_ROOT_DIR=${MATLAB_ROOT}"
