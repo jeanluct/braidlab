@@ -63,13 +63,13 @@ ArtinFactor FirstFactorInLCF(ArtinBraid B)
 {
   sint16 n=B.Index();
 
+  if (CL(B)>0)
+    return *B.FactorList.begin();
+
   if (B.LeftDelta>0)
     return ArtinFactor(n,1);
 
-  if (CL(B)==0)
-    return ArtinFactor(n,0);
-
-  return *B.FactorList.begin();
+  return ArtinFactor(n,0);
 }
 
 
