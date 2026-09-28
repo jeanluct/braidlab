@@ -24,6 +24,18 @@
 
 cmake_minimum_required(VERSION 3.20)
 
+# Oldest macOS the MEX files will load on.  Without this, the compiler
+# targets the build machine's own macOS version, so packages built on a
+# new runner would not load on older (but MATLAB-supported) macOS.  13.0
+# covers every macOS that MATLAB R2024b supports (13.7, 14, 15).  Must be
+# set before project(); an explicit -DCMAKE_OSX_DEPLOYMENT_TARGET or the
+# MACOSX_DEPLOYMENT_TARGET environment variable takes precedence.
+if(CMAKE_HOST_APPLE AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET
+    AND NOT DEFINED ENV{MACOSX_DEPLOYMENT_TARGET})
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING
+    "Minimum macOS version for the MEX files")
+endif()
+
 project(braidlab LANGUAGES C CXX)
 
 # Match the Makefile workflow's optimized default build behavior.
@@ -45,36 +57,40 @@ option(BRAIDLAB_BUILD_DOCS "Enable braidlab-doc target" OFF)
 # GMP linkage policy (issue #165).  Values:
 #   system  - link against system GMP; copy nothing.  Default; used by
 #             local developer builds.
-#   bundled - link against system GMP; install the resolved GMP runtime
-#             libraries alongside the GMP-using MEX files and adjust
-#             rpath/install-name so MEX files load them locally.  Used
-#             by CI release jobs to produce self-contained archives.
-#   static  - statically link libgmp/libgmpxx.  Reserved for future use;
-#             not implemented in Phase A.
+#   static  - statically link libgmp/libgmpxx into the MEX files, so
+#             they have no GMP runtime dependency at all.  Used by CI
+#             release jobs.  Needs static, position-independent GMP
+#             libraries (see .github/scripts/build-gmp-static.sh, or
+#             vcpkg's x64-windows-static-md triplet on Windows).  GMP is
+#             used under the GPLv3 option of its LGPLv3/GPLv2+ dual
+#             license, and its license texts are installed alongside.
 #   off     - build without GMP support (equivalent to BRAIDLAB_USE_GMP=OFF).
+# (A former 'bundled' mode, which shipped GMP shared libraries next to the
+# MEX files, was removed in 3.4.2 in favor of 'static'.)
 # BRAIDLAB_USE_GMP is retained as a backward-compatible alias: when
 # BRAIDLAB_GMP_LINKAGE is left at its default and BRAIDLAB_USE_GMP=OFF
 # is passed, BRAIDLAB_GMP_LINKAGE is forced to off.
 set(BRAIDLAB_GMP_LINKAGE "system" CACHE STRING
-  "GMP linkage policy: system, bundled, static, or off")
-set_property(CACHE BRAIDLAB_GMP_LINKAGE PROPERTY STRINGS system bundled static off)
+  "GMP linkage policy: system, static, or off")
+set_property(CACHE BRAIDLAB_GMP_LINKAGE PROPERTY STRINGS system static off)
 
 if(NOT BRAIDLAB_USE_GMP AND BRAIDLAB_GMP_LINKAGE STREQUAL "system")
   set(BRAIDLAB_GMP_LINKAGE "off" CACHE STRING
-    "GMP linkage policy: system, bundled, static, or off" FORCE)
+    "GMP linkage policy: system, static, or off" FORCE)
   message(STATUS "BRAIDLAB_USE_GMP=OFF -> BRAIDLAB_GMP_LINKAGE=off")
 endif()
 
-if(NOT BRAIDLAB_GMP_LINKAGE MATCHES "^(system|bundled|static|off)$")
+if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
   message(FATAL_ERROR
-    "BRAIDLAB_GMP_LINKAGE='${BRAIDLAB_GMP_LINKAGE}' is invalid; "
-    "expected one of: system, bundled, static, off.")
+    "BRAIDLAB_GMP_LINKAGE=bundled was removed in braidlab 3.4.2.  "
+    "Use 'static' for self-contained packages (see "
+    ".github/scripts/build-gmp-static.sh), or 'system'.")
 endif()
 
-if(BRAIDLAB_GMP_LINKAGE STREQUAL "static")
+if(NOT BRAIDLAB_GMP_LINKAGE MATCHES "^(system|static|off)$")
   message(FATAL_ERROR
-    "BRAIDLAB_GMP_LINKAGE=static is not implemented yet.  "
-    "Use 'system' (default) or 'bundled', or 'off' to disable GMP.")
+    "BRAIDLAB_GMP_LINKAGE='${BRAIDLAB_GMP_LINKAGE}' is invalid; "
+    "expected one of: system, static, off.")
 endif()
 
 set(BRAIDLAB_DIR_BRAID_PRIVATE "+braidlab/@braid/private")
@@ -110,6 +126,19 @@ function(braidlab_add_mex target source install_dir)
     R2017b
     NO_IMPLICIT_LINK_TO_MATLAB_LIBRARIES
   )
+
+  # On macOS, export exactly the two symbols a C-API MEX file defines.
+  # matlab_add_mex exports MATLAB's C++ MEX API entry points too
+  # (_mexCreateMexFunction etc., via cppMexFunction.map) even for C-API
+  # MEX files, and relies on -Wl,-U to excuse their absence.  The Xcode 26
+  # linker rejects that ("Undefined symbols ... <initial-undefines>"), and
+  # older linkers left dangling re-exports in the binaries.  Replacing the
+  # link flags wholesale is safe: on Apple, matlab_add_mex puts nothing
+  # else in LINK_FLAGS.
+  if(APPLE)
+    set_property(TARGET ${target} PROPERTY LINK_FLAGS
+      "-Wl,-exported_symbols_list,${CMAKE_SOURCE_DIR}/cmake/mex-exports-macos.txt")
+  endif()
 
   # Link to MATLAB's MEX runtime libraries.  On Linux we cannot use
   # the imported targets Matlab::mex / Matlab::mx directly: their
@@ -213,21 +242,52 @@ target_include_directories(trains PUBLIC "${CMAKE_SOURCE_DIR}/extern/trains")
 set(BRAIDLAB_GMP_LINK_LIBS)
 set(BRAIDLAB_GMP_DEFINITIONS)
 set(BRAIDLAB_GMP_INCLUDE_DIRS)
-set(BRAIDLAB_GMP_BUNDLE_FILES)
-# Locate GMP/GMPXX for system and bundled linkage modes.  A missing
-# GMP is now a hard error in those modes (replacing the previous
-# silent fallback to OFF), with per-OS install hints.
-if(BRAIDLAB_GMP_LINKAGE STREQUAL "system" OR BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
+# Locate GMP/GMPXX for the system and static linkage modes.  A missing
+# GMP is a hard error in those modes, with per-OS install hints.
+if(NOT BRAIDLAB_GMP_LINKAGE STREQUAL "off")
+  # For static linkage, ask for the archives explicitly: find_library
+  # would otherwise prefer a shared libgmp found on the same path.  On
+  # Windows a static .lib and an import .lib share a name, so there the
+  # choice is made by the vcpkg triplet (x64-windows-static-md).
+  if(BRAIDLAB_GMP_LINKAGE STREQUAL "static" AND NOT WIN32)
+    set(_braidlab_gmp_names libgmp.a)
+    set(_braidlab_gmpxx_names libgmpxx.a)
+  else()
+    set(_braidlab_gmp_names gmp)
+    set(_braidlab_gmpxx_names gmpxx)
+  endif()
   find_path(BRAIDLAB_GMP_INCLUDE_DIR NAMES gmp.h)
   find_path(BRAIDLAB_GMPXX_INCLUDE_DIR NAMES gmpxx.h)
-  find_library(BRAIDLAB_GMP_LIBRARY NAMES gmp)
-  find_library(BRAIDLAB_GMPXX_LIBRARY NAMES gmpxx)
+  find_library(BRAIDLAB_GMP_LIBRARY NAMES ${_braidlab_gmp_names})
+  find_library(BRAIDLAB_GMPXX_LIBRARY NAMES ${_braidlab_gmpxx_names})
+
+  # vcpkg's toolchain file puts its debug tree first whenever
+  # CMAKE_BUILD_TYPE is undefined, which it is under the multi-config
+  # Visual Studio generator.  Debug GMP links against Microsoft's debug C
+  # runtime, which exists only where Visual Studio is installed, so
+  # braidlab 3.4 shipped GMP DLLs that fail to load on ordinary machines.
+  # Refuse to build that way; configure with -DCMAKE_BUILD_TYPE=Release.
+  if(WIN32)
+    foreach(_braidlab_lib IN ITEMS "${BRAIDLAB_GMP_LIBRARY}" "${BRAIDLAB_GMPXX_LIBRARY}")
+      if(_braidlab_lib MATCHES "/debug/")
+        message(FATAL_ERROR
+          "GMP resolved to a debug build (${_braidlab_lib}).  Its DLLs "
+          "need the Visual Studio debug runtime.  Configure with "
+          "-DCMAKE_BUILD_TYPE=Release so vcpkg selects release libraries.")
+      endif()
+    endforeach()
+  endif()
 
   if(BRAIDLAB_GMP_INCLUDE_DIR AND BRAIDLAB_GMPXX_INCLUDE_DIR
      AND BRAIDLAB_GMP_LIBRARY AND BRAIDLAB_GMPXX_LIBRARY)
     list(APPEND BRAIDLAB_GMP_INCLUDE_DIRS "${BRAIDLAB_GMP_INCLUDE_DIR}" "${BRAIDLAB_GMPXX_INCLUDE_DIR}")
     list(REMOVE_DUPLICATES BRAIDLAB_GMP_INCLUDE_DIRS)
     list(APPEND BRAIDLAB_GMP_LINK_LIBS "${BRAIDLAB_GMPXX_LIBRARY}" "${BRAIDLAB_GMP_LIBRARY}")
+    if(BRAIDLAB_GMP_LINKAGE STREQUAL "static" AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      # Keep GMP's symbols private to each MEX file, so they can never
+      # bind to the libgmp.so that MATLAB itself loads (via gnutls).
+      list(APPEND BRAIDLAB_GMP_LINK_LIBS "-Wl,--exclude-libs,libgmp.a:libgmpxx.a")
+    endif()
     list(APPEND BRAIDLAB_GMP_DEFINITIONS BRAIDLAB_USE_GMP)
     message(STATUS "GMP enabled (BRAIDLAB_GMP_LINKAGE=${BRAIDLAB_GMP_LINKAGE})")
   else()
@@ -326,14 +386,24 @@ braidlab_add_mex_rel(entropy_helper
   COMPILE_DEFINITIONS ${BRAIDLAB_GMP_DEFINITIONS}
 )
 
-# Bundled-GMP support (issue #165, Phase A).  Resolves runtime
-# artefact paths and loader names, installs the GMP libraries
-# alongside the GMP-using MEX files, and patches rpath /
-# install-name so the loader finds them without any system GMP.
-# Kept in a separate module so it can be excised cleanly: delete
-# cmake/BraidlabBundledGMP.cmake and this include() block.
-if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
-  include(${CMAKE_SOURCE_DIR}/cmake/BraidlabBundledGMP.cmake)
+# Static GMP: ship GMP's license texts and a README in extern/gmp/.
+# This is a license obligation, so a missing license is an error.  The
+# texts come either from .github/scripts/build-gmp-static.sh
+# (<prefix>/share/licenses/gmp) or from vcpkg (<prefix>/share/gmp).
+if(BRAIDLAB_GMP_LINKAGE STREQUAL "static")
+  get_filename_component(_braidlab_gmp_libdir "${BRAIDLAB_GMP_LIBRARY}" DIRECTORY)
+  get_filename_component(_braidlab_gmp_prefix "${_braidlab_gmp_libdir}" DIRECTORY)
+  file(GLOB _braidlab_gmp_licenses
+    "${_braidlab_gmp_prefix}/share/licenses/gmp/COPYING*"
+    "${_braidlab_gmp_prefix}/share/gmp/copyright")
+  if(NOT _braidlab_gmp_licenses)
+    message(FATAL_ERROR
+      "BRAIDLAB_GMP_LINKAGE=static: no GMP license texts found under "
+      "${_braidlab_gmp_prefix}/share.  Build GMP with "
+      ".github/scripts/build-gmp-static.sh, or use vcpkg.")
+  endif()
+  install(FILES ${_braidlab_gmp_licenses} "${CMAKE_SOURCE_DIR}/extern/gmp/README.md"
+    DESTINATION extern/gmp)
 endif()
 
 if(BRAIDLAB_BUILD_DOCS)

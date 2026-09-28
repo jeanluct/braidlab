@@ -9,16 +9,18 @@ Config knobs reference: `devel/RELEASE-CONFIG.md`
 
 ## What the CI pipeline does
 
-At a high level, CI does three things:
+At a high level, CI does four things:
 
 1. Builds `doc/braidlab_guide.pdf` once.
 2. Builds platform-specific package artifacts with CMake + MATLAB smoke tests.
-3. Runs an Ubuntu compatibility lane against the latest MATLAB (non-blocking).
+3. On release tags, attaches those archives to a draft GitHub release.
+4. Runs an Ubuntu compatibility lane against the latest MATLAB (non-blocking).
 
 The release/package jobs produce archives that include:
 
-- `+braidlab/` (with bundled GMP runtime libraries co-located in
-  `+braidlab/@braid/private/` for the default flavor)
+- `+braidlab/` (in the default flavor, GMP is linked statically into the
+  MEX files that use it)
+- `extern/gmp/` (default flavor: GMP's license texts and a README)
 - `extern/VariablePrecisionIntegers/` (John D'Errico's VPI toolbox,
   required by braidlab's arbitrary-precision MATLAB code paths)
 - `examples/` (top-level example scripts referenced by the guide and
@@ -156,47 +158,47 @@ Purpose:
 - Produce the distributable package archives.
 - Use a pinned MATLAB release for deterministic packaging behavior.
 
-Platform/flavor matrix:
+Platform/flavor matrix (runner images pinned; see
+`devel/RELEASE-CONFIG.md` for the toolchain pins):
 
-- `ubuntu-22.04` -> archive `.tar.gz`
-- `macos-latest` -> archive `.zip`
-- `windows-latest` -> archive `.zip`
+- `ubuntu-22.04` -> archive `.tar.gz`.  This is only the host: the build
+  runs in a pinned `manylinux_2_28` container (glibc 2.28,
+  gcc-toolset-13) via `.github/scripts/build-linux-manylinux.sh`, with
+  MATLAB bind-mounted read-only.
+- `macos-15` (Apple silicon) and `macos-15-intel` -> archive `.zip`, with
+  Xcode 16.4 and deployment target 13.0.
+- `windows-2022` -> archive `.zip`, with Visual Studio 2022.
 
 Each platform produces two flavors:
 
-- `default` (always built): GMP runtime libraries are bundled inside the
-  archive (`-DBRAIDLAB_GMP_LINKAGE=bundled`).  Users do not need GMP
-  installed on their system.
+- `default` (always built): GMP is linked statically into the MEX files
+  (`-DBRAIDLAB_GMP_LINKAGE=static`).  Users do not need GMP installed, and
+  the package ships no shared libraries.
 - `no-gmp`: GMP-using code paths are compiled out
-  (`-DBRAIDLAB_GMP_LINKAGE=off`).  Smaller archive with zero GMP
-  runtime dependency, for users on stripped or GMP-incompatible
-  environments.  Built on every push so GMP-free build regressions
-  surface immediately.
+  (`-DBRAIDLAB_GMP_LINKAGE=off`).  Built on every push so GMP-free build
+  regressions surface immediately.
 
-GMP is installed deterministically per OS in CI before configuring CMake:
+Static GMP per platform (pinned version and checksum):
 
-- Linux: `apt-get install -y libgmp-dev libgmpxx4ldbl libgmp10`.
-- macOS: `brew install gmp`.
-- Windows: `vcpkg install gmp:x64-windows`; CMake is pointed at the
-  vcpkg toolchain file via `CMAKE_TOOLCHAIN_FILE`.
+- Linux, macOS: built by `.github/scripts/build-gmp-static.sh` (running
+  GMP's own tests) and cached with `actions/cache`.
+- Windows: `vcpkg install gmp:x64-windows-static-md`, with
+  `CMAKE_BUILD_TYPE=Release` so vcpkg does not pick its debug libraries.
 
 Key implementation details:
 
-- Configures and builds with CMake using `BRAIDLAB_GMP_LINKAGE` (system,
-  bundled, or off) per matrix entry.
 - Installs into an isolated `stage/` directory (`cmake --install ... --prefix stage`).
 - Downloads the PDF artifact into `stage/doc`.
-- Runs a per-OS dependency check on the staged GMP-using MEX files
-  (`ldd` on Linux, `otool -L` on macOS, `Get-ChildItem` on Windows) for
-  the bundled flavor; fails if a MEX still resolves GMP to a system path
-  instead of the co-located bundled copy.
+- Checks the staged MEX files: none may depend on GMP, no shared
+  libraries may be shipped, and on Windows none may import the debug C
+  runtime.  On Linux, `libmex`/`libmx` must be recorded by basename.
 - Runs a MATLAB smoke test against the staged install; the smoke test
   exercises a GMP-backed code path (`braidlab.braid.entropy`) on every
   flavor where GMP is enabled.
 - Copies metadata + `testsuite/` + `examples/` +
   `extern/VariablePrecisionIntegers/` into `stage/`.
 - Writes `BUILD-MANIFEST.txt` with commit/release/platform/flavor
-  metadata, including the `flavor` and `gmp_linkage` fields.
+  metadata, including `flavor`, `gmp_linkage` and `gmp_version`.
 - Archives selected directories/files from `stage/`.
 - Uploads archive as GitHub artifact.
 
@@ -211,9 +213,19 @@ Archive naming format:
 
 Examples:
 
-- `braidlab-3.4.0_linux-ubuntu-22.04-x86_64_matlab-R2024b.tar.gz`
-- `braidlab-3.4.0_linux-ubuntu-22.04-x86_64_matlab-R2024b_no-gmp.tar.gz`
+- `braidlab-3.4.2_linux-glibc2.28-x86_64_matlab-R2024b.tar.gz`
+- `braidlab-3.4.2_linux-glibc2.28-x86_64_matlab-R2024b_no-gmp.tar.gz`
 - `braidlab-dev-a1b2c3d_macos-arm64_matlab-R2024b.zip`
+- `braidlab-dev-a1b2c3d_macos-x86_64_matlab-R2024b.zip`
+
+## 2b) `publish_release` (release tags only)
+
+Runs after every `release_pinned` job succeeds, on pushed `release-*`
+tags only.  It downloads the package archives
+(`actions/download-artifact` unwraps the artifact zips), writes
+`SHA256SUMS`, and attaches both to a **draft** GitHub release titled
+`braidlab <version>`.  If the release already exists, its assets are
+replaced.  It is the only job with `contents: write`.
 
 ## 3) `compat_latest` (Ubuntu, allow-failure)
 
@@ -275,9 +287,11 @@ Expected result:
 1. Merge release candidate changes to `master`.
 2. Ensure `release_pinned` matrix jobs are green on `master`.
 3. Create and push release tag: `release-<version>`.
-4. Verify tag-triggered artifacts are generated for Linux/macOS/Windows.
+4. Wait for `publish_release`: it creates a draft release with all
+   archives and `SHA256SUMS`.
 5. Confirm each archive contains docs + metadata + `testsuite/`.
-6. Review `compat_latest`; if failing, log follow-up if not release-critical.
+6. Add release notes (from `CHANGELOG.md`) to the draft and publish it.
+7. Review `compat_latest`; if failing, log follow-up if not release-critical.
 
 ## Practical development checklist
 
@@ -342,19 +356,13 @@ If you want, this file can be split into:
 - Q: How do I know users can use the build? Will it fail if GMP is not
   installed on the user's system?
   A: The package jobs intentionally run a MATLAB smoke test after install, so
-  each artifact is at least load-tested before upload.  As of issue #165,
-  GMP portability is handled at packaging time:
-  - The default-flavor archive ships with GMP runtime libraries bundled
-    inside the package (`-DBRAIDLAB_GMP_LINKAGE=bundled`), co-located
-    with the GMP-using MEX files in `+braidlab/@braid/private/`.  The
-    MEX files load these via `$ORIGIN` (Linux) / `@loader_path` (macOS)
-    / DLL co-location (Windows).  Users do not need GMP installed.
-  - A `no-gmp` flavor archive (built on every push) compiles out
-    the GMP-using code paths (`-DBRAIDLAB_GMP_LINKAGE=off`) for
-    users who explicitly want zero GMP runtime dependency.
-  - Per-OS dependency-check steps (`ldd`/`otool -L`) verify in CI that
-    the bundled-flavor MEX files resolve GMP to the co-located library,
-    not to a system path.
+  each artifact is at least load-tested before upload.  Since 3.4.2 the
+  default-flavor MEX files link GMP statically, so users never need GMP
+  installed, and no GMP library ships in the package.  CI checks that no
+  MEX depends on GMP and that no shared libraries are shipped.  A `no-gmp`
+  flavor compiles GMP out entirely.  (Issue #165 originally bundled GMP
+  shared libraries next to the MEX files; see the static-linking question
+  below for why that changed.)
 
 - Q: Can we make the Makefile system a wrapper for CMake? It would be nice if
   `make clean; make` still worked.
@@ -368,13 +376,11 @@ If you want, this file can be split into:
 
 - Q: I used to build binaries manually and attach them to the release. How will
   this work now?
-  A: The intended flow is tag-driven packaging in CI:
-  1. Merge release-ready changes to `master`.
-  2. Push tag `release-<version>`.
-  3. CI builds all platform archives and uploads workflow artifacts.
-  4. Create/edit the GitHub Release and attach those generated archives.
-  Optional next step: automate step 4 by adding a release-publish job that runs
-  only on `release-*` tags and uploads artifacts directly to the GitHub Release.
+  A: It is automated.  Push tag `release-<version>`; CI builds all
+  platform archives, and the `publish_release` job attaches them with a
+  `SHA256SUMS` file to a draft GitHub release.  Add the release notes and
+  publish.  (Attaching by hand put the artifact wrappers, zips inside zips,
+  on 3.4's macOS and Windows assets.)
 
 - Q: Lots of things are hardwired in YAML (versions, etc.). Is that a problem?
   A: Some pinning is intentional for reproducibility, but you are right that
@@ -400,15 +406,15 @@ If you want, this file can be split into:
 
 - Q: Follow-up to GMP question above: can we statically-link GMP so the user
   doesn't have to have it installed on their system?
-  A: As of issue #165, the chosen solution is to bundle GMP shared
-  libraries inside the package rather than to static-link.  Tradeoffs
-  considered:
-  - Static linking pros: fewer runtime files in the archive.
-  - Static linking cons: larger MEX binaries, per-platform maintenance
-    overhead, and LGPLv3 relink obligations for shipped static libs.
-  - Bundling pros: same end-user effect (no system GMP required), keeps
-    distribution under simple LGPL dynamic-redistribution rules, and
-    lets users replace the bundled libraries with their own build.
-  Static linking remains a deferred opt-in
-  (`-DBRAIDLAB_GMP_LINKAGE=static`, currently unimplemented and rejected
-  at configure time) for the rare case where bundling is unsuitable.
+  A: Yes, and since 3.4.2 that is what the packages do
+  (`-DBRAIDLAB_GMP_LINKAGE=static`).  Issue #165 first chose bundling,
+  partly because of LGPLv3 relinking obligations.  But GMP is dual-licensed,
+  LGPLv3 or GPLv2, each with the option of later versions.  braidlab is
+  GPLv3+, so it uses GMP under the GPLv3, where static linking only
+  requires that source be available.  Bundling also turned out to be the
+  most fragile part of the packaging:
+  - it needed three per-platform loader mechanisms;
+  - Homebrew's dylibs required macOS 15;
+  - vcpkg's DLLs were debug builds;
+  - on Linux, MATLAB's own libgmp shadowed it anyway.
+  See `devel/plans/plan-toolchain-portability.md`.

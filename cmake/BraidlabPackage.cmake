@@ -32,7 +32,8 @@
 # It does NOT own:
 #   - MEX target install rules (handled by braidlab_add_mex in the
 #     main CMakeLists.txt, since they are coupled to target creation).
-#   - Bundled-GMP install rules (see cmake/BraidlabBundledGMP.cmake).
+#   - The GMP license files installed with static GMP (main
+#     CMakeLists.txt).
 
 # Install MATLAB source files so staged artifacts are directly usable after
 # adding the staging root to MATLAB path.
