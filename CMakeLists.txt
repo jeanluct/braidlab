@@ -57,10 +57,6 @@ option(BRAIDLAB_BUILD_DOCS "Enable braidlab-doc target" OFF)
 # GMP linkage policy (issue #165).  Values:
 #   system  - link against system GMP; copy nothing.  Default; used by
 #             local developer builds.
-#   bundled - link against system GMP; install the resolved GMP runtime
-#             libraries alongside the GMP-using MEX files and adjust
-#             rpath/install-name so MEX files load them locally.  Used
-#             by CI release jobs to produce self-contained archives.
 #   static  - statically link libgmp/libgmpxx into the MEX files, so
 #             they have no GMP runtime dependency at all.  Used by CI
 #             release jobs.  Needs static, position-independent GMP
@@ -69,23 +65,32 @@ option(BRAIDLAB_BUILD_DOCS "Enable braidlab-doc target" OFF)
 #             used under the GPLv3 option of its LGPLv3/GPLv2+ dual
 #             license, and its license texts are installed alongside.
 #   off     - build without GMP support (equivalent to BRAIDLAB_USE_GMP=OFF).
+# (A former 'bundled' mode, which shipped GMP shared libraries next to the
+# MEX files, was removed in 3.4.2 in favor of 'static'.)
 # BRAIDLAB_USE_GMP is retained as a backward-compatible alias: when
 # BRAIDLAB_GMP_LINKAGE is left at its default and BRAIDLAB_USE_GMP=OFF
 # is passed, BRAIDLAB_GMP_LINKAGE is forced to off.
 set(BRAIDLAB_GMP_LINKAGE "system" CACHE STRING
-  "GMP linkage policy: system, bundled, static, or off")
-set_property(CACHE BRAIDLAB_GMP_LINKAGE PROPERTY STRINGS system bundled static off)
+  "GMP linkage policy: system, static, or off")
+set_property(CACHE BRAIDLAB_GMP_LINKAGE PROPERTY STRINGS system static off)
 
 if(NOT BRAIDLAB_USE_GMP AND BRAIDLAB_GMP_LINKAGE STREQUAL "system")
   set(BRAIDLAB_GMP_LINKAGE "off" CACHE STRING
-    "GMP linkage policy: system, bundled, static, or off" FORCE)
+    "GMP linkage policy: system, static, or off" FORCE)
   message(STATUS "BRAIDLAB_USE_GMP=OFF -> BRAIDLAB_GMP_LINKAGE=off")
 endif()
 
-if(NOT BRAIDLAB_GMP_LINKAGE MATCHES "^(system|bundled|static|off)$")
+if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
+  message(FATAL_ERROR
+    "BRAIDLAB_GMP_LINKAGE=bundled was removed in braidlab 3.4.2.  "
+    "Use 'static' for self-contained packages (see "
+    ".github/scripts/build-gmp-static.sh), or 'system'.")
+endif()
+
+if(NOT BRAIDLAB_GMP_LINKAGE MATCHES "^(system|static|off)$")
   message(FATAL_ERROR
     "BRAIDLAB_GMP_LINKAGE='${BRAIDLAB_GMP_LINKAGE}' is invalid; "
-    "expected one of: system, bundled, static, off.")
+    "expected one of: system, static, off.")
 endif()
 
 set(BRAIDLAB_DIR_BRAID_PRIVATE "+braidlab/@braid/private")
@@ -237,10 +242,8 @@ target_include_directories(trains PUBLIC "${CMAKE_SOURCE_DIR}/extern/trains")
 set(BRAIDLAB_GMP_LINK_LIBS)
 set(BRAIDLAB_GMP_DEFINITIONS)
 set(BRAIDLAB_GMP_INCLUDE_DIRS)
-set(BRAIDLAB_GMP_BUNDLE_FILES)
-# Locate GMP/GMPXX for system and bundled linkage modes.  A missing
-# GMP is now a hard error in those modes (replacing the previous
-# silent fallback to OFF), with per-OS install hints.
+# Locate GMP/GMPXX for the system and static linkage modes.  A missing
+# GMP is a hard error in those modes, with per-OS install hints.
 if(NOT BRAIDLAB_GMP_LINKAGE STREQUAL "off")
   # For static linkage, ask for the archives explicitly: find_library
   # would otherwise prefer a shared libgmp found on the same path.  On
@@ -382,16 +385,6 @@ braidlab_add_mex_rel(entropy_helper
   LINK_LIBS ${BRAIDLAB_GMP_LINK_LIBS}
   COMPILE_DEFINITIONS ${BRAIDLAB_GMP_DEFINITIONS}
 )
-
-# Bundled-GMP support (issue #165, Phase A).  Resolves runtime
-# artefact paths and loader names, installs the GMP libraries
-# alongside the GMP-using MEX files, and patches rpath /
-# install-name so the loader finds them without any system GMP.
-# Kept in a separate module so it can be excised cleanly: delete
-# cmake/BraidlabBundledGMP.cmake and this include() block.
-if(BRAIDLAB_GMP_LINKAGE STREQUAL "bundled")
-  include(${CMAKE_SOURCE_DIR}/cmake/BraidlabBundledGMP.cmake)
-endif()
 
 # Static GMP: ship GMP's license texts and a README in extern/gmp/.
 # This is a license obligation, so a missing license is an error.  The
