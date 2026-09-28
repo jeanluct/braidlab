@@ -501,6 +501,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout (for CHANGELOG.md)
+        uses: actions/checkout@v6
+
       - name: Download package archives
         uses: actions/download-artifact@v8
         with:
@@ -516,6 +519,32 @@ jobs:
           sha256sum braidlab-* > SHA256SUMS
           cat SHA256SUMS
 
+      - name: Release notes from CHANGELOG.md
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # The draft's notes are the "## [X.Y.Z]" section of CHANGELOG.md
+          # at the tagged commit (see devel/RELEASING.md).
+          python3 - "${TAG#release-}" > release-notes.md <<'PYEOF'
+          import re, sys
+          v = sys.argv[1]
+          out, on = [], False
+          with open("CHANGELOG.md", encoding="utf-8") as f:
+              for line in f:
+                  if line.startswith("## [") or re.match(r"\[[^]]+\]: http", line):
+                      if on:
+                          break
+                      on = line.startswith(f"## [{v}] ")
+                      continue
+                  if on:
+                      out.append(line)
+          text = "".join(out).strip()
+          print(text if text else f"(No section for {v} found in CHANGELOG.md.)")
+          PYEOF
+          printf '\n\n---\nPackages built by CI from %s; see SHA256SUMS.\n' "${GITHUB_SHA::7}" >> release-notes.md
+          cat release-notes.md
+
       - name: Create or update draft release
         shell: bash
         env:
@@ -529,7 +558,7 @@ jobs:
           else
             gh release create "${TAG}" dist/* --repo "${GITHUB_REPOSITORY}" \
               --draft --verify-tag --title "braidlab ${TAG#release-}" \
-              --notes "Draft created by CI from ${GITHUB_SHA::7}.  Add release notes from CHANGELOG.md, check the assets, then publish."
+              --notes-file release-notes.md
           fi
 
   compat_latest:

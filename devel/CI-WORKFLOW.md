@@ -224,7 +224,8 @@ Runs after every `release_pinned` job succeeds, on pushed `release-*`
 tags only.  It downloads the package archives
 (`actions/download-artifact` unwraps the artifact zips), writes
 `SHA256SUMS`, and attaches both to a **draft** GitHub release titled
-`braidlab <version>`.  If the release already exists, its assets are
+`braidlab <version>`, whose notes are the `## [<version>]` section of
+`CHANGELOG.md` at the tagged commit.  If the release already exists, its assets are
 replaced.  It is the only job with `contents: write`.
 
 ## 3) `compat_latest` (Ubuntu, allow-failure)
@@ -284,14 +285,17 @@ Expected result:
 
 ## Practical release checklist
 
-1. Merge release candidate changes to `master`.
-2. Ensure `release_pinned` matrix jobs are green on `master`.
-3. Create and push release tag: `release-<version>`.
-4. Wait for `publish_release`: it creates a draft release with all
-   archives and `SHA256SUMS`.
-5. Confirm each archive contains docs + metadata + `testsuite/`.
-6. Add release notes (from `CHANGELOG.md`) to the draft and publish it.
-7. Review `compat_latest`; if failing, log follow-up if not release-critical.
+The full, step-by-step procedure (exact commands, conflict rules, checks,
+and the two approval gates) is `devel/RELEASING.md`.  In short:
+
+1. Prepare `CHANGELOG.md` on `develop` and a release branch
+   (`devel/release-prep.py` makes the text edits).
+2. Merge into `master` and tag `release-<version>`; push after approval.
+3. `publish_release` creates a draft release: all archives, `SHA256SUMS`,
+   and the `CHANGELOG.md` section as notes.
+4. Verify the draft (checksums, archive contents, testsuite on the
+   package), then publish after approval.
+5. Review `compat_latest`; if failing, log follow-up if not release-critical.
 
 ## Practical development checklist
 
@@ -377,10 +381,11 @@ If you want, this file can be split into:
 - Q: I used to build binaries manually and attach them to the release. How will
   this work now?
   A: It is automated.  Push tag `release-<version>`; CI builds all
-  platform archives, and the `publish_release` job attaches them with a
-  `SHA256SUMS` file to a draft GitHub release.  Add the release notes and
-  publish.  (Attaching by hand put the artifact wrappers, zips inside zips,
-  on 3.4's macOS and Windows assets.)
+  platform archives, and the `publish_release` job attaches them, with a
+  `SHA256SUMS` file and the `CHANGELOG.md` section as notes, to a draft
+  GitHub release.  Check it and publish.  The whole procedure is in
+  `devel/RELEASING.md`.  (Attaching by hand put the artifact wrappers,
+  zips inside zips, on 3.4's macOS and Windows assets.)
 
 - Q: Lots of things are hardwired in YAML (versions, etc.). Is that a problem?
   A: Some pinning is intentional for reproducibility, but you are right that
