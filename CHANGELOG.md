@@ -25,6 +25,9 @@
     (RHEL 8, Debian 11, Ubuntu 20.04, ...).  The archive name changes from
     `linux-ubuntu-22.04` to `linux-glibc2.28`.
   - macOS and Windows release assets are no longer zipped twice.
+  - The `_no-gmp` packages are no longer provided: with GMP built into
+    the MEX files, the default packages need no GMP installed.  Building
+    from source without GMP (`-DBRAIDLAB_GMP_LINKAGE=off`) still works.
 
 * Build system: GMP is now linked statically into the MEX files
   (`BRAIDLAB_GMP_LINKAGE=static`, GMP used under the GPLv3 option of its

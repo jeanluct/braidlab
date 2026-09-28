@@ -31,7 +31,9 @@ of its conclusions did not hold.  Details and evidence are in
   the GPLv3, and static linking only requires that the source be
   available.  The LGPL static-linking concern in "Dimension 2" below
   applies to proprietary programs.  GMP's license texts ship in
-  `extern/gmp/`.
+  `extern/gmp/`.  Because the default packages no longer need GMP
+  installed, the `no-gmp` package flavor recommended below is no longer
+  shipped; a CI job still checks the GMP-off build.
 - **Toolchain.**  It is pinned to the compilers MathWorks supports for
   the build release (runner images, Xcode, Visual Studio, CMake, the
   manylinux image and gcc-toolset).  So the build only changes when it is

@@ -113,10 +113,10 @@ image, which is announced months ahead.
 
 ## Package flavor and GMP linkage
 
-The `release_pinned` job builds two flavors per platform, set by
-`gmp_linkage` in the matrix rather than by a repository variable:
+The `release_pinned` job builds one package per platform, with
+`gmp_linkage` set in the matrix rather than by a repository variable:
 
-- `default` flavor: `BRAIDLAB_GMP_LINKAGE=static`.  GMP is linked
+- `BRAIDLAB_GMP_LINKAGE=static`.  GMP is linked
   statically into the MEX files that use it, so the packages have no
   GMP runtime dependency and ship no shared libraries.  GMP's license
   texts and `extern/gmp/README.md` are installed into the package.  GMP
@@ -128,13 +128,16 @@ The `release_pinned` job builds two flavors per platform, set by
     On x86-64 it configures with `--enable-fat`.
   - Windows: vcpkg's `x64-windows-static-md` triplet, with
     `CMAKE_BUILD_TYPE=Release`.
-- `no-gmp` flavor: `BRAIDLAB_GMP_LINKAGE=off`.  GMP-using code paths are
-  compiled out.  Built on every push, so that GMP-free build regressions
-  show up at once.
-
 These values describe the shipped artifacts and are deliberately not
-repository variables.  To change the flavor lineup, edit the matrix in
+repository variables.  To change them, edit the matrix in
 `.github/workflows/build-braidlab-packages.yml`.
+
+Until 3.4.2 there was also a `no-gmp` package flavor
+(`BRAIDLAB_GMP_LINKAGE=off`), for users who could not install GMP.
+Static GMP made it pointless, so it is no longer shipped.  The GMP-off
+build, which developers without GMP use, is still checked by the
+non-publishing `nogmp_check` job, which builds it and smoke-tests the
+MATLAB fallback.
 
 The former `bundled` linkage (GMP shared libraries shipped next to the
 MEX files) was removed in 3.4.2.  `system` remains for local builds.

@@ -36,8 +36,7 @@ This is the practical model to run CI long-term:
 
 - `pull_request`: always enabled (main quality gate for development).
 - `push` to stable branches (`master` and `develop`).
-- `push` tags matching `release-*` (release packaging trigger; also gates
-  the `no-gmp` flavor build).
+- `push` tags matching `release-*` (release packaging trigger).
 - `workflow_dispatch` for manual reruns and experiments.
 
 Manual runs can override the pinned MATLAB release via input
@@ -151,7 +150,7 @@ Why this exists:
 
 - Avoid redundant LaTeX builds in every platform lane.
 
-## 2) `release_pinned` (matrix: Linux/macOS/Windows × flavor)
+## 2) `release_pinned` (matrix: Linux, macOS arm64/x86_64, Windows)
 
 Purpose:
 
@@ -169,14 +168,10 @@ Platform/flavor matrix (runner images pinned; see
   Xcode 16.4 and deployment target 13.0.
 - `windows-2022` -> archive `.zip`, with Visual Studio 2022.
 
-Each platform produces two flavors:
-
-- `default` (always built): GMP is linked statically into the MEX files
-  (`-DBRAIDLAB_GMP_LINKAGE=static`).  Users do not need GMP installed, and
-  the package ships no shared libraries.
-- `no-gmp`: GMP-using code paths are compiled out
-  (`-DBRAIDLAB_GMP_LINKAGE=off`).  Built on every push so GMP-free build
-  regressions surface immediately.
+Each platform produces one package, with GMP linked statically into the
+MEX files (`-DBRAIDLAB_GMP_LINKAGE=static`).  Users do not need GMP
+installed, and the package ships no shared libraries.  (There is no
+longer a `no-gmp` package flavor; see `nogmp_check` below.)
 
 Static GMP per platform (pinned version and checksum):
 
@@ -209,24 +204,31 @@ Version naming behavior:
 
 Archive naming format:
 
-`braidlab-<version>_<platform>-<arch>_matlab-<release>[_no-gmp].<ext>`
+`braidlab-<version>_<platform>-<arch>_matlab-<release>.<ext>`
 
 Examples:
 
 - `braidlab-3.4.2_linux-glibc2.28-x86_64_matlab-R2024b.tar.gz`
-- `braidlab-3.4.2_linux-glibc2.28-x86_64_matlab-R2024b_no-gmp.tar.gz`
 - `braidlab-dev-a1b2c3d_macos-arm64_matlab-R2024b.zip`
 - `braidlab-dev-a1b2c3d_macos-x86_64_matlab-R2024b.zip`
 
 ## 2b) `publish_release` (release tags only)
 
-Runs after every `release_pinned` job succeeds, on pushed `release-*`
-tags only.  It downloads the package archives
-(`actions/download-artifact` unwraps the artifact zips), writes
-`SHA256SUMS`, and attaches both to a **draft** GitHub release titled
-`braidlab <version>`, whose notes are the `## [<version>]` section of
-`CHANGELOG.md` at the tagged commit.  If the release already exists, its assets are
-replaced.  It is the only job with `contents: write`.
+Runs after every `release_pinned` job succeeds, on pushed `release-*` tags
+only.  It downloads the package archives (`actions/download-artifact`
+unwraps the artifact zips), writes `SHA256SUMS`, and attaches both to a
+**draft** GitHub release titled `braidlab <version>`, whose notes are the
+`## [<version>]` section of `CHANGELOG.md` at the tagged commit.  If the
+release already exists, its assets are replaced.  It is the only job with
+`contents: write`.
+
+## 2c) `nogmp_check` (GMP-off build, not published)
+
+Builds braidlab with `-DBRAIDLAB_GMP_LINKAGE=off`, the configuration used
+by developers without GMP.  It then runs a MATLAB smoke test: `entropy`,
+plus a loop with VPI coordinates, which takes the MATLAB fallback that
+replaces GMP and must match double precision.  It uploads nothing, and
+`publish_release` does not wait for it.
 
 ## 3) `compat_latest` (Ubuntu, allow-failure)
 
@@ -359,14 +361,13 @@ If you want, this file can be split into:
 
 - Q: How do I know users can use the build? Will it fail if GMP is not
   installed on the user's system?
-  A: The package jobs intentionally run a MATLAB smoke test after install, so
-  each artifact is at least load-tested before upload.  Since 3.4.2 the
-  default-flavor MEX files link GMP statically, so users never need GMP
-  installed, and no GMP library ships in the package.  CI checks that no
-  MEX depends on GMP and that no shared libraries are shipped.  A `no-gmp`
-  flavor compiles GMP out entirely.  (Issue #165 originally bundled GMP
-  shared libraries next to the MEX files; see the static-linking question
-  below for why that changed.)
+  A: The package jobs intentionally run a MATLAB smoke test after install,
+  so each artifact is at least load-tested before upload.  Since 3.4.2 the
+  MEX files link GMP statically, so users never need GMP installed, and no
+  GMP library ships in the package.  CI checks that no MEX depends on GMP
+  and that no shared libraries are shipped.  (Issue #165 originally
+  bundled GMP shared libraries next to the MEX files; see the
+  static-linking question below for why that changed.)
 
 - Q: Can we make the Makefile system a wrapper for CMake? It would be nice if
   `make clean; make` still worked.

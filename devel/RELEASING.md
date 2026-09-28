@@ -169,9 +169,9 @@ gh release view release-X.Y.Z --json isDraft,name,body,assets
 ```
 
 Check:
-- **The draft:** `isDraft` is true; there are 8 `braidlab-X.Y.Z_*`
-  archives (Linux, macOS arm64, macOS x86_64, Windows, each default and
-  `_no-gmp`) plus `SHA256SUMS`; the notes match the CHANGELOG section.
+- **The draft:** `isDraft` is true; there are 4 `braidlab-X.Y.Z_*`
+  archives (Linux, macOS arm64, macOS x86_64, Windows) plus `SHA256SUMS`;
+  the notes match the CHANGELOG section.
 - **The downloaded files,** in a scratch directory:
   - `gh release download release-X.Y.Z` then `sha256sum -c SHA256SUMS`,
     which must be all `OK`;

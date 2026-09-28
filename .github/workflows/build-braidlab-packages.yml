@@ -121,28 +121,6 @@ jobs:
             archive_ext: zip
             flavor: default
             gmp_linkage: static
-          # no-gmp flavor: built on every push to catch GMP-free
-          # build regressions early.  Cheap because no GMP is built.
-          - os: ubuntu-22.04
-            platform_token: linux-glibc2.28
-            archive_ext: tar.gz
-            flavor: no-gmp
-            gmp_linkage: 'off'
-          - os: macos-15
-            platform_token: macos
-            archive_ext: zip
-            flavor: no-gmp
-            gmp_linkage: 'off'
-          - os: macos-15-intel
-            platform_token: macos
-            archive_ext: zip
-            flavor: no-gmp
-            gmp_linkage: 'off'
-          - os: windows-2022
-            platform_token: windows
-            archive_ext: zip
-            flavor: no-gmp
-            gmp_linkage: 'off'
 
     steps:
       - name: Checkout
@@ -446,11 +424,8 @@ jobs:
 
           MATLAB_TOKEN="matlab-${BRAIDLAB_RELEASE_MATLAB}"
           # Archive naming standard:
-          # braidlab-<version>_<platform>-<arch>_matlab-<release>[_no-gmp]
+          # braidlab-<version>_<platform>-<arch>_matlab-<release>
           BASE_NAME="braidlab-${VERSION}_${{ matrix.platform_token }}-${ARCH_TOKEN}_${MATLAB_TOKEN}"
-          if [ "${{ matrix.flavor }}" = "no-gmp" ]; then
-            BASE_NAME="${BASE_NAME}_no-gmp"
-          fi
 
           # Include distribution metadata and tests in package output.
           cp README.md LICENSE COPYING CHANGELOG.md stage/
@@ -560,6 +535,53 @@ jobs:
               --draft --verify-tag --title "braidlab ${TAG#release-}" \
               --notes-file release-notes.md
           fi
+
+  nogmp_check:
+    # The GMP-off source build (BRAIDLAB_GMP_LINKAGE=off), which developers
+    # without GMP use.  No packages are shipped in this flavor any more:
+    # the default packages link GMP statically, so users never need GMP.
+    # But the code path must keep building and working.  Nothing is
+    # uploaded, and publish_release does not wait for this job.
+    name: GMP-off Build Check (ubuntu)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup MATLAB (release-pinned)
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: ${{ env.BRAIDLAB_RELEASE_MATLAB }}
+
+      - name: Setup CMake (pinned)
+        uses: lukka/get-cmake@v4.4.2
+        with:
+          cmakeVersion: ${{ env.BRAIDLAB_CMAKE_VERSION }}
+
+      - name: Build and stage without GMP
+        shell: bash
+        run: |
+          cmake -S . -B build -DBRAIDLAB_GMP_LINKAGE=off
+          cmake --build build -j "${BRAIDLAB_BUILD_PARALLEL}"
+          cmake --install build --prefix stage
+
+      - name: MATLAB smoke test (no-GMP fallback)
+        uses: matlab-actions/run-command@v3
+        with:
+          command: |
+            root = getenv('MW_ORIG_WORKING_FOLDER');
+            addpath(fullfile(root,'stage'),'-begin');
+            braidlab.util.checkvpi();
+            b = braidlab.braid([1 2 -3 1 -2 3 1 2 -3]);
+            e = b.entropy;
+            assert(isfinite(e) && e > 0, 'entropy must be finite and positive');
+            % Loops with VPI coordinates take the MATLAB fallback that
+            % replaces GMP; the result must match double precision.
+            lv = b*braidlab.loop(4,'vpi');
+            ld = b*braidlab.loop(4);
+            assert(isa(lv.coords,'vpi'), 'expected VPI coordinates');
+            assert(isequal(double(lv.coords), double(ld.coords)), 'VPI fallback mismatch');
+            fprintf('GMP-off build OK: entropy = %g\n', e);
 
   compat_latest:
     name: Compatibility Check (ubuntu)
