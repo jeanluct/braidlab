@@ -68,7 +68,7 @@ Collect these and present them at STOP gate 1:
     | sort | uniq -c
   ```
 - **External code freshness:**
-  - `git fetch trains-remote cbraid-remote`
+  - `git fetch --multiple trains-remote cbraid-remote`
   - `git log --oneline trains-branch..trains-remote/master`
   - `git log --oneline cbraid-branch..cbraid-remote/master`
 
