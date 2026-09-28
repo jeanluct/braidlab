@@ -2,9 +2,11 @@
 
 Branch: `toolchain-portability` (from `develop` at `879e033`).
 
-Status: steps 1–3 and 5 are implemented, and every package job passes
-on the branch (run 36439748460).  Step 4 (release publishing) is
-implemented but still needs a test tag.  Target release: **3.4.2**, with
+Status: all steps are implemented and verified.  Every package job passes
+on the branch (run 36439748460).  The release-publishing job was tested
+with a throwaway tag (run 36445391102): it created a draft release with
+all 8 archives and a matching `SHA256SUMS`, and no archive is
+double-zipped.  The test release and tag were then deleted.  Target release: **3.4.2**, with
 rebuilt packages for all platforms, including Intel macOS.
 
 ## Results (measured on the branch's packages)
