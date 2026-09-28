@@ -11,6 +11,14 @@
   before and after on a corpus of 216 braids.  The upstream build is now
   CMake-based; braidlab still compiles the library sources directly.
 
+* Update the bundled `cbraid` library (`extern/cbraid`) to upstream
+  `891fcaf`.  This fixes cbraid issue #3: the ultra summit set and
+  conjugacy code could read past the end of a braid's normal form when
+  it is a power of Delta (undefined behavior, which could crash Matlab).
+  It also fixes a memory leak.  `conjtest` gets regression tests for
+  powers of Delta, and for a braid on which an intermediate upstream
+  version of the fix hung.
+
 * Binary packages: fix several portability problems in the 3.4 packages,
   found by inspecting what the shipped binaries require (see
   `devel/plans/plan-toolchain-portability.md`):
