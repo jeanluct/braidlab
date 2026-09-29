@@ -43,18 +43,27 @@ ofstream oFile;
 
 #ifdef __WINDOWSVERSION
 #ifndef VS2005
-#define THRO(T,N) {{Memo(T);   \
-	if (!ConOutput) oFile.close();                                        \
-	return false;   }}
+// Wrap THRO in do/while(0) so it behaves as one statement in if/else contexts.
+#define THRO(T,N) do { \
+	Memo(T); \
+	if (!ConOutput) { oFile.close(); } \
+	return false; \
+} while (0)
 #else
-#define THRO(T,N) {{RemoteGraph.Messages.push_back(T);   \
-	if (!ConOutput) oFile.close();                                        \
-	return false;   }}                            
+// Same macro-safety pattern for the VS2005 RemoteGraph variant.
+#define THRO(T,N) do { \
+	RemoteGraph.Messages.push_back(T); \
+	if (!ConOutput) { oFile.close(); } \
+	return false; \
+} while (0)
 #endif
 #else
-#define THRO(T,N) {{    \
-	if (!ConOutput) oFile.close();   cout << T << '\n';                                     \
-	return false;   }}
+// Keeps THRO safe as a single statement and allows a trailing semicolon.
+#define THRO(T,N) do { \
+	if (!ConOutput) { oFile.close(); } \
+	cout << T << '\n'; \
+	return false; \
+} while (0)
 #endif
 
 int stringtoint(const string& s)
@@ -75,11 +84,11 @@ uint Par(string Inp) //Returns number of parameters passed
 	if (i == string::npos) return 0;
     Inp.erase(0, i);
 	In.clear();
-	transform(Inp.begin(), Inp.end(), Inp.begin(), (int(*)(int)) tolower); //Convert to lower case
+	transform(Inp.begin(), Inp.end(), Inp.begin(), static_cast<int(*)(int)>(tolower)); //Convert to lower case
 	istringstream is(Inp);
 	string word;
 	while (is >> word) In.push_back(word);
-	return In.size();
+	return static_cast<uint>(In.size());
 }
 
 void Display(ostream& out, int Prec, bool addNewLines = false)
@@ -265,7 +274,7 @@ bool BatchProcess(istream& iFile, int Prec
 						else
 						{
 							W.SureAdd(gen);
-							if (abs(gen)>static_cast<int>(size)) size = abs(gen);
+							if (abs(gen)>static_cast<int>(size)) size = static_cast<uint>(abs(gen));
 						}
 					}
 					else
@@ -281,7 +290,7 @@ bool BatchProcess(istream& iFile, int Prec
 				size++;
 				if (!autostring && static_cast<int>(size)>str) THRO("Illegal braid generator in batch file",5);
 				if (autostring) B.Set(size,W);
-				else B.Set(str,W);
+				else B.Set(static_cast<uint>(str),W);
 				if (boundaryPeripheral) G.BoundaryPeripheralSet(B);
 				else G.Set(B);
 				gr = G.FindTrainTrack();
@@ -322,11 +331,11 @@ bool BatchProcess(istream& iFile, int Prec
 				HS = true;
 				H.n = 1;
 				H.L[1].s.Flush();
-				for (uint i=0; i<In[1].length(); ++i)
+				for (uint hsCodeIdx=0; hsCodeIdx<In[1].length(); ++hsCodeIdx)
 				{
-					if (In[1][i]!='0' && In[1][i]!='1') THRO("Illegal horseshoe code symbol",5);
-					if (In[1][i]=='0') H.L[1].s[i+1]=0;
-					else H.L[1].s[i+1]=1;
+					if (In[1][hsCodeIdx]!='0' && In[1][hsCodeIdx]!='1') THRO("Illegal horseshoe code symbol",5);
+					if (In[1][hsCodeIdx]=='0') H.L[1].s[hsCodeIdx+1]=0;
+					else H.L[1].s[hsCodeIdx+1]=1;
 				}
 				if (!H.FindPermutation()) THRO("Illegal horseshoe orbit code",5);
 				HSstring = In[1];
@@ -417,7 +426,7 @@ bool BatchProcess(istream& iFile, int Prec
 			{
 				if (i<=2) THRO("Illegal randomhs command in batch file", 5);
 				int numberOfOrbits = stringtoint(In[1]);
-				uint period = stringtoint(In[2]);
+				uint period = static_cast<uint>(stringtoint(In[2]));
 				if (numberOfOrbits < 1 || numberOfOrbits > 100000 || period < 3) THRO("Illegal randomhs command in batch file", 5);
 				HS = true;
 				H.n = 1;
@@ -466,9 +475,9 @@ bool BatchProcess(istream& iFile, int Prec
 		case 14: //randombr
 			{
 				if (i<=3) THRO("Illegal randombr command in batch file", 5);
-				uint numberOfBraids = stringtoint(In[1]);
+				uint numberOfBraids = static_cast<uint>(stringtoint(In[1]));
 				int numberOfStrings = stringtoint(In[2]);
-				uint numberOfGenerators = stringtoint(In[3]);
+				uint numberOfGenerators = static_cast<uint>(stringtoint(In[3]));
 				if (numberOfBraids < 1 || numberOfBraids > 100000 || numberOfStrings<3 || numberOfGenerators<1 || numberOfGenerators > 1000) THRO("Illegal randombr command in batch file", 5);
 				HS = false;
 				for (uint j=0; j<numberOfBraids; ++j)
@@ -488,7 +497,7 @@ bool BatchProcess(istream& iFile, int Prec
 						W.SureAdd(gen);
 						previousGenerator = gen;
 					}
-					B.Set(numberOfStrings,W);
+					B.Set(static_cast<uint>(numberOfStrings),W);
 					if (boundaryPeripheral) G.BoundaryPeripheralSet(B);
 					else G.Set(B);
 					gr = G.FindTrainTrack();

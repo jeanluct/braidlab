@@ -17,7 +17,7 @@ using namespace std;
 
 namespace trains {
 
-decimal TOL = 0.0000000001;//STARTTOL;
+decimal TOL = static_cast<decimal>(0.0000000001);//STARTTOL;
 bool GrowthCheck = true;
 
 static const char* ThurstonType[] = {"Pseudo-Anosov",
@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
 
   for (int i = 0; i < k; ++i)
     {
-      w.SureAdd((long int)atoi(argv[2+i]));
+      w.SureAdd(static_cast<long>(atoi(argv[2+i])));
     }
 
-  B.Set(n,w);
+	B.Set(static_cast<uint>(n),w);
   G.Set(B);
 
-  /* decimal g = G.FindTrainTrack(); */ /* Unused */
+  G.FindTrainTrack();
 
   /*
   if (G.GetType() == pA_or_red || G.GetType() == fo)

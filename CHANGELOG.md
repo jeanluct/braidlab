@@ -1,6 +1,72 @@
 # Change Log
 
 
+## [3.4.1] - 2026-09-29
+
+* Update the bundled `trains` library (`extern/trains`) to upstream
+  `b51ff82`.  This fixes undefined behavior from uninitialized edge and
+  vertex data inside the train-track code used by `train` and
+  `entropy(...,'Method','train')`.  Results are unchanged: `train` gives
+  identical output (type, entropy, transition matrix, train track map)
+  before and after on a corpus of 216 braids.  The upstream build is now
+  CMake-based; braidlab still compiles the library sources directly.
+
+* Update the bundled `cbraid` library (`extern/cbraid`) to upstream
+  `891fcaf`.  This fixes cbraid issue #3: the ultra summit set and
+  conjugacy code could read past the end of a braid's normal form when
+  it is a power of Delta (undefined behavior, which could crash Matlab).
+  It also fixes a memory leak.  `conjtest` gets regression tests for
+  powers of Delta, and for a braid on which an intermediate upstream
+  version of the fix hung.
+
+* Binary packages: fix several portability problems in the 3.4 packages,
+  found by inspecting what the shipped binaries require (see
+  `devel/plans/plan-toolchain-portability.md`):
+  - Windows: the bundled GMP DLLs were debug builds that need Visual
+    Studio's debug C runtime, so the GMP-backed functions
+    (`cross2gen_helper`, `loopsigma_helper`, `entropy_helper`) most likely
+    failed to load on machines without Visual Studio.
+  - macOS: the packages required macOS 15; they now run on macOS 13 and
+    later, as MATLAB R2024b does.  Intel Macs now have packages too.
+  - Linux: the packages required glibc 2.35; they are now built in a
+    `manylinux_2_28` container and run on any glibc 2.28 or newer distribution
+    (RHEL 8, Debian 11, Ubuntu 20.04, ...).  The archive name changes from
+    `linux-ubuntu-22.04` to `linux-glibc2.28`.
+  - macOS and Windows release assets are no longer zipped twice.
+  - The `_no-gmp` packages are no longer provided: with GMP built into
+    the MEX files, the default packages need no GMP installed.  Building
+    from source without GMP (`-DBRAIDLAB_GMP_LINKAGE=off`) still works.
+
+* Build system: GMP is now linked statically into the MEX files
+  (`BRAIDLAB_GMP_LINKAGE=static`, GMP used under the GPLv3 option of its
+  dual license, with its license texts in `extern/gmp/`).  The `bundled`
+  mode, which shipped GMP shared libraries, is removed.  On macOS the MEX
+  files export only `mexFunction` and `mexfilerequiredapiversion`, which
+  fixes linking with Xcode 26.  `CMAKE_OSX_DEPLOYMENT_TARGET` defaults to
+  13.0.
+
+* Continuous integration: the toolchain is pinned to the compilers
+  MathWorks supports for the build release, R2024b.  That means explicit
+  runner images (`macos-15`, `macos-15-intel`, `windows-2022`), Xcode 16.4,
+  Visual Studio 2022, CMake 3.31.6, and a dated manylinux image with
+  gcc-toolset-13.  Release tags now publish their packages, with a
+  `SHA256SUMS` file, to a draft GitHub release.
+
+* Guide (Appendices A and B) and README: update the installation and
+  troubleshooting instructions for the CMake build.
+  - Compiling from source needs `make install`: a plain `make` only
+    compiles the MEX files into `build/`, so braidlab could not find them.
+  - The `GLIBCXX ... not found` and "unsupported compiler" advice is
+    merged into one section, whose fix is to build with a GCC that your
+    Matlab release supports (`mex -setup` has no effect on a CMake build).
+  - Removed the sections on the Polish LaTeX `mex` command and the
+    `-largeArrayDims` warning, which no longer apply.
+  - For GMP in a non-standard place, use `CMAKE_PREFIX_PATH` rather than
+    `CPLUS_INCLUDE_PATH`.
+  - Bug reports should include the output of `ver` and, for precompiled
+    packages, `BUILD-MANIFEST.txt`.
+
+
 ## [3.4] - 2026-04-27
 
 * Build system: top-level `make` is now a compatibility wrapper around
@@ -462,6 +528,7 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
+[3.4.1]: https://github.com/jeanluct/braidlab/compare/release-3.4...release-3.4.1
 [3.4]: https://github.com/jeanluct/braidlab/compare/release-3.3...release-3.4
 [3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6

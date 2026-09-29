@@ -11,7 +11,7 @@ namespace trains {
 using namespace std;
 
 
-codelist::codelist(uint s, uint d, uint o) : p(new code[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+codelist::codelist(uint s, uint d, uint o) : p(new code[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 codelist::~codelist() {if (next) next->codelist::~codelist(); delete [] p;}
@@ -63,14 +63,14 @@ codelist& codelist::operator=(codelist& A)
 	if (this == &A) return *this;
 	Flush();
 	MaxAssigned = -1;
-	for (int i=0; i<=A.MaxAssigned; i++) Element(i) = A.Element(i);
+	for (long i=0; i<=A.MaxAssigned; i++) Element(static_cast<uint>(i)) = A.Element(static_cast<uint>(i));
 	return *this;
 }
 
 
 long codelist::Find(code& Value)
 {
-	for (int i=0; i<=MaxAssigned; i++) if (Element(i) == Value) return (i+origin);
+	for (long i=0; i<=MaxAssigned; i++) if (Element(static_cast<uint>(i)) == Value) return (i+origin);
 	return -1;
 }
 
@@ -143,7 +143,7 @@ void codelist::Rotate(long Angle)
 
 void codelist::Insert(uint i, code& Value)
 {
-	for (uint j = TopIndex()+1; j>i; j--) (*this)[j] = (*this)[j-1]; 
+	for (uint j = static_cast<uint>(TopIndex()+1); j>i; j--) (*this)[j] = (*this)[j-1]; 
 	(*this)[i] = Value;
 }
 
@@ -210,8 +210,9 @@ istream& operator >> (istream& In, code& C)
 	for (string::size_type i=0; i<s.length(); ++i)
 	{
 		if (s[i]!='0' && s[i]!='1') THROW("Illegal code symbol",0);
-		if (s[i]=='0') C.s[i+1] = 0;
-		else C.s[i+1] = 1;
+		const uint codePos = static_cast<uint>(i+1);
+		if (s[i]=='0') C.s[codePos] = 0;
+		else C.s[codePos] = 1;
 	}
 	return In;
 }
@@ -272,8 +273,9 @@ int horseshoe::FindPermutation()
 		uint Start = Place;
 		for (j=1; long(j)<=L[i].Length(); j++)
 		{
-			if (long(j)<L[i].Length()) Permutation[Positions[Place]] = Positions[Place+1];
-			else Permutation[Positions[Place]] = Positions[Start];
+			const uint positionIndex = static_cast<uint>(Positions[Place]);
+			if (long(j)<L[i].Length()) Permutation[positionIndex] = Positions[Place+1];
+			else Permutation[positionIndex] = Positions[Start];
 			Place++;
 		}
 	}

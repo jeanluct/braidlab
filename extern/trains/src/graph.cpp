@@ -12,7 +12,7 @@ namespace trains {
 
 using namespace std;
 
-turnlist::turnlist(uint s, uint d, uint o) : p(new turn[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+turnlist::turnlist(uint s, uint d, uint o) : p(new turn[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 turnlist::~turnlist() {if (next) next->turnlist::~turnlist(); delete [] p;}
@@ -64,14 +64,14 @@ turnlist& turnlist::operator=(turnlist& A)
 	if (this == &A) return *this;
 	Flush();                                              
 	MaxAssigned = -1;
-	for (int i=0; i<=A.MaxAssigned; i++) Element(i) = A.Element(i);
+	for (long i=0; i<=A.MaxAssigned; i++) Element(static_cast<uint>(i)) = A.Element(static_cast<uint>(i));
 	return *this;                                                     
 }
 
 
 long turnlist::Find(turn& Value)                                               
 {
-	for (int i=0; i<=MaxAssigned; i++) if (Element(i) == Value) return (i+origin);  
+	for (long i=0; i<=MaxAssigned; i++) if (Element(static_cast<uint>(i)) == Value) return (i+origin);  
 	return -1;                                                                       
 }
 
@@ -144,7 +144,7 @@ void turnlist::Rotate(long Angle)
 
 void turnlist::Insert(uint i, turn& Value)
 {                                              
-	for (uint j = TopIndex()+1; j>i; j--) (*this)[j] = (*this)[j-1]; 
+	for (uint j = static_cast<uint>(TopIndex()+1); j>i; j--) (*this)[j] = (*this)[j-1]; 
 	(*this)[i] = Value;
 }
 
@@ -177,11 +177,11 @@ uint turnlist::AgreesTo(turnlist& A)
 }
 
 
-void graph::Split(long Label)
+void graph::Split(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	if (!Index) THROW("Trying to split non-existent edge",1);
-	uint NewVertex = Vertices.TopIndex()+1, NewEdge = Edges.TopIndex()+1;
+	uint NewVertex = static_cast<uint>(Vertices.TopIndex()+1), NewEdge = static_cast<uint>(Edges.TopIndex()+1);
 	vertex& V = Vertices[NewVertex];
 	edge& E = Edges[NewEdge];
 	(V.Edges).Flush();
@@ -237,7 +237,7 @@ void graph::Split(long Label)
 	}
 }
 
-void graph::Collapse(long Label)
+void graph::Collapse(EdgeLabel Label)
 {
 	if (Label<0) Label = -Label;
 	uint Index = FindEdge(Label);
@@ -272,15 +272,15 @@ void graph::Collapse(long Label)
 					}
 				}
 			}
-			uint i = Vertices[StartIndex].Edges.Find(Label);
+			uint i = static_cast<uint>(Vertices[StartIndex].Edges.Find(Label));
 			//		#pragma warn -lvc
 			long Temp=-Label;
-			uint j = Vertices[EndIndex].Edges.Find(Temp);
+			uint j = static_cast<uint>(Vertices[EndIndex].Edges.Find(Temp));
 			//		#pragma warn .lvc
 			Vertices[StartIndex].Edges.Rotate(i);
-			Vertices[StartIndex].Edges.Remove(Vertices[StartIndex].Edges.TopIndex());
+			Vertices[StartIndex].Edges.Remove(static_cast<uint>(Vertices[StartIndex].Edges.TopIndex()));
 			Vertices[EndIndex].Edges.Rotate(j);
-			Vertices[EndIndex].Edges.Remove(Vertices[EndIndex].Edges.TopIndex());
+			Vertices[EndIndex].Edges.Remove(static_cast<uint>(Vertices[EndIndex].Edges.TopIndex()));
 			Vertices[StartIndex].Edges.Append(Vertices[EndIndex].Edges);
 			// Vertices with image E.End now have image E.Start
 			vertexiterator I(Vertices);
@@ -322,15 +322,15 @@ void graph::Collapse(long Label)
 					}
 				}
 			}
-			uint i = Vertices[StartIndex].Edges.Find(Label);
+			uint i = static_cast<uint>(Vertices[StartIndex].Edges.Find(Label));
 			//		#pragma warn -lvc
 			long Temp=-Label;
-			uint j = Vertices[EndIndex].Edges.Find(Temp);
+			uint j = static_cast<uint>(Vertices[EndIndex].Edges.Find(Temp));
 			//		#pragma warn .lvc
 			Vertices[StartIndex].Edges.Rotate(i);
-			Vertices[StartIndex].Edges.Remove(Vertices[StartIndex].Edges.TopIndex());
+			Vertices[StartIndex].Edges.Remove(static_cast<uint>(Vertices[StartIndex].Edges.TopIndex()));
 			Vertices[EndIndex].Edges.Rotate(j);
-			Vertices[EndIndex].Edges.Remove(Vertices[EndIndex].Edges.TopIndex());
+			Vertices[EndIndex].Edges.Remove(static_cast<uint>(Vertices[EndIndex].Edges.TopIndex()));
 			Vertices[EndIndex].Edges.Append(Vertices[StartIndex].Edges);
 			// Vertices with image E.Start now have image E.End
 			vertexiterator I(Vertices);
@@ -362,30 +362,30 @@ void graph::Collapse(long Label)
 	if (Embedding) TightenAllVertexEmbeddings();
 }
 
-void graph::Push(long Label, uint i)
+void graph::Push(EdgeLabel Label, uint i)
 {
 	uint Index = FindEdge(Label);
 	edge& E = Edges[Index];
-	uint VertexLabel;
+	uint VLabel;
 	if (E.Image.TopIndex() < long(i)) THROW("Trying to push more symbols than there are",1);
 	if (i==0) return;
 	intarray Pushed(i,1,1);
 	if (Label > 0)
 	{
-		VertexLabel = E.Start;
+		VLabel = E.Start;
 		for (uint j=1; j<=i; j++) Pushed[j] = E.Image[j];
 		E.Image.Remove(1,i-1);
 	}
 	else
 	{
-		VertexLabel = E.End;
-		uint k=E.Image.TopIndex();
+		VLabel = E.End;
+		uint k=static_cast<uint>(E.Image.TopIndex());
 		for (uint j=1; j<=i; j++) Pushed[j] = -E.Image[k--];
 		E.Image.Remove(k+1,i-1);
 	}
 	intarray PushedInverse = Pushed;
 	PushedInverse.Invert();
-	uint VIndex = FindVertex(VertexLabel);
+	uint VIndex = FindVertex(VLabel);
 	vertex& V = Vertices[VIndex];
 	intiterator I(V.Edges);
 	do
@@ -400,25 +400,25 @@ void graph::Push(long Label, uint i)
 	Vertices[VIndex].Image = From(PushedInverse[1]);
 }
 
-void graph::Subdivide(long Label, uint i)
+void graph::Subdivide(EdgeLabel Label, uint i)
 {
 	Split(Label);
 	Push(Label, i);
 }
 
-void graph::SubdivideAllBut(long Label, uint i)
+void graph::SubdivideAllBut(EdgeLabel Label, uint i)
 {
 	Split (Label);
-	uint ImageSize = Edges[FindEdge(Label)].Image.TopIndex();
+	uint ImageSize = static_cast<uint>(Edges[FindEdge(Label)].Image.TopIndex());
 	if (i>ImageSize) THROW("Trying to subdivide at illegal position",1);
 	Push(Label, ImageSize-i);
 }
 
-void graph::SubdivideHere(long Label, uint i)
+void graph::SubdivideHere(EdgeLabel Label, uint i)
 {
 	uint k=0;
 	uint Index = FindEdge(Label);
-	uint ImageSize = Edges[Index].Image.TopIndex();
+	uint ImageSize = static_cast<uint>(Edges[Index].Image.TopIndex());
 	if (i>ImageSize) THROW("Trying to subdivide at illegal position",1);
 	if (Label>0)
 		for (uint j=1; j<=i; j++)
@@ -469,18 +469,18 @@ bool graph::PullTight()
 	return Result;
 }
 
-void graph::ValenceTwoIsotopy(long Label)
+void graph::ValenceTwoIsotopyEdge(EdgeLabel Label)
 {
 	uint Index = FindEdge(Label);
 	uint VLabel = (Label>0) ? Edges[Index].Start : Edges[Index].End;
 	uint VIndex = FindVertex(VLabel);
 	if (!(Vertices[VIndex].Valence() == 2))
 		THROW("Performing valence two isotopy on wrong valence vertex",1);
-	Push(Label, Edges[Index].Image.TopIndex());
+	Push(Label, static_cast<uint>(Edges[Index].Image.TopIndex()));
 	Collapse(Label);
 }
 
-void graph::ValenceTwoIsotopy(uint Label)
+void graph::ValenceTwoIsotopyVertex(VertexLabel Label)
 {
 	uint Index = FindVertex(Label);
 	if (!(Vertices[Index].Valence() == 2))
@@ -491,12 +491,12 @@ void graph::ValenceTwoIsotopy(uint Label)
 	FindTypes();
 	if (Edges[Index1].Type == Preperipheral)
 	{
-		ValenceTwoIsotopy(Label1);
+		ValenceTwoIsotopyEdge(Label1);
 		return;
 	}
 	if (Edges[Index2].Type == Preperipheral)
 	{
-		ValenceTwoIsotopy(Label2);
+		ValenceTwoIsotopyEdge(Label2);
 		return;
 	}
 	//Determine which edge has greater eigenvector entry
@@ -510,11 +510,11 @@ void graph::ValenceTwoIsotopy(uint Label)
 		if (i==Index2) i2 = Count;
 		Count++;
 	}
-	if (M.IsBigger(i1, i2)) ValenceTwoIsotopy(Label1);
-	else ValenceTwoIsotopy(Label2);
+	if (M.IsBigger(i1, i2)) ValenceTwoIsotopyEdge(Label1);
+	else ValenceTwoIsotopyEdge(Label2);
 }
 
-void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
+void graph::FoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2, bool Care)
 {
 	if (Care)
 	{
@@ -526,7 +526,7 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 	if (!(From(Label1) == From(Label2))) THROW("Trying to fold edges at different vertices",1);
 	if (!(Derivative(Label1) == Derivative(Label2))) THROW("Trying to fold edges with different derivatives",1);
 	vertex& Vertex = Vertices[FindVertex(From(Label1))];
-	uint Edge1Posn = Vertex.Edges.Find(Label1), Edge2Posn = Vertex.Edges.Find(Label2);
+	uint Edge1Posn = static_cast<uint>(Vertex.Edges.Find(Label1)), Edge2Posn = static_cast<uint>(Vertex.Edges.Find(Label2));
 	if (Edge1Posn > Edge2Posn)
 	{
 		long Temp = Label1; Label1 = Label2; Label2 = Temp;
@@ -554,7 +554,7 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 		FoldDepth = Edge1Image.AgreesTo(Edge2Image);
 		for (uint i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint ImageLength = Edges[FindEdge(Vertex.Edges[i])].Image.TopIndex();
+			uint ImageLength = static_cast<uint>(Edges[FindEdge(Vertex.Edges[i])].Image.TopIndex());
 			if (ImageLength<FoldDepth) FoldDepth = ImageLength;
 		}
 		//Check if marked vertex is end of edge which is being fully folded
@@ -562,9 +562,9 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 		uint i;
 		for (i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint EdgeIndex = FindEdge(Vertex.Edges[i]);
+			uint EIndex = FindEdge(Vertex.Edges[i]);
 			uint EndVertIndex = FindVertex(To(Vertex.Edges[i]));
-			if (Edges[EdgeIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
+			if (Edges[EIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
 			{
 				Bad = true;
 				break;
@@ -624,8 +624,8 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 	if (Vertex.Edges[Edge1Posn]<0) FinalImage.Invert();
 	//Create new edge and vertex
 	long NewEdgeIndex = Edges.TopIndex()+1;
-	uint NewVertexIndex = Vertices.TopIndex()+1;
-	edge& NewEdge = Edges[NewEdgeIndex];
+	uint NewVertexIndex = static_cast<uint>(Vertices.TopIndex()+1);
+	edge& NewEdge = Edges[static_cast<uint>(NewEdgeIndex)];
 	vertex& NewVertex = Vertices[NewVertexIndex];
 	NewEdge.Label = NextEdgeLabel++;
 	NewVertex.Label = NextVertexLabel++;
@@ -668,7 +668,7 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 	Vertex.Edges = NewEdgesRound;
 	//Edges mapping over each of edges to be folded have image changed and set images of edges round new vertex
 	NewEdge.Image = FinalImage;
-	NewVertex.Image = To(FinalImage[FinalImage.TopIndex()]);
+	NewVertex.Image = To(FinalImage[static_cast<uint>(FinalImage.TopIndex())]);
 	intarray L, M; //M keeps track of labels to be flushed
 	L[1] = NewEdge.Label;
 	intiterator I(NewVertex.Edges);
@@ -697,13 +697,13 @@ void graph::FoldAsMuchAsPossible(long Label1, long Label2, bool Care)
 
 
 
-void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
+void graph::CarefulFoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2)
 {
 	if (Label1 == Label2) THROW("Trying to fold edge with itself",1);
 	if (!(From(Label1) == From(Label2))) THROW("Trying to fold edges at different vertices",1);
 	if (!(Derivative(Label1) == Derivative(Label2))) THROW("Trying to fold edges with different derivatives",1);
 	vertex& Vertex = Vertices[FindVertex(From(Label1))];
-	uint Edge1Posn = Vertex.Edges.Find(Label1), Edge2Posn = Vertex.Edges.Find(Label2);
+	uint Edge1Posn = static_cast<uint>(Vertex.Edges.Find(Label1)), Edge2Posn = static_cast<uint>(Vertex.Edges.Find(Label2));
 	if (Edge1Posn > Edge2Posn)
 	{
 		long Temp = Label1; Label1 = Label2; Label2 = Temp;
@@ -731,7 +731,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 		FoldDepth = Edge1Image.AgreesTo(Edge2Image);
 		for (uint i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint ImageLength = Edges[FindEdge(Vertex.Edges[i])].Image.TopIndex();
+			uint ImageLength = static_cast<uint>(Edges[FindEdge(Vertex.Edges[i])].Image.TopIndex());
 			if (ImageLength<FoldDepth) FoldDepth = ImageLength;
 		}
 		//Check if marked vertex is end of edge which is being fully folded
@@ -739,9 +739,9 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 		uint i;
 		for (i=1; i<=n; i++) if (ToFold[i])
 		{
-			uint EdgeIndex = FindEdge(Vertex.Edges[i]);
+			uint EIndex = FindEdge(Vertex.Edges[i]);
 			uint EndVertIndex = FindVertex(To(Vertex.Edges[i]));
-			if (Edges[EdgeIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
+			if (Edges[EIndex].Image.TopIndex() == long(FoldDepth) && Vertices[EndVertIndex].Flag)
 			{
 				Bad = true;
 				break;
@@ -760,7 +760,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 			}
 			else
 			{
-				for (uint k=BadEdge.Image.TopIndex(); k>BadEdge.Image.TopIndex()-FoldDepth+1; k--)
+				for (uint k=static_cast<uint>(BadEdge.Image.TopIndex()); k>static_cast<uint>(BadEdge.Image.TopIndex()-FoldDepth+1); k--)
 					if (Edges[FindEdge(BadEdge.Image[k])].Type == Main) CanReduce = true;
 			}
 			if (CanReduce)
@@ -795,7 +795,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 			}
 			else
 			{
-				while (Edges[FindEdge(CurrentEdge.Image[Guard-Place+1])].Type != Main)
+				while (Edges[FindEdge(CurrentEdge.Image[static_cast<uint>(Guard-Place+1)])].Type != Main)
 					Place++;
 			}
 			if (long(Place) >= Guard) 
@@ -809,7 +809,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 		{
 			while (BadEdge.Image.TopIndex() == 1)
 			{
-				::std::list<int> CurrentEdgePath(1, BadEdge.Image[1]);
+				::std::list<int> CurrentEdgePath(1, static_cast<int>(BadEdge.Image[1]));
 				bool done = false;
 				while(!done)
 				{
@@ -818,7 +818,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 					{
 						if (*I>0) NewEdgePath.insert(NewEdgePath.end(), Edges[FindEdge(*I)].Image.p.begin(), Edges[FindEdge(*I)].Image.p.end());
 						else for (::std::vector<long>::reverse_iterator J = Edges[FindEdge(*I)].Image.p.rbegin(); J != Edges[FindEdge(*I)].Image.p.rend(); ++J)
-							NewEdgePath.insert(NewEdgePath.end(), -(*J));
+							NewEdgePath.insert(NewEdgePath.end(), static_cast<int>(-(*J)));
 					}
 					for (::std::list<int>::iterator I = NewEdgePath.begin(); I != NewEdgePath.end(); ++I)
 					{
@@ -835,7 +835,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 							}
 							else
 							{
-								while (Edges[FindEdge(CurrentEdge.Image[Guard-Place+1])].Type != Main)
+								while (Edges[FindEdge(CurrentEdge.Image[static_cast<uint>(Guard-Place+1)])].Type != Main)
 									Place++;
 							}
 							if (long(Place) < Guard)
@@ -881,8 +881,8 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 	if (Vertex.Edges[Edge1Posn]<0) FinalImage.Invert();
 	//Create new edge and vertex
 	long NewEdgeIndex = Edges.TopIndex()+1;
-	uint NewVertexIndex = Vertices.TopIndex()+1;
-	edge& NewEdge = Edges[NewEdgeIndex];
+	uint NewVertexIndex = static_cast<uint>(Vertices.TopIndex()+1);
+	edge& NewEdge = Edges[static_cast<uint>(NewEdgeIndex)];
 	vertex& NewVertex = Vertices[NewVertexIndex];
 	NewEdge.Label = NextEdgeLabel++;
 	NewVertex.Label = NextVertexLabel++;
@@ -925,7 +925,7 @@ void graph::CarefulFoldAsMuchAsPossible(long Label1, long Label2)
 	Vertex.Edges = NewEdgesRound;
 	//Edges mapping over each of edges to be folded have image changed and set images of edges round new vertex
 	NewEdge.Image = FinalImage;
-	NewVertex.Image = To(FinalImage[FinalImage.TopIndex()]);
+	NewVertex.Image = To(FinalImage[static_cast<uint>(FinalImage.TopIndex())]);
 	intarray L, M; //M keeps track of labels to be flushed
 	L[1] = NewEdge.Label;
 	intiterator I(NewVertex.Edges);

@@ -23,7 +23,7 @@ char TopicIn[50];
 
 bool PAK()
 {
-	char p;
+	int p;
 	cout << "Enter 'q' to leave help, or press RETURN to continue... ";
 	p = cin.get();
 	if (p=='q' || p=='Q')

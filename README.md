@@ -6,12 +6,11 @@
 
 The easiest way to use *braidlab* is to download [one of the binaries][4] for Linux, Mac OSX, or Windows.  Unzip/untar the file and add the resulting folder to your Matlab path.  The archive is self-contained: it bundles the documentation PDF, testsuite, examples, and the [Variable Precision Integers][11] toolbox.
 
-Two binary flavors are produced for each platform:
+The GMP library (arbitrary precision arithmetic) is built into the MEX files that use it, so no GMP install is required on your system.
 
-- **default** — GMP runtime libraries (arbitrary precision arithmetic) are bundled inside the archive.  No GMP install is required on your system.
-- **`_no-gmp`** — GMP is compiled out, for environments where GMP cannot be used.  Other functionality is unaffected.
+Packages are built for Linux (x86-64), macOS (Apple silicon and Intel), and Windows (x86-64).  Each package works with the Matlab release in its name and all later releases, on the operating systems that release supports: Linux with glibc 2.28 or newer (for example RHEL 8, Debian 11, Ubuntu 20.04, or later), macOS 13 or later, and Windows 10 or 11.
 
-To compile from source, you can use either the legacy Makefile build (`make`) or the CMake build:
+To compile from source, you can use either the legacy Makefile build (`make install`, which compiles the MEX files and puts them into `+braidlab`; a plain `make` only compiles them into `build/`) or the CMake build:
 ```
 cmake -S . -B build
 cmake --build build -j

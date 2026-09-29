@@ -8,6 +8,7 @@
 #include <list>
 
 #include "newarray.h"
+#include "types.h"
 #include "edgevert.h"
 #include "braid.h"
 #include "Matrix.h"
@@ -28,7 +29,7 @@ enum matrixformat {raw, maple, latex};
 
 struct singularity
 {
-	singularity(int prongs_, ::std::list<long> location_, bool interior_) : prongs(prongs_), location(location_), interior(interior_) {};
+	singularity(int prongs_, ::std::list<long> location_, bool interior_) : prongs(prongs_), location(location_), interior(interior_) {}
 	int prongs;
 	::std::list<long> location;
 	bool interior;
@@ -56,7 +57,7 @@ struct vertexGateInformation
 
 struct cuspCounter
 {
-	cuspCounter(long nextEdge_=0, int cusps_=0) : nextEdge(nextEdge_), cusps(cusps_), considered(false) {};
+	cuspCounter(long nextEdge_=0, int cusps_=0) : nextEdge(nextEdge_), cusps(cusps_), considered(false) {}
 	long nextEdge; //Following this edge on the right, what is next edge we come to?
 	int cusps; //And how many cusps to get there?
 	bool considered;
@@ -122,8 +123,8 @@ class graph {
 public:
 	//Data Members
 	uint Punctures; // Number of punctures
-	long NextEdgeLabel; // Next edge label
-	uint NextVertexLabel;
+	EdgeLabel NextEdgeLabel; // Next edge label
+	VertexLabel NextVertexLabel;
 	edgelist Edges;
 	vertexlist Vertices;
 	turnlist Turns;     //Also holds infinitesimal edges when have efficient graph map
@@ -141,29 +142,29 @@ public:
 	::std::vector< ::std::string> Messages;
 #endif
 	//Utilities
-	uint FindEdge(long Label);  // Returns index of edge with given label, 0 if not found
-	uint FindVertex(uint Label);
-	void Replace(long Label, intarray& L); //Replaces occurences of Label or -Label in edge images
-	void LoopReplace(long Label, intarray& L); //Does the same in loops
-	void RemoveAll(long Label); // Calls array.RemoveAll on each edge image
-	void LoopRemoveAll(long Label); //Calls array.RemoveAll on each loop
+	EdgeIndex FindEdge(EdgeLabel Label);  // Returns index of edge with given label, 0 if not found
+	VertexIndex FindVertex(VertexLabel Label);
+	void Replace(EdgeLabel Label, intarray& L); //Replaces occurences of Label or -Label in edge images
+	void LoopReplace(EdgeLabel Label, intarray& L); //Does the same in loops
+	void RemoveAll(EdgeLabel Label); // Calls array.RemoveAll on each edge image
+	void LoopRemoveAll(EdgeLabel Label); //Calls array.RemoveAll on each loop
 	bool Tighten(); //Calls Tighten on each edge image. true if some edge tightened
 	void Flush(); //Flushes edge and vertex lists, and resets label counters
-	long Derivative(long Label); // Returns Dg(Label). Returns 0 if edge has null image
-	long Derivative(long Label, uint n); // Returns Dg^n(Label). Returns 0 if some edge has null image
-	long AltDerivative(long Label, uint n=1); // Returns first of Labels image which is not peripheral, repeats n times
-	bool IntersectsP(long Label); //Does edge intersect peripheral subgraph
-	bool IntersectsP(uint Index) {return (IntersectsP(Edges[Index].Label));} //INEFFICIENT
-	uint OnP(uint Label); //Returns appropriate puncture if Vertex is on Peripheral subgraph, 0 otherwise
-	uint OnPInd(uint Index); //Same as OnP, but for index not label
-	bool IsPeripheral(long Label); //Is edge peripheral
-	bool IsPeripheral(uint Index) {return (Edges[Index].Type == Peripheral);}
-	uint FromP(long Label) {return OnP(From(Label));}
+	EdgeLabel Derivative(EdgeLabel Label); // Returns Dg(Label). Returns 0 if edge has null image
+	EdgeLabel Derivative(EdgeLabel Label, uint n); // Returns Dg^n(Label). Returns 0 if some edge has null image
+	EdgeLabel AltDerivative(EdgeLabel Label, uint n=1); // Returns first of Labels image which is not peripheral, repeats n times
+	bool IntersectsPLabel(EdgeLabel Label); //Does edge intersect peripheral subgraph
+	bool IntersectsPIndex(EdgeIndex Index) {return (IntersectsPLabel(Edges[Index].Label));} //INEFFICIENT
+	PunctureIndex OnP(VertexLabel Label); //Returns appropriate puncture if Vertex is on Peripheral subgraph, 0 otherwise
+	PunctureIndex OnPInd(VertexIndex Index); //Same as OnP, but for index not label
+	bool IsPeripheralLabel(EdgeLabel Label); //Is edge peripheral
+	bool IsPeripheralIndex(EdgeIndex Index) {return (Edges[Index].Type == Peripheral);}
+	PunctureIndex FromP(EdgeLabel Label) {return OnP(From(Label));}
 	void FindTypes(); //Determines edge types
-	uint NumberEdges() {return Edges.TopIndex();}
-	uint NumberVertices() {return Vertices.TopIndex();}
-	uint From(long Label); //Start vertex of edge
-	uint To(long Label) {return From(-Label);}
+	uint NumberEdges() {return static_cast<uint>(Edges.TopIndex());}
+	uint NumberVertices() {return static_cast<uint>(Vertices.TopIndex());}
+	VertexLabel From(EdgeLabel Label); //Start vertex of edge
+	VertexLabel To(EdgeLabel Label) {return From(-Label);}
 	bool IsProperSubForest(bool* Inset, uint n); //Checks if edge indices in Inset[n+1] form proper subforest
 	bool RetractsOntoP(bool* Inset, uint n); //Checks if edge indices in Inset[n+1] form subgraph which deformation retracts onto P.
 	turn FindTurns(); //Computes all turns, and returns one with minimal iterates to identification
@@ -173,30 +174,30 @@ public:
 	bool Collapses(intarray& L); //Returns true if iterating turn germ L gives trivial germ
 	void FindGates(); //Calculates gates and infinitesimal edges if graph is efficient
 	void FindSingularities();
-	bool SingleVertexEmbeddingTighten(uint Index); // if more than half from vertex start same, push along them
-	void VertexEmbeddingTighten(uint Index) {while (SingleVertexEmbeddingTighten(Index));}
+	bool SingleVertexEmbeddingTighten(VertexIndex Index); // if more than half from vertex start same, push along them
+	void VertexEmbeddingTighten(VertexIndex Index) {while (SingleVertexEmbeddingTighten(Index));}
 	void TightenAllVertexEmbeddings() {for (uint i=1; i<=NumberVertices(); ++i) VertexEmbeddingTighten(i);} 
 	//Moves
-	void Split(long Label); // Splits edge given
-	void Collapse(long Label); // Collapses edge given
-	void Push(long Label, uint i);// Pushes i symbols from edge Label to each other edge at vertex
-	void Subdivide(long Label, uint i); // Subdivides edge Label after i symbols
-	void SubdivideHere(long Label, uint i); //Ensures new vertex is at position i in ORIGINAL edge image
-	void SubdivideAllBut(long Label, uint i); //Leaves i edge images after subdivision
-	void ValenceTwoIsotopy(long Label); //Across given edge (which is collapsed)
-	void ValenceTwoIsotopy(uint Label); //At given vertex - chooses correct edge
-	void FoldAsMuchAsPossible(long Label1, long Label2, bool Care = true);// Folds 2 edges and any between as much as possible, avoiding fold up to flagged vertex
-	void CarefulFoldAsMuchAsPossible(long Label1, long Label2); //Avoids problem of eventually only folding preperipheral edges
+	void Split(EdgeLabel Label); // Splits edge given
+	void Collapse(EdgeLabel Label); // Collapses edge given
+	void Push(EdgeLabel Label, uint i);// Pushes i symbols from edge Label to each other edge at vertex
+	void Subdivide(EdgeLabel Label, uint i); // Subdivides edge Label after i symbols
+	void SubdivideHere(EdgeLabel Label, uint i); //Ensures new vertex is at position i in ORIGINAL edge image
+	void SubdivideAllBut(EdgeLabel Label, uint i); //Leaves i edge images after subdivision
+	void ValenceTwoIsotopyEdge(EdgeLabel Label); //Across given edge (which is collapsed)
+	void ValenceTwoIsotopyVertex(VertexLabel Label); //At given vertex - chooses correct edge
+	void FoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2, bool Care = true);// Folds 2 edges and any between as much as possible, avoiding fold up to flagged vertex
+	void CarefulFoldAsMuchAsPossible(EdgeLabel Label1, EdgeLabel Label2); //Avoids problem of eventually only folding preperipheral edges
 	//Graph Setting
 	void IdentityGraph(uint n); //Sets up graph on n punctured disc with identity action
-	void ActOn(long g); //Acts on graph on n punctured disc with braid generator g
-	void VertexImageSwap(uint i, uint j);
+	void ActOn(BraidGenerator g); //Acts on graph on n punctured disc with braid generator g
+	void VertexImageSwap(VertexLabel i, VertexLabel j);
 	bool SanityCheck(); //Returns true if graph is sane
 	void OrientPeripheralEdges(); //Chooses orientation of peripheral edges
 	void AddLoop(const intarray& L, const ::std::string& Label) {loops.push_back(L); looplabels.push_back(Label);}
 public:
 	//Graph Setting
-	graph() : Factor(true), DesireEmbedding(true), UtilityFlag(false) {};
+	graph() : Factor(true), DesireEmbedding(true), UtilityFlag(false) {}
 	graph(braid& B); // Generate graph from braid.
 	void Set(braid& B); //Sets graph from braid.
 	void BoundaryPeripheralSet(braid& B); //Sets graph from braid with boundary a peripheral loop

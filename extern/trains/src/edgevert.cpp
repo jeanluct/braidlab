@@ -9,7 +9,7 @@ namespace trains {
 
 using namespace std;
 
-edgelist::edgelist(uint s, uint d, uint o) : p(new edge[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+edgelist::edgelist(uint s, uint d, uint o) : p(new edge[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 edgelist::~edgelist() {if (next) next->edgelist::~edgelist(); delete [] p;}
@@ -61,14 +61,14 @@ edgelist& edgelist::operator=(edgelist& A)
 	if (this == &A) return *this;                        
 	Flush();
 	MaxAssigned = -1;                                      
-	for (int i=0; i<=A.MaxAssigned; i++) Element(i) = A.Element(i);
+	for (long i=0; i<=A.MaxAssigned; i++) Element(static_cast<uint>(i)) = A.Element(static_cast<uint>(i));
 	return *this;
 }
 
 
 long edgelist::Find(edge& Value)                                               
 {
-	for (int i=0; i<=MaxAssigned; i++) if (Element(i) == Value) return (i+origin);  
+	for (long i=0; i<=MaxAssigned; i++) if (Element(static_cast<uint>(i)) == Value) return (i+origin);  
 	return -1;
 }                                                                                    
 
@@ -142,7 +142,7 @@ void edgelist::Rotate(long Angle)
 
 void edgelist::Insert(uint i, edge& Value)
 {
-	for (uint j = TopIndex()+1; j>i; j--) (*this)[j] = (*this)[j-1];
+	for (uint j = static_cast<uint>(TopIndex()+1); j>i; j--) (*this)[j] = (*this)[j-1];
 	(*this)[i] = Value;
 }
 
@@ -176,7 +176,7 @@ uint edgelist::AgreesTo(edgelist& A)
 }
 
 
-edgeiterator::edgeiterator(edgelist& A) : Index(0), Array(&A) {};
+edgeiterator::edgeiterator(edgelist& A) : Index(0), Array(&A) {}
 
 edge& edgeiterator::Now() {return Array->Element(Index);}
 
@@ -205,7 +205,7 @@ void edgeiterator::Reset()
 }
 
 
-vertexlist::vertexlist(uint s, uint d, uint o) : p(new vertex[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {};
+vertexlist::vertexlist(uint s, uint d, uint o) : p(new vertex[s]), next(NULL), size(s), delta(d), origin(o), MaxAssigned(-1) {}
 
 
 vertexlist::~vertexlist() {if (next) next->vertexlist::~vertexlist(); delete [] p;}
@@ -256,14 +256,14 @@ vertexlist& vertexlist::operator=(vertexlist& A)
 	if (this == &A) return *this;
 	Flush();
 	MaxAssigned = -1;
-	for (int i=0; i<=A.MaxAssigned; i++) Element(i) = A.Element(i);
+	for (long i=0; i<=A.MaxAssigned; i++) Element(static_cast<uint>(i)) = A.Element(static_cast<uint>(i));
 	return *this;
 }
 
 
 long vertexlist::Find(vertex& Value)
 {
-	for (int i=0; i<=MaxAssigned; i++) if (Element(i) == Value) return (i+origin);
+	for (long i=0; i<=MaxAssigned; i++) if (Element(static_cast<uint>(i)) == Value) return (i+origin);
 	return -1;
 }
 
@@ -337,7 +337,7 @@ void vertexlist::Rotate(long Angle)
 
 void vertexlist::Insert(uint i, vertex& Value)
 {
-	for (uint j = TopIndex()+1; j>i; j--) (*this)[j] = (*this)[j-1];
+	for (uint j = static_cast<uint>(TopIndex()+1); j>i; j--) (*this)[j] = (*this)[j-1];
 	(*this)[i] = Value;
 }
 
@@ -370,7 +370,7 @@ uint vertexlist::AgreesTo(vertexlist& A)
 }
 
 
-vertexiterator::vertexiterator(vertexlist& A) : Index(0), Array(&A) {};
+vertexiterator::vertexiterator(vertexlist& A) : Index(0), Array(&A) {}
 
 vertex& vertexiterator::Now() {return Array->Element(Index);}
 
@@ -403,7 +403,7 @@ void vertexiterator::Reset()
 
 static const char* EdgeType[] = {"Main", "Peripheral", "Pre-peripheral"};
 
-void edge::Set(long label, edgetype type, uint start, uint end, intarray& image, uint puncture)
+void edge::Set(EdgeLabel label, edgetype type, VertexLabel start, VertexLabel end, intarray& image, PunctureIndex puncture)
 {
 	Label = label;
 	Type = type;
@@ -447,7 +447,7 @@ ostream& operator<<(ostream& Out, edge E)
 
 
 //Vertex Class
-void vertex::Set(uint label, intarray& edges, uint image)
+void vertex::Set(VertexLabel label, intarray& edges, VertexLabel image)
 {
 	Label = label;
 	Image = image;

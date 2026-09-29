@@ -24,22 +24,22 @@ TTT::TTT(graph& G)
 	long CurrentEdge = (u==uint(E.TopIndex())) ? E[1] : E[u+1];
 	long EndEdge = -CurrentEdge;
 	//add this edge to key for edge 1, and add 1 to Type
-	Type.push_back(NewEdge);
-	(Key[NewEdge]).push_back(int(CurrentEdge));
+	Type.push_back(static_cast<int>(NewEdge));
+	(Key[static_cast<int>(NewEdge)]).push_back(static_cast<int>(CurrentEdge));
 	//mark edge as seen
-	G.Edges[G.FindEdge(CurrentEdge)].Key = NewEdge;
+	G.Edges[G.FindEdge(CurrentEdge)].Key = static_cast<int>(NewEdge);
 	//Now move around graph...
 	do {
 		CurrentEdge = -CurrentEdge;
 		CurrentVertex = G.From(CurrentEdge);
 		if (G.OnP(CurrentVertex) == G.Punctures) Type.push_back(-1);
 		intarray& F = (G.Vertices[G.FindVertex(CurrentVertex)]).Edges;
-		int i = F.TopIndex(); //Number of edges at vertex.
+		int i = static_cast<int>(F.TopIndex()); //Number of edges at vertex.
 		if (G.OnP(CurrentVertex)>0) i-=2; //Ignore peripheral edges
 		u = uint(F.Find(CurrentEdge));
 		do {
 			u++; if (long(u)>F.TopIndex()) u=1;
-		} while (G.IsPeripheral(F[u]));
+		} while (G.IsPeripheralLabel(F[u]));
 		CurrentEdge = F[u];
 		if (i!=2) // start new edge
 		{
@@ -47,9 +47,9 @@ TTT::TTT(graph& G)
 			if (G.Edges[v].Key == 0) //edge not seen before
 			{
 				NewEdge++;
-				Type.push_back(NewEdge);
-				(Key[NewEdge]).push_back(int(CurrentEdge));
-				G.Edges[v].Key = NewEdge;
+				Type.push_back(static_cast<int>(NewEdge));
+				(Key[static_cast<int>(NewEdge)]).push_back(static_cast<int>(CurrentEdge));
+				G.Edges[v].Key = static_cast<int>(NewEdge);
 			}
 			else //edge seen before
 			{
@@ -61,15 +61,15 @@ TTT::TTT(graph& G)
 			int& K=G.Edges[G.FindEdge(CurrentEdge)].Key;
 			if (K==0)
 			{
-				(Key[NewEdge]).push_back(int(CurrentEdge));
-				K = NewEdge;
+				(Key[static_cast<int>(NewEdge)]).push_back(static_cast<int>(CurrentEdge));
+				K = static_cast<int>(NewEdge);
 			}
 		}
 
 	} while (CurrentEdge != EndEdge);
 
 
-	NumEdges = NewEdge;
+	NumEdges = static_cast<int>(NewEdge);
 
 	//Now work out images of TTT edges
 
@@ -83,7 +83,7 @@ TTT::TTT(graph& G)
 		for (iter = Key[i].begin(); iter != Key[i].end(); iter++)    // Loop over old edges in new edge
 		{
 			long Label = long (*iter);
-			intarray E = G.Edges[G.FindEdge(Label)].Image;
+			intarray edgeImage = G.Edges[G.FindEdge(Label)].Image;
 			int Start, Inc;
 			if (Label>0) //traverse forward
 			{
@@ -91,18 +91,19 @@ TTT::TTT(graph& G)
 			}
 			else
 			{
-				Start = E.TopIndex(); Inc=-1;
+				Start = static_cast<int>(edgeImage.TopIndex()); Inc=-1;
 			}
-			for (int j=Start; j<=E.TopIndex() && j>=1; j+=Inc)
+			for (int j=Start; j<=edgeImage.TopIndex() && j>=1; j+=Inc)
 			{
-				int K = G.Edges[G.FindEdge(E[j])].Key;
+				const long currentImageEdge = edgeImage[static_cast<uint>(j)];
+				int K = G.Edges[G.FindEdge(currentImageEdge)].Key;
 				long Test = (Label>0) ? -LastEdge : LastEdge;
-				if (K>0 && (K != NowEdge || E[j] == Test))
+				if (K>0 && (K != NowEdge || currentImageEdge == Test))
 				{
 					NowEdge = K;
 					(*iteriter).push_back(K);
 				}
-				if (K>0) LastEdge = (Label>0) ? E[j] : -E[j];
+				if (K>0) LastEdge = (Label>0) ? currentImageEdge : -currentImageEdge;
 			}
 		}
 		iteriter++;

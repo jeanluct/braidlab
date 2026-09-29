@@ -17,7 +17,14 @@ ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
-CPPFLAGS = -Wall -O -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
+CPPFLAGS = -Wall -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
+# Use make DEBUG=1 to compile with debug info.
+ifeq ($(DEBUG),1)
+	CPPFLAGS += -g
+else
+	# Only optimize when the DEBUG flat is unset.
+	CPPFLAGS += -O
+endif
 LIBFLAGS = -lcbraid $(LIBFLAGS_CLN)
 MAKEDEPFLAGS = -M
 
