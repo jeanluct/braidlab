@@ -11,6 +11,14 @@
   before and after on a corpus of 216 braids.  The upstream build is now
   CMake-based; braidlab still compiles the library sources directly.
 
+* Update the bundled `cbraid` library (`extern/cbraid`) to upstream
+  `891fcaf`.  This fixes cbraid issue #3: the ultra summit set and
+  conjugacy code could read past the end of a braid's normal form when
+  it is a power of Delta (undefined behavior, which could crash Matlab).
+  It also fixes a memory leak.  `conjtest` gets regression tests for
+  powers of Delta, and for a braid on which an intermediate upstream
+  version of the fix hung.
+
 * Binary packages: fix several portability problems in the 3.4 packages,
   found by inspecting what the shipped binaries require (see
   `devel/plans/plan-toolchain-portability.md`):
@@ -25,6 +33,9 @@
     (RHEL 8, Debian 11, Ubuntu 20.04, ...).  The archive name changes from
     `linux-ubuntu-22.04` to `linux-glibc2.28`.
   - macOS and Windows release assets are no longer zipped twice.
+  - The `_no-gmp` packages are no longer provided: with GMP built into
+    the MEX files, the default packages need no GMP installed.  Building
+    from source without GMP (`-DBRAIDLAB_GMP_LINKAGE=off`) still works.
 
 * Build system: GMP is now linked statically into the MEX files
   (`BRAIDLAB_GMP_LINKAGE=static`, GMP used under the GPLv3 option of its

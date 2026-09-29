@@ -232,5 +232,35 @@ classdef cfbraidTest < matlab.unittest.TestCase
       testCase.verifyFalse(isconj);
     end
 
+    function test_conjtest_deltapowers(testCase)
+      % Powers of Delta have normal forms with no factors besides Delta,
+      % which cbraid's ultra summit set code once dereferenced out of
+      % range (cbraid issue #3).
+      for n = 3:6
+        D = braidlab.braid('halftwist', n);
+        D2 = braidlab.braid('fulltwist', n);
+        h = braidlab.braid(1:n-1, n);
+        testCase.verifyTrue(conjtest(D, D));
+        testCase.verifyTrue(conjtest(D2, D2));
+        [isconj, C] = conjtest(D, h * D * h.inv);
+        testCase.verifyTrue(isconj);
+        testCase.verifyTrue(inv(C) * D * C == h * D * h.inv);
+        testCase.verifyFalse(conjtest(D2, D));
+      end
+    end
+
+    function test_conjtest_deltasquared_factor(testCase)
+      % AreConjugate hung on this braid (s2 s4 s3^-1 Delta^2) in cbraid
+      % versions between its issue #3 fix and PR #11.
+      B = braidlab.braid([2 4 -3], 5) * braidlab.braid('fulltwist', 5);
+      [isconj, C] = conjtest(B, B);
+      testCase.verifyTrue(isconj);
+      testCase.verifyTrue(inv(C) * B * C == B);
+      g = braidlab.braid([1 -2 3 2 -1 4], 5);
+      [isconj, C] = conjtest(B, g * B * g.inv);
+      testCase.verifyTrue(isconj);
+      testCase.verifyTrue(inv(C) * B * C == g * B * g.inv);
+    end
+
   end
 end

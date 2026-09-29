@@ -6,7 +6,7 @@ Status: all steps are implemented and verified.  Every package job passes
 on the branch (run 36439748460).  The release-publishing job was tested
 with a throwaway tag (run 36445391102): it created a draft release with
 all 8 archives and a matching `SHA256SUMS`, and no archive is
-double-zipped.  The test release and tag were then deleted.  Target release: **3.4.2**, with
+double-zipped.  The test release and tag were then deleted.  Target release: **3.4.1**, with
 rebuilt packages for all platforms, including Intel macOS.
 
 ## Results (measured on the branch's packages)
@@ -266,6 +266,6 @@ libraries.
 
 - Build release floor: R2024b.
 - Ship Intel macOS packages.
-- Publish the result as braidlab 3.4.2.
+- Publish the result as braidlab 3.4.1.
 - Fix F6 by publishing release assets from CI (D).
 - Self-checking builds (C): deferred until the rest is done.

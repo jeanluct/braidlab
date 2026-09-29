@@ -59,6 +59,20 @@ sint16  CL(ArtinBraid B)
 }
 
 
+ArtinFactor FirstFactorInLCF(ArtinBraid B)
+{
+  sint16 n=B.Index();
+
+  if (CL(B)>0)
+    return *B.FactorList.begin();
+
+  if (B.LeftDelta>0)
+    return ArtinFactor(n,1);
+
+  return ArtinFactor(n,0);
+}
+
+
 ///////////////////////////////////////////////////////
 //
 //  Sup(B)  computes the supremun of a braid B,
@@ -949,7 +963,7 @@ ArtinBraid SendToUSS(ArtinBraid B, ArtinBraid & C)
 
   while((*it)!=D)
     {
-      C=C*((*(*it).FactorList.begin()).Flip(B2.LeftDelta));
+      C=C*(FirstFactorInLCF(*it).Flip(B2.LeftDelta));
       it++;
     }
 
@@ -973,8 +987,8 @@ ArtinBraid SendToUSS(ArtinBraid B, ArtinBraid & C)
 ArtinFactor Transport(ArtinBraid B, ArtinFactor F)
 {
   ArtinBraid B2=((!ArtinBraid(F))*B*F).MakeLCF();
-  ArtinBraid B3=((!ArtinBraid(*B.FactorList.begin()))*F*(*B2.FactorList.begin())).MakeLCF();
-  return *B3.FactorList.begin();
+  ArtinBraid B3=((!ArtinBraid(FirstFactorInLCF(B)))*F*FirstFactorInLCF(B2)).MakeLCF();
+  return FirstFactorInLCF(B3);
 }
 
 
@@ -997,11 +1011,11 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
   sint16 i, N=1;
   ArtinFactor F1=F;
 
-  C1=ArtinBraid((*B1.FactorList.begin()).Flip(B1.LeftDelta));
+  C1=ArtinBraid(FirstFactorInLCF(B1).Flip(B1.LeftDelta));
   B1=Cycling(B1);
   while(B1!=B)
     {
-      C1.RightMultiply((*B1.FactorList.begin()).Flip(B1.LeftDelta));
+      C1.RightMultiply(FirstFactorInLCF(B1).Flip(B1.LeftDelta));
       B1=Cycling(B1);
       N++;
     }
@@ -1016,18 +1030,13 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
 
       for(i=0; i<N; i++)
 	{
-	  C2.RightMultiply((*B1.FactorList.begin()).Flip(B1.LeftDelta));
+	  C2.RightMultiply(FirstFactorInLCF(B1).Flip(B1.LeftDelta));
 	  B1=Cycling(B1);
 	}
 
       ArtinBraid B2=((!C1)*F1*C2).MakeLCF();
 
-      if (B2.LeftDelta==1)
-	F1=ArtinFactor(n,1);
-      else if (B2.CompareWithIdentity())
-	F1=ArtinFactor(n,0);
-      else
-	F1=*B2.FactorList.begin();
+      F1=FirstFactorInLCF(B2);
 
       it=find(ret.begin(), ret.end(),F1);
 
@@ -1049,7 +1058,7 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
 
 ArtinFactor Pullback(ArtinBraid B, ArtinFactor F)
 {
-  ArtinFactor F1=(*B.FactorList.begin());
+  ArtinFactor F1=FirstFactorInLCF(B);
   F1=F1.Flip(B.LeftDelta+1);
   ArtinFactor F2=F;
   F2=F2.Flip();
@@ -1063,12 +1072,7 @@ ArtinFactor Pullback(ArtinBraid B, ArtinFactor F)
 
   ArtinFactor b0=ArtinFactor(B.Index());
 
-  if (B2.LeftDelta==1)
-    b0=ArtinFactor(B.Index(),1);
-  else if (B2.CompareWithIdentity())
-    b0=ArtinFactor(B.Index(),0);
-  else
-    b0=*B2.FactorList.begin();
+  b0=FirstFactorInLCF(B2);
 
   ArtinFactor bi=F.Flip(B.LeftDelta);
 
@@ -1418,7 +1422,7 @@ ArtinBraid   TreePath(ArtinBraid B, list<list<ArtinBraid> > & uss, list<ArtinFac
     }
 
   for(itb2=(*it).begin(); itb2!=itb; itb2++)
-    C.RightMultiply((*(*itb2).FactorList.begin()).Flip(B.LeftDelta));
+    C.RightMultiply(FirstFactorInLCF(*itb2).Flip(B.LeftDelta));
 
   while(current!=1)
     {
@@ -1481,7 +1485,7 @@ bool AreConjugate(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
 	{
 	  if(*itb==BT2)
 	    break;
-	  D2=D2*((*(*itb).FactorList.begin()).Flip((*itb).LeftDelta));
+	  D2=D2*(FirstFactorInLCF(*itb).Flip((*itb).LeftDelta));
 	}
       if(itb!=(*it).end())
 	break;
@@ -1566,7 +1570,7 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
       D=TreePath(*(*it).begin(),uss,mins,prev);
       C=D;
       for(itb=(*it).begin(); itb!=(*it).end(); itb++)
-	C=C*((*(*itb).FactorList.begin()).Flip(B.LeftDelta));
+	C=C*(FirstFactorInLCF(*itb).Flip(B.LeftDelta));
       C=C*(!D);
       C.MakeLCF();
 
@@ -2190,6 +2194,8 @@ void PrintUSS(list<list<ArtinBraid> > &  uss, list<sint16> word, sint16 n,
 	}
       f << endl << endl << endl;
     }
+
+  delete[] sizes;
 }
 
 
@@ -2768,7 +2774,7 @@ while (it==ret.end())
 return *it;
 }
 
-// María Cumplido Cabello
+// Marï¿½a Cumplido Cabello
 
 
 /////////////////////////////////////////////////////////////

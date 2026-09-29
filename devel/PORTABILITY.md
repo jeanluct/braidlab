@@ -11,7 +11,7 @@ Companion documents:
 - `devel/CI-WORKFLOW.md` — operational use of the workflow.
 - `devel/RELEASE-CONFIG.md` — what is pinned and how to override it.
 
-## Update (3.4.2): current policy and corrections
+## Update (3.4.1): current policy and corrections
 
 This document was written for 3.4, when the packages bundled GMP shared
 libraries.  Inspecting the shipped 3.4 binaries later showed that several
@@ -31,7 +31,9 @@ of its conclusions did not hold.  Details and evidence are in
   the GPLv3, and static linking only requires that the source be
   available.  The LGPL static-linking concern in "Dimension 2" below
   applies to proprietary programs.  GMP's license texts ship in
-  `extern/gmp/`.
+  `extern/gmp/`.  Because the default packages no longer need GMP
+  installed, the `no-gmp` package flavor recommended below is no longer
+  shipped; a CI job still checks the GMP-off build.
 - **Toolchain.**  It is pinned to the compilers MathWorks supports for
   the build release (runner images, Xcode, Visual Studio, CMake, the
   manylinux image and gcc-toolset).  So the build only changes when it is

@@ -36,7 +36,14 @@ ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
-CPPFLAGS = -Wall -O -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
+CPPFLAGS = -Wall -fPIC -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
+# Use make DEBUG=1 to compile with debug info.
+ifeq ($(DEBUG),1)
+	CPPFLAGS += -g
+else
+	# Only optimize when the DEBUG flat is unset.
+	CPPFLAGS += -O
+endif
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
 ARFLAGS = rcs
 CXX ?= g++
