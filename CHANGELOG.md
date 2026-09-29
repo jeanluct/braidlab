@@ -1,9 +1,6 @@
 # Change Log
 
 
-## [Unreleased][unreleased]
-
-
 ## [3.4.1] - 2026-09-29
 
 * Update the bundled `trains` library (`extern/trains`) to upstream
@@ -531,7 +528,6 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.4.1...develop
 [3.4.1]: https://github.com/jeanluct/braidlab/compare/release-3.4...release-3.4.1
 [3.4]: https://github.com/jeanluct/braidlab/compare/release-3.3...release-3.4
 [3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
