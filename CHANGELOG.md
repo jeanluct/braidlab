@@ -3,6 +3,9 @@
 
 ## [Unreleased][unreleased]
 
+
+## [3.4.1] - 2026-09-29
+
 * Update the bundled `trains` library (`extern/trains`) to upstream
   `b51ff82`.  This fixes undefined behavior from uninitialized edge and
   vertex data inside the train-track code used by `train` and
@@ -528,7 +531,8 @@ Several improvements to the method braid.entropy:
 First release of braidlab.
 
 
-[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.4...develop
+[unreleased]: https://github.com/jeanluct/braidlab/compare/release-3.4.1...develop
+[3.4.1]: https://github.com/jeanluct/braidlab/compare/release-3.4...release-3.4.1
 [3.4]: https://github.com/jeanluct/braidlab/compare/release-3.3...release-3.4
 [3.3]: https://github.com/jeanluct/braidlab/compare/release-3.2.6...release-3.3
 [3.2.6]: https://github.com/jeanluct/braidlab/compare/release-3.2.5...release-3.2.6
